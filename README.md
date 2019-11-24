@@ -14,6 +14,8 @@ Immediate goals of *securitas* are:
 * Allow group administrators to add/remove members from groups for which they
   are responsible.
 
+<img src="https://images.elrod.me/securitas-screenshot.png">
+
 ## Setup tips
 
 * Use relrod's [containerdev](https://github.com/relrod/containerdev) project for development. (Or don't, but at least follow the steps in the Dockerfile to set up your own environment.)
