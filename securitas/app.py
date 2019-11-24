@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, make_response, session
+import python_freeipa
 
-from securitas.ipa import maybe_ipa_admin_session, maybe_ipa_login, maybe_ipa_session
+from securitas.ipa import maybe_ipa_admin_session, maybe_ipa_login, maybe_ipa_session, untouched_ipa_client
 
 app = Flask(__name__)
 app.config.from_envvar('SECURITAS_CONFIG_PATH')
@@ -46,6 +47,49 @@ def login():
         return redirect(url_for('user', username=username))
     flash('Could not log in to the IPA server.', 'red')
     return redirect(url_for('root'))
+
+@app.route('/password-reset', methods=['GET', 'POST'])
+def password_reset():
+    if request.method == 'GET':
+        return render_template('password-reset.html')
+
+    username = request.form.get('username')
+    current_password = request.form.get('current_password')
+    password = request.form.get('password')
+    password_confirm = request.form.get('password_confirm')
+
+    if not all([username, current_password, password, password_confirm]):
+        flash('Please fill in all fields to reset your password', 'red')
+        return redirect(url_for('password_reset'))
+
+    if password != password_confirm:
+        flash('Password and confirmation did not match.', 'red')
+        return redirect(url_for('password_reset'))
+
+    ipa = untouched_ipa_client(app)
+    res = None
+    try:
+        res = ipa.change_password(username, password, current_password)
+    except python_freeipa.exceptions.PWChangePolicyError as e:
+        flash(
+            'Failed to reset your password (policy error): %s' % str(e.policy_error),
+            'red')
+        return redirect(url_for('password_reset'))
+    except python_freeipa.exceptions.PWChangeInvalidPassword as e:
+        flash(
+            'Failed to reset your password (invalid current password).',
+            'red')
+        return redirect(url_for('password_reset'))
+    except python_freeipa.exceptions.FreeIPAError as e:
+        flash('Failed to reset your password: %s' % str(e), 'red')
+        return redirect(url_for('password_reset'))
+
+    if res and res.ok:
+        flash('Your password has been changed, ' \
+              'please try to log in with the new one now.',
+              'green')
+        return redirect(url_for('root'))
+
 
 @app.route('/register', methods=['POST'])
 def register():

@@ -3,6 +3,14 @@ import python_freeipa
 from python_freeipa import Client
 from flask import flash, session
 
+# Construct an IPA client from app config, but don't attempt to log in with it
+# or to form a session of any kind with it. This is useful for one-off cases
+# like password resets where a session isn't actually required.
+def untouched_ipa_client(app):
+    return Client(
+        app.config['FREEIPA_SERVER'],
+        verify_ssl=app.config['FREEIPA_CACERT'])
+
 # Attempt to obtain an IPA session from a cookie.
 #
 # If we are given a token as a cookie in the request, decrypt it and see if we
