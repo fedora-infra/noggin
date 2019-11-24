@@ -3,7 +3,7 @@ class IPAAdmin(object):
         self.__username = app.config['FREEIPA_ADMIN_USER']
         self.__password = app.config['FREEIPA_ADMIN_PASSWORD']
         app.config['FREEIPA_ADMIN_USER'] = '***'
-        app.config['FREEIPA_ADMIN_PASSWORD'] = '***'
+        app.config['FREEIPA_ADMIN_PASSWORD'] = '***' # nosec
         self.__app = app
 
     # Attempt to obtain an administrative IPA session
