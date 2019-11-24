@@ -23,3 +23,15 @@ Immediate goals of *securitas* are:
 * Run `containerdev-build && containerdev`
 * From inside the container shell, run `flask run -h0`
 * In your local browser go to localhost:5000
+
+
+## Contribution guidelines
+
+* Simplicity above all. Keep the code simple enough that it can be easily reviewed for security concerns.
+* Prettiness above pep-8/similar. I'm not too interested in patches that only change code style.
+  Most of the code was written in the style it was for a reason. Contributions which don't follow
+  the style of neighboring code won't be accepted until they do.
+* Handle every possible case, and do so where it makes sense. Example: It's important to handle issues from
+  talking to the IPA server, but show flashes in the Flask code, not the proxy/client code.
+* Once this project becomes "real", code that touches security-critical paths must be signed off by TWO people.
+  People who sign off are agreeing to have reviewed the code thoroughly and thought about edge cases.
