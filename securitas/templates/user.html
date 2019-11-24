@@ -1,0 +1,70 @@
+{% extends "with_navbar.html" %}
+
+{# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
+
+{% block title %}User: codeblock{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  {{ css("user") }}
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  <div class="container section">
+
+    <div class="row">
+      <div class="col s12">
+        <h3 class="header light-blue-text text-darken-4 fw300">{{ user['displayname'][0] }}</h3>
+        <div class="card horizontal">
+          <div class="card-image">
+            <img src="https://www.gravatar.com/avatar/87d9ad0608173b406b4816cf0cc95f72?s=200">
+          </div>
+          <div class="card-stacked">
+            <div class="card-content">
+              <p>
+                Perhaps this is a short bio blurb where I talk about how awesome I am.
+                Maybe I mention things like working on solving the AAA problem for Fedora.
+                Or maybe we don't store any bios because they'd require more schema extensions
+                and could be probably be abused for spam purposes.
+              </p>
+            </div>
+            <div class="card-action right-align">
+              <a class="light-blue-text text-darken-4" href="https://fedoraproject.org/wiki/User:codeblock">Wiki</a>
+              <a class="light-blue-text text-darken-4" href="https://codeblock.fedorapeople.org/">People</a>
+              <a class="light-blue-text text-darken-4" href="https://pagure.io/codeblock">Pagure</a>
+              <a class="light-blue-text text-darken-4" href="https://github.com/relrod">GitHub</a>
+            </div>
+          </div>
+        </div> <!-- ./card -->
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col m6 s12">
+        <h4 class="header fw300">Groups</h4>
+        <ul class="collection">
+          {% for group in user['memberof_group'] %}
+            {# This will be expensive for users in lots of groups, but I don't know a way around it. #}
+            {% with group_details = ipa.group_show(group) %}
+              <li class="collection-item avatar">
+                <!-- TODO: .red if sponsor/admin -->
+                <i class="material-icons circle">group</i>
+                <a href="/group/{{ group }}">
+                  <span class="title">{{ group }}</span>
+                </a>
+                {% if group_details.get('description') %}
+                  <p>{{ group_details.get('description')[0] }} ({{ group }})</p>
+                {% endif %}
+                {# TODO: sponsor if sponsor #}
+                <p>member</p>
+              {% endwith %}
+            </li>
+          {% endfor %}
+        </ul>
+
+      </div>
+    </div>
+    
+  </div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+
+{# NOTE! Any use of `ipa` in here MUST be checked, as for some handlers it
+   simply won't exist! Use e.g. {{ ipa.foo if ipa is defined and ipa }} #}
+
+{% block content %}
+  <nav>
+    <div class="nav-wrapper light-blue darken-3">
+      <div class="container">
+        <a href="/" class="brand-logo">securitas portal</a>
+        {% if ipa is defined and ipa %}
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li>Logged in as: {{ current_user['result'][0]['uid'][0] if current_user }}</li>
+            <li><a href="/logout">Log Out</a></li>
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  {% with flashes = get_flashed_messages(with_categories=True) %}
+    {% if flashes %}
+      <div class="container">
+        {% for category, flash in flashes %}
+          <div class="card-panel {{ category }} lighten-4 {{ category }}-text text-darken-4">
+            {{ flash|safe }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+{% endblock %}

@@ -1,0 +1,57 @@
+{% macro css(name) %}
+  <link href="{{ url_for('static', filename='css/' + name + '.css') }}" rel="stylesheet" type="text/css">  
+{% endmacro %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    {% block head %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+      <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" type="text/css">
+      <title>{% block title %}Edit me!{% endblock %} - {{ project }}</title>
+    {% endblock %}
+  </head>
+  <body>
+    <main>
+      {% block content %}
+        <h1>Edit me!</h1>
+      {% endblock %}
+    </main>
+
+    {% block footer %}
+      <footer class="page-footer light-blue">
+        <div class="container">
+          <div class="row">
+            <div class="col l6 s12">
+              <h5 class="white-text">Footer Content</h5>
+              <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+            </div>
+            <div class="col l4 offset-l2 s12">
+              <h5 class="white-text">Links</h5>
+              <ul>
+                <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
+                <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
+                <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
+                <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-copyright">
+          <div class="container">
+            &copy; 2019 Red Hat, Inc.
+            <span class="grey-text text-lighten-4 right">{{ ipa._request('ping')['summary'] if ipa is defined and ipa }}</span>
+          </div>
+        </div>
+      </footer>
+    {% endblock %}
+
+    {% block scripts %}
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    {% endblock %}
+  </body>
+</html>
