@@ -22,6 +22,7 @@ def root():
     username = session.get('securitas_username_insecure')
     if ipa and username:
         return redirect(url_for('user', username=username))
+    # Kick any non-authed user back to the login form.
     return render_template('index.html')
 
 @app.route('/logout')
@@ -53,6 +54,9 @@ def login():
     if ipa:
         flash('Welcome, %s!' % username, 'green')
         return redirect(url_for('user', username=username))
+
+    # If we made it here, we hit something weird not caught above. We didn't
+    # bomb out, but we don't have IPA creds, either. Boot us back to /.
     flash('Could not log in to the IPA server.', 'red')
     return redirect(url_for('root'))
 
@@ -98,6 +102,14 @@ def password_reset():
               'green')
         return redirect(url_for('root'))
 
+    # If we made it here, we hit something weird not caught above. We didn't
+    # bomb out, but we don't have a valid/good response from IPA. Boot the user
+    # back to /.
+    flash('Something went wrong and your password might not have been ' \
+          'changed. Please try again, or report the issue to the system ' \
+          'administrator.',
+          'red')
+    return redirect(url_for('root'))
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -106,16 +118,23 @@ def register():
     username = request.form.get('username')
     password = request.form.get('password')
     password_confirm = request.form.get('password_confirm')
+
     if not all([first_name, last_name, username, password, password_confirm]):
         flash('Please fill in all fields to register an account.', 'red')
         return redirect(url_for('root'))
+
     if password != password_confirm:
         flash('Password and confirmation did not match.', 'red')
         return redirect(url_for('root'))
+
     ipa_admin = maybe_ipa_admin_session(app)
+
     if not ipa_admin:
-        flash('Internal error: Could not obtain admin session. Try again later.', 'red')
+        flash('Internal error: Could not obtain admin session. Try again ' \
+              'later.',
+              'red')
         return redirect(url_for('root'))
+
     add = ipa_admin.user_add(
         username,
         first_name,
@@ -123,13 +142,14 @@ def register():
         '%s %s' % (first_name, last_name), # TODO ???
         user_password=password,
         login_shell='/bin/bash')
-    print(add)
+
     flash(
-        'Congratulations, you now have an account! Go ahead and sign in to proceed.',
+        'Congratulations, you now have an account! Go ahead and sign in to ' \
+        'proceed.',
         'green')
-    return redirect(url_for('root'))    
-        
-    
+
+    return redirect(url_for('root'))
+
 @app.route('/user/<username>/')
 def user(username):
     ipa = maybe_ipa_session(app)
