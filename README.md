@@ -17,6 +17,7 @@ Immediate goals of *securitas* are:
 Here is what works so far:
 
 * User pages (seeing information about a user, groups they are in, etc.)
+* Group pages (seeing who all is in a group)
 * Logging in
 * Registering new accounts
 * Resetting current, known (possibly expired) passwords (but not forgotten ones)
