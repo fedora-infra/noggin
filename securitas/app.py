@@ -1,15 +1,18 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, make_response, session
 import python_freeipa
 
-from securitas.ipa import maybe_ipa_admin_session, maybe_ipa_login, maybe_ipa_session, untouched_ipa_client
+from securitas.security.ipa import maybe_ipa_login, maybe_ipa_session, untouched_ipa_client
+from securitas.security.ipa_admin import IPAAdmin
 from securitas.utility import gravatar
 
 app = Flask(__name__)
 app.config.from_envvar('SECURITAS_CONFIG_PATH')
 
+ipa_admin = IPAAdmin(app)
+
 @app.context_processor
 def inject_global_template_vars():
-    ipa = maybe_ipa_session(app)
+    ipa = maybe_ipa_session(app, session)
     # TODO: move project out to config var
     return dict(
         project="The Fedora Project",
@@ -20,7 +23,7 @@ def inject_global_template_vars():
 
 @app.route('/')
 def root():
-    ipa = maybe_ipa_session(app)
+    ipa = maybe_ipa_session(app, session)
     username = session.get('securitas_username_insecure')
     if ipa and username:
         return redirect(url_for('user', username=username))
@@ -29,7 +32,7 @@ def root():
 
 @app.route('/logout')
 def logout():
-    ipa = maybe_ipa_session(app)
+    ipa = maybe_ipa_session(app, session)
     if ipa:
         ipa.logout()
     session.clear()
@@ -45,7 +48,7 @@ def login():
 
     try:
         # This call will set the cookie itself, we don't have to.
-        ipa = maybe_ipa_login(app, username, password)
+        ipa = maybe_ipa_login(app, session, username, password)
     except python_freeipa.exceptions.PasswordExpired as e:
         flash('Password expired. Please reset it.', 'red')
         return redirect(url_for('password_reset'))
@@ -129,21 +132,20 @@ def register():
         flash('Password and confirmation did not match.', 'red')
         return redirect(url_for('root'))
 
-    ipa_admin = maybe_ipa_admin_session(app)
-
-    if not ipa_admin:
-        flash('Internal error: Could not obtain admin session. Try again ' \
-              'later.',
-              'red')
+    try:
+        add = ipa_admin.user_add(
+            username,
+            first_name,
+            last_name,
+            '%s %s' % (first_name, last_name), # TODO ???
+            user_password=password,
+            login_shell='/bin/bash')
+    except FreeIPAError as e:
+        print(e)
+        flash(
+            'An error occurred while creating the account, please try again.',
+            'red')
         return redirect(url_for('root'))
-
-    add = ipa_admin.user_add(
-        username,
-        first_name,
-        last_name,
-        '%s %s' % (first_name, last_name), # TODO ???
-        user_password=password,
-        login_shell='/bin/bash')
 
     flash(
         'Congratulations, you now have an account! Go ahead and sign in to ' \
@@ -154,7 +156,7 @@ def register():
 
 @app.route('/user/<username>/')
 def user(username):
-    ipa = maybe_ipa_session(app)
+    ipa = maybe_ipa_session(app, session)
     if ipa:
         user = ipa.user_show(username)
         return render_template('user.html', user=user)
