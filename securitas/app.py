@@ -40,10 +40,18 @@ def login():
         flash('Please provide both a username and a password.', 'red')
         return redirect(url_for('root'))
 
-    # This call will set the cookie itself, we don't have to.
-    ipa = maybe_ipa_login(app, username, password)
+    try:
+        # This call will set the cookie itself, we don't have to.
+        ipa = maybe_ipa_login(app, username, password)
+    except python_freeipa.exceptions.PasswordExpired as e:
+        flash('Password expired. Please reset it.', 'red')
+        return redirect(url_for('password_reset'))
+    except python_freeipa.exceptions.Unauthorized as e:
+        flash(str(e), 'red')
+        return redirect(url_for('root'))
+
     if ipa:
-        flash('Welcome, %s!' % username)
+        flash('Welcome, %s!' % username, 'green')
         return redirect(url_for('user', username=username))
     flash('Could not log in to the IPA server.', 'red')
     return redirect(url_for('root'))

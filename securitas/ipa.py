@@ -1,7 +1,7 @@
 from cryptography.fernet import Fernet
 import python_freeipa
 from python_freeipa import Client
-from flask import flash, session
+from flask import session
 
 # Construct an IPA client from app config, but don't attempt to log in with it
 # or to form a session of any kind with it. This is useful for one-off cases
@@ -59,29 +59,13 @@ def maybe_ipa_admin_session(app):
 # On a successful login, we will encrypt the session token and put it in the
 # user's session, returning the client handler to the caller.
 #
-# On an unsuccessful login, we'll set a flash and return None.
-#
-# TODO: Add some logging or maybe return something more useful on invalid login.
-#       It will be useful to determine between "can't log in because the server
-#       is broken" vs "can't log in because user gave a bad password"
-#       We do catch and flash on expired password, though.
+# On an unsuccessful login, we'll let the exception bubble up.
 def maybe_ipa_login(app, username, password):
     client = Client(
         app.config['FREEIPA_SERVER'],
         verify_ssl=app.config['FREEIPA_CACERT'])
 
-    auth = None
-
-    try:
-        auth = client.login(username, password)
-    except python_freeipa.exceptions.PasswordExpired as e:
-        flash(
-            'Password expired. Please <a href="/password-reset">reset it</a>.',
-            'red')
-        return None
-    except python_freeipa.exceptions.Unauthorized as e:
-        flash(str(e), 'red')
-        return None
+    auth = client.login(username, password)
 
     if auth and auth.logged_in:
         fernet = Fernet(app.config['FERNET_SECRET'])
