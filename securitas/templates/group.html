@@ -1,0 +1,58 @@
+{% extends "with_navbar.html" %}
+
+{# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
+
+{% block title %}Group: {{ group['cn'][0] }}{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  {{ css("gruop") }}
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  <div class="container section">
+
+    <div class="row">
+      <div class="col s12">
+        <h3 class="header light-blue-text text-darken-4 fw300">{{ group['cn'][0] }}</h3>
+        <div class="card">
+          <div class="card-content">
+            <p>{{ group['description'][0] if group.get('description') }}</p>
+          </div>
+        </div> <!-- ./card -->
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col m6 s12">
+        <h4 class="header fw300">Users</h4>
+        <ul class="collection">
+          {% for user in group['member_user'] %}
+            {# This will be expensive for users in lots of groups, but I don't know a way around it. #}
+            {% with user_details = ipa.user_show(user) %}
+              <li class="collection-item avatar">
+                <!-- TODO: .red if sponsor/admin -->
+                {% if user_details.get('mail') %}
+                  <img src="{{ gravatar(user_details['mail'][0], 200) }}" class="circle">
+                {% else %}
+                  <i class="material-icons circle">person</i>
+                {% endif %}
+                <a href="/user/{{ user_details['uid'][0] }}">
+                  <span class="title">{{ user_details['uid'][0] }}</span>
+                </a>
+                {% if user_details.get('cn') %}
+                  <p>{{ user_details.get('cn')[0] }}</p>
+                {% endif %}
+                {# TODO: sponsor if sponsor #}
+                <p>member</p>
+              {% endwith %}
+              </li>
+            {% endfor %}
+        </ul>
+
+      </div>
+    </div>
+
+  </div>
+{% endblock %}
