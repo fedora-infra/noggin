@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, make_response, session
+from flask_wtf.csrf import CSRFProtect
 import python_freeipa
 
 from securitas.security.ipa import maybe_ipa_login, maybe_ipa_session, untouched_ipa_client
@@ -6,6 +7,7 @@ from securitas.security.ipa_admin import IPAAdmin
 from securitas.utility import gravatar
 
 app = Flask(__name__)
+csrf = CSRFProtect(app)
 app.config.from_envvar('SECURITAS_CONFIG_PATH')
 
 ipa_admin = IPAAdmin(app)
