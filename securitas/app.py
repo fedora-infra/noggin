@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for, mak
 import python_freeipa
 
 from securitas.ipa import maybe_ipa_admin_session, maybe_ipa_login, maybe_ipa_session, untouched_ipa_client
+from securitas.utility import gravatar
 
 app = Flask(__name__)
 app.config.from_envvar('SECURITAS_CONFIG_PATH')
@@ -12,6 +13,7 @@ def inject_global_template_vars():
     # TODO: move project out to config var
     return dict(
         project="The Fedora Project",
+        gravatar=gravatar,
         ipa=ipa,
         current_user=ipa.user_find(whoami=True) if ipa else None
     )
