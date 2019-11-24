@@ -2,7 +2,7 @@
 
 {# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
 
-{% block title %}User: codeblock{% endblock %}
+{% block title %}User: {{ user['uid'][0] }}{% endblock %}
 
 {% block head %}
   {{ super() }}
@@ -30,9 +30,11 @@
               </p>
             </div>
             <div class="card-action right-align">
-              <a class="light-blue-text text-darken-4" href="https://fedoraproject.org/wiki/User:codeblock">Wiki</a>
-              <a class="light-blue-text text-darken-4" href="https://codeblock.fedorapeople.org/">People</a>
-              <a class="light-blue-text text-darken-4" href="https://pagure.io/codeblock">Pagure</a>
+              {# TODO: What all do we want to link to here? #}
+              {# TODO: And should these links be configurable somehow for other deployments? #}
+              <a class="light-blue-text text-darken-4" href="https://fedoraproject.org/wiki/User:{{ user['uid'][0] }}">Wiki</a>
+              <a class="light-blue-text text-darken-4" href="https://{{ user['uid'][0] }}.fedorapeople.org/">People</a>
+              <a class="light-blue-text text-darken-4" href="https://pagure.io/{{ user['uid'][0] }}">Pagure</a>
               <a class="light-blue-text text-darken-4" href="https://github.com/relrod">GitHub</a>
             </div>
           </div>
