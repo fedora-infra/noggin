@@ -16,7 +16,7 @@ Immediate goals of *securitas* are:
 
 ## Setup tips
 
-* Use relrod's [containerdev](https://github.com/relrod/containerdev) project for development.
+* Use relrod's [containerdev](https://github.com/relrod/containerdev) project for development. (Or don't, but at least follow the steps in the Dockerfile to set up your own environment.)
 * Copy your IPA server's `/etc/ipa/ca.crt` to `.containerdev-public/ipa01`
 * Copy `securitas.cfg.default` to `securitas.cfg` and edit it accordingly. It's in .gitignore, so you are safe to put whatever in it.
 * Have `podman` installed
