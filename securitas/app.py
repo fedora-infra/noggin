@@ -142,7 +142,12 @@ def register():
             '%s %s' % (first_name, last_name), # TODO ???
             user_password=password,
             login_shell='/bin/bash')
-    except FreeIPAError as e:
+
+        # Now we fake a password change, so that it's not immediately expired.
+        # This also logs the user in right away.
+        ipa = untouched_ipa_client(app)
+        ipa.change_password(username, password, password)
+    except python_freeipa.exceptions.FreeIPAError as e:
         print(e)
         flash(
             'An error occurred while creating the account, please try again.',
