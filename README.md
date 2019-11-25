@@ -1,5 +1,7 @@
 # securitas
 
+[![Build Status](https://travis-ci.org/relrod/securitas.svg?branch=master)](https://travis-ci.org/relrod/securitas)
+
 From Latin. n. "security".
 
 *securitas* is a self-service portal for FreeIPA.

@@ -1,0 +1,11 @@
+language: generic
+
+services:
+  - docker
+
+before_install:
+  - docker build -t securitas .containerdev-public
+
+script:
+  # For now just run these doctests, but eventually we'll add more things to run.
+  - docker run --rm -it  -v $(pwd):/project securitas /bin/python3 -m doctest -v securitas/utility/get.py

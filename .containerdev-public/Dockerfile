@@ -15,7 +15,7 @@ VOLUME /project
 
 WORKDIR /project
 
-COPY ipa01 /etc/ipa01.crt
+#COPY ipa01 /etc/ipa01.crt
 
 ENV FLASK_APP securitas/app.py
 
