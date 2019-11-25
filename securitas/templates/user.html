@@ -2,7 +2,7 @@
 
 {# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
 
-{% block title %}User: {{ user['uid'][0] }}{% endblock %}
+{% block title %}User: {{ Get(user)['uid'][0].otherwise('<unknown>') }}{% endblock %}
 
 {% block head %}
   {{ super() }}
@@ -24,11 +24,11 @@
         </h3>
         <div class="card horizontal">
           <div class="card-image">
-            <img src="{{ gravatar(Get(user).get('mail').get(0).otherwise('default').final, 200) }}">
+            <img src="{{ gravatar(Get(user)['mail'][0].otherwise('default').final, 200) }}">
           </div>
           <div class="card-stacked">
             <div class="card-content">
-              <span class="card-title">{{ user['uid'][0] }}</span>
+              <span class="card-title">{{ Get(user)['uid'][0] }}</span>
               <p>
                 Perhaps this is a short bio blurb where I talk about how awesome I am.
                 Maybe I mention things like working on solving the AAA problem for Fedora.
@@ -39,9 +39,9 @@
             <div class="card-action right-align">
               {# TODO: What all do we want to link to here? #}
               {# TODO: And should these links be configurable somehow for other deployments? #}
-              <a class="light-blue-text text-darken-4" href="https://fedoraproject.org/wiki/User:{{ user['uid'][0] }}">Wiki</a>
-              <a class="light-blue-text text-darken-4" href="https://{{ user['uid'][0] }}.fedorapeople.org/">People</a>
-              <a class="light-blue-text text-darken-4" href="https://pagure.io/{{ user['uid'][0] }}">Pagure</a>
+              <a class="light-blue-text text-darken-4" href="https://fedoraproject.org/wiki/User:{{ Get(user)['uid'][0] }}">Wiki</a>
+              <a class="light-blue-text text-darken-4" href="https://{{ Get(user)['uid'][0] }}.fedorapeople.org/">People</a>
+              <a class="light-blue-text text-darken-4" href="https://pagure.io/{{ Get(user)['uid'][0] }}">Pagure</a>
               <a class="light-blue-text text-darken-4" href="https://github.com/relrod">GitHub</a>
             </div>
           </div>
@@ -53,7 +53,7 @@
       <div class="col m6 s12">
         <h4 class="header fw300">Groups</h4>
         <ul class="collection">
-          {% for group in user['memberof_group'] %}
+          {% for group in user['memberof_group']|sort %}
             {# This will be expensive for users in lots of groups, but I don't know a way around it. #}
             {% with group_details = ipa.group_show(group) %}
               <li class="collection-item avatar">
@@ -63,7 +63,7 @@
                   <span class="title">{{ group }}</span>
                 </a>
                 {% if group_details.get('description') %}
-                  <p>{{ group_details.get('description')[0] }} ({{ group }})</p>
+                  <p>{{ Get(group_details)['description'][0] }}</p>
                 {% endif %}
                 {# TODO: sponsor if sponsor #}
                 <p>member</p>
