@@ -182,3 +182,13 @@ def group(groupname):
     else:
         flash('Please log in to continue.', 'orange')
         return redirect(url_for('root'))
+
+@app.route('/groups/')
+def groups():
+    ipa = maybe_ipa_session(app, session)
+    if ipa:
+        groups = ipa.group_find()
+        return render_template('groups.html', groups=groups)
+    else:
+        flash('Please log in to continue.', 'orange')
+        return redirect(url_for('root'))
