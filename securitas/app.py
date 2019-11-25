@@ -9,6 +9,8 @@ from securitas.utility import gravatar
 app = Flask(__name__)
 csrf = CSRFProtect(app)
 app.config.from_envvar('SECURITAS_CONFIG_PATH')
+if app.config.get('TEMPLATES_AUTO_RELOAD'):
+    app.jinja_env.auto_reload = True
 
 ipa_admin = IPAAdmin(app)
 
