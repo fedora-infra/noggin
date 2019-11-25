@@ -4,7 +4,7 @@ import python_freeipa
 
 from securitas.security.ipa import maybe_ipa_login, maybe_ipa_session, untouched_ipa_client
 from securitas.security.ipa_admin import IPAAdmin
-from securitas.utility import gravatar
+from securitas.utility import gravatar, with_ipa
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
@@ -164,31 +164,19 @@ def register():
     return redirect(url_for('root'))
 
 @app.route('/user/<username>/')
-def user(username):
-    ipa = maybe_ipa_session(app, session)
-    if ipa:
-        user = ipa.user_show(username)
-        return render_template('user.html', user=user)
-    else:
-        flash('Please log in to continue.', 'orange')
-        return redirect(url_for('root'))
+@with_ipa(app, session)
+def user(ipa, username):
+    user = ipa.user_show(username)
+    return render_template('user.html', user=user)
 
 @app.route('/group/<groupname>/')
-def group(groupname):
-    ipa = maybe_ipa_session(app, session)
-    if ipa:
-        group = ipa.group_show(groupname)
-        return render_template('group.html', group=group)
-    else:
-        flash('Please log in to continue.', 'orange')
-        return redirect(url_for('root'))
+@with_ipa(app, session)
+def group(ipa, groupname):
+    group = ipa.group_show(groupname)
+    return render_template('group.html', group=group)
 
 @app.route('/groups/')
-def groups():
-    ipa = maybe_ipa_session(app, session)
-    if ipa:
-        groups = ipa.group_find()
-        return render_template('groups.html', groups=groups)
-    else:
-        flash('Please log in to continue.', 'orange')
-        return redirect(url_for('root'))
+@with_ipa(app, session)
+def groups(ipa):
+    groups = ipa.group_find()
+    return render_template('groups.html', groups=groups)
