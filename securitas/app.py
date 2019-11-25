@@ -4,7 +4,7 @@ import python_freeipa
 
 from securitas.security.ipa import maybe_ipa_login, maybe_ipa_session, untouched_ipa_client
 from securitas.security.ipa_admin import IPAAdmin
-from securitas.utility import gravatar, with_ipa
+from securitas.utility import Get, gravatar, with_ipa
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
@@ -21,6 +21,7 @@ def inject_global_template_vars():
     return dict(
         project="The Fedora Project",
         gravatar=gravatar,
+        Get=Get,
         ipa=ipa,
         current_user=ipa.user_find(whoami=True) if ipa else None
     )

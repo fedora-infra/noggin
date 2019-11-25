@@ -15,10 +15,16 @@
 
     <div class="row">
       <div class="col s12">
-        <h3 class="header light-blue-text text-darken-4 fw300">{{ user['displayname'][0] }}</h3>
+        <h3 class="header light-blue-text text-darken-4 fw300">
+          {% if user.get('displayname') %}
+            {{ user['displayname'][0] }}
+          {% else %}
+            {{ user['uid'][0] }}
+          {% endif %}
+        </h3>
         <div class="card horizontal">
           <div class="card-image">
-            <img src="{{ gravatar(user['mail'][0], 200) }}">
+            <img src="{{ gravatar(Get(user).get('mail').get(0).otherwise('default').final, 200) }}">
           </div>
           <div class="card-stacked">
             <div class="card-content">

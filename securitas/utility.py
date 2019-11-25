@@ -1,3 +1,4 @@
+import collections
 import hashlib
 from functools import wraps
 from flask import flash, redirect, url_for
@@ -21,3 +22,42 @@ def with_ipa(app, session):
             return redirect(url_for('root'))
         return fn
     return decorator
+
+# We invent a fake "Maybe" monad here, but really the goal is to get a pretty
+# DSL to use in templates, so we can do things like:
+#
+# {{ Get(user).get('uid').get(0).or_else('email').get(0).otherwise('Nope!').final }}
+class Get(object):
+    def __init__(self, clxn, top=None):
+        self._clxn = clxn
+        self.final = self._clxn
+        if top:
+            self.top = top.top
+        else:
+            self.top = self
+
+    # If the final value we land on is None, hop back to the
+    # beginning and try again.
+    def or_else(self, idx, default=None):
+        if self.final is None:
+            return self.top.get(idx, default)
+        else:
+            return Get(self.final)
+
+    # Just an alias for the constructor to make a pretty DSL:
+    # {{ Get(user).get('uid').get(0).or_else('email').get(0).otherwise('Unknown').final }}
+    def otherwise(self, default):
+        return Get(default)
+
+    def get(self, idx, default=None):
+        if isinstance(self._clxn, collections.Mapping):
+            return Get(self._clxn.get(idx, default), self)
+        if '__getitem__' in dir(self._clxn):
+            try:
+                return Get(self._clxn[idx], self)
+            except IndexError:
+                return Get(default, self)
+        # We got something that doesn't seem to be iterable.
+        # Maybe a None. Return the last default of the chain, but still wrapped in
+        # Get.
+        return Get(default, self)
