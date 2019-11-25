@@ -47,7 +47,10 @@ class Get(object):
     # Just an alias for the constructor to make a pretty DSL:
     # {{ Get(user).get('uid').get(0).or_else('email').get(0).otherwise('Unknown').final }}
     def otherwise(self, default):
-        return Get(default)
+        if self._clxn is None:
+            return Get(default)
+        else:
+            return self
 
     def get(self, idx, default=None):
         if isinstance(self._clxn, collections.Mapping):
