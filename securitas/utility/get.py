@@ -9,24 +9,61 @@ import collections
 class Get(object):
     """
     Some pretty wrappers for chaining getters of indexable collections.
+    Doctests:
+
     >>> c = {'tomatoes': {'tasty': False}, 'foo': 'bar'}
+
+    This is the pretty indexing notation:
     >>> Get(c)['tomatoes']['tasty'].final
     False
+
+    But it's the same as this:
     >>> Get(c).get('tomatoes').get('tasty').final
     False
+
+    You can specify your default along in .get():
     >>> Get(c).get('tomatoes', 'default').final
     {'tasty': False}
     >>> Get(c).get('monkies', 'default').final
     'default'
+
+    Or do so at the end:
+    >>> Get(c).get('tomatoes').otherwise('default').final
+    {'tasty': False}
+    >>> Get(c).get('monkies').otherwise('default').final
+    'default'
+
+    It also works with index notation:
+    >>> Get(c)['tomatoes'].otherwise('default').final
+    {'tasty': False}
+    >>> Get(c)['monkies'].otherwise('default').final
+    'default'
+
+    More complex chaining works too. When using verbose notation, the
+    `or_else` method will start a chain back at the original object
+    (c in this case).
+
+    This is useful to explore multiple paths before giving up:
     >>> Get(c).get('tomatoes').get('red').or_else('tomatoes').get('tasty').final
     False
+
+    The index notation variant is called `rather` and is exposed as a property
+    to avoid needing parentheses:
     >>> Get(c)['tomatoes']['red'].rather['tomatoes']['tasty'].final
     False
+
+    And of course we can still specify a default:
     >>> Get(c)['tomatoes']['red'].rather['tomatoes']['spicy'].otherwise('default').final
     'default'
+
+    This shows what happens if we fall all the way through:
     >>> Get(c)['asdf'].rather['bar']['zzz'].otherwise('haha').final
     'haha'
+
+    This is the same, but with no default at all. We get None back at the end:
     >>> Get(c)['tomatoes']['tastyjj'].rather['foo']['bar'].final
+
+    If we had specified a default, we would have gotten it back, though:
     >>> Get(c)['tomatoes']['tastyjj'].rather['foo']['bar'].otherwise('fishes').final
     'fishes'
     """
