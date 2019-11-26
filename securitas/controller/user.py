@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template, session, url_for
+from flask import flash, redirect, render_template, session, url_for
 
 from securitas import app
 from securitas.utility import with_ipa, user_or_404

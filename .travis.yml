@@ -9,3 +9,4 @@ before_install:
 script:
   # For now just run these doctests, but eventually we'll add more things to run.
   - docker run --rm -it  -v $(pwd):/project securitas /bin/python3 -m doctest -v securitas/utility/get.py
+  - docker run --rm -it  -v $(pwd):/project securitas flake8 --select F securitas

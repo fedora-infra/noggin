@@ -1,4 +1,4 @@
-from flask import flash, render_template, redirect, request, session, url_for
+from flask import flash, redirect, request, session, url_for
 import python_freeipa
 
 from securitas import app
@@ -23,7 +23,7 @@ def login():
     try:
         # This call will set the cookie itself, we don't have to.
         ipa = maybe_ipa_login(app, session, username, password)
-    except python_freeipa.exceptions.PasswordExpired as e:
+    except python_freeipa.exceptions.PasswordExpired:
         flash('Password expired. Please reset it.', 'red')
         return redirect(url_for('password_reset'))
     except python_freeipa.exceptions.Unauthorized as e:

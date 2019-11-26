@@ -9,7 +9,8 @@ RUN dnf -y install \
     && dnf clean all \
     && pip3 install git+https://github.com/relrod/python-freeipa@exceptional-exceptions \
       flask-wtf \
-      bandit
+      bandit \
+      flake8
 
 VOLUME /project
 

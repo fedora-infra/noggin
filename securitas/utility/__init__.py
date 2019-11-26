@@ -4,7 +4,7 @@ from flask import abort, flash, redirect, url_for
 import python_freeipa
 
 from securitas.security.ipa import maybe_ipa_session
-from securitas.utility.get import Get
+from securitas.utility.get import Get # noqa: F401
 
 def gravatar(email, size):
     return "https://www.gravatar.com/avatar/" + hashlib.md5(
@@ -27,11 +27,11 @@ def with_ipa(app, session):
 def group_or_404(ipa, groupname):
     try:
         return ipa.group_show(groupname)
-    except python_freeipa.exceptions.NotFound as e:
+    except python_freeipa.exceptions.NotFound:
         abort(404)
 
 def user_or_404(ipa, username):
     try:
         return ipa.user_show(username)
-    except python_freeipa.exceptions.NotFound as e:
+    except python_freeipa.exceptions.NotFound:
         abort(404)

@@ -31,7 +31,7 @@ def maybe_ipa_session(app, session):
         # successful.
         try:
             client._request('ping')
-        except python_freeipa.exceptions.Unauthorized as e:
+        except python_freeipa.exceptions.Unauthorized:
             return None
         return client
     return None

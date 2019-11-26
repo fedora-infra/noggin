@@ -31,7 +31,7 @@ def password_reset():
             'Failed to reset your password (policy error): %s' % str(e.policy_error),
             'red')
         return redirect(url_for('password_reset'))
-    except python_freeipa.exceptions.PWChangeInvalidPassword as e:
+    except python_freeipa.exceptions.PWChangeInvalidPassword:
         flash(
             'Failed to reset your password (invalid current password).',
             'red')

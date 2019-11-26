@@ -1,13 +1,13 @@
-from flask import render_template, request, flash, redirect, url_for, make_response, session, jsonify
+from flask import render_template, request, redirect, url_for, session, jsonify
 
-from securitas import app, ipa_admin
-from securitas.controller.authentication import login, logout
-from securitas.controller.group import group, groups
-from securitas.controller.password import password_reset
-from securitas.controller.registration import register
-from securitas.controller.user import user
-from securitas.security.ipa import maybe_ipa_login, maybe_ipa_session, untouched_ipa_client
-from securitas.utility import Get, gravatar, with_ipa
+from securitas import app
+from securitas.controller.authentication import login, logout # noqa: F401
+from securitas.controller.group import group, groups # noqa: F401
+from securitas.controller.password import password_reset # noqa: F401
+from securitas.controller.registration import register # noqa: F401
+from securitas.controller.user import user # noqa: F401
+from securitas.security.ipa import maybe_ipa_session # noqa: F401
+from securitas.utility import Get, gravatar, with_ipa # noqa: F401
 
 @app.context_processor
 def inject_global_template_vars():
@@ -38,25 +38,25 @@ def root():
 @with_ipa(app, session)
 def search_json(ipa):
     username = request.args.get('username')
-    group = request.args.get('group')
+    groupname = request.args.get('group')
 
     res = []
 
     if username:
-        users = ipa.user_find(username)
+        users_ = ipa.user_find(username)
 
-        for user in users['result']:
-            uid = Get(user)['uid'][0].final
-            cn = Get(user)['cn'][0].final
+        for user_ in users_['result']:
+            uid = Get(user_)['uid'][0].final
+            cn = Get(user_)['cn'][0].final
             if uid is not None:
                 # If the cn is None, who cares?
                 res.append({ 'uid': uid, 'cn': cn })
 
-    if group:
-        groups = ipa.group_find(group)
-        for group in groups['result']:
-            cn = Get(group)['cn'][0].final
-            description = Get(group)['description'][0].final
+    if groupname:
+        groups_ = ipa.group_find(groupname)
+        for group_ in groups_['result']:
+            cn = Get(group_)['cn'][0].final
+            description = Get(group_)['description'][0].final
             if cn is not None:
                 # If the description is None, who cares?
                 res.append({ 'cn': cn, 'description': description })

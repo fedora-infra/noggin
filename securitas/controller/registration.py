@@ -21,7 +21,7 @@ def register():
         return redirect(url_for('root'))
 
     try:
-        add = ipa_admin.user_add(
+        ipa_admin.user_add(
             username,
             first_name,
             last_name,
