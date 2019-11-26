@@ -18,7 +18,8 @@ def inject_global_template_vars():
         gravatar=gravatar,
         Get=Get,
         ipa=ipa,
-        current_user=ipa.user_find(whoami=True) if ipa else None
+        current_user=ipa.user_find(whoami=True) if ipa else None,
+        current_username=session.get('securitas_username'),
     )
 
 @app.errorhandler(404)

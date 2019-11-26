@@ -29,17 +29,22 @@
           <div class="card-stacked">
             <div class="card-content">
               <span class="card-title">{{ Get(user)['uid'][0] }}</span>
-              <p>
-                <a href="#">Edit profile</a>
-              </p>
+              {% if Get(user)['uid'][0].final == current_username %}
+                <p>
+                  <a href="#">Edit profile</a>
+                </p>
+              {% endif %}
               {% call(tz) ifa(Get(user)['fastimezone'][0]) %}
-                <p><b>Time zone:</b> {{ tz }}</p>
+                <p><b>Timezone:</b> {{ tz }}</p>
               {% endcall %}
               {% call(nick) ifa(Get(user)['fasircnick'][0]) %}
                 <p><b>IRC Nickname:</b> {{ nick }}</p>
               {% endcall %}
               {% call(locale) ifa(Get(user)['faslocale'][0]) %}
                 <p><b>Locale:</b> {{ locale }}</p>
+              {% endcall %}
+              {% call(keys) ifa(Get(user)['fasgpgkeyid'].otherwise([]).final) %}
+                <p><b>GPG Keys:</b> {{ keys|join(', ') }}</p>
               {% endcall %}
             </div>
             <div class="card-action">
