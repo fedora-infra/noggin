@@ -25,7 +25,7 @@ Here is what works so far:
 * Resetting current, known (possibly expired) passwords (but not forgotten ones)
 * Decent error handling for all of the above
 
-<img src="https://images.elrod.me/securitas-screenshot.png">
+<img src="https://images.elrod.me/securitas-screenshot.png?1">
 
 ## Setup tips
 
