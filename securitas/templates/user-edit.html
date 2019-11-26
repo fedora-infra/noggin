@@ -1,0 +1,25 @@
+{% extends "with_navbar.html" %}
+
+{# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
+
+{% block title %}Edit User: {{ Get(user)['uid'][0].otherwise('<unknown>') }}{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  {{ css("user") }}
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  <div class="container section">
+
+    <div class="row">
+      <div class="col s12">
+        <h3 class="header light-blue-text text-darken-4 fw300">
+          Insert user edit form here
+        </h3>
+      </div>
+    </div>
+    
+  </div>
+{% endblock %}
