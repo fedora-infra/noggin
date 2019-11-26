@@ -24,6 +24,12 @@ def with_ipa(app, session):
         return fn
     return decorator
 
+def group_or_404(ipa, groupname):
+    try:
+        return ipa.group_show(groupname)
+    except python_freeipa.exceptions.NotFound as e:
+        abort(404)
+
 def user_or_404(ipa, username):
     try:
         return ipa.user_show(username)
