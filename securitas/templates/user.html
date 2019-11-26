@@ -14,7 +14,7 @@
   <div class="container section">
 
     <div class="row">
-      <div class="col s12">
+      <div class="col s3">
         <h3 class="header light-blue-text text-darken-4 fw300">
           {% if user.get('displayname') %}
             {{ user['displayname'][0] }}
@@ -22,56 +22,53 @@
             {{ user['uid'][0] }}
           {% endif %}
         </h3>
-        <div class="card horizontal">
+        <div class="card">
           <div class="card-image">
-            <img src="{{ gravatar(Get(user)['mail'][0].otherwise('default').final, 200) }}">
+            <img src="{{ gravatar(Get(user)['mail'][0].otherwise('default').final, 400) }}">
           </div>
           <div class="card-stacked">
             <div class="card-content">
-              <span class="card-title">{{ Get(user)['uid'][0] }}</span>
+              <span class="card-title">{{ Get(user)['cn'][0] }}</span>
               <p>
-                Perhaps this is a short bio blurb where I talk about how awesome I am.
-                Maybe I mention things like working on solving the AAA problem for Fedora.
-                Or maybe we don't store any bios because they'd require more schema extensions
-                and could be probably be abused for spam purposes.
+                <a href="#">Edit profile</a>
               </p>
             </div>
-            <div class="card-action right-align">
+            <div class="card-action">
               {# TODO: What all do we want to link to here? #}
               {# TODO: And should these links be configurable somehow for other deployments? #}
               <a class="light-blue-text text-darken-4" href="https://fedoraproject.org/wiki/User:{{ Get(user)['uid'][0] }}">Wiki</a>
-              <a class="light-blue-text text-darken-4" href="https://{{ Get(user)['uid'][0] }}.fedorapeople.org/">People</a>
-              <a class="light-blue-text text-darken-4" href="https://pagure.io/{{ Get(user)['uid'][0] }}">Pagure</a>
-              <a class="light-blue-text text-darken-4" href="https://github.com/relrod">GitHub</a>
+              <a class="light-blue-text text-darken-4" href="https://{{ Get(user)['uid'][0] }}.fedorapeople.org/">Fedora People</a>
             </div>
           </div>
         </div> <!-- ./card -->
-      </div>
-    </div>
 
-    <div class="row">
-      <div class="col m6 s12">
-        <h4 class="header fw300">Groups</h4>
-        <ul class="collection">
-          {% for group in user['memberof_group']|sort %}
-            {# This will be expensive for users in lots of groups, but I don't know a way around it. #}
-            {% with group_details = ipa.group_show(group) %}
-              <li class="collection-item avatar">
-                <!-- TODO: .red if sponsor/admin -->
-                <i class="material-icons circle">group</i>
-                <a href="/group/{{ group }}">
-                  <span class="title">{{ group }}</span>
-                </a>
-                {% if group_details.get('description') %}
-                  <p>{{ Get(group_details)['description'][0] }}</p>
-                {% endif %}
-                {# TODO: sponsor if sponsor #}
-                <p>member</p>
-              {% endwith %}
-            </li>
-          {% endfor %}
-        </ul>
+      </div> <!-- ./col s3 -->
+      <div class="col s9">
 
+        <div class="section">
+          <h4 class="header fw300">Groups</h4>
+          <ul class="collection">
+            {% for group in user['memberof_group']|sort %}
+              {# This will be expensive for users in lots of groups, but I don't know a way around it. #}
+              {% with group_details = ipa.group_show(group) %}
+                {% with is_sponsor = Get(user)['uid'][0].final in Get(group_details)['membermanager_user'].otherwise([]).final %}
+                  <li class="collection-item avatar">
+                    <!-- TODO: .red if sponsor/admin -->
+                    <i class="material-icons circle {{ 'red' if is_sponsor else 'green' }}">group</i>
+                    <a href="/group/{{ group }}">
+                      <span class="title">{{ group }}</span>
+                    </a>
+                    <p>{{ Get(group_details)['description'][0] }}</p>
+                    {# TODO: sponsor if sponsor #}
+                    <p>{{ 'sponsor' if is_sponsor else 'member' }} </p>
+                  </li>
+                  {% endwith %}
+                {% endwith %}
+
+              {% endfor %}
+          </ul>
+        </div>
+        
       </div>
     </div>
     
