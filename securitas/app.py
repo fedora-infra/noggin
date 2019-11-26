@@ -1,5 +1,4 @@
 from flask import render_template, request, flash, redirect, url_for, make_response, session, jsonify
-import python_freeipa
 
 from securitas import app, ipa_admin
 from securitas.controller.authentication import login, logout
@@ -21,6 +20,10 @@ def inject_global_template_vars():
         ipa=ipa,
         current_user=ipa.user_find(whoami=True) if ipa else None
     )
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 @app.route('/')
 def root():
