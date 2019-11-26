@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, make_response, session
+from flask import Flask, render_template, request, flash, redirect, url_for, make_response, session, jsonify
 from flask_wtf.csrf import CSRFProtect
 import python_freeipa
 
@@ -181,3 +181,32 @@ def group(ipa, groupname):
 def groups(ipa):
     groups = ipa.group_find()
     return render_template('groups.html', groups=groups)
+
+@app.route('/search/json')
+@with_ipa(app, session)
+def search_json(ipa):
+    username = request.args.get('username')
+    group = request.args.get('group')
+
+    res = []
+
+    if username:
+        users = ipa.user_find(username)
+
+        for user in users['result']:
+            uid = Get(user)['uid'][0].final
+            cn = Get(user)['cn'][0].final
+            if uid is not None:
+                # If the cn is None, who cares?
+                res.append({ 'uid': uid, 'cn': cn })
+
+    if group:
+        groups = ipa.group_find(group)
+        for group in groups['result']:
+            cn = Get(group)['cn'][0].final
+            description = Get(group)['description'][0].final
+            if cn is not None:
+                # If the description is None, who cares?
+                res.append({ 'cn': cn, 'description': description })
+
+    return jsonify(res)

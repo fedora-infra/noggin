@@ -7,13 +7,32 @@
   <nav>
     <div class="nav-wrapper light-blue darken-3">
       <div class="container">
-        <a href="/" class="brand-logo orbitron securitas-brand"><i class="material-icons"><em>lock</em></i> securitas</a>
-        {% if ipa is defined and ipa %}
-          <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li>Logged in as: {{ current_user['result'][0]['uid'][0] if current_user }}</li>
-            <li><a href="/logout">Log Out</a></li>
-          </ul>
-        {% endif %}
+        <div class="row">
+          <div class="col s4">
+            {% if ipa is defined and ipa %}
+              <form>
+                <div class="input-field">
+                  <input id="search" type="search" required>
+                  <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                  <i class="material-icons">close</i>
+                </div>
+              </form>
+            {% endif %}
+          </div>
+
+          <div class="col s4 center">
+            <a href="/" class="brand-logo orbitron securitas-brand center"><i class="material-icons"><em>lock</em></i> securitas</a>
+          </div>
+
+          <div class="col s4 right">
+            {% if ipa is defined and ipa %}
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li>Logged in as: {{ Get(current_user)['result'][0]['uid'][0].otherwise('<unknown>') }}</li>
+                <li><a href="/logout">Log Out</a></li>
+              </ul>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -29,4 +48,46 @@
       </div>
     {% endif %}
   {% endwith %}
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/bloodhound.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/typeahead.jquery.min.js"></script>
+  <script>
+    var bloodhound_users = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: '/search/json?username=%QUERY',
+            wildcard: '%QUERY'
+        }
+    });
+
+    var bloodhound_groups = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: '/search/json?group=%QUERY',
+            wildcard: '%QUERY'
+        }
+    });
+
+    // TODO: This breaks the style and doesn't quite work yet anyway
+    /*
+    $('#search').typeahead(
+        { highlight: true},
+        { name: 'users',
+          display: 'cn',
+          source: bloodhound_users,
+          templates: { header: '<h3>Users</h3>' }
+        },
+        { name: 'groups',
+          display: 'cn',
+          source: bloodhound_groups,
+          templates: { header: '<h3>Groups</h3>' }
+        }
+    );
+    */
+  </script>
 {% endblock %}
