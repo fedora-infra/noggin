@@ -1,12 +1,12 @@
-from flask import flash, redirect, render_template, session, url_for
+from flask import abort, flash, redirect, render_template, session, url_for
 
 from securitas import app
-from securitas.utility import with_ipa
+from securitas.utility import with_ipa, user_or_404
 
 @app.route('/user/<username>/')
 @with_ipa(app, session)
 def user(ipa, username):
-    user = ipa.user_show(username)
+    user = user_or_404(ipa, username)
     return render_template('user.html', user=user)
 
 @app.route('/user/<username>/edit/')
@@ -18,5 +18,5 @@ def user_edit(ipa, username):
             'You do not have permission to edit this account.',
             'red')
         return redirect(url_for('user', username=username))
-    user = ipa.user_show(username)
+    user = user_or_404(ipa, username)
     return render_template('user-edit.html', user=user)

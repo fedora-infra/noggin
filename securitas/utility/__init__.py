@@ -1,6 +1,7 @@
 import hashlib
 from functools import wraps
-from flask import flash, redirect, url_for
+from flask import abort, flash, redirect, url_for
+import python_freeipa
 
 from securitas.security.ipa import maybe_ipa_session
 from securitas.utility.get import Get
@@ -22,3 +23,9 @@ def with_ipa(app, session):
             return redirect(url_for('root'))
         return fn
     return decorator
+
+def user_or_404(ipa, username):
+    try:
+        return ipa.user_show(username)
+    except python_freeipa.exceptions.NotFound as e:
+        abort(404)
