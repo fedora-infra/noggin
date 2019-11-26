@@ -2,6 +2,12 @@
   <link href="{{ url_for('static', filename='css/' + name + '.css') }}" rel="stylesheet" type="text/css">  
 {% endmacro %}
 
+{% macro ifa(cond) %}
+  {% if cond %}
+    {{ caller(cond) }}
+  {% endif %}
+{% endmacro %}
+
 <!doctype html>
 <html lang="en">
   <head>

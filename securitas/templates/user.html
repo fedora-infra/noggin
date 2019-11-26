@@ -32,6 +32,15 @@
               <p>
                 <a href="#">Edit profile</a>
               </p>
+              {% call(tz) ifa(Get(user)['fastimezone'][0]) %}
+                <p><b>Time zone:</b> {{ tz }}</p>
+              {% endcall %}
+              {% call(nick) ifa(Get(user)['fasircnick'][0]) %}
+                <p><b>IRC Nickname:</b> {{ nick }}</p>
+              {% endcall %}
+              {% call(locale) ifa(Get(user)['faslocale'][0]) %}
+                <p><b>Locale:</b> {{ locale }}</p>
+              {% endcall %}
             </div>
             <div class="card-action">
               {# TODO: What all do we want to link to here? #}
