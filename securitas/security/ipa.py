@@ -54,9 +54,7 @@ def maybe_ipa_login(app, session, username, password):
         encrypted_session = fernet.encrypt(
             bytes(client._session.cookies['ipa_session'], 'utf8'))
         session['securitas_session'] = encrypted_session
-        # Also store the username. Don't use it for anything sensitive, but
-        # it's useful for simple redirects, etc.
-        session['securitas_username_insecure'] = username
+        session['securitas_username'] = username
         return client
 
     return None

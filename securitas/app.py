@@ -25,7 +25,7 @@ def inject_global_template_vars():
 @app.route('/')
 def root():
     ipa = maybe_ipa_session(app, session)
-    username = session.get('securitas_username_insecure')
+    username = session.get('securitas_username')
     if ipa and username:
         return redirect(url_for('user', username=username))
     # Kick any non-authed user back to the login form.
