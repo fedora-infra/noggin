@@ -2,7 +2,7 @@
 
 {# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
 
-{% block title %}Group: {{ Get(group)['cn'][0] }}{% endblock %}
+{% block title %}Group: {{ group.name }}{% endblock %}
 
 {% block head %}
   {{ super() }}
@@ -15,13 +15,13 @@
 
     <div class="row">
       <div class="col s12">
-        <h3 class="header light-blue-text text-darken-4 fw300">{{ Get(group)['cn'][0] }}</h3>
-        <p>{{ Get(group)['description'][0] }}</p>
+        <h3 class="header light-blue-text text-darken-4 fw300">{{ group.name }}</h3>
+        <p>{{ group.description }}</p>
       </div>
     </div>
 
     <!--
-    {% if Get(current_user)['result'][0]['uid'][0].final in Get(group)['membermanager_user'].otherwise([]).final %}
+    {% if current_user.username in group.sponsors %}
       <div class="row">
         <div class="col s12">
           <div class="card-panel orange lighten-4 orange-text text-darken-4">
@@ -37,55 +37,49 @@
       <div class="col m6 s12">
         <h4 class="header fw300">Sponsors</h4>
         <ul class="collection">
-          {% for user in Get(group)['membermanager_user'].otherwise([]).final %}
-            {# This will be expensive for users in lots of groups, but I don't know a way around it. #}
-            {% with user_details = ipa.user_show(user) %}
-              <li class="collection-item avatar">
-                <!-- TODO: .red if sponsor/admin -->
-                {% if user_details.get('mail') %}
-                  <img src="{{ gravatar(Get(user_details)['mail'][0].otherwise('default').final, 200) }}" class="circle">
-                {% else %}
-                  <i class="material-icons circle">person</i>
-                {% endif %}
-                <a href="/user/{{ Get(user_details)['uid'][0] }}">
-                  <span class="title">{{ Get(user_details)['uid'][0] }}</span>
-                </a>
-                <p>{{ Get(user_details)['cn'][0] }}</p>
-                {# TODO: sponsor if sponsor #}
-                <p>member</p>
-              {% endwith %}
-              </li>
-            {% endfor %}
+          {% for sponsor in sponsors.values() %}
+            <li class="collection-item avatar">
+              <!-- TODO: .red if sponsor/admin -->
+              {% if sponsor.mail %}
+                <img src="{{ gravatar(sponsor.mail, 200) }}" class="circle">
+              {% else %}
+                <i class="material-icons circle">person</i>
+              {% endif %}
+              <a href="/user/{{ sponsor.username }}">
+                <span class="title">{{ sponsor.username }}</span>
+              </a>
+              <p>{{ sponsor.name }}</p>
+              {# TODO: sponsor if sponsor #}
+              <p>member</p>
+            </li>
+          {% endfor %}
         </ul>
       </div>
 
       <div class="col m6 s12">
         <h4 class="header fw300">
           Users
-          {% if Get(current_user)['result'][0]['uid'][0].final in Get(group)['membermanager_user'].otherwise([]).final %}
+          {% if current_user.username in group.members %}
             <a class="btn-floating btn-small right waves-effect waves-light red"><i class="material-icons">add</i></a>
           {% endif %}
         </h4>
         <ul class="collection">
-          {% for user in Get(group)['member_user'].otherwise([]).final %}
-            {# This will be expensive for users in lots of groups, but I don't know a way around it. #}
-            {% with user_details = ipa.user_show(user) %}
-              <li class="collection-item avatar">
-                <!-- TODO: .red if sponsor/admin -->
-                {% if user_details.get('mail') %}
-                  <img src="{{ gravatar(Get(user_details)['mail'][0].otherwise('default').final, 200) }}" class="circle">
-                {% else %}
-                  <i class="material-icons circle">person</i>
-                {% endif %}
-                <a href="/user/{{ Get(user_details)['uid'][0] }}">
-                  <span class="title">{{ Get(user_details)['uid'][0] }}</span>
-                </a>
-                <p>{{ Get(user_details)['cn'][0] }}</p>
-                {# TODO: sponsor if sponsor #}
-                <p>member</p>
-              {% endwith %}
-              </li>
-            {% endfor %}
+          {% for member in members.values() %}
+            <li class="collection-item avatar">
+              <!-- TODO: .red if sponsor/admin -->
+              {% if member.mail %}
+                <img src="{{ gravatar(member.mail, 200) }}" class="circle">
+              {% else %}
+                <i class="material-icons circle">person</i>
+              {% endif %}
+              <a href="/user/{{ member.username }}">
+                <span class="title">{{ member.username }}</span>
+              </a>
+              <p>{{ member.name }}</p>
+              {# TODO: sponsor if sponsor #}
+              <p>member</p>
+            </li>
+          {% endfor %}
         </ul>
       </div>
 

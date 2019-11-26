@@ -1,8 +1,6 @@
 {% extends "with_navbar.html" %}
 
-{# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
-
-{% block title %}Edit User: {{ Get(user)['uid'][0].otherwise('<unknown>') }}{% endblock %}
+{% block title %}Edit User: {{ user.username }}{% endblock %}
 
 {% block head %}
   {{ super() }}

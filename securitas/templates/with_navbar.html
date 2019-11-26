@@ -9,7 +9,7 @@
       <div class="container">
         <div class="row">
           <div class="col s4">
-            {% if ipa is defined and ipa %}
+            {% if current_user %}
               <form>
                 <div class="input-field">
                   <input id="search" type="search" required>
@@ -25,9 +25,9 @@
           </div>
 
           <div class="col s4 right">
-            {% if ipa is defined and ipa %}
+            {% if current_user %}
               <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li>Logged in as: {{ Get(current_user)['result'][0]['uid'][0].otherwise('<unknown>') }}</li>
+                <li>Logged in as: {{ current_user.username }}</li>
                 <li><a href="/logout">Log Out</a></li>
               </ul>
             {% endif %}

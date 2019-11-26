@@ -18,16 +18,16 @@
         <h3 class="header light-blue-text text-darken-4 fw300">Group List</h3>
 
         <ul class="collection">
-          {% for group in groups['result'] %}
+          {% for group in groups %}
             <li class="collection-item avatar">
               <i class="material-icons circle">group</i>
-              <a href="/group/{{ group['cn'][0] }}">
-                <span class="title">{{ group['cn'][0] }}</span>
+              <a href="/group/{{ group.name }}">
+                <span class="title">{{ group.name }}</span>
               </a>
-              <p>{{ group['dn'] }}</p>
-              <p>{{ group['member_user']|length|default(0) }} members</p>
-              {% if group.get('description') %}
-                <p>{{ group['cn'][0] }}</p>
+              <p>{{ group.dn }}</p>
+              <p>{{ group.members|length|default(0) }} members</p>
+              {% if group.description %}
+                <p>{{ group.description }}</p>
               {% endif %}
             </li>
           {% endfor %}

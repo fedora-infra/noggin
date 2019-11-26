@@ -2,7 +2,7 @@
 
 {# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
 
-{% block title %}User: {{ Get(user)['uid'][0].otherwise('<unknown>') }}{% endblock %}
+{% block title %}User: {{ user.username }}{% endblock %}
 
 {% block head %}
   {{ super() }}
@@ -16,42 +16,38 @@
     <div class="row">
       <div class="col s12 l3">
         <h3 class="header light-blue-text text-darken-4 fw300">
-          {% if user.get('displayname') %}
-            {{ user['displayname'][0] }}
-          {% else %}
-            {{ user['uid'][0] }}
-          {% endif %}
+          {{ user.name if user.name else user.username }}
         </h3>
         <div class="card">
           <div class="card-image">
-            <img src="{{ gravatar(Get(user)['mail'][0].otherwise('default').final, 400) }}">
+            <img src="{{ gravatar(user.mail if user.mail else 'default', 400) }}">
           </div>
           <div class="card-stacked">
             <div class="card-content">
-              <span class="card-title">{{ Get(user)['uid'][0] }}</span>
-              {% if Get(user)['uid'][0].final == current_username %}
+              <span class="card-title">{{ user.username }}</span>
+              {% if user.username == current_user.username %}
                 <p>
                   <a href="#">Edit profile</a>
                 </p>
               {% endif %}
-              {% call(tz) ifa(Get(user)['fastimezone'][0]) %}
-                <p><b>Timezone:</b> {{ tz }}</p>
-              {% endcall %}
-              {% call(nick) ifa(Get(user)['fasircnick'][0]) %}
-                <p><b>IRC Nickname:</b> {{ nick }}</p>
-              {% endcall %}
-              {% call(locale) ifa(Get(user)['faslocale'][0]) %}
-                <p><b>Locale:</b> {{ locale }}</p>
-              {% endcall %}
-              {% call(keys) ifa(Get(user)['fasgpgkeyid'].otherwise([]).final) %}
-                <p><b>GPG Keys:</b> {{ keys|join(', ') }}</p>
-              {% endcall %}
+              {% if user.timezone %}
+                <p><b>Timezone:</b> {{ user.timezone }}</p>
+              {% endif %}
+              {% if user.ircnick %}
+                <p><b>IRC Nickname:</b> {{ user.ircnick }}</p>
+              {% endif %}
+              {% if user.locale %}
+                <p><b>Locale:</b> {{ user.locale }}</p>
+              {% endif %}
+              {% if user.gpgkeys %}
+                <p><b>GPG Keys:</b> {{ user.gpgkeys|join(', ') }}</p>
+              {% endif %}
             </div>
             <div class="card-action">
               {# TODO: What all do we want to link to here? #}
               {# TODO: And should these links be configurable somehow for other deployments? #}
-              <a class="light-blue-text text-darken-4" href="https://fedoraproject.org/wiki/User:{{ Get(user)['uid'][0] }}">Wiki</a>
-              <a class="light-blue-text text-darken-4" href="https://{{ Get(user)['uid'][0] }}.fedorapeople.org/">Fedora People</a>
+              <a class="light-blue-text text-darken-4" href="https://fedoraproject.org/wiki/User:{{ user.username }}">Wiki</a>
+              <a class="light-blue-text text-darken-4" href="https://{{ user.username }}.fedorapeople.org/">Fedora People</a>
             </div>
           </div>
         </div> <!-- ./card -->
@@ -62,24 +58,22 @@
         <div class="section">
           <h4 class="header fw300">Groups</h4>
           <ul class="collection">
-            {% for group in user['memberof_group']|sort %}
-              {# This will be expensive for users in lots of groups, but I don't know a way around it. #}
-              {% with group_details = ipa.group_show(group) %}
-                {% with is_sponsor = Get(user)['uid'][0].final in Get(group_details)['membermanager_user'].otherwise([]).final %}
-                  <li class="collection-item avatar">
-                    <!-- TODO: .red if sponsor/admin -->
-                    <i class="material-icons circle {{ 'red' if is_sponsor else 'green' }}">group</i>
-                    <a href="/group/{{ group }}">
-                      <span class="title">{{ group }}</span>
-                    </a>
-                    <p>{{ Get(group_details)['description'][0] }}</p>
-                    {# TODO: sponsor if sponsor #}
-                    <p>{{ 'sponsor' if is_sponsor else 'member' }} </p>
-                  </li>
-                  {% endwith %}
-                {% endwith %}
-
-              {% endfor %}
+            {% for group in groups %}
+              {% with is_sponsor = user.username in group.sponsors %}
+                <li class="collection-item avatar">
+                  <!-- TODO: .red if sponsor/admin -->
+                  <i class="material-icons circle {{ 'red' if is_sponsor else 'green' }}">group</i>
+                  <a href="/group/{{ group.name }}">
+                    <span class="title">{{ group.name }}</span>
+                  </a>
+                  {% if group.description %}
+                    <p>{{ group.description }}</p>
+                  {% endif %}
+                  {# TODO: sponsor if sponsor #}
+                  <p>{{ 'sponsor' if is_sponsor else 'member' }} </p>
+                </li>
+              {% endwith %}
+            {% endfor %}
           </ul>
         </div>
         

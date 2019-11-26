@@ -6,8 +6,10 @@ from securitas.controller.group import group, groups # noqa: F401
 from securitas.controller.password import password_reset # noqa: F401
 from securitas.controller.registration import register # noqa: F401
 from securitas.controller.user import user # noqa: F401
+from securitas.representation.group import Group
+from securitas.representation.user import User
 from securitas.security.ipa import maybe_ipa_session # noqa: F401
-from securitas.utility import Get, gravatar, with_ipa # noqa: F401
+from securitas.utility import gravatar, with_ipa # noqa: F401
 
 @app.context_processor
 def inject_global_template_vars():
@@ -16,9 +18,8 @@ def inject_global_template_vars():
     return dict(
         project="The Fedora Project",
         gravatar=gravatar,
-        Get=Get,
         ipa=ipa,
-        current_user=ipa.user_find(whoami=True) if ipa else None,
+        current_user=User(ipa.user_find(whoami=True)['result'][0]) if ipa else None,
         current_username=session.get('securitas_username'),
     )
 
@@ -44,20 +45,20 @@ def search_json(ipa):
     res = []
 
     if username:
-        users_ = ipa.user_find(username)
+        users_ = [User(u) for u in ipa.user_find(username)['result']]
 
-        for user_ in users_['result']:
-            uid = Get(user_)['uid'][0].final
-            cn = Get(user_)['cn'][0].final
+        for user_ in users_:
+            uid = user_.username
+            cn = user_.name
             if uid is not None:
                 # If the cn is None, who cares?
                 res.append({ 'uid': uid, 'cn': cn })
 
     if groupname:
-        groups_ = ipa.group_find(groupname)
-        for group_ in groups_['result']:
-            cn = Get(group_)['cn'][0].final
-            description = Get(group_)['description'][0].final
+        groups_ = [Group(g) for g in ipa.group_find(groupname)['result']]
+        for group_ in groups_:
+            cn = group_.name
+            description = group_.description
             if cn is not None:
                 # If the description is None, who cares?
                 res.append({ 'cn': cn, 'description': description })

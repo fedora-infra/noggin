@@ -4,7 +4,6 @@ from flask import abort, flash, redirect, url_for
 import python_freeipa
 
 from securitas.security.ipa import maybe_ipa_session
-from securitas.utility.get import Get # noqa: F401
 
 def gravatar(email, size):
     return "https://www.gravatar.com/avatar/" + hashlib.md5(
