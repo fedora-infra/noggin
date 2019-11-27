@@ -6,6 +6,14 @@ class User(Representation):
         return self._attr('uid')
 
     @property
+    def firstname(self):
+        return self._attr('givenname')
+
+    @property
+    def lastname(self):
+        return self._attr('sn')
+
+    @property
     def name(self):
         if 'displayname' in self.raw:
             return self._attr('displayname')

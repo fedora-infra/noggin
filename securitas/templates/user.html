@@ -27,7 +27,7 @@
               <span class="card-title">{{ user.username }}</span>
               {% if user.username == current_user.username %}
                 <p>
-                  <a href="#">Edit profile</a>
+                  <a href="{{ url_for('user_edit', username=user.username) }}">Edit profile</a>
                 </p>
               {% endif %}
               {% if user.timezone %}

@@ -14,10 +14,78 @@
     <div class="row">
       <div class="col s12">
         <h3 class="header light-blue-text text-darken-4 fw300">
-          Insert user edit form here
+          Edit user: {{ user.username }}
         </h3>
+
+        {% if form.errors %}
+          <ul class="errors">
+            {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+              {% for error in field_errors %}
+                <li>{{ form[field_name].label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        <form action="/user/{{ user.username }}/edit/" method="post">
+          {{ form.csrf_token }}
+
+          <div class="card">
+            <div class="card-content">
+
+              <div class="row">
+                <div class="input-field col s6">
+                  {{ form.firstname }}
+                  {{ form.firstname.label }}
+                </div>
+
+                <div class="input-field col s6">
+                  {{ form.lastname }}
+                  {{ form.lastname.label }}
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="input-field col s6">
+                  {{ form.mail }}
+                  {{ form.mail.label }}
+                </div>
+
+                <div class="input-field col s6">
+                  {{ form.locale }}
+                  {{ form.locale.label }}
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="input-field col s6">
+                  {{ form.ircnick }}
+                  {{ form.ircnick.label }}
+                </div>
+
+                <div class="input-field col s6">
+                  {{ form.timezone }}
+                  {{ form.timezone.label }}
+                </div>
+              </div>
+
+              <!-- Keep this one last for rendering purposes. -->
+              {# TODO: We need to have a way to add more keys #}
+              <div class="row">
+                <div class="input-field col s6">
+                  {{ form.gpgkeys }}
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="input-field col s12">
+                  <button class="btn waves-effect waves-light light-blue darken-4 w100" id="submit" type="submit" tabindex="9">Submit</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
       </div>
-    </div>
-    
+    </div>    
   </div>
 {% endblock %}
