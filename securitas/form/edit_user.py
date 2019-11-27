@@ -50,3 +50,21 @@ class EditUserForm(FlaskForm):
             DataRequired(message='Timezone must not be empty'),
             AnyOf(TIMEZONES, message='Timezone must be a valid timezone'),
         ])
+
+    github = StringField(
+        'GitHub Username',
+        validators=[
+            Optional(),
+        ])
+
+    gitlab = StringField(
+        'GitLab Username',
+        validators=[
+            Optional(),
+        ])
+
+    rhbz_mail = StringField(
+        'E-mail Address used in Red Hat Bugzilla',
+        validators=[
+            Optional(),
+        ])

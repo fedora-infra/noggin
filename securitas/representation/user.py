@@ -46,3 +46,15 @@ class User(Representation):
     @property
     def groups(self):
         return self._attrlist('memberof_group')
+
+    @property
+    def github(self):
+        return self._attr('fasgithubusername')
+
+    @property
+    def gitlab(self):
+        return self._attr('fasgitlabusername')
+
+    @property
+    def rhbz_mail(self):
+        return self._attr('fasrhbzemail')

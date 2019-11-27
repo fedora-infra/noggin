@@ -42,6 +42,21 @@
               {% if user.gpgkeys %}
                 <p><b>GPG Keys:</b> {{ user.gpgkeys|join(', ') }}</p>
               {% endif %}
+              {% if user.rhbz_mail %}
+                <p><b>RHBZ E-Mail:</b> {{ user.rhbz_mail }}</p>
+              {% endif %}
+              {% if user.github %}
+                <p>
+                  <b>GitHub:</b>
+                  <a href="https://github.com/{{ user.github }}">@{{ user.github }}</a>
+                </p>
+              {% endif %}
+              {% if user.gitlab %}
+                <p>
+                  <b>GitLab:</b>
+                  <a href="https://gitlab.com/{{ user.gitlab }}">@{{ user.gitlab }}</a>
+                </p>
+              {% endif %}
             </div>
             <div class="card-action">
               {# TODO: What all do we want to link to here? #}

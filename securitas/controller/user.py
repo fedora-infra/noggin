@@ -39,7 +39,11 @@ def user_edit(ipa, username):
                 fasircnick=form.ircnick.data,
                 faslocale=form.locale.data,
                 fastimezone=form.timezone.data,
-                fasgpgkeyid=form.gpgkeys.data)
+                fasgpgkeyid=form.gpgkeys.data,
+                fasgithubusername=form.github.data.lstrip('@'),
+                fasgitlabusername=form.gitlab.data.lstrip('@'),
+                fasrhbzemail=form.rhbz_mail.data,
+            )
         except python_freeipa.exceptions.BadRequest as e:
             if e.message == 'no modifications to be performed':
                 # Then we are ok still.
