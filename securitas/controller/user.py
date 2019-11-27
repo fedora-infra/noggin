@@ -29,7 +29,7 @@ def user_edit(ipa, username):
 
     if form.validate_on_submit():
         try:
-            res = ipa.user_mod(
+            ipa.user_mod(
                 username,
                 first_name=form.firstname.data,
                 last_name=form.lastname.data,
