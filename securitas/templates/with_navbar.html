@@ -13,9 +13,9 @@
             {% if current_user %}
               <form>
                 <div class="input-field">
-                  <input id="search" type="search" required>
-                  <label class="label-icon" for="search"><i class="material-icons">search</i></label>
-                  <i class="material-icons">close</i>
+                  <input id="search" type="search" class="typeahead" autocomplete="off">
+                  <!-- TODO: Fix margin-top hack; typeahead.js breaks it somehow otherwise. :( -->
+                  <label class="label-icon" for="search" style="margin-top: -12px;"><i class="material-icons">search</i></label>
                 </div>
               </form>
             {% endif %}
@@ -74,21 +74,24 @@
         }
     });
 
-    // TODO: This breaks the style and doesn't quite work yet anyway
-    /*
     $('#search').typeahead(
         { highlight: true},
         { name: 'users',
-          display: 'cn',
+          display: 'uid',
           source: bloodhound_users,
-          templates: { header: '<h3>Users</h3>' }
+          templates: {
+            header: '<h5>Users</h5>'
+          }
         },
         { name: 'groups',
           display: 'cn',
           source: bloodhound_groups,
-          templates: { header: '<h3>Groups</h3>' }
+          templates: { header: '<h5>Groups</h5>' }
         }
-    );
-    */
+    ).on('typeahead:selected', function(evt, itm, name) {
+      var path = name == "users" ? "user" : "group";
+      var n = path == "group" ? itm.cn : itm.uid;
+      window.location.href = '/' + path + '/' + n + '/';
+    });
   </script>
 {% endblock %}

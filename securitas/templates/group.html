@@ -27,7 +27,7 @@
     {# Here we create the modal to add users to the group, but only if the person
        viewing this page is a sponsor of the group. #}
 
-    <div id="sponsor-modal" class="modal">
+    <div id="sponsor-modal" class="modal with-typeahead">
       <div class="modal-content">
         <h4>Add Member to {{ group.name }}</h4>
 
@@ -35,7 +35,7 @@
           <div class="row">
             <div class="input-field col s6">
               {{ sponsor_form.hidden_tag() }}
-              {{ sponsor_form.new_member_username }}
+              {{ sponsor_form.new_member_username(class='typeahead', autocomplete="off") }}
               {{ sponsor_form.new_member_username.label }}
               <button class="btn waves-effect waves-light light-blue darken-4 w100" id="submit" type="submit" tabindex="9">Submit</button>
             </div>
@@ -54,7 +54,7 @@
       </div>
     </div>
 
-    <!--
+    {#
     {% if current_user.username in group.sponsors %}
       <div class="row">
         <div class="col s12">
@@ -65,7 +65,7 @@
         </div>
       </div>
     {% endif %}
-    -->
+    #}
 
     <div class="row">
       <div class="col m6 s12">
@@ -132,4 +132,21 @@
     </div>
 
   </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super () }}
+  <script>
+    {% if current_user.username in group.sponsors and sponsor_form %}
+      var typeahead = $('#new_member_username').typeahead(
+        { highlight: true},
+        { name: 'users',
+          display: 'uid',
+          source: bloodhound_users,
+          templates: { }
+        }
+      );
+      typeahead.unwrap();
+    {% endif %}
+  </script>
 {% endblock %}
