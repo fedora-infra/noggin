@@ -44,7 +44,7 @@ def group_add_member(ipa):
         groupname = sponsor_form.groupname.data
         # First make sure the user exists
         try:
-            user = ipa.user_show(username)
+            ipa.user_show(username)
         except python_freeipa.exceptions.NotFound:
             flash('User %s was not found in the system.' % username, 'red')
             return redirect(url_for('group', groupname=groupname))
