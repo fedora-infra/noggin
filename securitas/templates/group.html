@@ -11,6 +11,40 @@
 
 {% block content %}
   {{ super() }}
+
+  {% if sponsor_form and sponsor_form.errors %}
+    <ul class="errors">
+      {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+        {% for error in field_errors %}
+          <li>{{ form[field_name].label }}: {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+
+  {% if current_user.username in group.sponsors and sponsor_form %}
+    {# Here we create the modal to add users to the group, but only if the person
+       viewing this page is a sponsor of the group. #}
+
+    <div id="sponsor-modal" class="modal">
+      <div class="modal-content">
+        <h4>Add Member to {{ group.name }}</h4>
+
+        <form action="{{ url_for('group_add_member') }}" method="post">
+          <div class="row">
+            <div class="input-field col s6">
+              {{ sponsor_form.hidden_tag() }}
+              {{ sponsor_form.new_member_username }}
+              {{ sponsor_form.new_member_username.label }}
+              <button class="btn waves-effect waves-light light-blue darken-4 w100" id="submit" type="submit" tabindex="9">Submit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
   <div class="container section">
 
     <div class="row">
@@ -60,27 +94,39 @@
         <h4 class="header fw300">
           Users
           {% if current_user.username in group.sponsors %}
-            <a class="btn-floating btn-small right waves-effect waves-light red"><i class="material-icons">add</i></a>
+            <button class="btn btn-floating btn-small right waves-effect waves-light red modal-trigger" data-target="sponsor-modal">
+              <i class="material-icons">add</i>
+            </button>
           {% endif %}
         </h4>
-        <ul class="collection">
-          {% for member in members.values() %}
-            <li class="collection-item avatar">
-              <!-- TODO: .red if sponsor/admin -->
-              {% if member.mail %}
-                <img src="{{ gravatar(member.mail, 200) }}" class="circle">
-              {% else %}
-                <i class="material-icons circle">person</i>
-              {% endif %}
-              <a href="/user/{{ member.username }}">
-                <span class="title">{{ member.username }}</span>
-              </a>
-              <p>{{ member.name }}</p>
-              {# TODO: sponsor if sponsor #}
-              <p>member</p>
-            </li>
-          {% endfor %}
-        </ul>
+        <form action="{{ url_for('group_remove_member') }}" method="post">
+          {{ sponsor_form.hidden_tag() }}
+          <ul class="collection">
+            {% for member in members.values() %}
+              <li class="collection-item avatar">
+                <!-- TODO: .red if sponsor/admin -->
+                {% if member.mail %}
+                  <img src="{{ gravatar(member.mail, 200) }}" class="circle">
+                {% else %}
+                  <i class="material-icons circle">person</i>
+                {% endif %}
+                <a href="/user/{{ member.username }}">
+                  <span class="title">{{ member.username }}</span>
+                </a>
+                <p>{{ member.name }}</p>
+                {# TODO: sponsor if sponsor #}
+                <p>member</p>
+                {% if current_user.username in group.sponsors %}
+                  <div class="secondary-content">
+                    <button type="submit" class="btn-flat waves-effect waves-light red-text" name="username" value="{{ member.username }}">
+                      <i class="material-icons">remove_circle_outline</i>
+                    </button>
+                  </div>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </form>
       </div>
 
     </div>

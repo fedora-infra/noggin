@@ -7,7 +7,7 @@ RUN dnf -y install \
     python3-pip \
     python3-cryptography \
     && dnf clean all \
-    && pip3 install git+https://github.com/relrod/python-freeipa@exceptional-exceptions \
+    && pip3 install python-freeipa \
       flask-wtf \
       bandit \
       flake8

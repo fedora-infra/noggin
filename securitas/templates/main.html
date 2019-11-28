@@ -1,5 +1,5 @@
 {% macro css(name) %}
-  <link href="{{ url_for('static', filename='css/' + name + '.css') }}" rel="stylesheet" type="text/css">  
+  <link href="{{ url_for('static', filename='css/' + name + '.css') }}" rel="stylesheet" type="text/css">
 {% endmacro %}
 
 {% macro ifa(cond) %}
@@ -41,9 +41,14 @@
     {% endblock %}
 
     {% block scripts %}
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
       <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+      <script>
+        $(function() {
+          $('.modal').modal()
+        });
+      </script>
     {% endblock %}
   </body>
 </html>

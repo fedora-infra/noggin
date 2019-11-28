@@ -56,7 +56,7 @@ def user_edit(ipa, username):
         flash(
             'Profile has been succesfully updated.',
             'green')
-        return redirect(url_for('user', username=username))        
+        return redirect(url_for('user', username=username))
 
     form.process(obj=user)
     return render_template('user-edit.html', user=user, form=form)
