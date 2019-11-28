@@ -1,6 +1,6 @@
 import hashlib
 from functools import wraps
-from flask import abort, flash, redirect, url_for
+from flask import abort, flash, g, redirect, url_for
 import python_freeipa
 
 from securitas.security.ipa import maybe_ipa_session
@@ -17,6 +17,7 @@ def with_ipa(app, session):
         def fn(*args, **kwargs):
             ipa = maybe_ipa_session(app, session)
             if ipa:
+                g.ipa = ipa
                 return f(*args, **kwargs, ipa=ipa)
             flash('Please log in to continue.', 'orange')
             return redirect(url_for('root'))

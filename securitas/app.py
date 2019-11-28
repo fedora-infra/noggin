@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, session, jsonify
+from flask import g, render_template, request, redirect, url_for, session, jsonify
 
 from securitas import app
 from securitas.controller.authentication import login, logout # noqa: F401
@@ -13,13 +13,12 @@ from securitas.utility import gravatar, with_ipa # noqa: F401
 
 @app.context_processor
 def inject_global_template_vars():
-    ipa = maybe_ipa_session(app, session)
     # TODO: move project out to config var
     return dict(
         project="The Fedora Project",
         gravatar=gravatar,
-        ipa=ipa,
-        current_user=User(ipa.user_find(whoami=True)['result'][0]) if ipa else None,
+        ipa=g.ipa if 'ipa' in g else None,
+        current_user=User(g.ipa.user_find(whoami=True)['result'][0]) if 'ipa' in g else None,
         current_username=session.get('securitas_username'),
     )
 

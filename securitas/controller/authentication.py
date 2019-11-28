@@ -3,10 +3,11 @@ import python_freeipa
 
 from securitas import app
 from securitas.security.ipa import maybe_ipa_login, maybe_ipa_session
+from securitas.utility import with_ipa
 
 @app.route('/logout')
-def logout():
-    ipa = maybe_ipa_session(app, session)
+@with_ipa(app, session)
+def logout(ipa):
     if ipa:
         ipa.logout()
     session.clear()

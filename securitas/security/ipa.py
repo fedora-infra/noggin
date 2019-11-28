@@ -30,7 +30,8 @@ def maybe_ipa_session(app, session):
         # We have reconstructed a client, let's send a ping and see if we are
         # successful.
         try:
-            client._request('ping')
+            ping = client._request('ping')
+            client.ipa_version = ping['summary']
         except python_freeipa.exceptions.Unauthorized:
             return None
         return client
