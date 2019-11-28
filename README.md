@@ -18,12 +18,15 @@ Immediate goals of *securitas* are:
 
 Here is what works so far:
 
-* User pages (seeing information about a user, groups they are in, etc.)
-* Group pages (seeing who all is in a group)
 * Logging in
 * Registering new accounts
 * Resetting current, known (possibly expired) passwords (but not forgotten ones)
 * Decent error handling for all of the above
+* User pages (seeing information about a user, groups they are in, etc.)
+* Group pages (seeing who all is in a group)
+* Allowing group member managers to sponsor people into groups
+* Allowing group member managers to remove people from groups
+* Editing user profile information
 
 <img src="https://images.elrod.me/securitas-screenshot.png?2">
 
