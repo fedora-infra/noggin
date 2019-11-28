@@ -15,7 +15,7 @@ Immediate goals of *securitas* are:
 * Allow users to update and manage their information (name, password, etc.)
 * Allow group administrators to add/remove members from groups for which they
   are responsible.
-  
+
 Here is what works so far:
 
 * User pages (seeing information about a user, groups they are in, etc.)
@@ -25,7 +25,7 @@ Here is what works so far:
 * Resetting current, known (possibly expired) passwords (but not forgotten ones)
 * Decent error handling for all of the above
 
-<img src="https://images.elrod.me/securitas-screenshot.png?1">
+<img src="https://images.elrod.me/securitas-screenshot.png?2">
 
 ## Setup tips
 
