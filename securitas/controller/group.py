@@ -1,4 +1,4 @@
-from flask import flash, render_template, redirect, session, url_for
+from flask import flash, g, render_template, redirect, session, url_for
 import python_freeipa
 
 from securitas import app
@@ -14,17 +14,15 @@ def group(ipa, groupname):
     group = Group(group_or_404(ipa, groupname))
     sponsor_form = AddGroupMemberForm(groupname=groupname)
     remove_form = RemoveGroupMemberForm(groupname=groupname)
-    members = {}
-    sponsors = {}
-    for member in group.members:
-        info = User(ipa.user_show(member))
-        members[info.username] = info
-    for sponsor in group.sponsors:
-        if sponsor in members:
-            sponsors[sponsor] = members[sponsor]
-        else:
-            info = User(ipa.user_show(sponsor))
-            sponsors[info.username] = info
+
+    sponsors = []
+    members = [User(u) for u in ipa.user_find(in_group=groupname)['result']]
+    for member in members:
+        if member.username in group.sponsors:
+            sponsors.append(member)
+
+    # We can safely assume g.current_user exists after @with_ipa
+    current_user_is_sponsor = g.current_user.username in group.sponsors
 
     return render_template(
         'group.html',
@@ -33,6 +31,7 @@ def group(ipa, groupname):
         sponsors=sponsors,
         sponsor_form=sponsor_form,
         remove_form=remove_form,
+        current_user_is_sponsor=current_user_is_sponsor,
     )
 
 @app.route('/group/add-member/', methods=['POST'])

@@ -3,6 +3,7 @@ from functools import wraps
 from flask import abort, flash, g, redirect, url_for
 import python_freeipa
 
+from securitas.representation.user import User
 from securitas.security.ipa import maybe_ipa_session
 
 def gravatar(email, size):
@@ -18,6 +19,7 @@ def with_ipa(app, session):
             ipa = maybe_ipa_session(app, session)
             if ipa:
                 g.ipa = ipa
+                g.current_user = User(g.ipa.user_find(whoami=True)['result'][0])
                 return f(*args, **kwargs, ipa=ipa)
             flash('Please log in to continue.', 'orange')
             return redirect(url_for('root'))

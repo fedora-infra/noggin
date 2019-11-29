@@ -23,7 +23,7 @@
   {% endif %}
 
 
-  {% if current_user.username in group.sponsors and sponsor_form %}
+  {% if current_user_is_sponsor and sponsor_form %}
     {# Here we create the modal to add users to the group, but only if the person
        viewing this page is a sponsor of the group. #}
 
@@ -55,7 +55,7 @@
     </div>
 
     {#
-    {% if current_user.username in group.sponsors %}
+    {% if current_user_is_sponsor %}
       <div class="row">
         <div class="col s12">
           <div class="card-panel orange lighten-4 orange-text text-darken-4">
@@ -71,7 +71,7 @@
       <div class="col m6 s12">
         <h4 class="header fw300">Sponsors</h4>
         <ul class="collection">
-          {% for sponsor in sponsors.values()|sort(attribute='username') %}
+          {% for sponsor in sponsors|sort(attribute='username') %}
             <li class="collection-item avatar">
               <!-- TODO: .red if sponsor/admin -->
               {% if sponsor.mail %}
@@ -93,7 +93,7 @@
       <div class="col m6 s12">
         <h4 class="header fw300">
           Users
-          {% if current_user.username in group.sponsors %}
+          {% if current_user_is_sponsor %}
             <button class="btn btn-floating btn-small right waves-effect waves-light red modal-trigger" data-target="sponsor-modal">
               <i class="material-icons">add</i>
             </button>
@@ -102,7 +102,7 @@
         <form action="{{ url_for('group_remove_member') }}" method="post">
           {{ sponsor_form.hidden_tag() }}
           <ul class="collection">
-            {% for member in members.values()|sort(attribute='username') %}
+            {% for member in members|sort(attribute='username') %}
               <li class="collection-item avatar">
                 <!-- TODO: .red if sponsor/admin -->
                 {% if member.mail %}
@@ -116,7 +116,7 @@
                 <p>{{ member.name }}</p>
                 {# TODO: sponsor if sponsor #}
                 <p>member</p>
-                {% if current_user.username in group.sponsors %}
+                {% if current_user_is_sponsor %}
                   <div class="secondary-content">
                     <button type="submit" class="btn-flat waves-effect waves-light red-text" name="username" value="{{ member.username }}">
                       <i class="material-icons">remove_circle_outline</i>
@@ -137,7 +137,7 @@
 {% block scripts %}
   {{ super () }}
   <script>
-    {% if current_user.username in group.sponsors and sponsor_form %}
+    {% if current_user_is_sponsor and sponsor_form %}
       var typeahead = $('#new_member_username').typeahead(
         { highlight: true},
         { name: 'users',
