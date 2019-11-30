@@ -2,7 +2,7 @@ from flask import flash, redirect, request, session, url_for
 import python_freeipa
 
 from securitas import app
-from securitas.security.ipa import maybe_ipa_login, maybe_ipa_session
+from securitas.security.ipa import maybe_ipa_login
 from securitas.utility import with_ipa
 
 @app.route('/logout')
