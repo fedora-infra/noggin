@@ -1,13 +1,14 @@
 from cryptography.fernet import Fernet
 import python_freeipa
 from python_freeipa import Client
+import random
 
 # Construct an IPA client from app config, but don't attempt to log in with it
 # or to form a session of any kind with it. This is useful for one-off cases
 # like password resets where a session isn't actually required.
 def untouched_ipa_client(app):
     return Client(
-        app.config['FREEIPA_SERVER'],
+        random.choice(app.config['FREEIPA_SERVERS']),
         verify_ssl=app.config['FREEIPA_CACERT'])
 
 # Attempt to obtain an IPA session from a cookie.
@@ -19,11 +20,12 @@ def untouched_ipa_client(app):
 # It will be None if no session was provided or was provided but invalid.
 def maybe_ipa_session(app, session):
     encrypted_session = session.get('securitas_session', None)
-    if encrypted_session:
+    server_hostname = session.get('securitas_ipa_server_hostname', None)
+    if encrypted_session and server_hostname:
         fernet = Fernet(app.config['FERNET_SECRET'])
         ipa_session = fernet.decrypt(encrypted_session)
         client = Client(
-            app.config['FREEIPA_SERVER'],
+            server_hostname,
             verify_ssl=app.config['FREEIPA_CACERT'])
         client._session.cookies['ipa_session'] = str(ipa_session, 'utf8')
 
@@ -34,6 +36,8 @@ def maybe_ipa_session(app, session):
             client.ipa_version = ping['summary']
         except python_freeipa.exceptions.Unauthorized:
             return None
+        # If there's any other kind of exception, we let it propagate up for the
+        # controller (and, more practically, @with_ipa) to handle.
         return client
     return None
 
@@ -44,8 +48,13 @@ def maybe_ipa_session(app, session):
 #
 # On an unsuccessful login, we'll let the exception bubble up.
 def maybe_ipa_login(app, session, username, password):
+    # A session token is bound to a particular server, so we store the server
+    # in the session and just always use that. Flask sessions are signed, so we
+    # are safe in later assuming that the server hostname cookie has not been
+    # altered.
+    chosen_server = random.choice(app.config['FREEIPA_SERVERS'])
     client = Client(
-        app.config['FREEIPA_SERVER'],
+        chosen_server,
         verify_ssl=app.config['FREEIPA_CACERT'])
 
     auth = client.login(username, password)
@@ -55,6 +64,7 @@ def maybe_ipa_login(app, session, username, password):
         encrypted_session = fernet.encrypt(
             bytes(client._session.cookies['ipa_session'], 'utf8'))
         session['securitas_session'] = encrypted_session
+        session['securitas_ipa_server_hostname'] = chosen_server
         session['securitas_username'] = username
         return client
 
