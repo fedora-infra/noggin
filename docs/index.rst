@@ -37,6 +37,7 @@ Here is what works so far:
    :caption: User Guide
 
    installation
+   release_notes
 
 .. API
 

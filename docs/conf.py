@@ -13,7 +13,9 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath("../"))  # NOQA
+
+import securitas
 
 
 # -- Project information -----------------------------------------------------
@@ -23,10 +25,10 @@ copyright = '2020, Red Hat, Inc'
 author = 'Fedora Infrastructure'
 
 # The short X.Y version
-version = '0.0'
+version = ".".join(securitas.__version__.split(".")[:2])
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = securitas.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -37,6 +39,7 @@ release = '0.0.1'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.extlinks',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
 ]
@@ -83,4 +86,10 @@ html_static_path = ['_static']
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+}
+
+extlinks = {
+    "commit": ("https://github.com/fedora-infra/securitas/commit/%s", ""),
+    "issue": ("https://github.com/fedora-infra/securitas/issues/%s", "#"),
+    "pr": ("https://github.com/fedora-infra/securitas/pull/%s", "PR#"),
 }
