@@ -6,9 +6,15 @@ import python_freeipa
 from securitas.representation.user import User
 from securitas.security.ipa import maybe_ipa_session
 
+
 def gravatar(email, size):
-    return "https://www.gravatar.com/avatar/" + hashlib.md5(
-        email.lower().encode('utf8')).hexdigest() + "?s=" + str(size) # nosec
+    return (
+        "https://www.gravatar.com/avatar/"
+        + hashlib.md5(email.lower().encode('utf8')).hexdigest()  # nosec
+        + "?s="
+        + str(size)
+    )
+
 
 # A wrapper that will give us 'ipa' if it exists, or bump the user back to /
 # with a message telling them to log in.
@@ -23,14 +29,18 @@ def with_ipa(app, session):
                 return f(*args, **kwargs, ipa=ipa)
             flash('Please log in to continue.', 'orange')
             return redirect(url_for('root'))
+
         return fn
+
     return decorator
+
 
 def group_or_404(ipa, groupname):
     try:
         return ipa.group_show(groupname)
     except python_freeipa.exceptions.NotFound:
         abort(404)
+
 
 def user_or_404(ipa, username):
     try:

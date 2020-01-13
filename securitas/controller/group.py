@@ -8,6 +8,7 @@ from securitas.representation.user import User
 from securitas.representation.group import Group
 from securitas.utility import group_or_404, with_ipa
 
+
 @app.route('/group/<groupname>/')
 @with_ipa(app, session)
 def group(ipa, groupname):
@@ -33,6 +34,7 @@ def group(ipa, groupname):
         remove_form=remove_form,
         current_user_is_sponsor=current_user_is_sponsor,
     )
+
 
 @app.route('/group/add-member/', methods=['POST'])
 @with_ipa(app, session)
@@ -60,10 +62,9 @@ def group_add_member(ipa):
 
             return redirect(url_for('group', groupname=groupname))
 
-        flash(
-            'You got it! %s has been added to %s.' % (username, groupname),
-            'green')
+        flash('You got it! %s has been added to %s.' % (username, groupname), 'green')
         return redirect(url_for('group', groupname=groupname))
+
 
 @app.route('/group/remove-member/', methods=['POST'])
 @with_ipa(app, session)
@@ -86,9 +87,10 @@ def group_remove_member(ipa):
             return redirect(url_for('group', groupname=groupname))
 
         flash(
-            'You got it! %s has been removed from %s.' % (username, groupname),
-            'green')
+            'You got it! %s has been removed from %s.' % (username, groupname), 'green'
+        )
         return redirect(url_for('group', groupname=groupname))
+
 
 @app.route('/groups/')
 @with_ipa(app, session)

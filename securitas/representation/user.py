@@ -1,5 +1,6 @@
 from securitas.representation import Representation
 
+
 class User(Representation):
     @property
     def username(self):

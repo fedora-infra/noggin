@@ -1,5 +1,6 @@
 from securitas.representation import Representation
 
+
 class Group(Representation):
     @property
     def name(self):
