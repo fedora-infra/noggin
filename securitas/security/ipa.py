@@ -9,7 +9,9 @@ import random
 def untouched_ipa_client(app):
     return Client(
         random.choice(app.config['FREEIPA_SERVERS']),
-        verify_ssl=app.config['FREEIPA_CACERT'])
+        verify_ssl=app.config['FREEIPA_CACERT'],
+    )
+
 
 # Attempt to obtain an IPA session from a cookie.
 #
@@ -24,9 +26,7 @@ def maybe_ipa_session(app, session):
     if encrypted_session and server_hostname:
         fernet = Fernet(app.config['FERNET_SECRET'])
         ipa_session = fernet.decrypt(encrypted_session)
-        client = Client(
-            server_hostname,
-            verify_ssl=app.config['FREEIPA_CACERT'])
+        client = Client(server_hostname, verify_ssl=app.config['FREEIPA_CACERT'])
         client._session.cookies['ipa_session'] = str(ipa_session, 'utf8')
 
         # We have reconstructed a client, let's send a ping and see if we are
@@ -41,6 +41,7 @@ def maybe_ipa_session(app, session):
         return client
     return None
 
+
 # Attempt to log in to an IPA server.
 #
 # On a successful login, we will encrypt the session token and put it in the
@@ -53,16 +54,15 @@ def maybe_ipa_login(app, session, username, password):
     # are safe in later assuming that the server hostname cookie has not been
     # altered.
     chosen_server = random.choice(app.config['FREEIPA_SERVERS'])
-    client = Client(
-        chosen_server,
-        verify_ssl=app.config['FREEIPA_CACERT'])
+    client = Client(chosen_server, verify_ssl=app.config['FREEIPA_CACERT'])
 
     auth = client.login(username, password)
 
     if auth and auth.logged_in:
         fernet = Fernet(app.config['FERNET_SECRET'])
         encrypted_session = fernet.encrypt(
-            bytes(client._session.cookies['ipa_session'], 'utf8'))
+            bytes(client._session.cookies['ipa_session'], 'utf8')
+        )
         session['securitas_session'] = encrypted_session
         session['securitas_ipa_server_hostname'] = chosen_server
         session['securitas_username'] = username

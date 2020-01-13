@@ -4,6 +4,7 @@ import python_freeipa
 from securitas import app
 from securitas.security.ipa import untouched_ipa_client
 
+
 @app.route('/password-reset', methods=['GET', 'POST'])
 def password_reset():
     if request.method == 'GET':
@@ -29,28 +30,31 @@ def password_reset():
     except python_freeipa.exceptions.PWChangePolicyError as e:
         flash(
             'Failed to reset your password (policy error): %s' % str(e.policy_error),
-            'red')
+            'red',
+        )
         return redirect(url_for('password_reset'))
     except python_freeipa.exceptions.PWChangeInvalidPassword:
-        flash(
-            'Failed to reset your password (invalid current password).',
-            'red')
+        flash('Failed to reset your password (invalid current password).', 'red')
         return redirect(url_for('password_reset'))
     except python_freeipa.exceptions.FreeIPAError as e:
         flash('Failed to reset your password: %s' % str(e), 'red')
         return redirect(url_for('password_reset'))
 
     if res and res.ok:
-        flash('Your password has been changed, ' \
-              'please try to log in with the new one now.',
-              'green')
+        flash(
+            'Your password has been changed, '
+            'please try to log in with the new one now.',
+            'green',
+        )
         return redirect(url_for('root'))
 
     # If we made it here, we hit something weird not caught above. We didn't
     # bomb out, but we don't have a valid/good response from IPA. Boot the user
     # back to /.
-    flash('Something went wrong and your password might not have been ' \
-          'changed. Please try again, or report the issue to the system ' \
-          'administrator.',
-          'red')
+    flash(
+        'Something went wrong and your password might not have been '
+        'changed. Please try again, or report the issue to the system '
+        'administrator.',
+        'red',
+    )
     return redirect(url_for('root'))

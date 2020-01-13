@@ -7,6 +7,7 @@ from securitas.representation.group import Group
 from securitas.representation.user import User
 from securitas.utility import with_ipa, user_or_404
 
+
 @app.route('/user/<username>/')
 @with_ipa(app, session)
 def user(ipa, username):
@@ -14,14 +15,13 @@ def user(ipa, username):
     groups = [Group(g) for g in ipa.group_find(user=username)['result']]
     return render_template('user.html', user=user, groups=groups)
 
+
 @app.route('/user/<username>/edit/', methods=['GET', 'POST'])
 @with_ipa(app, session)
 def user_edit(ipa, username):
     # TODO: Maybe make this a decorator some day?
     if session.get('securitas_username') != username:
-        flash(
-            'You do not have permission to edit this account.',
-            'red')
+        flash('You do not have permission to edit this account.', 'red')
         return redirect(url_for('user', username=username))
 
     user = User(user_or_404(ipa, username))
@@ -49,13 +49,9 @@ def user_edit(ipa, username):
                 # Then we are ok still.
                 pass
             else:
-                flash(
-                    e.message,
-                    'red')
+                flash(e.message, 'red')
                 return redirect(url_for('user_edit', username=username))
-        flash(
-            'Profile has been succesfully updated.',
-            'green')
+        flash('Profile has been succesfully updated.', 'green')
         return redirect(url_for('user', username=username))
 
     form.process(obj=user)

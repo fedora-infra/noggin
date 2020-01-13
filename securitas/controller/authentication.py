@@ -5,6 +5,7 @@ from securitas import app
 from securitas.security.ipa import maybe_ipa_login
 from securitas.utility import with_ipa
 
+
 @app.route('/logout')
 @with_ipa(app, session)
 def logout(ipa):
@@ -12,6 +13,7 @@ def logout(ipa):
         ipa.logout()
     session.clear()
     return redirect(url_for('root'))
+
 
 @app.route('/login', methods=['POST'])
 def login():
