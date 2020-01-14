@@ -6,8 +6,23 @@ pull_request_rules:
       rebase_fallback: null
       strict: true
   conditions:
+  - -files~=^securitas/security/
   - label!=WIP
   - approved-reviews-by=@fedora-infra/authdev
   - "#approved-reviews-by>=1"
+  - status-success=DCO
+  - status-success=CI on f31
+
+- name: Sensitive files
+  actions:
+    merge:
+      method: rebase
+      rebase_fallback: null
+      strict: true
+  conditions:
+  - files~=^securitas/security/
+  - label!=WIP
+  - approved-reviews-by=@fedora-infra/authdev
+  - "#approved-reviews-by>=2"
   - status-success=DCO
   - status-success=CI on f31
