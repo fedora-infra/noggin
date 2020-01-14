@@ -70,6 +70,40 @@ Your pull request should contain tests for your new feature or bug fix. If
 you're not certain how to write tests, we will be happy to help you.
 
 
+Release Notes
+-------------
+
+To add entries to the release notes, create a file in the ``news`` directory in the
+``source.type`` name format, where the ``source`` part of the filename is:
+
+* ``42`` when the change is described in issue ``42``
+* ``PR42`` when the change has been implemented in pull request ``42``, and
+  there is no associated issue
+* ``Cabcdef`` when the change has been implemented in changeset ``abcdef``, and
+  there is no associated issue or pull request.
+
+And where the extension ``type`` is one of:
+
+* ``bic``: for backwards incompatible changes
+* ``dependency``: for dependency changes
+* ``feature``: for new features
+* ``bug``: for bug fixes
+* ``dev``: for development improvements
+* ``docs``: for documentation improvements
+* ``other``: for other changes
+
+The content of the file will end up in the release notes. It should not end with a ``.``
+(full stop).
+
+If it is not present already, add a file in the ``news`` directory named ``username.author``
+where ``username`` is the first part of your commit's email address, and containing the name
+you want to be credited as. There is a script to generate a list of authors that we run
+before releasing, but creating the file manually allows you to set a custom name.
+
+A preview of the release notes can be generated with
+``SECURITAS_CONFIG_PATH=`pwd`/securitas.cfg.default towncrier --draft``.
+
+
 Licensing
 ---------
 
@@ -116,3 +150,19 @@ address, indicating that you agree to the `Developer Certificate of Origin
 	    this project or the open source license(s) involved.
 
 Use ``git commit -s`` to add the Signed-off-by tag.
+
+
+Releasing
+---------
+
+When cutting a new release, follow these steps:
+
+#. Update the version in ``pyproject.toml``
+#. Add missing authors to the release notes fragments by changing to the ``news`` directory and
+   running the ``get-authors.py`` script, but check for duplicates and errors
+#. Generate the release notes by running
+   ``SECURITAS_CONFIG_PATH=`pwd`/securitas.cfg.default towncrier``
+#. Commit the changes
+#. Tag the commit with ``-s`` to generate a signed tag
+#. Push those changes to the upstream Github repository (via a PR or not)
+#. Generate a tarball and push to PyPI with the command ``poetry --build publish``

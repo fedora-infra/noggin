@@ -10,3 +10,16 @@ if app.config.get('TEMPLATES_AUTO_RELOAD'):
     app.jinja_env.auto_reload = True
 
 ipa_admin = IPAAdmin(app)
+
+
+try:
+    import importlib.metadata
+
+    __version__ = importlib.metadata.version("securitas")
+except ImportError:
+    try:
+        import pkg_resources
+
+        __version__ = pkg_resources.get_distribution("securitas").version
+    except ImportError:
+        __version__ = None

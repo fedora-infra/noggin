@@ -3,6 +3,7 @@ import python_freeipa
 from python_freeipa import Client
 import random
 
+
 # Construct an IPA client from app config, but don't attempt to log in with it
 # or to form a session of any kind with it. This is useful for one-off cases
 # like password resets where a session isn't actually required.
