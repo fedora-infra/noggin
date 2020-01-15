@@ -1,0 +1,44 @@
+---
+- name: Install RPM packages
+  dnf:
+      name: ['git', 'vim', 'poetry', 'python3-flask', 'python3-pip', 'python3-cryptography', 'freeipa-server']
+      state: present
+
+- name: install python deps with poetry
+  shell: poetry install
+  become: yes
+  become_user: vagrant
+  args:
+    chdir: /vagrant/
+
+- name: install freeipa server
+  shell: ipa-server-install -a adminPassw0rd! --hostname=ipa.example.com -r EXAMPLE.COM -p adminPassw0rd! -n example.com -U
+
+- name: get freeipa-fas
+  git:
+    repo: https://github.com/fedora-infra/freeipa-fas.git
+    dest: /tmp/freeipa-fas
+
+- name: install freeipa-fas
+  shell: ./install.sh
+  args:
+    chdir: /tmp/freeipa-fas/
+
+- name: Install the .bashrc
+  copy:
+      src: .bashrc
+      dest: /home/vagrant/.bashrc
+      mode: 0644
+      owner: vagrant
+      group: vagrant
+
+- name: Install securitas.cfg
+  copy:
+      src: /vagrant/securitas.cfg.default
+      dest: /home/vagrant/securitas.cfg
+      remote_src: yes
+      owner: vagrant
+      group: vagrant
+
+
+
