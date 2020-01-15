@@ -1,4 +1,5 @@
 from python_freeipa import Client
+import random
 
 
 class IPAAdmin(object):
@@ -12,7 +13,7 @@ class IPAAdmin(object):
     # Attempt to obtain an administrative IPA session
     def __maybe_ipa_admin_session(self):
         self.__client = Client(
-            self.__app.config['FREEIPA_SERVER'],
+            random.choice(self.__app.config['FREEIPA_SERVERS']),
             verify_ssl=self.__app.config['FREEIPA_CACERT'],
         )
         self.__client.login(self.__username, self.__password)
