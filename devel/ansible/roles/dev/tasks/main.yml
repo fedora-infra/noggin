@@ -40,5 +40,27 @@
       owner: vagrant
       group: vagrant
 
+- name: Install dummy data deps
+  pip:
+    name:
+      - python-freeipa
+      - Faker
 
+- name: Create dummy freeipa data
+  shell: python3 /vagrant/tools/create-test-data.py
 
+- name: Install the systemd unit files for securitas services
+  copy:
+      src: "{{ item }}"
+      dest: /etc/systemd/system/{{ item }}
+      mode: 0644
+  with_items:
+      - securitas.service
+
+- name: Start and enable the securitas services
+  service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+  with_items:
+      - securitas
