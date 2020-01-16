@@ -25,3 +25,9 @@ class IPAAdmin(object):
         res = ipa.user_add(*args, **kwargs)
         ipa.logout()
         return res
+
+    def user_del(self, *args, **kwargs):
+        ipa = self.__maybe_ipa_admin_session()
+        res = ipa.user_del(*args, **kwargs)
+        ipa.logout()
+        return res
