@@ -25,6 +25,35 @@ below.
 .. note:: If you do not wish to use GitHub, please send patches to
           infrastructure@lists.fedoraproject.org.
 
+Development Environment
+=======================
+Vagrant allows contributors to get quickly up and running with a Securitas development environment by
+automatically configuring a virtual machine. To get started, first install the Vagrant and Virtualization 
+packages needed, and start the libvirt service::
+
+    $ sudo dnf install ansible libvirt vagrant-libvirt vagrant-sshfs vagrant-hostmanager
+    $ sudo systemctl enable libvirtd
+    $ sudo systemctl start libvirtd
+
+Check out the code and run ``vagrant up``::
+
+    $ git clone https://github.com/fedora-infra/securitas
+    $ cd securitas
+    $ vagrant up
+
+Next, SSH into your newly provisioned development environment, and start the securitas web application:
+
+    $ vagrant ssh
+    $ cd /vagrant/
+    $ poetry run flask run --host=0.0.0.0
+
+With the securitas web application running, go to http://ipa.example.com:5000/ in the browser on your
+host machine to see the web application. http://ipa.example.com will give you access to the regular freeIPA
+webUI.
+
+Note that the ``/vagrant/`` file contains the source of the git checkout on your host. Any changes
+to the files in that directory on the host will be automatically synced to the VM.
+
 
 Guidelines
 ==========
