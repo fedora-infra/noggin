@@ -1,0 +1,12 @@
+{% macro with_errors(field) %}
+    {% if field.errors %}
+        {% set css_class = 'invalid ' + kwargs.pop('class', '') %}
+        {{ field(class=css_class, **kwargs) }}
+    {% else %}
+        {{ field(**kwargs) }}
+    {% endif %}
+    <label for="{{ field.name }}">{{ field.label }}</label>
+    <span class="helper-text" data-error="{{ field.errors|map('escape')|join('<br />') }}">
+        {{ field.description|e }}
+    </span>
+{% endmacro %}

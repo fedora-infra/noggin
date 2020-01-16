@@ -23,55 +23,7 @@
 
     <div class="row">
       <div class="col s5">
-        <form action="/register" method="post">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-          <div class="card">
-            <div class="card-content">
-
-              <span class="card-title">Register</span>
-
-              <div class="row">
-                <div class="input-field col s6">
-                  <input placeholder="Jane" id="first_name" name="first_name" type="text" class="validate" tabindex="4">
-                  <label for="first_name">First Name</label>
-                </div>
-
-                <div class="input-field col s6">
-                  <input placeholder="Doe" id="last_name" name="last_name" type="text" class="validate" tabindex="5">
-                  <label for="last_name">Last Name</label>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="input-field col s12">
-                  <input placeholder="jdoe" id="username" name="username" type="text" class="validate" tabindex="6">
-                  <label for="username">Username</label>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="input-field col s6">
-                  <input placeholder="password" id="password" name="password" type="password" class="validate" tabindex="7">
-                  <label for="password">Password</label>
-                </div>
-
-                <div class="input-field col s6">
-                  <input placeholder="password" id="password_confirm" name="password_confirm" type="password" class="validate" tabindex="8">
-                  <label for="password_confirm">Password Confirmation</label>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="input-field col s12">
-                  <button class="btn waves-effect waves-light light-blue darken-4 w100" id="submit" type="submit" tabindex="9">Submit</button>
-                </div>
-              </div>
-
-            </div>
-            <div class="clearfix"></div>
-          </div>
-        </form>
+        {% include '_register_form.html' %}
       </div>
 
       <div class="col s5 offset-s2">
