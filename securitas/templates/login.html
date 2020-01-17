@@ -1,0 +1,26 @@
+{% extends "with_navbar.html" %}
+{% block title %}Self-Service Portal{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  {{ css("index") }}
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+
+  <div class="container section">
+    <div class="row">
+      <div class="col s12">
+        <h3 class="header light-blue-text text-darken-4 fw300">User login</h3>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col s5">
+        {% include '_login_form.html' %}
+      </div>
+
+    </div>
+  </div>
+{% endblock %}

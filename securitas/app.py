@@ -7,6 +7,7 @@ from securitas.controller.password import password_reset  # noqa: F401
 from securitas.controller.registration import register  # noqa: F401
 from securitas.controller.user import user  # noqa: F401
 from securitas.form.register_user import RegisterUserForm
+from securitas.form.login_user import LoginUserForm
 from securitas.representation.group import Group
 from securitas.representation.user import User
 from securitas.security.ipa import maybe_ipa_session  # noqa: F401
@@ -38,7 +39,10 @@ def root():
         return redirect(url_for('user', username=username))
     # Kick any non-authed user back to the login form.
     register_form = RegisterUserForm()
-    return render_template('index.html', register_form=register_form)
+    login_form = LoginUserForm()
+    return render_template(
+        'index.html', register_form=register_form, login_form=login_form
+    )
 
 
 @app.route('/search/json')
