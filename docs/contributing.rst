@@ -48,10 +48,10 @@ Next, SSH into your newly provisioned development environment:
 where you can run the following commands:
 
     $ securitas-restart
-		$ securitas-stop
-		$ securitas-logs
-		$ securitas-start
-		$ securitas-unit-tests
+    $ securitas-stop
+    $ securitas-logs
+    $ securitas-start
+    $ securitas-unit-tests
 
 The securitas web application should be running automatically. To access it, go to http://ipa.example.com:5000/ in the browser on your
 host machine to see the web application. http://ipa.example.com will give you access to the regular freeIPA
