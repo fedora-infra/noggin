@@ -3,15 +3,25 @@ from unittest import mock
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
+from flask import session
 
 
-def test_logout(client):
-    """Test logout"""
-    # check that when unauthed, we redirect back to /
-    result = client.get('/logout', follow_redirects=True)
-    page = BeautifulSoup(result.data, 'html.parser')
-    assert page.title
-    assert page.title.string == 'Self-Service Portal - The Fedora Project'
+def test_logout_unauthed(client):
+    """Test logout when not logged in"""
+    result = client.get('/logout', follow_redirects=False)
+    assert result.status_code == 302
+    assert result.location == "http://localhost/"
+
+
+@pytest.mark.vcr()
+def test_logout(client, logged_in_dummy_user):
+    """Test logout with a logged-in user"""
+    result = client.get('/logout', follow_redirects=False)
+    assert result.status_code == 302
+    assert result.location == "http://localhost/"
+    assert "securitas_session" not in session
+    assert "securitas_username" not in session
+    assert "securitas_ipa_server_hostname" not in session
 
 
 @pytest.mark.vcr()
@@ -26,6 +36,8 @@ def test_login(client):
     messages = page.select(".flash-messages .green")
     assert len(messages) == 1
     assert messages[0].get_text(strip=True) == 'Welcome, dudemcpants!'
+    assert session.get("securitas_username") == "dudemcpants"
+    assert session.get("securitas_session") is not None
 
 
 def test_login_no_password(client):
@@ -39,6 +51,8 @@ def test_login_no_password(client):
     assert 'invalid' in password_input['class']
     helper_text = password_input.find_next("span", class_="helper-text")
     assert helper_text["data-error"] == "You must provide a password"
+    assert "securitas_session" not in session
+    assert "securitas_username" not in session
 
 
 def test_login_no_username(client):
@@ -52,6 +66,8 @@ def test_login_no_username(client):
     assert 'invalid' in username_input['class']
     helper_text = username_input.find_next("span", class_="helper-text")
     assert helper_text["data-error"] == "You must provide a user name"
+    assert "securitas_session" not in session
+    assert "securitas_username" not in session
 
 
 @pytest.mark.vcr()
@@ -68,6 +84,8 @@ def test_login_incorrect_password(client):
     error_message = submit_button.find_next("p")
     assert "red-text" in error_message["class"]
     assert error_message.get_text(strip=True) == 'Unauthorized: bad credentials.'
+    assert "securitas_session" not in session
+    assert "securitas_username" not in session
 
 
 def test_login_generic_error(client):
@@ -85,6 +103,8 @@ def test_login_generic_error(client):
     error_message = submit_button.find_next("p")
     assert "red-text" in error_message["class"]
     assert error_message.string == 'Could not log in to the IPA server.'
+    assert "securitas_session" not in session
+    assert "securitas_username" not in session
 
 
 def test_login_cant_login(client):
@@ -99,3 +119,5 @@ def test_login_cant_login(client):
     error_message = submit_button.find_next("p")
     assert "red-text" in error_message["class"]
     assert error_message.string == 'Could not log in to the IPA server.'
+    assert "securitas_session" not in session
+    assert "securitas_username" not in session

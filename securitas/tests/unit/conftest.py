@@ -5,7 +5,7 @@ import pytest
 
 from securitas import ipa_admin
 from securitas.app import app
-from securitas.security.ipa import untouched_ipa_client
+from securitas.security.ipa import untouched_ipa_client, maybe_ipa_login
 
 
 @pytest.fixture(scope="session")
@@ -53,17 +53,25 @@ def vcr_cassette_dir(request):
 
 @pytest.fixture
 def dummy_user():
-    try:
-        ipa_admin.user_add(
-            'dummy',
-            'Dummy',
-            'User',
-            'Dummy User',
-            user_password='dummy_password',
-            login_shell='/bin/bash',
-        )
-        ipa = untouched_ipa_client(app)
-        ipa.change_password('dummy', 'dummy_password', 'dummy_password')
-        yield
-    finally:
-        ipa_admin.user_del('dummy')
+    ipa_admin.user_add(
+        'dummy',
+        'Dummy',
+        'User',
+        'Dummy User',
+        user_password='dummy_password',
+        login_shell='/bin/bash',
+    )
+    ipa = untouched_ipa_client(app)
+    ipa.change_password('dummy', 'dummy_password', 'dummy_password')
+    yield
+    ipa_admin.user_del('dummy')
+
+
+@pytest.fixture
+def logged_in_dummy_user(client, dummy_user):
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_login(app, sess, "dummy", "dummy_password")
+    yield ipa
+    ipa.logout()
+    with client.session_transaction() as sess:
+        sess.clear()
