@@ -57,10 +57,9 @@
   with_items:
       - securitas.service
 
-- name: Start and enable the securitas services
-  service:
-      name: "{{ item }}"
-      state: started
-      enabled: yes
-  with_items:
-      - securitas
+- name: Reload systemd so it learns about securitas
+  systemd:
+    state: started
+    name: securitas
+    daemon_reload: yes
+    enabled: yes
