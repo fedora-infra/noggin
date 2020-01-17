@@ -5,6 +5,26 @@ import python_freeipa
 from bs4 import BeautifulSoup
 from flask import session, get_flashed_messages
 
+from securitas import ipa_admin
+
+
+@pytest.fixture
+def dummy_user_expired_password():
+    ipa_admin.user_add(
+        'dummy',
+        'Dummy',
+        'User',
+        'Dummy User',
+        user_password='dummy_password',
+        login_shell='/bin/bash',
+    )
+    # Don't change the password: it will be expired
+    yield
+    ipa_admin.user_del('dummy')
+
+
+# Logout
+
 
 def test_logout_unauthed(client):
     """Test logout when not logged in"""
@@ -25,6 +45,9 @@ def test_logout(client, logged_in_dummy_user):
     assert "securitas_session" not in session
     assert "securitas_username" not in session
     assert "securitas_ipa_server_hostname" not in session
+
+
+# Login
 
 
 @pytest.mark.vcr()
@@ -122,5 +145,27 @@ def test_login_cant_login(client):
     error_message = submit_button.find_next("p")
     assert "red-text" in error_message["class"]
     assert error_message.string == 'Could not log in to the IPA server.'
+    assert "securitas_session" not in session
+    assert "securitas_username" not in session
+
+
+@pytest.mark.vcr()
+def test_login_expired_password(client, dummy_user_expired_password):
+    """Test a successful Login with an expired password"""
+    result = client.post(
+        '/login',
+        data={"username": "dummy", "password": "dummy_password"},
+        follow_redirects=False,
+    )
+    # We are sent to the password reset page
+    assert result.status_code == 302
+    assert result.location == "http://localhost/password-reset"
+    # With an appropriate message
+    messages = get_flashed_messages(with_categories=True)
+    assert len(messages) == 1
+    category, message = messages[0]
+    assert message == "Password expired. Please reset it."
+    assert category == "red"
+    # We are not logged in
     assert "securitas_session" not in session
     assert "securitas_username" not in session
