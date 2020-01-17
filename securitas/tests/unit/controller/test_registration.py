@@ -143,3 +143,12 @@ def test_register_generic_error(client):
         error_message.string
         == 'An error occurred while creating the account, please try again.'
     )
+
+
+def test_register_get(client):
+    """Display the registration page"""
+    result = client.get('/register')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    forms = page.select("form[action='/register']")
+    assert len(forms) == 1
