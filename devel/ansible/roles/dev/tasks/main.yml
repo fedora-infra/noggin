@@ -47,7 +47,7 @@
       - Faker
 
 - name: Create dummy freeipa data
-  shell: python3 /vagrant/tools/create-test-data.py
+  shell: python3 /vagrant/devel/ansible/roles/dev/create-test-data.py
 
 - name: Install the systemd unit files for securitas services
   copy:
@@ -57,7 +57,7 @@
   with_items:
       - securitas.service
 
-- name: Reload systemd so it learns about securitas
+- name: Start securitas service using systemd
   systemd:
     state: started
     name: securitas

@@ -6,6 +6,7 @@ Wants=network-online.target
 [Service]
 Environment=FLASK_APP=/vagrant/securitas/app.py
 Environment=SECURITAS_CONFIG_PATH=/home/vagrant/securitas.cfg
+Environment=FLASK_DEBUG=1
 User=vagrant
 WorkingDirectory=/vagrant
 ExecStart=poetry run flask run -h 0.0.0.0
