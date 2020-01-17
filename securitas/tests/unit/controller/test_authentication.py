@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
-from flask import session
+from flask import session, get_flashed_messages
 
 
 def test_logout_unauthed(client):
@@ -11,6 +11,9 @@ def test_logout_unauthed(client):
     result = client.get('/logout', follow_redirects=False)
     assert result.status_code == 302
     assert result.location == "http://localhost/"
+    # Make sure we haven't instructed the user to login in a flash message.
+    messages = get_flashed_messages()
+    assert len(messages) == 0
 
 
 @pytest.mark.vcr()

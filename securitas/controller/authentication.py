@@ -3,13 +3,15 @@ import python_freeipa
 
 from securitas import app
 from securitas.form.login_user import LoginUserForm
-from securitas.security.ipa import maybe_ipa_login
-from securitas.utility import with_ipa
+from securitas.security.ipa import maybe_ipa_login, maybe_ipa_session
 
 
 @app.route('/logout')
-@with_ipa(app, session)
-def logout(ipa):
+def logout():
+    """Log the user out."""
+    # Don't use the with_ipa() decorator, otherwise anonymous users visiting this endpoint will be
+    # asked to login to then be logged out.
+    ipa = maybe_ipa_session(app, session)
     if ipa:
         ipa.logout()
     session.clear()

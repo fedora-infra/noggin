@@ -29,7 +29,6 @@ def ipa_cert():
             pass
         cert.close()
         app.config['FREEIPA_CACERT'] = cert.name
-        print(cert.name)
         yield
 
 
