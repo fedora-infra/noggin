@@ -1,3 +1,5 @@
+import datetime
+
 from flask import flash, redirect, url_for, render_template
 import python_freeipa
 
@@ -13,6 +15,8 @@ def register():
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
+        now = datetime.datetime.utcnow().replace(microsecond=0)
+
         try:
             ipa_admin.user_add(
                 username,
@@ -21,6 +25,7 @@ def register():
                 f'{form.firstname.data} {form.lastname.data}',  # TODO ???
                 user_password=password,
                 login_shell='/bin/bash',
+                fascreationtime=f"{now.isoformat()}Z",
             )
 
             # Now we fake a password change, so that it's not immediately expired.

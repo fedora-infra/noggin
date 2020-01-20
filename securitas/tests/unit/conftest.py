@@ -1,3 +1,4 @@
+import datetime
 import os
 import tempfile
 
@@ -52,6 +53,7 @@ def vcr_cassette_dir(request):
 
 @pytest.fixture
 def dummy_user():
+    now = datetime.datetime.utcnow().replace(microsecond=0)
     ipa_admin.user_add(
         'dummy',
         'Dummy',
@@ -59,6 +61,7 @@ def dummy_user():
         'Dummy User',
         user_password='dummy_password',
         login_shell='/bin/bash',
+        fascreationtime=f"{now.isoformat()}Z",
     )
     ipa = untouched_ipa_client(app)
     ipa.change_password('dummy', 'dummy_password', 'dummy_password')
