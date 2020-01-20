@@ -4,9 +4,17 @@ import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
 
+from securitas import ipa_admin
+
+
+@pytest.fixture
+def cleanup_dummy_user():
+    yield
+    ipa_admin.user_del('dummy')
+
 
 @pytest.mark.vcr()
-def test_register(client):
+def test_register(client, cleanup_dummy_user):
     """Register a user"""
     result = client.post(
         '/register',
