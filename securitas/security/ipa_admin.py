@@ -1,8 +1,13 @@
+from functools import wraps
+
 from python_freeipa.client_legacy import ClientLegacy
 import random
 
 
 class IPAAdmin(object):
+
+    __WRAPPED_METHODS = ("user_add", "user_del", "group_add", "group_del")
+
     def __init__(self, app):
         self.__username = app.config['FREEIPA_ADMIN_USER']
         self.__password = app.config['FREEIPA_ADMIN_PASSWORD']
@@ -20,14 +25,18 @@ class IPAAdmin(object):
         self.__client._request('ping')
         return self.__client
 
-    def user_add(self, *args, **kwargs):
-        ipa = self.__maybe_ipa_admin_session()
-        res = ipa.user_add(*args, **kwargs)
-        ipa.logout()
-        return res
+    def __wrap_method(self, method_name):
+        @wraps(getattr(ClientLegacy, method_name))
+        def wrapper(*args, **kwargs):
+            ipa = self.__maybe_ipa_admin_session()
+            ipa_method = getattr(ipa, method_name)
+            res = ipa_method(*args, **kwargs)
+            ipa.logout()
+            return res
 
-    def user_del(self, *args, **kwargs):
-        ipa = self.__maybe_ipa_admin_session()
-        res = ipa.user_del(*args, **kwargs)
-        ipa.logout()
-        return res
+        return wrapper
+
+    def __getattr__(self, name):
+        if name in self.__WRAPPED_METHODS:
+            return self.__wrap_method(name)
+        raise AttributeError(name)
