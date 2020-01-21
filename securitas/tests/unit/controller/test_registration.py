@@ -4,9 +4,9 @@ import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
 from flask import current_app, session
-
 from securitas import ipa_admin
 from securitas.security.ipa import maybe_ipa_login
+from securitas.utility.defaults import DEFAULTS
 
 
 @pytest.fixture
@@ -165,8 +165,8 @@ def test_register_get(client):
 
 
 @pytest.mark.vcr()
-def test_register_creation_time(client, cleanup_dummy_user):
-    """Verify that the creation time is added to the user attributes"""
+def test_register_default_values(client, cleanup_dummy_user):
+    """Verify that the default attributes are added to the user"""
     result = client.post(
         '/register',
         data={
@@ -180,5 +180,12 @@ def test_register_creation_time(client, cleanup_dummy_user):
     assert result.status_code == 302
     ipa = maybe_ipa_login(current_app, session, "dummy", "password")
     user = ipa.user_show("dummy")
+    # Creation time
     assert "fascreationtime" in user
     assert user["fascreationtime"][0]
+    # Locale
+    assert "faslocale" in user
+    assert user["faslocale"][0] == DEFAULTS["user_locale"]
+    # Timezone
+    assert "fastimezone" in user
+    assert user["fastimezone"][0] == DEFAULTS["user_timezone"]
