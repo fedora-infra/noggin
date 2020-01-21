@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import FieldList, StringField
+from wtforms import FieldList, StringField, SelectField
 from wtforms.validators import AnyOf, DataRequired, Email, Optional
 
 from securitas.utility.locales import LOCALES
@@ -23,8 +23,9 @@ class EditUserForm(FlaskForm):
         ],
     )
 
-    locale = StringField(
+    locale = SelectField(
         'Locale',
+        choices=[(l, l) for l in LOCALES],
         validators=[
             DataRequired(message='Locale must not be empty'),
             AnyOf(LOCALES, message='Locale must be a valid locale short-code'),
@@ -35,8 +36,9 @@ class EditUserForm(FlaskForm):
 
     gpgkeys = FieldList(StringField('GPG Keys', validators=[Optional()]))
 
-    timezone = StringField(
+    timezone = SelectField(
         'Timezone',
+        choices=[(t, t) for t in TIMEZONES],
         validators=[
             DataRequired(message='Timezone must not be empty'),
             AnyOf(TIMEZONES, message='Timezone must be a valid timezone'),
