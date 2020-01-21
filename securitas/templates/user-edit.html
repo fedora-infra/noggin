@@ -7,6 +7,7 @@
   {{ css("user") }}
 {% endblock %}
 
+{% import '_form_macros.html' as macros %}
 {% block content %}
   {{ super() }}
   <div class="container section">
@@ -17,17 +18,7 @@
           Edit user: {{ user.username }}
         </h3>
 
-        {% if form.errors %}
-          <ul class="errors">
-            {% for field_name, field_errors in form.errors|dictsort if field_errors %}
-              {% for error in field_errors %}
-                <li>{{ form[field_name].label }}: {{ error }}</li>
-              {% endfor %}
-            {% endfor %}
-          </ul>
-        {% endif %}
-
-        <form action="/user/{{ user.username }}/edit/" method="post">
+        <form action="{{ url_for('user_edit', username=user.username) }}" method="post">
           {{ form.csrf_token }}
 
           <div class="card">
@@ -35,56 +26,47 @@
 
               <div class="row">
                 <div class="input-field col s6">
-                  {{ form.firstname }}
-                  {{ form.firstname.label }}
+                  {{ macros.with_errors(form.firstname, class="validate") }}
                 </div>
 
                 <div class="input-field col s6">
-                  {{ form.lastname }}
-                  {{ form.lastname.label }}
+                  {{ macros.with_errors(form.lastname, class="validate") }}
                 </div>
               </div>
 
               <div class="row">
                 <div class="input-field col s6">
-                  {{ form.mail }}
-                  {{ form.mail.label }}
+                  {{ macros.with_errors(form.mail, class="validate") }}
                 </div>
 
                 <div class="input-field col s6">
-                  {{ form.locale }}
-                  {{ form.locale.label }}
+                  {{ macros.with_errors(form.locale) }}
                 </div>
               </div>
 
               <div class="row">
                 <div class="input-field col s6">
-                  {{ form.ircnick }}
-                  {{ form.ircnick.label }}
+                  {{ macros.with_errors(form.ircnick) }}
                 </div>
 
                 <div class="input-field col s6">
-                  {{ form.timezone }}
-                  {{ form.timezone.label }}
+                  {{ macros.with_errors(form.timezone) }}
                 </div>
               </div>
 
               <div class="row">
                 <div class="input-field col s6">
-                  {{ form.github }}
-                  {{ form.github.label }}
+                  {{ macros.with_errors(form.github) }}
                 </div>
 
                 <div class="input-field col s6">
-                  {{ form.gitlab }}
-                  {{ form.gitlab.label }}
+                  {{ macros.with_errors(form.gitlab) }}
                 </div>
               </div>
 
               <div class="row">
                 <div class="input-field col s6">
-                  {{ form.rhbz_mail }}
-                  {{ form.rhbz_mail.label }}
+                  {{ macros.with_errors(form.rhbz_mail) }}
                 </div>
               </div>
 
@@ -92,13 +74,14 @@
               {# TODO: We need to have a way to add more keys #}
               <div class="row">
                 <div class="input-field col s6">
-                  {{ form.gpgkeys }}
+                  {{ macros.with_errors(form.gpgkeys) }}
                 </div>
               </div>
 
               <div class="row">
                 <div class="input-field col s12">
                   <button class="btn waves-effect waves-light light-blue darken-4 w100" id="submit" type="submit" tabindex="9">Submit</button>
+                  {{ macros.non_field_errors(form) }}
                 </div>
               </div>
 

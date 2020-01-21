@@ -8,11 +8,11 @@ from securitas.utility.timezones import TIMEZONES
 
 class EditUserForm(FlaskForm):
     firstname = StringField(
-        'First Name', validators=[DataRequired(message='First name must not be empty'),]
+        'First Name', validators=[DataRequired(message='First name must not be empty')]
     )
 
     lastname = StringField(
-        'Last Name', validators=[DataRequired(message='Last name must not be empty'),]
+        'Last Name', validators=[DataRequired(message='Last name must not be empty')]
     )
 
     mail = StringField(
@@ -31,9 +31,9 @@ class EditUserForm(FlaskForm):
         ],
     )
 
-    ircnick = StringField('IRC Nickname', validators=[Optional(),])
+    ircnick = StringField('IRC Nickname', validators=[Optional()])
 
-    gpgkeys = FieldList(StringField('GPG Keys', validators=[Optional(),]))
+    gpgkeys = FieldList(StringField('GPG Keys', validators=[Optional()]))
 
     timezone = StringField(
         'Timezone',
@@ -43,10 +43,10 @@ class EditUserForm(FlaskForm):
         ],
     )
 
-    github = StringField('GitHub Username', validators=[Optional(),])
+    github = StringField('GitHub Username', validators=[Optional()])
 
-    gitlab = StringField('GitLab Username', validators=[Optional(),])
+    gitlab = StringField('GitLab Username', validators=[Optional()])
 
     rhbz_mail = StringField(
-        'E-mail Address used in Red Hat Bugzilla', validators=[Optional(),]
+        'E-mail Address used in Red Hat Bugzilla', validators=[Optional()]
     )

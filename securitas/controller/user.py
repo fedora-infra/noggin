@@ -25,7 +25,7 @@ def user_edit(ipa, username):
         return redirect(url_for('user', username=username))
 
     user = User(user_or_404(ipa, username))
-    form = EditUserForm()
+    form = EditUserForm(obj=user)
 
     if form.validate_on_submit():
         try:
@@ -46,13 +46,14 @@ def user_edit(ipa, username):
             )
         except python_freeipa.exceptions.BadRequest as e:
             if e.message == 'no modifications to be performed':
-                # Then we are ok still.
-                pass
+                return redirect(url_for('user', username=username))
             else:
-                flash(e.message, 'red')
-                return redirect(url_for('user_edit', username=username))
-        flash('Profile has been succesfully updated.', 'green')
-        return redirect(url_for('user', username=username))
+                app.logger.error(
+                    f'An error happened while editing user {username}: {e.message}'
+                )
+                form.errors['non_field_errors'] = [e.message]
+        else:
+            flash('Profile has been succesfully updated.', 'green')
+            return redirect(url_for('user', username=username))
 
-    form.process(obj=user)
     return render_template('user-edit.html', user=user, form=form)

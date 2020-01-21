@@ -52,6 +52,9 @@ def test_user_edit(client, logged_in_dummy_user):
     assert page.title.string == 'Edit User: dummy - The Fedora Project'
     form = page.select("form[action='/user/dummy/edit/']")
     assert len(form) == 1
+    assert form[0].find("input", attrs={"name": "firstname"})["value"] == "Dummy"
+    assert form[0].find("input", attrs={"name": "lastname"})["value"] == "User"
+    assert form[0].find("input", attrs={"name": "mail"})["value"] == "dummy@example.com"
 
 
 @pytest.mark.vcr()
@@ -112,10 +115,9 @@ def test_user_edit_post_bad_request(client, logged_in_dummy_user):
             message="something went wrong", code="4242"
         )
         result = client.post('/user/dummy/edit/', data=POST_CONTENTS)
-    assert result.status_code == 302
-    assert result.location == "http://localhost/user/dummy/edit/"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "something went wrong"
-    assert category == "red"
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    submit_button = page.select("button[type='submit']")[0]
+    error_message = submit_button.find_next("p")
+    assert "red-text" in error_message["class"]
+    assert error_message.string == 'something went wrong'
