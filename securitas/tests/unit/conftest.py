@@ -52,21 +52,35 @@ def vcr_cassette_dir(request):
 
 
 @pytest.fixture
-def dummy_user():
-    now = datetime.datetime.utcnow().replace(microsecond=0)
-    ipa_admin.user_add(
-        'dummy',
-        'Dummy',
-        'User',
-        'Dummy User',
-        user_password='dummy_password',
-        login_shell='/bin/bash',
-        fascreationtime=f"{now.isoformat()}Z",
-    )
-    ipa = untouched_ipa_client(app)
-    ipa.change_password('dummy', 'dummy_password', 'dummy_password')
+def make_user():
+    created_users = []
+
+    def _make_user(name):
+        now = datetime.datetime.utcnow().replace(microsecond=0)
+        password = f'{name}_password'
+        ipa_admin.user_add(
+            name,
+            name.title(),
+            'User',
+            f'{name.title()} User',
+            user_password=password,
+            login_shell='/bin/bash',
+            fascreationtime=f"{now.isoformat()}Z",
+        )
+        ipa = untouched_ipa_client(app)
+        ipa.change_password(name, password, password)
+        created_users.append(name)
+
+    yield _make_user
+
+    for username in created_users:
+        ipa_admin.user_del(username)
+
+
+@pytest.fixture
+def dummy_user(make_user):
+    make_user("dummy")
     yield
-    ipa_admin.user_del('dummy')
 
 
 @pytest.fixture
