@@ -32,16 +32,33 @@ for x in range(50):
             firstName + " " + lastName,
             home_directory=f"/home/fedora/{username}",
             disabled=False,
-            random_pass=True,
+            user_password='testuserpw',
             fasircnick=username,
             faslocale=None,
             fastimezone=None,
             fasgpgkeyid=[],
         )
-
         if x % 3 == 0:
             ipa.group_add_member("developers", username, skip_errors=True)
         if x % 2 == 0:
             ipa.group_add_member("admins", username, skip_errors=True)
     except python_freeipa.exceptions.FreeIPAError as e:
         print(e)
+
+# add a known user for testing purposes
+try:
+    ipa.user_add(
+        "testuser",
+        "Test",
+        "User",
+        "Test User",
+        home_directory=f"/home/fedora/testUser",
+        disabled=False,
+        random_pass=True,
+        fasircnick="testuser",
+        faslocale=None,
+        fastimezone=None,
+        fasgpgkeyid=[],
+    )
+except python_freeipa.exceptions.FreeIPAError as e:
+    print(e)
