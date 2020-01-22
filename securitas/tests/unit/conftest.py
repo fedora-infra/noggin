@@ -84,6 +84,12 @@ def dummy_user(make_user):
 
 
 @pytest.fixture
+def cleanup_dummy_user():
+    yield
+    ipa_admin.user_del('dummy')
+
+
+@pytest.fixture
 def logged_in_dummy_user(client, dummy_user):
     with client.session_transaction() as sess:
         ipa = maybe_ipa_login(app, sess, "dummy", "dummy_password")
