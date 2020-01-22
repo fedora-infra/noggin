@@ -76,13 +76,12 @@
                 <li class="collection-item avatar">
                   <!-- TODO: .red if sponsor/admin -->
                   <i class="material-icons circle {{ 'red' if is_sponsor else 'green' }}">group</i>
-                  <a href="/group/{{ group.name }}">
+                  <a href="{{ url_for('group', groupname=group.name) }}">
                     <span class="title">{{ group.name }}</span>
                   </a>
                   {% if group.description %}
                     <p>{{ group.description }}</p>
                   {% endif %}
-                  {# TODO: sponsor if sponsor #}
                   <p>{{ 'sponsor' if is_sponsor else 'member' }} </p>
                 </li>
               {% endwith %}

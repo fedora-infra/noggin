@@ -12,17 +12,6 @@
 {% block content %}
   {{ super() }}
 
-  {% if sponsor_form and sponsor_form.errors %}
-    <ul class="errors">
-      {% for field_name, field_errors in form.errors|dictsort if field_errors %}
-        {% for error in field_errors %}
-          <li>{{ form[field_name].label }}: {{ error }}</li>
-        {% endfor %}
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-
   {% if current_user_is_sponsor and sponsor_form %}
     {# Here we create the modal to add users to the group, but only if the person
        viewing this page is a sponsor of the group. #}
@@ -31,7 +20,7 @@
       <div class="modal-content">
         <h4>Add Member to {{ group.name }}</h4>
 
-        <form action="{{ url_for('group_add_member') }}" method="post">
+        <form action="{{ url_for('group_add_member', groupname=group.name) }}" method="post">
           <div class="row">
             <div class="input-field col s6">
               {{ sponsor_form.hidden_tag() }}
@@ -99,7 +88,7 @@
             </button>
           {% endif %}
         </h4>
-        <form action="{{ url_for('group_remove_member') }}" method="post">
+        <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
           {{ sponsor_form.hidden_tag() }}
           <ul class="collection">
             {% for member in members|sort(attribute='username') %}

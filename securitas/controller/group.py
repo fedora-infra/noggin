@@ -16,6 +16,8 @@ def group(ipa, groupname):
     sponsor_form = AddGroupMemberForm(groupname=groupname)
     remove_form = RemoveGroupMemberForm(groupname=groupname)
 
+    # This only finds sponsors that are also members of the group. Can we have sponsors which are
+    # not members?
     sponsors = []
     members = [User(u) for u in ipa.user_find(in_group=groupname)['result']]
     for member in members:
@@ -36,13 +38,12 @@ def group(ipa, groupname):
     )
 
 
-@app.route('/group/add-member/', methods=['POST'])
+@app.route('/group/<groupname>/members/', methods=['POST'])
 @with_ipa(app, session)
-def group_add_member(ipa):
+def group_add_member(ipa, groupname):
     sponsor_form = AddGroupMemberForm()
     if sponsor_form.validate_on_submit():
         username = sponsor_form.new_member_username.data
-        groupname = sponsor_form.groupname.data
         # First make sure the user exists
         try:
             ipa.user_show(username)
@@ -56,22 +57,22 @@ def group_add_member(ipa):
             # https://github.com/opennode/python-freeipa/issues/24
             for error in e.message['member']['user']:
                 flash('Unable to add user %s: %s' % (error[0], error[1]), 'red')
-
-            for error in e.message['member']['group']:
-                flash('Unable to add group %s: %s' % (error[0], error[1]), 'red')
-
             return redirect(url_for('group', groupname=groupname))
 
         flash('You got it! %s has been added to %s.' % (username, groupname), 'green')
         return redirect(url_for('group', groupname=groupname))
 
+    for field_errors in sponsor_form.errors.values():
+        for error in field_errors:
+            flash(error, 'red')
+    return redirect(url_for('group', groupname=groupname))
 
-@app.route('/group/remove-member/', methods=['POST'])
+
+@app.route('/group/<groupname>/members/remove', methods=['POST'])
 @with_ipa(app, session)
-def group_remove_member(ipa):
+def group_remove_member(ipa, groupname):
     form = RemoveGroupMemberForm()
     if form.validate_on_submit():
-        groupname = form.groupname.data
         username = form.username.data
         try:
             ipa.group_remove_member(groupname, users=username)
@@ -80,16 +81,17 @@ def group_remove_member(ipa):
             # https://github.com/opennode/python-freeipa/issues/24
             for error in e.message['member']['user']:
                 flash('Unable to remove user %s: %s' % (error[0], error[1]), 'red')
-
-            for error in e.message['member']['group']:
-                flash('Unable to remove group %s: %s' % (error[0], error[1]), 'red')
-
             return redirect(url_for('group', groupname=groupname))
 
         flash(
             'You got it! %s has been removed from %s.' % (username, groupname), 'green'
         )
         return redirect(url_for('group', groupname=groupname))
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'red')
+    return redirect(url_for('group', groupname=groupname))
 
 
 @app.route('/groups/')
