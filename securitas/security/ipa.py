@@ -1,14 +1,57 @@
 from cryptography.fernet import Fernet
 import python_freeipa
-from python_freeipa.client_legacy import ClientLegacy
+from python_freeipa.client_legacy import ClientLegacy as IPAClient
+from python_freeipa.exceptions import ValidationError
 import random
+
+
+def parse_group_management_error(data):
+    """
+    An extension of freeipa's function to handle membermanagers.
+
+    TODO: send this upstream.
+    """
+    failed = data['failed']
+    targets = ('member', 'membermanager')
+    for target in targets:
+        if target in failed and (failed[target]['group'] or failed[target]['user']):
+            raise ValidationError(failed)
+
+
+class Client(IPAClient):
+    """
+    Subclass the official client to add a missing method that we need.
+
+    TODO: send this upstream.
+    """
+
+    def group_add_member_manager(
+        self, group, users=None, groups=None, skip_errors=False, **kwargs
+    ):
+        """
+        Add member managers to a group.
+
+        :param group: Group name.
+        :param users: Users to add.
+        :type users: string or list
+        :param groups: Groups to add.
+        :type groups: string or list
+        :param skip_errors: Skip processing errors.
+        :type skip_errors: bool
+        """
+        params = {'all': True, 'raw': True, 'user': users, 'group': groups}
+        params.update(kwargs)
+        data = self._request('group_add_member_manager', group, params)
+        if not skip_errors:
+            parse_group_management_error(data)
+        return data['result']
 
 
 # Construct an IPA client from app config, but don't attempt to log in with it
 # or to form a session of any kind with it. This is useful for one-off cases
 # like password resets where a session isn't actually required.
 def untouched_ipa_client(app):
-    return ClientLegacy(
+    return Client(
         random.choice(app.config['FREEIPA_SERVERS']),
         verify_ssl=app.config['FREEIPA_CACERT'],
     )
@@ -27,7 +70,7 @@ def maybe_ipa_session(app, session):
     if encrypted_session and server_hostname:
         fernet = Fernet(app.config['FERNET_SECRET'])
         ipa_session = fernet.decrypt(encrypted_session)
-        client = ClientLegacy(server_hostname, verify_ssl=app.config['FREEIPA_CACERT'])
+        client = Client(server_hostname, verify_ssl=app.config['FREEIPA_CACERT'])
         client._session.cookies['ipa_session'] = str(ipa_session, 'utf8')
 
         # We have reconstructed a client, let's send a ping and see if we are
@@ -55,7 +98,7 @@ def maybe_ipa_login(app, session, username, password):
     # are safe in later assuming that the server hostname cookie has not been
     # altered.
     chosen_server = random.choice(app.config['FREEIPA_SERVERS'])
-    client = ClientLegacy(chosen_server, verify_ssl=app.config['FREEIPA_CACERT'])
+    client = Client(chosen_server, verify_ssl=app.config['FREEIPA_CACERT'])
 
     auth = client.login(username, password)
 
