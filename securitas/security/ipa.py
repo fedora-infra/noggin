@@ -42,6 +42,18 @@ class Client(IPAClient):
         params = {'all': True, 'raw': True, 'user': users, 'group': groups}
         params.update(kwargs)
         data = self._request('group_add_member_manager', group, params)
+        return data['result']
+
+
+    def pwpolicy_mod(
+        self, group, o_krbminpwdlife=None, **kwargs
+    ):
+        """
+        Set the password time policy to zero
+        """
+        params = {'all': True, 'raw': True, 'krbminpwdlife': krbminpwdlife}
+        params.update(kwargs)
+        data = self._request('pwpolicy_mod', group, params)
         if not skip_errors:
             parse_group_management_error(data)
         return data['result']
