@@ -36,7 +36,7 @@
 
   <div class="container section">
 
-    <div class="row">
+    <div class="row" data-section="identity">
       <div class="col s12">
         <h3 class="header light-blue-text text-darken-4 fw300">{{ group.name }}</h3>
         {% if group.description %}<p>{{ group.description }}</p>{% endif %}
@@ -44,7 +44,7 @@
     </div>
 
     <div class="row">
-      <div class="col m6 s12">
+      <div class="col m6 s12" data-section="sponsors">
         <h4 class="header fw300">Sponsors</h4>
         {% if sponsors|length == 0 %}
         <p>No sponsors yet.</p>
@@ -69,7 +69,7 @@
         {% endif %}
       </div>
 
-      <div class="col m6 s12">
+      <div class="col m6 s12" data-section="members">
         <h4 class="header fw300">
           Users
           {% if current_user_is_sponsor %}
