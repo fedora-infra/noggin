@@ -40,14 +40,10 @@
       owner: vagrant
       group: vagrant
 
-- name: Install dummy data deps
-  pip:
-    name:
-      - python-freeipa>=1.0
-      - Faker
-
 - name: Create dummy freeipa data
-  shell: python3 /vagrant/devel/create-test-data.py
+  shell: poetry run python /vagrant/devel/create-test-data.py
+  become: yes
+  become_user: vagrant
 
 - name: Install the systemd unit files for securitas services
   copy:

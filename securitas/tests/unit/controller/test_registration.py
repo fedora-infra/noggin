@@ -9,6 +9,12 @@ from securitas.security.ipa import maybe_ipa_login
 from securitas.utility.defaults import DEFAULTS
 
 
+@pytest.fixture
+def cleanup_dummy_user():
+    yield
+    ipa_admin.user_del('dummy')
+
+
 @pytest.mark.vcr()
 def test_register(client, cleanup_dummy_user):
     """Register a user"""

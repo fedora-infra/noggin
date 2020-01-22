@@ -13,25 +13,6 @@ def test_password_reset(client):
     assert page.title.string == 'Password Reset - The Fedora Project'
 
 
-def test_missing_credentials(client):
-    """Verify that missing details are caught"""
-    result = client.post(
-        '/password-reset',
-        data={
-            "username": "",
-            "current_password": "",
-            "password": "",
-            "password_confirm": "",
-        },
-        follow_redirects=True,
-    )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .red")
-    assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Please fill in all fields to reset your password'
-
-
 def test_non_matching_passwords(client):
     """Verify that passwords that dont match are caught"""
     result = client.post(
@@ -46,17 +27,18 @@ def test_non_matching_passwords(client):
     )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .red")
-    assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Password and confirmation did not match.'
+    password_input = page.select("input[name='password']")[0]
+    assert 'invalid' in password_input['class']
+    helper_text = password_input.find_next("span", class_="helper-text")
+    assert helper_text["data-error"] == "Passwords must match"
 
-
-def test_password_policy(client):
-    """Verify that password policies are upheld"""
+@pytest.mark.vcr()
+def test_password(client):
+    """Verify that current password must be correct"""
     result = client.post(
         '/password-reset',
         data={ 
-            "username": "jbloggs",
+            "username": "admin",
             "current_password": "1",
             "password": "LongSuperSafePassword",
             "password_confirm": "LongSuperSafePassword",
@@ -65,9 +47,11 @@ def test_password_policy(client):
     )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .red")
-    assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Failed to reset your password (invalid current password).'
+    password_input = page.select("input[name='current_password']")[0]
+    assert 'invalid' in password_input['class']
+    helper_text = password_input.find_next("span", class_="helper-text")
+    assert helper_text["data-error"] == "The old password or username is not correct"
+
 
 @pytest.mark.vcr()
 def test_time_sensitive_password_policy(client, dummy_user):
@@ -82,39 +66,21 @@ def test_time_sensitive_password_policy(client, dummy_user):
         },
         follow_redirects=True,
     )
-    assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .red")
-    assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Failed to reset your password (policy error): Constraint violation: Too soon to change password'
+    password_input = page.select("input[name='password']")[0]
+    assert 'invalid' in password_input['class']
+    helper_text = password_input.find_next("span", class_="helper-text")
+    assert helper_text["data-error"] == "Constraint violation: Too soon to change password"
+
 
 @pytest.mark.vcr()
-def test_incorrect_current_password(client):
-    """Verify that current password must be correct"""
-    result = client.post(
-        '/password-reset',
-        data={
-            "username": "testuser",
-            "current_password": "thisisnotthecorrectspassword",
-            "password": "1",
-            "password_confirm": "1",
-        },
-        follow_redirects=True,
-    )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .red")
-    assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Failed to reset your password (invalid current password).'
-
-@pytest.mark.vcr()
-def test_password_changes(client):
+def test_password_changes(client, dummy_user_as_group_manager, remove_password_min_time):
     """Verify that password changes"""
     result = client.post(
         '/password-reset',
         data={
-            "username": "testuser",
-            "current_password": "testuserpw",
+            "username": "dummy",
+            "current_password": "dummy_password",
             "password": "secretpw",
             "password_confirm": "secretpw",
         },

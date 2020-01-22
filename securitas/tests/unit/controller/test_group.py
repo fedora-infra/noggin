@@ -7,14 +7,6 @@ from flask import get_flashed_messages
 from securitas import ipa_admin
 
 
-@pytest.fixture
-def dummy_user_as_group_manager(logged_in_dummy_user, dummy_group):
-    """Make the dummy user a manager of the dummy-group group."""
-    ipa_admin.group_add_member("dummy-group", users="dummy")
-    ipa_admin.group_add_member_manager("dummy-group", users="dummy")
-    yield
-
-
 @pytest.mark.vcr()
 def test_groups_list(client, logged_in_dummy_user, dummy_group):
     """Test the groups list: /groups/"""
