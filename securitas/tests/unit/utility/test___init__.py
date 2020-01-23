@@ -50,9 +50,9 @@ def test_with_ipa(client, dummy_user):
         assert "ipa" in view.call_args_list[0][1]
         assert isinstance(view.call_args_list[0][1]["ipa"], ipa.__class__)
         assert "arg" in view.call_args_list[0][0]
-        assert hasattr(g, "ipa")
+        assert "ipa" in g
         assert isinstance(g.ipa, ipa.__class__)
-        assert hasattr(g, "current_user") and g.current_user is not None
+        assert "current_user" in g
         assert g.current_user.username == "dummy"
 
 
@@ -66,8 +66,8 @@ def test_with_ipa_anonymous(client):
         assert response.status_code == 302
         assert response.location == "/"
         view.assert_not_called()
-        assert not hasattr(g, "ipa")
-        assert not hasattr(g, "current_user")
+        assert "ipa" not in g
+        assert "current_user" not in g
         messages = get_flashed_messages(with_categories=True)
         assert len(messages) == 1
         category, message = messages[0]
