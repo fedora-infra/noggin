@@ -8,13 +8,6 @@ from securitas import ipa_admin
 
 
 @pytest.fixture
-def dummy_group():
-    ipa_admin.group_add('dummy-group', description="A dummy group")
-    yield
-    ipa_admin.group_del('dummy-group')
-
-
-@pytest.fixture
 def dummy_user_as_group_manager(logged_in_dummy_user, dummy_group):
     """Make the dummy user a manager of the dummy-group group."""
     ipa_admin.group_add_member("dummy-group", users="dummy")

@@ -91,3 +91,10 @@ def logged_in_dummy_user(client, dummy_user):
     ipa.logout()
     with client.session_transaction() as sess:
         sess.clear()
+
+
+@pytest.fixture
+def dummy_group():
+    ipa_admin.group_add('dummy-group', description="A dummy group")
+    yield
+    ipa_admin.group_del('dummy-group')
