@@ -1,0 +1,19 @@
+#!/bin/bash -e
+
+# The assemble script builds the application artifacts from a source and
+# places them into appropriate directories inside the image.
+
+# Execute the default S2I script
+/usr/libexec/s2i/assemble
+
+echo "---> Installing poetry ..."
+pip install poetry
+
+# Don't create virtual environments
+poetry config virtualenvs.create false
+
+echo "---> Installing application and dependencies ..."
+poetry install --no-dev --extras deploy
+
+# set permissions for any installed artifacts
+fix-permissions /opt/app-root -P
