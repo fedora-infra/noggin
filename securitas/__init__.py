@@ -20,6 +20,10 @@ except ImportError:
     try:
         import pkg_resources
 
-        __version__ = pkg_resources.get_distribution("securitas").version
+        try:
+            __version__ = pkg_resources.get_distribution("securitas").version
+        except pkg_resources.DistributionNotFound:
+            # The app is not installed, but the flask dev server can run it nonetheless.
+            __version__ = None
     except ImportError:
         __version__ = None
