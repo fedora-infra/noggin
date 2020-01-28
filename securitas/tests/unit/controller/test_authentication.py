@@ -51,26 +51,25 @@ def test_logout(client, logged_in_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_login(client):
+def test_login(client, dummy_user):
     """Test a successful Login"""
     result = client.post(
         '/login',
-        data={"username": "dudemcpants", "password": "n:nPv{P].9}]!q$RE%w<38@"},
+        data={"username": "dummy", "password": "dummy_password"},
         follow_redirects=True,
     )
     page = BeautifulSoup(result.data, 'html.parser')
     messages = page.select(".flash-messages .green")
     assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Welcome, dudemcpants!'
-    assert session.get("securitas_username") == "dudemcpants"
+    assert messages[0].get_text(strip=True) == 'Welcome, dummy!'
+    assert session.get("securitas_username") == "dummy"
     assert session.get("securitas_session") is not None
 
 
-def test_login_no_password(client):
+@pytest.mark.vcr()
+def test_login_no_password(client, dummy_user):
     """Test not giving a password"""
-    result = client.post(
-        '/login', data={"username": "dudemcpants"}, follow_redirects=True
-    )
+    result = client.post('/login', data={"username": "dummy"}, follow_redirects=True)
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     password_input = page.select("input[name='password']")[0]
@@ -97,11 +96,11 @@ def test_login_no_username(client):
 
 
 @pytest.mark.vcr()
-def test_login_incorrect_password(client):
+def test_login_incorrect_password(client, dummy_user):
     """Test a incorrect password"""
     result = client.post(
         '/login',
-        data={"username": "dudemcpants", "password": "an incorrect password"},
+        data={"username": "dummy", "password": "an incorrect password"},
         follow_redirects=True,
     )
     assert result.status_code == 200
