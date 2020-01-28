@@ -25,46 +25,8 @@
       <div class="col s5">
         {% include '_register_form.html' %}
       </div>
-
       <div class="col s5 offset-s2">
-        <form action="/login" method="post">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <div class="card">
-            <div class="card-content">
-
-              <span class="card-title">Log In</span>
-
-              <div class="row">
-                <div class="input-field col s12">
-                  <input placeholder="jdoe" id="login_username" name="username" type="text" class="validate" tabindex="1">
-                  <label for="login_username">Username</label>
-                </div>
-
-                <div class="input-field col s12">
-                  <input placeholder="password" id="login_password" name="password" type="password" class="validate" tabindex="2">
-                  <label for="login_password">Password</label>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="input-field col s12">
-                  <button class="btn waves-effect waves-light light-blue darken-4 w100" id="submit" type="submit" tabindex="3">Log In</button>
-                </div>
-
-                <p class="col s12">
-                  <small><a href="{{ url_for('password_reset') }}">Expired password?</a></small>
-                </p>
-
-                <p class="col s12">
-                  <small><a href="#">Forgot password?</a></small>
-                </p>
-              </div>
-
-            </div>
-            <div class="clearfix"></div>
-          </div>
-
-        </form>
+        {% include '_login_form.html' %}
       </div>
     </div>
   </div>

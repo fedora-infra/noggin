@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import FieldList, StringField
+from wtforms import FieldList, StringField, SelectField
 from wtforms.validators import AnyOf, DataRequired, Email, Optional
 
 from securitas.utility.locales import LOCALES
@@ -8,11 +8,11 @@ from securitas.utility.timezones import TIMEZONES
 
 class EditUserForm(FlaskForm):
     firstname = StringField(
-        'First Name', validators=[DataRequired(message='First name must not be empty'),]
+        'First Name', validators=[DataRequired(message='First name must not be empty')]
     )
 
     lastname = StringField(
-        'Last Name', validators=[DataRequired(message='Last name must not be empty'),]
+        'Last Name', validators=[DataRequired(message='Last name must not be empty')]
     )
 
     mail = StringField(
@@ -23,30 +23,32 @@ class EditUserForm(FlaskForm):
         ],
     )
 
-    locale = StringField(
+    locale = SelectField(
         'Locale',
+        choices=[(l, l) for l in LOCALES],
         validators=[
             DataRequired(message='Locale must not be empty'),
             AnyOf(LOCALES, message='Locale must be a valid locale short-code'),
         ],
     )
 
-    ircnick = StringField('IRC Nickname', validators=[Optional(),])
+    ircnick = StringField('IRC Nickname', validators=[Optional()])
 
-    gpgkeys = FieldList(StringField('GPG Keys', validators=[Optional(),]))
+    gpgkeys = FieldList(StringField('GPG Keys', validators=[Optional()]))
 
-    timezone = StringField(
+    timezone = SelectField(
         'Timezone',
+        choices=[(t, t) for t in TIMEZONES],
         validators=[
             DataRequired(message='Timezone must not be empty'),
             AnyOf(TIMEZONES, message='Timezone must be a valid timezone'),
         ],
     )
 
-    github = StringField('GitHub Username', validators=[Optional(),])
+    github = StringField('GitHub Username', validators=[Optional()])
 
-    gitlab = StringField('GitLab Username', validators=[Optional(),])
+    gitlab = StringField('GitLab Username', validators=[Optional()])
 
     rhbz_mail = StringField(
-        'E-mail Address used in Red Hat Bugzilla', validators=[Optional(),]
+        'E-mail Address used in Red Hat Bugzilla', validators=[Optional()]
     )

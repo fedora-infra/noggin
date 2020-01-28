@@ -19,15 +19,15 @@
 
         <ul class="collection">
           {% for group in groups %}
-            <li class="collection-item avatar">
+            <li class="collection-item avatar" data-group-name="{{ group.name }}">
               <i class="material-icons circle">group</i>
-              <a href="/group/{{ group.name }}">
+              <a href="{{ url_for('group', groupname=group.name) }}">
                 <span class="title">{{ group.name }}</span>
               </a>
-              <p>{{ group.dn }}</p>
-              <p>{{ group.members|length|default(0) }} members</p>
+              <p data-role="dn">{{ group.dn }}</p>
+              <p data-role="members-count">{{ group.members|length|default(0) }} members</p>
               {% if group.description %}
-                <p>{{ group.description }}</p>
+                <p data-role="description">{{ group.description }}</p>
               {% endif %}
             </li>
           {% endfor %}

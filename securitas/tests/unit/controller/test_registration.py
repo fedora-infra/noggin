@@ -3,10 +3,20 @@ from unittest import mock
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
+from flask import current_app, session
+from securitas import ipa_admin
+from securitas.security.ipa import maybe_ipa_login
+from securitas.utility.defaults import DEFAULTS
+
+
+@pytest.fixture
+def cleanup_dummy_user():
+    yield
+    ipa_admin.user_del('dummy')
 
 
 @pytest.mark.vcr()
-def test_register(client):
+def test_register(client, cleanup_dummy_user):
     """Register a user"""
     result = client.post(
         '/register',
@@ -143,3 +153,39 @@ def test_register_generic_error(client):
         error_message.string
         == 'An error occurred while creating the account, please try again.'
     )
+
+
+def test_register_get(client):
+    """Display the registration page"""
+    result = client.get('/register')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    forms = page.select("form[action='/register']")
+    assert len(forms) == 1
+
+
+@pytest.mark.vcr()
+def test_register_default_values(client, cleanup_dummy_user):
+    """Verify that the default attributes are added to the user"""
+    result = client.post(
+        '/register',
+        data={
+            "firstname": "First",
+            "lastname": "Last",
+            "username": "dummy",
+            "password": "password",
+            "password_confirm": "password",
+        },
+    )
+    assert result.status_code == 302
+    ipa = maybe_ipa_login(current_app, session, "dummy", "password")
+    user = ipa.user_show("dummy")
+    # Creation time
+    assert "fascreationtime" in user
+    assert user["fascreationtime"][0]
+    # Locale
+    assert "faslocale" in user
+    assert user["faslocale"][0] == DEFAULTS["user_locale"]
+    # Timezone
+    assert "fastimezone" in user
+    assert user["fastimezone"][0] == DEFAULTS["user_timezone"]

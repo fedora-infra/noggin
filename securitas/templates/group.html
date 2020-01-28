@@ -12,17 +12,6 @@
 {% block content %}
   {{ super() }}
 
-  {% if sponsor_form and sponsor_form.errors %}
-    <ul class="errors">
-      {% for field_name, field_errors in form.errors|dictsort if field_errors %}
-        {% for error in field_errors %}
-          <li>{{ form[field_name].label }}: {{ error }}</li>
-        {% endfor %}
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-
   {% if current_user_is_sponsor and sponsor_form %}
     {# Here we create the modal to add users to the group, but only if the person
        viewing this page is a sponsor of the group. #}
@@ -31,7 +20,7 @@
       <div class="modal-content">
         <h4>Add Member to {{ group.name }}</h4>
 
-        <form action="{{ url_for('group_add_member') }}" method="post">
+        <form action="{{ url_for('group_add_member', groupname=group.name) }}" method="post">
           <div class="row">
             <div class="input-field col s6">
               {{ sponsor_form.hidden_tag() }}
@@ -47,29 +36,19 @@
 
   <div class="container section">
 
-    <div class="row">
+    <div class="row" data-section="identity">
       <div class="col s12">
         <h3 class="header light-blue-text text-darken-4 fw300">{{ group.name }}</h3>
-        <p>{{ group.description }}</p>
+        {% if group.description %}<p>{{ group.description }}</p>{% endif %}
       </div>
     </div>
 
-    {#
-    {% if current_user_is_sponsor %}
-      <div class="row">
-        <div class="col s12">
-          <div class="card-panel orange lighten-4 orange-text text-darken-4">
-            <h4 class="header fw300">Sponsorship Panel</h4>
-
-          </div>
-        </div>
-      </div>
-    {% endif %}
-    #}
-
     <div class="row">
-      <div class="col m6 s12">
+      <div class="col m6 s12" data-section="sponsors">
         <h4 class="header fw300">Sponsors</h4>
+        {% if sponsors|length == 0 %}
+        <p>No sponsors yet.</p>
+        {% else %}
         <ul class="collection">
           {% for sponsor in sponsors|sort(attribute='username') %}
             <li class="collection-item avatar">
@@ -79,18 +58,18 @@
               {% else %}
                 <i class="material-icons circle">person</i>
               {% endif %}
-              <a href="/user/{{ sponsor.username }}">
+              <a href="{{ url_for('user', username=sponsor.username) }}">
                 <span class="title">{{ sponsor.username }}</span>
               </a>
               <p>{{ sponsor.name }}</p>
-              {# TODO: sponsor if sponsor #}
-              <p>member</p>
+              <p>sponsor</p>
             </li>
           {% endfor %}
         </ul>
+        {% endif %}
       </div>
 
-      <div class="col m6 s12">
+      <div class="col m6 s12" data-section="members">
         <h4 class="header fw300">
           Users
           {% if current_user_is_sponsor %}
@@ -99,9 +78,13 @@
             </button>
           {% endif %}
         </h4>
-        <form action="{{ url_for('group_remove_member') }}" method="post">
+        {% if members|length == 0 %}
+        <p>No members yet.</p>
+        {% else %}
+        <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
           {{ sponsor_form.hidden_tag() }}
           <ul class="collection">
+            {% set sponsor_usernames = sponsors|map(attribute='username') %}
             {% for member in members|sort(attribute='username') %}
               <li class="collection-item avatar">
                 <!-- TODO: .red if sponsor/admin -->
@@ -110,12 +93,17 @@
                 {% else %}
                   <i class="material-icons circle">person</i>
                 {% endif %}
-                <a href="/user/{{ member.username }}">
+                <a href="{{ url_for('user', username=member.username) }}">
                   <span class="title">{{ member.username }}</span>
                 </a>
                 <p>{{ member.name }}</p>
-                {# TODO: sponsor if sponsor #}
-                <p>member</p>
+                <p>
+                  {% if member.username in sponsor_usernames %}
+                    sponsor
+                  {% else %}
+                    member
+                  {% endif %}
+                </p>
                 {% if current_user_is_sponsor %}
                   <div class="secondary-content">
                     <button type="submit" class="btn-flat waves-effect waves-light red-text" name="username" value="{{ member.username }}">
@@ -127,6 +115,7 @@
             {% endfor %}
           </ul>
         </form>
+        {% endif %}
       </div>
 
     </div>

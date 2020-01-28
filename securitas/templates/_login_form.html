@@ -1,0 +1,32 @@
+{% import '_form_macros.html' as macros %}
+
+<form action="{{ url_for('login') }}" method="post">
+  {{ login_form.csrf_token }}
+
+  <div class="card">
+    <div class="card-content">
+      <span class="card-title">Log In</span>
+      <div class="row">
+        <div class="input-field col s12">
+          {{ macros.with_errors(login_form.username, class="validate", placeholder="jdoe", tabindex="1") }}
+        </div>
+        <div class="input-field col s12">
+          {{ macros.with_errors(login_form.password, class="validate", placeholder="password", tabindex="2") }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <button class="btn waves-effect waves-light light-blue darken-4 w100" id="submit" type="submit" tabindex="3">Log In</button>
+          {{ macros.non_field_errors(login_form) }}
+        </div>
+        <p class="col s12">
+          <small><a href="{{ url_for('password_reset') }}">Expired password?</a></small>
+        </p>
+        <p class="col s12">
+          <small><a href="#">Forgot password?</a></small>
+        </p>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+</form>

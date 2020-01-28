@@ -43,11 +43,7 @@
           >
             Submit
           </button>
-          {% if register_form.errors.non_field_errors %}
-            {% for error in register_form.errors.non_field_errors %}
-              <p class="red-text text-darken-2">{{ error|e }}</p>
-            {% endfor %}
-          {% endif %}
+          {{ macros.non_field_errors(register_form) }}
         </div>
       </div>
     </div>

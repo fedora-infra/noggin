@@ -1,3 +1,28 @@
+from flask import request
+
+from .defaults import DEFAULTS
+
+
+def guess_locale():
+    locale = request.accept_languages.best_match(LOCALES)
+    if locale is not None:
+        return locale
+    # Try the short versions of the locales.
+    # build from a reversed list so the first locale gets priority
+    short_locales = dict([(l.split("-")[0], l) for l in reversed(LOCALES)])
+    locale = request.accept_languages.best_match(short_locales.keys())
+    if locale is not None:
+        # We still want the long form
+        # First, is there a "generic" long form?
+        generic = f"{locale}-{locale.upper()}"
+        if generic in LOCALES:
+            return generic
+        else:
+            return short_locales[locale]
+    # Unspecified or unsupported locale, fallback.
+    return DEFAULTS["user_locale"]
+
+
 LOCALES = [
     'af-ZA',
     'am-ET',
@@ -35,19 +60,20 @@ LOCALES = [
     'cs-CZ',
     'cy-GB',
     'da-DK',
+    'de-DE',
     'de-AT',
     'de-CH',
-    'de-DE',
     'de-LI',
     'de-LU',
     'dsb-DE',
     'dv-MV',
     'el-GR',
+    'en-US',
+    'en-GB',
     'en-029',
     'en-AU',
     'en-BZ',
     'en-CA',
-    'en-GB',
     'en-IE',
     'en-IN',
     'en-JM',
@@ -56,9 +82,9 @@ LOCALES = [
     'en-PH',
     'en-SG',
     'en-TT',
-    'en-US',
     'en-ZA',
     'en-ZW',
+    'es-ES',
     'es-AR',
     'es-BO',
     'es-CL',
@@ -66,7 +92,6 @@ LOCALES = [
     'es-CR',
     'es-DO',
     'es-EC',
-    'es-ES',
     'es-GT',
     'es-HN',
     'es-MX',
@@ -85,10 +110,10 @@ LOCALES = [
     'fi-FI',
     'fil-PH',
     'fo-FO',
+    'fr-FR',
     'fr-BE',
     'fr-CA',
     'fr-CH',
-    'fr-FR',
     'fr-LU',
     'fr-MC',
     'fy-NL',

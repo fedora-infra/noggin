@@ -15,15 +15,17 @@ ipa_admin = IPAAdmin(app)
 try:
     import importlib.metadata
 
-    __version__ = importlib.metadata.version("securitas")
+    __version__ = importlib.metadata.version("securitas")  # pragma: no cover
 except ImportError:
     try:
         import pkg_resources
 
         try:
-            __version__ = pkg_resources.get_distribution("securitas").version
+            __version__ = pkg_resources.get_distribution(
+                "securitas"
+            ).version  # pragma: no cover
         except pkg_resources.DistributionNotFound:
             # The app is not installed, but the flask dev server can run it nonetheless.
-            __version__ = None
+            __version__ = None  # pragma: no cover
     except ImportError:
-        __version__ = None
+        __version__ = None  # pragma: no cover
