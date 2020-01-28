@@ -69,7 +69,9 @@ def test_login(client, dummy_user):
 @pytest.mark.vcr()
 def test_login_no_password(client, dummy_user):
     """Test not giving a password"""
-    result = client.post('/login', data={"username": "dummy"}, follow_redirects=True)
+    result = client.post(
+        '/login', data={"username": "dummy"}, follow_redirects=True
+    )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     password_input = page.select("input[name='password']")[0]
