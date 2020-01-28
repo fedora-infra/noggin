@@ -89,12 +89,14 @@ def dummy_group():
     yield
     ipa_admin.group_del('dummy-group')
 
+
 @pytest.fixture
 def dummy_user_as_group_manager(logged_in_dummy_user, dummy_group):
     """Make the dummy user a manager of the dummy-group group."""
     ipa_admin.group_add_member("dummy-group", users="dummy")
     ipa_admin.group_add_member_manager("dummy-group", users="dummy")
     yield
+
 
 @pytest.fixture
 def remove_password_min_time():
@@ -109,10 +111,3 @@ def logged_in_dummy_user(client, dummy_user):
     ipa.logout()
     with client.session_transaction() as sess:
         sess.clear()
-
-
-@pytest.fixture
-def dummy_group():
-    ipa_admin.group_add('dummy-group', description="A dummy group")
-    yield
-    ipa_admin.group_del('dummy-group')

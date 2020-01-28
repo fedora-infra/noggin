@@ -46,7 +46,6 @@ class Client(IPAClient):
             parse_group_management_error(data)
         return data['result']
 
-
     def pwpolicy_mod(
         self, group, krbminpwdlife=None, **kwargs
     ):
