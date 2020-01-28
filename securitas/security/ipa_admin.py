@@ -1,4 +1,4 @@
-from python_freeipa import Client
+from python_freeipa.client_legacy import ClientLegacy
 import random
 
 
@@ -12,7 +12,7 @@ class IPAAdmin(object):
 
     # Attempt to obtain an administrative IPA session
     def __maybe_ipa_admin_session(self):
-        self.__client = Client(
+        self.__client = ClientLegacy(
             random.choice(self.__app.config['FREEIPA_SERVERS']),
             verify_ssl=self.__app.config['FREEIPA_CACERT'],
         )

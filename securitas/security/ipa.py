@@ -1,6 +1,6 @@
 from cryptography.fernet import Fernet
 import python_freeipa
-from python_freeipa import Client
+from python_freeipa.client_legacy import ClientLegacy
 import random
 
 
@@ -8,7 +8,7 @@ import random
 # or to form a session of any kind with it. This is useful for one-off cases
 # like password resets where a session isn't actually required.
 def untouched_ipa_client(app):
-    return Client(
+    return ClientLegacy(
         random.choice(app.config['FREEIPA_SERVERS']),
         verify_ssl=app.config['FREEIPA_CACERT'],
     )
@@ -27,7 +27,7 @@ def maybe_ipa_session(app, session):
     if encrypted_session and server_hostname:
         fernet = Fernet(app.config['FERNET_SECRET'])
         ipa_session = fernet.decrypt(encrypted_session)
-        client = Client(server_hostname, verify_ssl=app.config['FREEIPA_CACERT'])
+        client = ClientLegacy(server_hostname, verify_ssl=app.config['FREEIPA_CACERT'])
         client._session.cookies['ipa_session'] = str(ipa_session, 'utf8')
 
         # We have reconstructed a client, let's send a ping and see if we are
@@ -55,7 +55,7 @@ def maybe_ipa_login(app, session, username, password):
     # are safe in later assuming that the server hostname cookie has not been
     # altered.
     chosen_server = random.choice(app.config['FREEIPA_SERVERS'])
-    client = Client(chosen_server, verify_ssl=app.config['FREEIPA_CACERT'])
+    client = ClientLegacy(chosen_server, verify_ssl=app.config['FREEIPA_CACERT'])
 
     auth = client.login(username, password)
 
