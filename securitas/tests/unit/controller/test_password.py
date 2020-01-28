@@ -74,7 +74,7 @@ def test_time_sensitive_password_policy(client, dummy_user):
 
 
 @pytest.mark.vcr()
-def test_password_changes(client, dummy_user_as_group_manager, remove_password_min_time):
+def test_password_changes(client, dummy_user, dummy_user_as_group_manager, remove_password_min_time):
     """Verify that password changes"""
     result = client.post(
         '/password-reset',
