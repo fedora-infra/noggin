@@ -1,6 +1,5 @@
 import pytest
 from bs4 import BeautifulSoup
-from securitas import ipa_admin
 
 
 def test_password_reset(client):
@@ -32,12 +31,13 @@ def test_non_matching_passwords(client):
     helper_text = password_input.find_next("span", class_="helper-text")
     assert helper_text["data-error"] == "Passwords must match"
 
+
 @pytest.mark.vcr()
 def test_password(client):
     """Verify that current password must be correct"""
     result = client.post(
         '/password-reset',
-        data={ 
+        data={
             "username": "admin",
             "current_password": "1",
             "password": "LongSuperSafePassword",
@@ -74,7 +74,8 @@ def test_time_sensitive_password_policy(client, dummy_user):
 
 
 @pytest.mark.vcr()
-def test_password_changes(client, dummy_user, dummy_user_as_group_manager, remove_password_min_time):
+def test_password_changes(client, dummy_user,
+                          dummy_user_as_group_manager, remove_password_min_time):
     """Verify that password changes"""
     result = client.post(
         '/password-reset',
@@ -90,4 +91,5 @@ def test_password_changes(client, dummy_user, dummy_user_as_group_manager, remov
     page = BeautifulSoup(result.data, 'html.parser')
     messages = page.select(".flash-messages .green")
     assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Your password has been changed, please try to log in with the new one now.'
+    assert messages[0].get_text(strip=True) == 'Your password has been changed, \
+                                                please try to log in with the new one now.'
