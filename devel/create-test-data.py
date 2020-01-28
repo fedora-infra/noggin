@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import random
-
 import python_freeipa
 from python_freeipa import Client
 from faker import Faker
@@ -41,9 +39,9 @@ for x in range(50):
             fasgpgkeyid=[],
         )
 
-        if x % 3 == 0 and i != 0:
-            ipa.group_add_member("developers", user, skip_errors=True)
-        if x % 2 == 0 and i != 0:
-            ipa.group_add_member("admins", user, skip_errors=True)
+        if x % 3 == 0:
+            ipa.group_add_member("developers", username, skip_errors=True)
+        if x % 2 == 0:
+            ipa.group_add_member("admins", username, skip_errors=True)
     except python_freeipa.exceptions.FreeIPAError as e:
         print(e)
