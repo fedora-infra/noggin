@@ -48,10 +48,13 @@ class Client(IPAClient):
 
 
     def pwpolicy_mod(
-        self, group, o_krbminpwdlife=None, **kwargs
+        self, group, krbminpwdlife=None, **kwargs
     ):
         """
-        Set the password time policy to zero
+        Set the password time policy
+
+        :param group: Group name.
+        :param krbminpwdlife: The minimum password lifetime
         """
         params = {'all': True, 'raw': True, 'krbminpwdlife': krbminpwdlife}
         params.update(kwargs)
