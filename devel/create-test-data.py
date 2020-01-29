@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import python_freeipa
-from python_freeipa import Client
+from python_freeipa.client_legacy import ClientLegacy
 from faker import Faker
 
 fake = Faker()
@@ -10,7 +10,7 @@ fake = Faker()
 ipa_server = "ipa.example.com"
 ipa_user = "admin"
 ipa_pw = "adminPassw0rd!"
-ipa = Client(host=ipa_server)
+ipa = ClientLegacy(host=ipa_server)
 ipa.login(ipa_user, ipa_pw)
 
 # create a developers group
