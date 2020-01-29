@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block head %}
+    {% endblock %}
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" type="text/css">
+    <title>{% block title %}{% endblock %} - {{ project }}</title>
+  </head>
+  <body>
+    {% block content %}{% endblock %}
+    {% block footer %}{% endblock %}
+    {% block scripts %}
+      {% if current_user %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/bloodhound.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/typeahead.jquery.min.js"></script>
+        <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+      {% endif %}
+    {% endblock %}
+  </body>
+</html>

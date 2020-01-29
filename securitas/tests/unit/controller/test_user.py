@@ -26,7 +26,7 @@ def test_user(client, logged_in_dummy_user):
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
     assert page.title.string == 'User: dummy - The Fedora Project'
-    user_fullname = page.select("h3.header")
+    user_fullname = page.select("#user_fullname")
     assert len(user_fullname) == 1
     assert user_fullname[0].get_text(strip=True) == "Dummy User"
 
@@ -40,7 +40,7 @@ def test_user_unauthed(client):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "Please log in to continue."
-    assert category == "orange"
+    assert category == "warning"
 
 
 @pytest.mark.vcr()
@@ -67,7 +67,7 @@ def test_user_edit_post(client, logged_in_dummy_user):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "Profile has been succesfully updated."
-    assert category == "green"
+    assert category == "success"
 
 
 @pytest.mark.parametrize("method", ["GET", "POST"])
@@ -85,7 +85,7 @@ def test_user_edit_no_permission(method, client, logged_in_dummy_user):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "You do not have permission to edit this account."
-    assert category == "red"
+    assert category == "danger"
 
 
 @pytest.mark.vcr()
@@ -104,7 +104,7 @@ def test_user_edit_post_no_change(client, logged_in_dummy_user):
     category, message = messages[-1]
     # Nothing changed, last message should be OK
     assert message == "Profile has been succesfully updated."
-    assert category == "green"
+    assert category == "success"
 
 
 @pytest.mark.vcr()
@@ -117,7 +117,5 @@ def test_user_edit_post_bad_request(client, logged_in_dummy_user):
         result = client.post('/user/dummy/edit/', data=POST_CONTENTS)
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    submit_button = page.select("button[type='submit']")[0]
-    error_message = submit_button.find_next("p")
-    assert "red-text" in error_message["class"]
+    error_message = page.select("#formerrors .text-danger")[0]
     assert error_message.string == 'something went wrong'

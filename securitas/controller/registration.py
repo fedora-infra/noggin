@@ -64,7 +64,7 @@ def register():
         else:
             flash(
                 'Congratulations, you now have an account! Go ahead and sign in to proceed.',
-                'green',
+                'success',
             )
             return redirect(url_for('root'))
 

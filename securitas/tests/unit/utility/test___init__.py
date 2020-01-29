@@ -72,4 +72,4 @@ def test_with_ipa_anonymous(client):
         assert len(messages) == 1
         category, message = messages[0]
         assert message == "Please log in to continue."
-        assert category == "orange"
+        assert category == "warning"

@@ -13,6 +13,7 @@ def gravatar(email, size):
         + hashlib.md5(email.lower().encode('utf8')).hexdigest()  # nosec
         + "?s="
         + str(size)
+        + "&d=robohash"
     )
 
 
@@ -27,7 +28,7 @@ def with_ipa(app, session):
                 g.ipa = ipa
                 g.current_user = User(g.ipa.user_find(whoami=True)['result'][0])
                 return f(*args, **kwargs, ipa=ipa)
-            flash('Please log in to continue.', 'orange')
+            flash('Please log in to continue.', 'warning')
             return redirect(url_for('root'))
 
         return fn

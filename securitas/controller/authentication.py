@@ -28,7 +28,7 @@ def login():
             # This call will set the cookie itself, we don't have to.
             ipa = maybe_ipa_login(app, session, username, password)
         except python_freeipa.exceptions.PasswordExpired:
-            flash('Password expired. Please reset it.', 'red')
+            flash('Password expired. Please reset it.', 'danger')
             return redirect(url_for('password_reset'))
         except python_freeipa.exceptions.Unauthorized as e:
             form.errors['non_field_errors'] = [e.message]
@@ -42,7 +42,7 @@ def login():
             form.errors['non_field_errors'] = ['Could not log in to the IPA server.']
         else:
             if ipa:
-                flash(f'Welcome, {username}!', 'green')
+                flash(f'Welcome, {username}!', 'success')
                 return redirect(url_for('user', username=username))
             else:
                 app.logger.error(

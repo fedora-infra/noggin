@@ -1,32 +1,30 @@
-{% extends "with_navbar.html" %}
+{% extends "main.html" %}
 {% block title %}Self-Service Portal{% endblock %}
-
-{% block head %}
-  {{ super() }}
-  {{ css("index") }}
-{% endblock %}
 
 {% block content %}
   {{ super() }}
 
-  <div class="container section">
-    <div class="row">
-      <div class="col s12">
-        <h2 class="header light-blue-text text-darken-4 fw300">Welcome to sēcūritās!</h2>
-        <p>
-          This is the open source, community self-service portal for FreeIPA.
-          It allows you to do things like create an account, change your
-          password, manage group membership, and more.
-        </p>
+  <div class="bg-light border-bottom py-5">
+    <div class="container section">
+      <div class="row">
+        <div class="col-8">
+          <h2 class="display-4">Welcome to sēcūritās!</h2>
+          <p class="lead">
+            This is the open source, community self-service portal for FreeIPA.
+            It allows you to do things like create an account, change your
+            password, manage group membership, and more.
+          </p>
+        </div>
+        <div class="col">
+            {% include '_login_form.html' %}
+        </div>
       </div>
     </div>
-
-    <div class="row">
+  </div>
+  <div class="container">
+    <div class="row py-5">
       <div class="col s5">
         {% include '_register_form.html' %}
-      </div>
-      <div class="col s5 offset-s2">
-        {% include '_login_form.html' %}
       </div>
     </div>
   </div>

@@ -21,7 +21,7 @@ def user(ipa, username):
 def user_edit(ipa, username):
     # TODO: Maybe make this a decorator some day?
     if session.get('securitas_username') != username:
-        flash('You do not have permission to edit this account.', 'red')
+        flash('You do not have permission to edit this account.', 'danger')
         return redirect(url_for('user', username=username))
 
     user = User(user_or_404(ipa, username))
@@ -53,7 +53,7 @@ def user_edit(ipa, username):
                 )
                 form.errors['non_field_errors'] = [e.message]
         else:
-            flash('Profile has been succesfully updated.', 'green')
+            flash('Profile has been succesfully updated.', 'success')
             return redirect(url_for('user', username=username))
 
     return render_template('user-edit.html', user=user, form=form)
