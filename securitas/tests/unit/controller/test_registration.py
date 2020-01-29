@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
-from flask import current_app, session
+from flask import current_app, session, get_flashed_messages
 from securitas import ipa_admin
 from securitas.security.ipa import maybe_ipa_login
 from securitas.utility.defaults import DEFAULTS
@@ -40,7 +40,7 @@ def test_register(client, cleanup_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_register_short_password(client):
+def test_register_short_password(client, cleanup_dummy_user):
     """Register a user with too short a password"""
     result = client.post(
         '/register',
@@ -52,15 +52,17 @@ def test_register_short_password(client):
             "password_confirm": "42",
         },
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    password_input = page.select("input[name='password']")[0]
-    assert 'is-invalid' in password_input['class']
-    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert (
-        invalidfeedback.get_text(strip=True)
-        == "Constraint violation: Password is too short"
+    assert result.status_code == 302
+    assert result.location == f"http://localhost/login"
+    messages = get_flashed_messages(with_categories=True)
+    assert len(messages) == 1
+    category, message = messages[0]
+    assert message == (
+        'Your account has been created, but the password you chose does not comply '
+        'with the policy (Constraint violation: Password is too short) and has thus '
+        'been set as expired. You will be asked to change it after logging in.'
     )
+    assert category == "warning"
 
 
 @pytest.mark.vcr()
@@ -155,6 +157,38 @@ def test_register_generic_error(client):
         error_message.string
         == 'An error occurred while creating the account, please try again.'
     )
+
+
+@pytest.mark.vcr()
+def test_register_generic_pwchange_error(client, cleanup_dummy_user):
+    """Change user's password with an unhandled error"""
+    ipa_client = mock.Mock()
+    ipa_client.change_password.side_effect = python_freeipa.exceptions.FreeIPAError(
+        message="something went wrong", code="4242"
+    )
+    with mock.patch(
+        "securitas.controller.registration.untouched_ipa_client", lambda a: ipa_client
+    ):
+        result = client.post(
+            '/register',
+            data={
+                "firstname": "First",
+                "lastname": "Last",
+                "username": "dummy",
+                "password": "password",
+                "password_confirm": "password",
+            },
+        )
+    assert result.status_code == 302
+    assert result.location == f"http://localhost/login"
+    messages = get_flashed_messages(with_categories=True)
+    assert len(messages) == 1
+    category, message = messages[0]
+    assert message == (
+        'Your account has been created, but an error occurred while setting your '
+        'password (something went wrong). You may need to change it after logging in.'
+    )
+    assert category == "warning"
 
 
 def test_register_get(client):
