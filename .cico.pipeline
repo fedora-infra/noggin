@@ -1,1 +1,63 @@
-fedoraInfraTox { }
+#!groovy
+
+/**
+ * This is Securitas' Jenkins Pipeline Jenkinsfile.
+ *
+ * You can read documentation about this file at https://jenkins.io/doc/book/pipeline/jenkinsfile/.
+ * A useful list of plugins can be found here: https://jenkins.io/doc/pipeline/steps/.
+ *
+ * For reference, this is the source of the fedoraInfraTox() macro that runs
+ * tox on mutiple Fedora releases:
+ * https://github.com/centosci/cico-shared-library/blob/master/vars/fedoraInfraTox.groovy
+ */
+
+// fedoraInfraTox()
+
+def stages = [:]
+def fedora_containers = [
+                containerTemplate(name: 'jnlp',
+                                  image: "docker-registry.default.svc:5000/openshift/cico-workspace:latest",
+                                  ttyEnabled: false,
+                                  args: '${computer.jnlpmac} ${computer.name}',
+                                  workingDir: "/workdir")
+]
+def active_fedoras = ["f30", "f31", "rawhide"]
+
+active_fedoras.each { fedora ->
+    stages["tox-${fedora}"] = {
+        stage("tox-${fedora}"){
+            container("${fedora}"){
+                withEnv(['HOME=/workdir/workspace']) {
+                    sh "cp -al ./ ../${fedora}/"
+                    dir( "../${fedora}" ){
+                        sh "rm -rf .tox"
+                        sh "tox"
+                    }
+                }
+            }
+        }
+    }
+
+    fedora_containers.add(containerTemplate(name: "${fedora}",
+                                            image: "quay.io/centosci/python-tox:${fedora}",
+                                            ttyEnabled: true,
+                                            alwaysPullImage: true,
+                                            command: "cat",
+                                            workingDir: '/workdir'))
+}
+
+podTemplate(name: 'fedora-tox',
+            label: 'fedora-tox',
+            cloud: 'openshift',
+            containers: fedora_containers
+){
+    node('fedora-tox'){
+        ansiColor('xterm'){
+            stage ('checkout'){
+                checkout scm
+            }
+
+            parallel stages
+        }
+    }
+}
