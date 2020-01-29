@@ -1,20 +1,33 @@
 {% macro with_errors(field) %}
-  {% if field.errors %}
-    {% set css_class = 'invalid ' + kwargs.pop('class', '') %}
-    {{ field(class=css_class, **kwargs) }}
+  {% if kwargs.pop('nolabel', '') %}
+    {% set label = False %}
   {% else %}
-    {{ field(**kwargs) }}
+    {% set label = True %}
   {% endif %}
-  <label for="{{ field.name }}">{{ field.label }}</label>
-  <span class="helper-text" data-error="{{ field.errors|map('escape')|join('<br />') }}">
-    {{ field.description|e }}
-  </span>
+  {% if field.errors %}
+    {% set css_class = 'form-control is-invalid ' + kwargs.pop('class', '') %}
+  {% else %}
+    {% set css_class = 'form-control ' + kwargs.pop('class', '') %}
+  {% endif %}
+
+  {% if label %}
+    <label for="{{ field.name }}" class="mb-0 font-weight-bold">{{ field.label }}</label>
+  {% endif %}
+  {{ field(class=css_class, **kwargs) }}
+  
+  {% if field.errors %}
+  <div class="invalid-feedback">
+      {{ field.errors|map('escape')|join(' ') }}
+  </div>
+  {% endif %}
 {% endmacro %}
 
 {% macro non_field_errors(form) %}
   {% if form.errors.non_field_errors %}
+    <div id="formerrors">
     {% for error in form.errors.non_field_errors %}
-      <p class="red-text text-darken-2">{{ error|e }}</p>
+      <div class="text-danger text-center">{{ error|e }}</div>
     {% endfor %}
+    </div>
   {% endif %}
 {% endmacro %}

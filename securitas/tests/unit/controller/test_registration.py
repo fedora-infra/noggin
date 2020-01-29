@@ -31,11 +31,11 @@ def test_register(client, cleanup_dummy_user):
     )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .green")
+    messages = page.select(".flash-messages .alert-success")
     assert len(messages) == 1
     assert (
         messages[0].get_text(strip=True)
-        == 'Congratulations, you now have an account! Go ahead and sign in to proceed.'
+        == 'Congratulations, you now have an account! Go ahead and sign in to proceed.×'
     )
 
 
@@ -55,9 +55,9 @@ def test_register_short_password(client):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     password_input = page.select("input[name='password']")[0]
-    assert 'invalid' in password_input['class']
-    helper_text = password_input.find_next("span", class_="helper-text")
-    assert helper_text["data-error"] == "Constraint violation: Password is too short"
+    assert 'is-invalid' in password_input['class']
+    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
+    assert invalidfeedback.get_text(strip=True) == "Constraint violation: Password is too short"
 
 
 @pytest.mark.vcr()
@@ -76,9 +76,9 @@ def test_register_duplicate(client, dummy_user):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     username_input = page.select("input[name='username']")[0]
-    assert 'invalid' in username_input['class']
-    helper_text = username_input.find_next('span', class_='helper-text')
-    assert helper_text['data-error'] == 'user with name "dummy" already exists'
+    assert 'is-invalid' in username_input['class']
+    invalidfeedback = username_input.find_next('div', class_='invalid-feedback')
+    assert invalidfeedback.get_text(strip=True) == 'user with name "dummy" already exists'
 
 
 @pytest.mark.vcr()
@@ -97,10 +97,10 @@ def test_register_invalid_username(client):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     username_input = page.select("input[name='username']")[0]
-    assert 'invalid' in username_input['class']
-    helper_text = username_input.find_next("span", class_="helper-text")
+    assert 'is-invalid' in username_input['class']
+    invalidfeedback = username_input.find_next('div', class_='invalid-feedback')
     assert (
-        helper_text["data-error"] == 'may only include letters, numbers, _, -, . and $'
+        invalidfeedback.get_text(strip=True) == 'may only include letters, numbers, _, -, . and $'
     )
 
 
@@ -122,9 +122,7 @@ def test_register_invalid_first_name(client):
         )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    submit_button = page.select("button[type='submit']")[0]
-    error_message = submit_button.find_next("p")
-    assert "red-text" in error_message["class"]
+    error_message = page.select("#formerrors .text-danger")[0]
     assert error_message.string == 'invalid first name'
 
 
@@ -146,9 +144,7 @@ def test_register_generic_error(client):
         )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    submit_button = page.select("button[type='submit']")[0]
-    error_message = submit_button.find_next("p")
-    assert "red-text" in error_message["class"]
+    error_message = page.select("#formerrors .text-danger")[0]
     assert (
         error_message.string
         == 'An error occurred while creating the account, please try again.'

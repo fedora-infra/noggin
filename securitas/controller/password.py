@@ -38,7 +38,7 @@ def password_reset():
             flash(
                 'Your password has been changed, '
                 'please try to log in with the new one now.',
-                'green',
+                'success',
             )
             return redirect(url_for('root'))
     return render_template('password-reset.html', password_reset_form=form)

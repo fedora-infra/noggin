@@ -1,52 +1,23 @@
 {% import '_form_macros.html' as macros %}
 
-<form action="{{ url_for('register') }}" method="post">
+<div class="h4 text-center mb-4">
+    Create New Account
+</div>
+<form action="{{ url_for('register') }}" method="post" novalidate>
   {{ register_form.csrf_token }}
-
-  <div class="card">
-    <div class="card-content">
-      <span class="card-title">Register</span>
-
-      <div class="row">
-        <div class="input-field col s6">
-          {{ macros.with_errors(register_form.firstname, class="validate", placeholder="Jane", tabindex="4") }}
-        </div>
-
-        <div class="input-field col s6">
-          {{ macros.with_errors(register_form.lastname, class="validate", placeholder="Doe", tabindex="5") }}
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="input-field col s12">
-          {{ macros.with_errors(register_form.username, class="validate", placeholder="jdoe", tabindex="6") }}
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="input-field col s6">
-          {{ macros.with_errors(register_form.password, class="validate", placeholder="password", tabindex="7") }}
-        </div>
-
-        <div class="input-field col s6">
-          {{ macros.with_errors(register_form.password_confirm, class="validate", placeholder="password", tabindex="8") }}
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="input-field col s12">
-          <button
-            class="btn waves-effect waves-light light-blue darken-4 w100"
-            id="submit"
-            type="submit"
-            tabindex="9"
-          >
-            Submit
-          </button>
-          {{ macros.non_field_errors(register_form) }}
-        </div>
-      </div>
+  <div class="form-row">
+    <div class="form-group col">{{ macros.with_errors(register_form.username, tabindex="4") }}</div>
+    <div class="form-group col">{{ macros.with_errors(register_form.firstname, tabindex="5") }}</div>
+    <div class="form-group col">{{ macros.with_errors(register_form.lastname, tabindex="6") }}</div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col">{{ macros.with_errors(register_form.password, class="validate", tabindex="7") }}</div>
+    <div class="form-group col">{{ macros.with_errors(register_form.password_confirm, class="validate", tabindex="8") }}</div>
+  </div>
+  <div class="form-row">
+    {{ macros.non_field_errors(register_form) }}
+    <div class="form-group col">
+      <button class="btn btn-outline-primary btn-block" id="submit" type="submit" tabindex="9">Submit</button>
     </div>
-    <div class="clearfix"></div>
   </div>
 </form>

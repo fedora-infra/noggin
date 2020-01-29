@@ -1,0 +1,62 @@
+{% extends "master.html" %}
+
+
+{% block head %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="{{ url_for('theme.static', filename='css/default.css') }}" rel="stylesheet" type="text/css">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-info justify-content-between mb-5 border-bottom">
+        <a class="navbar-brand" href="/">sēcūritās</a>
+        {% if current_user %}
+        <form><input id="search" type="search" class="typeahead form-control" autocomplete="off" placeholder="search..."></form>
+        <ul class="navbar-nav align-items-center">
+            <li class="nav-item">
+                <a class="nav-link color-white" href="{{ url_for('groups') }}">Groups</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ gravatar(current_user.mail if current_user.mail else 'default', 30) }}" class="bg-white"/>
+                        
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{{ url_for('user', username=current_user.username) }}">Profile</a>
+                    <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
+                </div>
+            </li>
+        </ul>
+        {% endif %}
+    </nav>
+    {% with flashes = get_flashed_messages(with_categories=True) %}
+        {% if flashes %}
+        <div class="container flash-messages fixed-top mt-5">
+            {% for category, flash in flashes %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                {{ flash|striptags }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+{% endblock %}
+
+{% block footer %}
+    <footer class="bg-light border-top py-4 mt-4">
+        <div class="container h6 text-center">
+            <div><small>Powered by <a href="https://github.com/fedora-infra/securitas">securitas</a></small></div>
+            <div class="text-muted"><small>{{ ipa.ipa_version|default('') }}</small></div>
+        </div>
+    </footer>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    {{ super() }}
+{% endblock %}

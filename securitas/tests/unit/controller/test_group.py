@@ -48,7 +48,7 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     assert title.get_text(strip=True) == "dummy-group"
     assert title.find_next_sibling("p").get_text(strip=True) == "A dummy group"
     # Check the sponsors list
-    sponsors = page.select("div[data-section='sponsors'] ul li")
+    sponsors = page.select("div[data-section='sponsors'] row div")
     assert len(sponsors) == 1, str(sponsors)
     assert sponsors[0].find("a")["href"] == "/user/dummy/"
     assert sponsors[0].find("a").get_text(strip=True) == "dummy"
@@ -83,7 +83,7 @@ def test_group_add_member(client, dummy_user_as_group_manager, make_user):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "You got it! testuser has been added to dummy-group."
-    assert category == "green"
+    assert category == "success"
 
 
 @pytest.mark.vcr()
@@ -98,7 +98,7 @@ def test_group_add_unknown_member(client, dummy_user_as_group_manager):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "User testuser was not found in the system."
-    assert category == "red"
+    assert category == "danger"
 
 
 @pytest.mark.vcr()
@@ -121,7 +121,7 @@ def test_group_add_member_invalid(client, dummy_user_as_group_manager, make_user
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "Unable to add user testuser: something went wrong"
-    assert category == "red"
+    assert category == "danger"
 
 
 @pytest.mark.vcr()
@@ -134,7 +134,7 @@ def test_group_add_member_invalid_form(client, dummy_user_as_group_manager):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "New member username must not be empty"
-    assert category == "red"
+    assert category == "danger"
 
 
 @pytest.mark.vcr()
@@ -151,7 +151,7 @@ def test_group_remove_member(client, dummy_user_as_group_manager, make_user):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "You got it! testuser has been removed from dummy-group."
-    assert category == "green"
+    assert category == "success"
 
 
 @pytest.mark.vcr()
@@ -173,7 +173,7 @@ def test_group_remove_member_invalid(client, dummy_user_as_group_manager):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "Unable to remove user testuser: something went wrong"
-    assert category == "red"
+    assert category == "danger"
 
 
 @pytest.mark.vcr()
@@ -186,4 +186,4 @@ def test_group_remove_member_invalid_form(client, dummy_user_as_group_manager):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "Username must not be empty"
-    assert category == "red"
+    assert category == "danger"

@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import FieldList, StringField, SelectField
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import AnyOf, DataRequired, Email, Optional
 
 from securitas.utility.locales import LOCALES
@@ -15,7 +16,7 @@ class EditUserForm(FlaskForm):
         'Last Name', validators=[DataRequired(message='Last name must not be empty')]
     )
 
-    mail = StringField(
+    mail = EmailField(
         'E-mail Address',
         validators=[
             DataRequired(message='Email must not be empty'),
@@ -49,6 +50,4 @@ class EditUserForm(FlaskForm):
 
     gitlab = StringField('GitLab Username', validators=[Optional()])
 
-    rhbz_mail = StringField(
-        'E-mail Address used in Red Hat Bugzilla', validators=[Optional()]
-    )
+    rhbz_mail = EmailField('Red Hat Bugzilla Email', validators=[Optional()])

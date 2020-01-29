@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Blueprint
 from flask_wtf.csrf import CSRFProtect
 
 from securitas.security.ipa_admin import IPAAdmin
@@ -11,6 +11,15 @@ if app.config.get('TEMPLATES_AUTO_RELOAD'):
 
 ipa_admin = IPAAdmin(app)
 
+themename = app.config.get('THEME', 'default')
+blueprint = Blueprint(
+    'theme',
+    __name__,
+    static_url_path='/theme/static',
+    static_folder="themes/" + themename + "/static/",
+    template_folder="themes/" + themename + "/templates/",
+)
+app.register_blueprint(blueprint)
 
 try:
     import importlib.metadata

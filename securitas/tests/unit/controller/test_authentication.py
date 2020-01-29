@@ -59,9 +59,9 @@ def test_login(client, dummy_user):
         follow_redirects=True,
     )
     page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .green")
+    messages = page.select(".flash-messages .alert-success")
     assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Welcome, dummy!'
+    assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
     assert session.get("securitas_username") == "dummy"
     assert session.get("securitas_session") is not None
 
@@ -73,9 +73,9 @@ def test_login_no_password(client, dummy_user):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     password_input = page.select("input[name='password']")[0]
-    assert 'invalid' in password_input['class']
-    helper_text = password_input.find_next("span", class_="helper-text")
-    assert helper_text["data-error"] == "You must provide a password"
+    assert 'is-invalid' in password_input['class']
+    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
+    assert invalidfeedback.get_text(strip=True) == "You must provide a password"
     assert "securitas_session" not in session
     assert "securitas_username" not in session
 
@@ -88,9 +88,9 @@ def test_login_no_username(client):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     username_input = page.select("input[name='username']")[0]
-    assert 'invalid' in username_input['class']
-    helper_text = username_input.find_next("span", class_="helper-text")
-    assert helper_text["data-error"] == "You must provide a user name"
+    assert 'is-invalid' in username_input['class']
+    invalidfeedback = username_input.find_next('div', class_='invalid-feedback')
+    assert invalidfeedback.get_text(strip=True) == "You must provide a user name"
     assert "securitas_session" not in session
     assert "securitas_username" not in session
 
@@ -105,9 +105,7 @@ def test_login_incorrect_password(client, dummy_user):
     )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    submit_button = page.select("button[type='submit']")[0]
-    error_message = submit_button.find_next("p")
-    assert "red-text" in error_message["class"]
+    error_message = page.select("#formerrors .text-danger")[0]
     assert error_message.get_text(strip=True) == 'Unauthorized: bad credentials.'
     assert "securitas_session" not in session
     assert "securitas_username" not in session
@@ -124,9 +122,7 @@ def test_login_generic_error(client):
         )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    submit_button = page.select("button[type='submit']")[0]
-    error_message = submit_button.find_next("p")
-    assert "red-text" in error_message["class"]
+    error_message = page.select("#formerrors .text-danger")[0]
     assert error_message.string == 'Could not log in to the IPA server.'
     assert "securitas_session" not in session
     assert "securitas_username" not in session
@@ -140,9 +136,7 @@ def test_login_cant_login(client):
         )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    submit_button = page.select("button[type='submit']")[0]
-    error_message = submit_button.find_next("p")
-    assert "red-text" in error_message["class"]
+    error_message = page.select("#formerrors .text-danger")[0]
     assert error_message.string == 'Could not log in to the IPA server.'
     assert "securitas_session" not in session
     assert "securitas_username" not in session
@@ -164,7 +158,7 @@ def test_login_expired_password(client, dummy_user_expired_password):
     assert len(messages) == 1
     category, message = messages[0]
     assert message == "Password expired. Please reset it."
-    assert category == "red"
+    assert category == "danger"
     # We are not logged in
     assert "securitas_session" not in session
     assert "securitas_username" not in session
