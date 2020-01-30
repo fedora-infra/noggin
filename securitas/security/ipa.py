@@ -55,7 +55,8 @@ class Client(IPAClient):
         :param cn: Group name.
         :param krbminpwdlife: The minimum password lifetime
         """
-        params = {'all': True, 'raw': True, 'krbminpwdlife': krbminpwdlife, 'cospriority': cospriority, 'krbpwdminlength': krbpwdminlength}
+        params = {'all': True, 'raw': True, 'krbminpwdlife': krbminpwdlife,
+                  'cospriority': cospriority, 'krbpwdminlength': krbpwdminlength}
         params.update(kwargs)
         data = self._request('pwpolicy_add', group, params)
         return data['result']
