@@ -1,6 +1,7 @@
 import datetime
 import os
 import tempfile
+import logging
 
 import pytest
 
@@ -99,8 +100,8 @@ def dummy_user_as_group_manager(logged_in_dummy_user, dummy_group):
 
 
 @pytest.fixture
-def remove_password_min_time():
-    ipa_admin.pwpolicy_mod("dummy-group", 0)
+def no_password_min_time(dummy_user_as_group_manager):
+    ipa_admin.pwpolicy_add("dummy-group", krbminpwdlife=0, cospriority=10, krbpwdminlength=8)
 
 
 @pytest.fixture

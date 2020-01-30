@@ -1,5 +1,8 @@
 import pytest
 from bs4 import BeautifulSoup
+import logging
+ 
+logging.basicConfig(level=logging.DEBUG)
 
 
 def test_password_reset(client):
@@ -61,8 +64,8 @@ def test_time_sensitive_password_policy(client, dummy_user):
         data={
             "username": "dummy",
             "current_password": "dummy_password",
-            "password": "1",
-            "password_confirm": "1",
+            "password": "somesupersecretpassword",
+            "password_confirm": "somesupersecretpassword",
         },
         follow_redirects=True,
     )
@@ -72,10 +75,29 @@ def test_time_sensitive_password_policy(client, dummy_user):
     helper_text = password_input.find_next("span", class_="helper-text")
     assert helper_text["data-error"] == "Constraint violation: Too soon to change password"
 
+@pytest.mark.vcr()
+def test_short_password(client, no_password_min_time):
+    """Verify that new password policies are upheld"""
+    result = client.post(
+        '/password-reset',
+        data={
+            "username": "dummy",
+            "current_password": "dummy_password",
+            "password": "1",
+            "password_confirm": "1",
+        },
+        follow_redirects=True,
+    )
+    page = BeautifulSoup(result.data, 'html.parser')
+    log = logging.getLogger('test_2')
+    log.debug(page)
+    password_input = page.select("input[name='password']")[0]
+    assert 'invalid' in password_input['class']
+    helper_text = password_input.find_next("span", class_="helper-text")
+    assert helper_text["data-error"] == "Constraint violation: Password is too short"
 
 @pytest.mark.vcr()
-def test_password_changes(client, dummy_user,
-                          dummy_user_as_group_manager, remove_password_min_time):
+def test_password_changes(client, no_password_min_time):
     """Verify that password changes"""
     result = client.post(
         '/password-reset',
@@ -91,5 +113,4 @@ def test_password_changes(client, dummy_user,
     page = BeautifulSoup(result.data, 'html.parser')
     messages = page.select(".flash-messages .green")
     assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Your password has been changed, \
-                                                please try to log in with the new one now.'
+    assert messages[0].get_text(strip=True) == 'Your password has been changed, please try to log in with the new one now.'

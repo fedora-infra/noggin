@@ -46,18 +46,18 @@ class Client(IPAClient):
             parse_group_management_error(data)
         return data['result']
 
-    def pwpolicy_mod(
-        self, group, krbminpwdlife=None, **kwargs
+    def pwpolicy_add(
+        self, group, krbminpwdlife=None, krbpwdminlength=None, cospriority=None, **kwargs
     ):
         """
-        Set the password time policy
+        Create the password time policy
 
-        :param group: Group name.
+        :param cn: Group name.
         :param krbminpwdlife: The minimum password lifetime
         """
-        params = {'all': True, 'raw': True, 'krbminpwdlife': krbminpwdlife}
+        params = {'all': True, 'raw': True, 'krbminpwdlife': krbminpwdlife, 'cospriority': cospriority, 'krbpwdminlength': krbpwdminlength}
         params.update(kwargs)
-        data = self._request('pwpolicy_mod', group, params)
+        data = self._request('pwpolicy_add', group, params)
         return data['result']
 
 
