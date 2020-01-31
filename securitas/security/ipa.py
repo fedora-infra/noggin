@@ -47,16 +47,27 @@ class Client(IPAClient):
         return data['result']
 
     def pwpolicy_add(
-        self, group, krbminpwdlife=None, krbpwdminlength=None, cospriority=None, **kwargs
+        self,
+        group,
+        krbminpwdlife=None,
+        krbpwdminlength=None,
+        cospriority=None,
+        **kwargs
     ):
         """
-        Create the password time policy
+        Create the password policy
 
         :param cn: Group name.
         :param krbminpwdlife: The minimum password lifetime
+        :param krbpwdminlength: The minimum password length
         """
-        params = {'all': True, 'raw': True, 'krbminpwdlife': krbminpwdlife,
-                  'cospriority': cospriority, 'krbpwdminlength': krbpwdminlength}
+        params = {
+            'all': True,
+            'raw': True,
+            'krbminpwdlife': krbminpwdlife,
+            'cospriority': cospriority,
+            'krbpwdminlength': krbpwdminlength,
+        }
         params.update(kwargs)
         data = self._request('pwpolicy_add', group, params)
         return data['result']

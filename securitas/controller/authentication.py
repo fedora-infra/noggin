@@ -34,7 +34,7 @@ def login():
             form.errors['non_field_errors'] = [e.message]
         except python_freeipa.exceptions.FreeIPAError as e:
             # If we made it here, we hit something weird not caught above. We didn't
-            # bomb out, but we don't have IPA creds, either. Boot us back to /.
+            # bomb out, but we don't have IPA creds, either.
             app.logger.error(
                 f'An unhandled error {e.__class__.__name__} happened while logging in user '
                 f'{username}: {e.message}'

@@ -20,11 +20,19 @@ def password_reset():
         try:
             res = ipa.change_password(username, password, current_password)
         except python_freeipa.exceptions.PWChangeInvalidPassword:
-            form.current_password.errors.append("The old password or username is not correct")
+            form.current_password.errors.append(
+                "The old password or username is not correct"
+            )
         except python_freeipa.exceptions.PWChangePolicyError as e:
             form.password.errors.append(e.policy_error)
         except python_freeipa.exceptions.FreeIPAError as e:
-            form.errors['non_field_errors'] = [e.message]
+            # If we made it here, we hit something weird not caught above. We didn't
+            # bomb out, but we don't have IPA creds, either.
+            app.logger.error(
+                f'An unhandled error {e.__class__.__name__} happened while reseting the password for user '
+                f'{username}: {e.message}'
+            )
+            form.errors['non_field_errors'] = ['Could not change password.']
 
         if res and res.ok:
             flash(
