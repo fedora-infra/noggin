@@ -13,7 +13,7 @@ class IPAAdmin(object):
         "group_del",
         "group_add_member",
         "group_add_member_manager",
-        "pwpolicy_add"
+        "pwpolicy_add",
     )
 
     def __init__(self, app):
