@@ -2,7 +2,6 @@ import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
 from unittest import mock
-from securitas import app
 
 
 def test_password_reset(client):
