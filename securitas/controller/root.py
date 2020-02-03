@@ -35,19 +35,11 @@ def search_json(ipa):
         users_ = [User(u) for u in ipa.user_find(username)['result']]
 
         for user_ in users_:
-            uid = user_.username
-            cn = user_.name
-            if uid is not None:
-                # If the cn is None, who cares?
-                res.append({'uid': uid, 'cn': cn})
+            res.append({'uid': user_.username, 'cn': user_.name})
 
     if groupname:
         groups_ = [Group(g) for g in ipa.group_find(groupname)['result']]
         for group_ in groups_:
-            cn = group_.name
-            description = group_.description
-            if cn is not None:
-                # If the description is None, who cares?
-                res.append({'cn': cn, 'description': description})
+            res.append({'cn': group_.name, 'description': group_.description})
 
     return jsonify(res)
