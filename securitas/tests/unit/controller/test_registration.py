@@ -57,7 +57,10 @@ def test_register_short_password(client):
     password_input = page.select("input[name='password']")[0]
     assert 'is-invalid' in password_input['class']
     invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert invalidfeedback.get_text(strip=True) == "Constraint violation: Password is too short"
+    assert (
+        invalidfeedback.get_text(strip=True)
+        == "Constraint violation: Password is too short"
+    )
 
 
 @pytest.mark.vcr()
@@ -78,7 +81,9 @@ def test_register_duplicate(client, dummy_user):
     username_input = page.select("input[name='username']")[0]
     assert 'is-invalid' in username_input['class']
     invalidfeedback = username_input.find_next('div', class_='invalid-feedback')
-    assert invalidfeedback.get_text(strip=True) == 'user with name "dummy" already exists'
+    assert (
+        invalidfeedback.get_text(strip=True) == 'user with name "dummy" already exists'
+    )
 
 
 @pytest.mark.vcr()
@@ -100,7 +105,8 @@ def test_register_invalid_username(client):
     assert 'is-invalid' in username_input['class']
     invalidfeedback = username_input.find_next('div', class_='invalid-feedback')
     assert (
-        invalidfeedback.get_text(strip=True) == 'may only include letters, numbers, _, -, . and $'
+        invalidfeedback.get_text(strip=True)
+        == 'may only include letters, numbers, _, -, . and $'
     )
 
 

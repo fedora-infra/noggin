@@ -13,20 +13,18 @@ def test_groups_list(client, logged_in_dummy_user, dummy_group):
     result = client.get('/groups/')
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    groups = page.select("ul.collection li[data-group-name='dummy-group']")
-    assert len(groups) == 1
-    group_link = groups[0].find("a")
+    groups = page.select("ul.list-group li")
+    group_names = [g.find("span", class_="title").get_text(strip=True) for g in groups]
+    assert "dummy-group" in group_names
+    dummy_group_index = group_names.index("dummy-group")
+    group_block = groups[dummy_group_index]
+    group_link = group_block.find("a")
     assert group_link is not None
     assert group_link.get_text(strip=True) == "dummy-group"
     assert group_link["href"] == "/group/dummy-group/"
-    group_dn = group_link.find_next_sibling("p", attrs={"data-role": "dn"})
-    assert (
-        group_dn.get_text(strip=True)
-        == "cn=dummy-group,cn=groups,cn=accounts,dc=example,dc=com"
-    )
-    group_mc = group_link.find_next_sibling("p", attrs={"data-role": "members-count"})
+    group_mc = group_block.find("div", attrs={"data-role": "members-count"})
     assert group_mc.get_text(strip=True) == "0 members"
-    group_desc = group_link.find_next_sibling("p", attrs={"data-role": "description"})
+    group_desc = group_block.find("div", attrs={"data-role": "description"})
     assert group_desc.get_text(strip=True) == "A dummy group"
 
 
@@ -48,7 +46,7 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     assert title.get_text(strip=True) == "dummy-group"
     assert title.find_next_sibling("p").get_text(strip=True) == "A dummy group"
     # Check the sponsors list
-    sponsors = page.select("div[data-section='sponsors'] row div")
+    sponsors = page.select("div[data-section='sponsors'] .row > div")
     assert len(sponsors) == 1, str(sponsors)
     assert sponsors[0].find("a")["href"] == "/user/dummy/"
     assert sponsors[0].find("a").get_text(strip=True) == "dummy"
@@ -58,8 +56,7 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     for index, username in enumerate(["dummy"] + test_users):
         assert members[index].find("a")["href"] == f"/user/{username}/"
         assert members[index].find("a").get_text(strip=True) == username
-    # Current user is a sponsor, there must be the corresponding widgets
-    assert len(page.select("button[data-target='sponsor-modal']")) == 1
+    # Current user is a sponsor, there must be the corresponding add form
     assert len(page.select("form[action='/group/dummy-group/members/']")) == 1
 
 
