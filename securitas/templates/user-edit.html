@@ -6,15 +6,15 @@
 {% block content %}
   {{ super() }}
   <div class="container section">
-    <div class="row">
+    <div class="row form-group">
       <div class="col s12">
         <h3 class="header light-blue-text text-darken-4 fw300">
           Edit user: {{ user.username }}
         </h3>
-
+        
         <form class="needs-validation" action="{{ url_for('user_edit', username=user.username) }}" method="post" novalidate>
           {{ form.csrf_token }}
-
+          
           <div class="form-row">
             <div class="form-group col">{{ macros.with_errors(form.firstname) }}</div>
             <div class="form-group col">{{ macros.with_errors(form.lastname) }}</div>
@@ -32,21 +32,24 @@
             <div class="form-group col">{{ macros.with_errors(form.gitlab) }}</div>
           </div>
           <div class="form-row">
-              <div class="form-group col">{{ macros.with_errors(form.rhbz_mail) }}</div>
+            <div class="form-group col">{{ macros.with_errors(form.rhbz_mail) }}</div>
           </div>
           <div class="form-row">
-              {# TODO: We need to have a way to add more keys and fix this styling #}
-              <div class="form-group col">{{ macros.with_errors(form.gpgkeys) }}</div>
+            {# TODO: We need to have a way to add more keys and fix this styling #}
+            <div class="form-group col">{{ macros.with_errors(form.gpgkeys) }}</div>
           </div>
-
+          
           <div class="form-row">
-              {{ macros.non_field_errors(form) }}
-              <div class="form-group col">
-                <button class="btn btn-primary" id="submit" type="submit" tabindex="9">Submit</button>
-              </div>
+            {{ macros.non_field_errors(form) }}
+            <div class="form-group col">
+              <button class="btn btn-primary" id="submit" type="submit" tabindex="9">Submit</button>
+            </div>
           </div>
         </form>
       </div>
+    </div>
+    <div class="row form-group">
+      {{ request_disable_account() if request_disable_account is defined }}
     </div>
   </div>
 {% endblock %}
