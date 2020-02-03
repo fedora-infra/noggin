@@ -29,8 +29,8 @@ def password_reset():
             # If we made it here, we hit something weird not caught above. We didn't
             # bomb out, but we don't have IPA creds, either.
             app.logger.error(
-                f'An unhandled error {e.__class__.__name__} happened while reseting the password for user '
-                f'{username}: {e.message}'
+                f'An unhandled error {e.__class__.__name__} happened while reseting '
+                f'the password for user {username}: {e.message}'
             )
             form.errors['non_field_errors'] = ['Could not change password.']
 
