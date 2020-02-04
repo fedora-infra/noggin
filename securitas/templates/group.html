@@ -9,9 +9,10 @@
   <div class="container section">
     <div class="row" data-section="identity">
       <div class="col">
-        <h3 class="header light-blue-text text-darken-4 fw300">{{ group.name }}</h3>
-        {% if group.description %}<p>{{ group.description }}</p>{% endif %}
+          <h3>{{ group.name }}</h3>
+          {% if group.description %}<div>{{ group.description }}</div>{% endif %}
       </div>
+      {{ edit_group_details() if edit_group_details is defined }}
     </div>
     <div class="row">
       <div class="col-12" data-section="sponsors">

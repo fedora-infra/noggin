@@ -67,3 +67,16 @@
     <script src="{{ url_for('theme.static', filename='js/fedora-bootstrap/fedora-bootstrap.min.js') }}"></script>
     {{ super() }}
 {% endblock %}
+
+
+{# an optional macro defining an element to show for editing group details #}
+{# typically, it used to link to a ticket tracker for an admin to edit a group #}
+{% macro edit_group_details() %}
+    {% if current_user_is_sponsor and sponsor_form %}
+        <div class="col-auto ml-auto">
+            <a class="btn btn-sm btn-outline-primary" href="https://pagure.io/fedora-infrastructure/new_issue" title="file a Fedora Infra ticket to change the details or sponsors of this group">
+                Request Change of Details
+            </a>
+        </div>
+    {% endif %}
+{% endmacro %}
