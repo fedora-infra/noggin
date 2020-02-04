@@ -2,14 +2,16 @@
 
 
 {% block head %}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link href="{{ url_for('theme.static', filename='css/default.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('theme.static', filename='js/fedora-bootstrap/fedora-bootstrap.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('theme.static', filename='fonts/open-sans.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('theme.static', filename='fonts/hack.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('theme.static', filename='fonts/font-awesome.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('theme.static', filename='css/fas.css') }}" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block navbar %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-info justify-content-between mb-5 border-bottom">
-        <a class="navbar-brand" href="/">sēcūritās</a>
+    <nav class="navbar navbar-expand-lg navbar-light masthead justify-content-between py-2">
+        <a class="navbar-brand" href="/"><img src="{{ url_for('theme.static', filename='images/FAS.png') }}" alt="Fedora Account System logo" height="40"></a>
         {% if current_user %}
         <form><input id="search" type="search" class="typeahead form-control" autocomplete="off" placeholder="search..."></form>
         <ul class="navbar-nav align-items-center">
@@ -46,21 +48,22 @@
 {% endblock %}
 
 {% block bodycontent %}
-    {% block content %}{% endblock %}
+    <div class="bg-white py-5">
+        {% block content %}{% endblock %}
+    </div>
 {% endblock %}
 
 {% block footer %}
-    <footer class="bg-light border-top py-4 mt-4">
-        <div class="container h6 text-center">
-            <div><small>Powered by <a href="https://github.com/fedora-infra/securitas">securitas</a></small></div>
-            <div class="text-muted"><small>{{ ipa.ipa_version|default('') }}</small></div>
+    <footer class="footer text-light">
+        <div class="container h4 text-center py-5">
+            <div>Powered by <a href="https://github.com/fedora-infra/securitas" class="text-white font-weight-bold">securitas</a></div>
+            <div>{{ ipa.ipa_version|default('') }}</div>
         </div>
     </footer>
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="{{ url_for('theme.static', filename='js/jquery/jquery-1.10.2.min.js') }}"></script>
+    <script src="{{ url_for('theme.static', filename='js/fedora-bootstrap/fedora-bootstrap.min.js') }}"></script>
     {{ super() }}
 {% endblock %}
