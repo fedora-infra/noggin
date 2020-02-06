@@ -59,3 +59,11 @@
     name: securitas
     daemon_reload: yes
     enabled: yes
+
+- name: Copy SAR script
+  copy:
+      src: /vagrant/devel/ansible/roles/dev/files/sar.py
+      dest: /usr/bin/securitas-sar.py
+      remote_src: yes
+      owner: vagrant
+      group: vagrant
