@@ -42,9 +42,9 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
     assert page.title.string == 'Group: dummy-group - The Fedora Project'
-    title = page.find("h3", class_="header")
+    title = page.select_one("div[data-section='identity'] > .col > h3")
     assert title.get_text(strip=True) == "dummy-group"
-    assert title.find_next_sibling("p").get_text(strip=True) == "A dummy group"
+    assert title.find_next_sibling("div").get_text(strip=True) == "A dummy group"
     # Check the sponsors list
     sponsors = page.select("div[data-section='sponsors'] .row > div")
     assert len(sponsors) == 1, str(sponsors)
