@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import FieldList, StringField, SelectField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import AnyOf, DataRequired, Email, Optional
+from wtforms.validators import AnyOf, DataRequired, Email, Optional, Length
 
 from securitas.utility.locales import LOCALES
 from securitas.utility.timezones import TIMEZONES
@@ -35,7 +35,9 @@ class EditUserForm(FlaskForm):
 
     ircnick = StringField('IRC Nickname', validators=[Optional()])
 
-    gpgkeys = FieldList(StringField('GPG Keys', validators=[Optional()]))
+    gpgkeys = FieldList(
+        StringField('GPG Keys', validators=[Optional(), Length(max=16)])
+    )
 
     timezone = SelectField(
         'Timezone',

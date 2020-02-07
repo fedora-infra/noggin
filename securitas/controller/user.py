@@ -56,4 +56,8 @@ def user_edit(ipa, username):
             flash('Profile has been succesfully updated.', 'success')
             return redirect(url_for('user', username=username))
 
+    # Append 2 empty entries at the bottom of the fieldlist
+    for i in range(2):
+        form.gpgkeys.append_entry()
+
     return render_template('user-edit.html', user=user, form=form)
