@@ -12,6 +12,7 @@
         <img class="img-thumbnail" src="{{ gravatar(user.mail if user.mail else 'default', 400) }}">
         {% if user.username == current_user.username %}
           <a href="{{ url_for('user_edit', username=user.username) }}" class="btn btn-outline-primary btn-block mb-2 mt-1">Edit profile</a>
+          <a href="{{ url_for('auth_password_reset', username=user.username) }}" class="btn btn-outline-primary btn-block mb-2 mt-1">Change Password</a>
         {% endif %}
         <div>
               {% if user.timezone %}

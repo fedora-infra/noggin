@@ -4,9 +4,6 @@ from wtforms.validators import DataRequired, EqualTo
 
 
 class PasswordResetForm(FlaskForm):
-    username = StringField(
-        'Username', validators=[DataRequired(message='User name must not be empty')]
-    )
 
     current_password = PasswordField(
         'Current Password',

@@ -152,7 +152,7 @@ def test_login_expired_password(client, dummy_user_expired_password):
     )
     # We are sent to the password reset page
     assert result.status_code == 302
-    assert result.location == "http://localhost/password-reset"
+    assert result.location == "http://localhost/password-reset?username=dummy"
     # With an appropriate message
     messages = get_flashed_messages(with_categories=True)
     assert len(messages) == 1

@@ -29,7 +29,7 @@ def login():
             ipa = maybe_ipa_login(app, session, username, password)
         except python_freeipa.exceptions.PasswordExpired:
             flash('Password expired. Please reset it.', 'danger')
-            return redirect(url_for('password_reset'))
+            return redirect(url_for('password_reset', username=username))
         except python_freeipa.exceptions.Unauthorized as e:
             form.errors['non_field_errors'] = [e.message]
         except python_freeipa.exceptions.FreeIPAError as e:
