@@ -11,7 +11,10 @@ def parse_group_management_error(data):
 
     TODO: send this upstream.
     """
-    failed = data['failed']
+    try:
+        failed = data['failed']
+    except KeyError:
+        return
     targets = ('member', 'membermanager')
     for target in targets:
         if target in failed and (failed[target]['group'] or failed[target]['user']):

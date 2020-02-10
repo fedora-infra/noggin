@@ -90,6 +90,10 @@ def test_parse_group_management_error_membermanager(ipa_call_error):
         parse_group_management_error(ipa_call_error)
 
 
+def test_parse_group_management_error_keyerror(ipa_call_error):
+    assert parse_group_management_error(ipa_call_error.pop('failed')) is None
+
+
 def test_ipa_client_with_errors(ipa_call_error):
     with patch("securitas.security.ipa.Client._request") as request:
         request.return_value = ipa_call_error
