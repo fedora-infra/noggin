@@ -1,7 +1,7 @@
 from cryptography.fernet import Fernet
 import python_freeipa
 from python_freeipa.client_legacy import ClientLegacy as IPAClient
-from python_freeipa.exceptions import ValidationError
+from python_freeipa.exceptions import ValidationError, BadRequest
 import random
 
 
@@ -48,6 +48,26 @@ class Client(IPAClient):
         if not skip_errors:
             parse_group_management_error(data)
         return data['result']
+
+    def batch(self, methods=None, raise_errors=True):
+        """
+        Make multiple ipa calls via one remote procedure call.
+
+        :param methods: Nested Methods to execute.
+        :type methods: dict
+        :param skip_errors: Raise errors from RPC calls.
+        :type skip_errors: bool
+        """
+        data = self._request('batch', methods)
+        for idx, result in enumerate(data['results']):
+            error = result['error']
+            if error:
+                exception = BadRequest(message=error, code=result['error_code'])
+                if raise_errors:
+                    raise exception
+                else:
+                    data['results'][idx] = exception
+        return data
 
     def pwpolicy_add(
         self,

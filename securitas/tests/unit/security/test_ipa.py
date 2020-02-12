@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 from cryptography.fernet import Fernet
 from flask import current_app
-from python_freeipa.exceptions import ValidationError
+from python_freeipa.exceptions import ValidationError, BadRequest
 
 from securitas.security.ipa import (
     maybe_ipa_session,
@@ -110,3 +110,58 @@ def test_ipa_client_skip_errors(ipa_call_error):
             "dummy-group", users="dummy", skip_errors=True
         )
         assert result == "call-result"
+
+
+@pytest.mark.vcr
+def test_ipa_client_batch(client, logged_in_dummy_user, dummy_group):
+    """Check the IPAClient batch method"""
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_session(current_app, sess)
+        result = ipa.batch(
+            methods=[
+                {"method": "user_find", "params": [[], {"uid": "dummy", 'all': True}]},
+                {"method": "group_find", "params": [["dummy-group"], {}]},
+            ]
+        )
+        assert result['count'] == 2
+        assert result['results'][0]['result'][0]['displayname'][0] == 'Dummy User'
+        assert result['results'][1]['result'][0]['description'][0] == 'A dummy group'
+
+
+@pytest.mark.vcr
+def test_ipa_client_batch_no_raise_errors(client, logged_in_dummy_user, dummy_group):
+    """Check the IPAClient batch method"""
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_session(current_app, sess)
+        result = ipa.batch(
+            methods=[
+                {"method": "user_find", "params": [[], {"uid": "dummy", 'all': True}]},
+                {"method": "this_method_wont_work", "params": [["dummy-group"], {}]},
+            ],
+            raise_errors=False,
+        )
+        assert result['count'] == 2
+        assert result['results'][0]['result'][0]['displayname'][0] == 'Dummy User'
+        assert isinstance(result['results'][1], BadRequest)
+
+
+@pytest.mark.vcr
+def test_ipa_client_batch_unknown_method(client, logged_in_dummy_user):
+    """Check the IPAClient batch method returns unknown command errors"""
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_session(current_app, sess)
+        with pytest.raises(BadRequest) as e:
+            ipa.batch(methods=[{"method": "user_findy", "params": [[], {}]}])
+            assert "unknown command 'user_findy'" in e
+
+
+@pytest.mark.vcr
+def test_ipa_client_batch_unknown_option(client, logged_in_dummy_user):
+    """Check the IPAClient batch method returns invalid params errors"""
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_session(current_app, sess)
+        with pytest.raises(BadRequest) as e:
+            ipa.batch(
+                methods=[{"method": "user_find", "params": [[], {"pants": "pants"}]}]
+            )
+            assert "invalid 'params': Unknown option: pants" in e
