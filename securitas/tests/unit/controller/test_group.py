@@ -37,6 +37,10 @@ def test_group(client, dummy_user_as_group_manager, make_user):
         make_user(username)
     ipa_admin.group_add_member("dummy-group", users=test_users)
 
+    # Add another user, but only as a membermanager
+    make_user("testuser4")
+    ipa_admin.group_add_member_manager("dummy-group", users=["testuser4"])
+
     result = client.get('/group/dummy-group/')
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
@@ -47,9 +51,11 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     assert title.find_next_sibling("div").get_text(strip=True) == "A dummy group"
     # Check the sponsors list
     sponsors = page.select("div[data-section='sponsors'] .row > div")
-    assert len(sponsors) == 1, str(sponsors)
+    assert len(sponsors) == 2, str(sponsors)
     assert sponsors[0].find("a")["href"] == "/user/dummy/"
     assert sponsors[0].find("a").get_text(strip=True) == "dummy"
+    assert sponsors[1].find("a")["href"] == "/user/testuser4/"
+    assert sponsors[1].find("a").get_text(strip=True) == "testuser4"
     # Check the members list
     members = page.select("div[data-section='members'] ul li")
     assert len(members) == len(test_users) + 1

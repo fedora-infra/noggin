@@ -16,13 +16,15 @@ def group(ipa, groupname):
     sponsor_form = AddGroupMemberForm(groupname=groupname)
     remove_form = RemoveGroupMemberForm(groupname=groupname)
 
-    # This only finds sponsors that are also members of the group. Can we have sponsors which are
-    # not members?
-    sponsors = []
     members = [User(u) for u in ipa.user_find(in_group=groupname)['result']]
-    for member in members:
-        if member.username in group.sponsors:
-            sponsors.append(member)
+
+    batch_methods = [
+        {"method": "user_find", "params": [[], {"uid": sponsorname, 'all': True}]}
+        for sponsorname in group.sponsors
+    ]
+    sponsors = [
+        User(u['result'][0]) for u in ipa.batch(methods=batch_methods)['results']
+    ]
 
     # We can safely assume g.current_user exists after @with_ipa
     current_user_is_sponsor = g.current_user.username in group.sponsors
