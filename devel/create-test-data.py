@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
 import python_freeipa
-from python_freeipa.client_legacy import ClientLegacy
 from faker import Faker
 
-fake = Faker()
+from securitas.security.ipa import Client
 
+
+fake = Faker()
 
 ipa_server = "ipa.example.com"
 ipa_user = "admin"
 ipa_pw = "adminPassw0rd!"
-ipa = ClientLegacy(host=ipa_server, verify_ssl=False)
+ipa = Client(host=ipa_server, verify_ssl=False)
 ipa.login(ipa_user, ipa_pw)
 
 # create a developers group
@@ -40,6 +41,10 @@ for x in range(50):
         )
         if x % 3 == 0:
             ipa.group_add_member("developers", username, skip_errors=True)
+            if x < 10:
+                ipa.group_add_member_manager(
+                    "developers", users=username, skip_errors=True
+                )
         if x % 2 == 0:
             ipa.group_add_member("admins", username, skip_errors=True)
     except python_freeipa.exceptions.FreeIPAError as e:
