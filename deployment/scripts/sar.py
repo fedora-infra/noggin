@@ -1,5 +1,6 @@
-import click
 import json
+
+import click
 from python_freeipa.client_legacy import ClientLegacy
 
 
