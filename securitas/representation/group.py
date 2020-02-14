@@ -23,3 +23,6 @@ class Group(Representation):
         if 'dn' in self.raw:
             return self.raw['dn']
         return None
+
+    def __eq__(self, obj):
+        return isinstance(obj, Group) and self.raw == obj.raw
