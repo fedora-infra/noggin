@@ -9,6 +9,8 @@ class IPAAdmin(object):
     __WRAPPED_METHODS = (
         "user_add",
         "user_del",
+        "user_show",
+        "user_mod",
         "group_add",
         "group_del",
         "group_add_member",

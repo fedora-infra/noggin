@@ -278,3 +278,4 @@ def test_password_changes(client, dummy_user, no_password_min_time):
     category, message = messages[0]
     assert message == "Your password has been changed"
     assert category == "success"
+    )
