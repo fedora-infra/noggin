@@ -1,5 +1,6 @@
 from flask import Flask, Blueprint
 from flask_wtf.csrf import CSRFProtect
+from flask_mail import Mail
 
 from securitas.security.ipa_admin import IPAAdmin
 
@@ -26,6 +27,9 @@ blueprint = Blueprint(
     template_folder="themes/" + themename + "/templates/",
 )
 app.register_blueprint(blueprint)
+
+# Flask-Mail
+mailer = Mail(app)
 
 # Set the version
 try:
