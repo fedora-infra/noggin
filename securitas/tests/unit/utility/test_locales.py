@@ -1,8 +1,7 @@
 import pytest
-from flask import current_app
 
+from securitas.app import app
 from securitas.utility.locales import guess_locale
-from securitas.utility.defaults import DEFAULTS
 
 
 @pytest.mark.parametrize(
@@ -14,10 +13,10 @@ from securitas.utility.defaults import DEFAULTS
         ("en", "en-US"),
         ("en-GB,en;q=0.8", "en-GB"),
         ("it", "it-IT"),
-        ("xx", DEFAULTS["user_locale"]),
+        ("xx", app.config["USER_DEFAULTS"]["user_locale"]),
     ],
 )
 def test_guess_locale(client, accepted, expected):
     headers = {"Accept-Language": accepted}
-    with current_app.test_request_context('/', headers=headers):
+    with app.test_request_context('/', headers=headers):
         assert guess_locale() == expected
