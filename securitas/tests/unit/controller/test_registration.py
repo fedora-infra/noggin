@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 from flask import current_app, session, get_flashed_messages
 from securitas import ipa_admin
 from securitas.security.ipa import maybe_ipa_login
-from securitas.utility.defaults import DEFAULTS
 
 
 @pytest.fixture
@@ -221,7 +220,9 @@ def test_register_default_values(client, cleanup_dummy_user):
     assert user["fascreationtime"][0]
     # Locale
     assert "faslocale" in user
-    assert user["faslocale"][0] == DEFAULTS["user_locale"]
+    assert user["faslocale"][0] == current_app.config["USER_DEFAULTS"]["user_locale"]
     # Timezone
     assert "fastimezone" in user
-    assert user["fastimezone"][0] == DEFAULTS["user_timezone"]
+    assert (
+        user["fastimezone"][0] == current_app.config["USER_DEFAULTS"]["user_timezone"]
+    )

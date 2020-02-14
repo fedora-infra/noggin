@@ -5,13 +5,19 @@ from securitas.security.ipa_admin import IPAAdmin
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
+
+# Load defaults
+app.config.from_pyfile('defaults.cfg')
+# Load the configuration file
 app.config.from_envvar('SECURITAS_CONFIG_PATH')
+
 if app.config.get('TEMPLATES_AUTO_RELOAD'):
     app.jinja_env.auto_reload = True
 
 ipa_admin = IPAAdmin(app)
 
-themename = app.config.get('THEME', 'default')
+# Theme support
+themename = app.config.get('THEME')
 blueprint = Blueprint(
     'theme',
     __name__,
@@ -21,6 +27,7 @@ blueprint = Blueprint(
 )
 app.register_blueprint(blueprint)
 
+# Set the version
 try:
     import importlib.metadata
 
