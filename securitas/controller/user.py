@@ -45,6 +45,7 @@ def user_edit(ipa, username):
                 full_name='%s %s' % (form.firstname.data, form.lastname.data),
                 display_name='%s %s' % (form.firstname.data, form.lastname.data),
                 mail=form.mail.data,
+                ipasshpubkey=form.sshpubkeys.data,
                 fasircnick=form.ircnick.data,
                 faslocale=form.locale.data,
                 fastimezone=form.timezone.data,
@@ -55,7 +56,7 @@ def user_edit(ipa, username):
             )
         except python_freeipa.exceptions.BadRequest as e:
             if e.message == 'no modifications to be performed':
-                return redirect(url_for('user', username=username))
+                form.errors['non_field_errors'] = [e.message]
             else:
                 app.logger.error(
                     f'An error happened while editing user {username}: {e.message}'
@@ -65,8 +66,12 @@ def user_edit(ipa, username):
             flash('Profile has been succesfully updated.', 'success')
             return redirect(url_for('user', username=username))
 
-    # Append 2 empty entries at the bottom of the fieldlist
-    for i in range(2):
-        form.gpgkeys.append_entry()
+    # if the form has errors, we don't want to add new fields. otherwise,
+    # more fields will show up with every validation error
+    if not form.errors:
+        # Append 2 empty entries at the bottom of the gpgkeys fieldlist
+        for i in range(2):
+            form.gpgkeys.append_entry()
+            form.sshpubkeys.append_entry()
 
     return render_template('user-edit.html', user=user, form=form)
