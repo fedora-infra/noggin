@@ -17,14 +17,12 @@ def user(ipa, username):
     # groups.
     groups = [Group(g) for g in ipa.group_find(user=username, all=False)['result']]
     managed_groups = [
-        Group(g) for g in ipa.group_find(
-            membermanager_user=username, all=False)['result']
+        Group(g)
+        for g in ipa.group_find(membermanager_user=username, all=False)['result']
     ]
     return render_template(
-        'user.html',
-        user=user,
-        groups=groups,
-        managed_groups=managed_groups)
+        'user.html', user=user, groups=groups, managed_groups=managed_groups
+    )
 
 
 @app.route('/user/<username>/edit/', methods=['GET', 'POST'])
