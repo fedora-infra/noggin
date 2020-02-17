@@ -158,6 +158,28 @@ def test_group_remove_member(client, dummy_user_as_group_manager, make_user):
 
 
 @pytest.mark.vcr()
+def test_group_remove_self(client, logged_in_dummy_user, dummy_group):
+    """Test a non-sponsor user removing themselves from a group"""
+    ipa_admin.group_add_member("dummy-group", users="dummy")
+    result = client.get('/group/dummy-group/')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    leave_btn = page.select_one("#leave-group-btn")
+    assert leave_btn.get_text(strip=True) == "Leave group"
+
+    result = client.post(
+        '/group/dummy-group/members/remove', data={"username": "dummy"}
+    )
+    assert result.status_code == 302
+    assert result.location == f"http://localhost/group/dummy-group/"
+    messages = get_flashed_messages(with_categories=True)
+    assert len(messages) == 1
+    category, message = messages[0]
+    assert message == "You got it! dummy has been removed from dummy-group."
+    assert category == "success"
+
+
+@pytest.mark.vcr()
 def test_group_remove_member_invalid(client, dummy_user_as_group_manager):
     """Test failure when removing a member from a group"""
     with mock.patch("securitas.security.ipa.Client.group_remove_member") as method:
