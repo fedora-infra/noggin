@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import FieldList, StringField, SelectField
+from wtforms import FieldList, StringField, SelectField, TextAreaField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import AnyOf, DataRequired, Email, Optional, Length
 
@@ -22,6 +22,10 @@ class EditUserForm(FlaskForm):
             DataRequired(message='Email must not be empty'),
             Email(message='Email must be valid'),
         ],
+    )
+
+    sshpubkeys = FieldList(
+        TextAreaField('SSH Keys', validators=[Optional()], render_kw={"rows": 4})
     )
 
     locale = SelectField(
