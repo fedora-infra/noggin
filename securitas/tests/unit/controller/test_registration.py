@@ -3,9 +3,11 @@ from unittest import mock
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
-from flask import current_app, session, get_flashed_messages
+from flask import current_app, session
+
 from securitas import ipa_admin
 from securitas.security.ipa import maybe_ipa_login
+from securitas.tests.unit.utilities import assert_redirects_with_flash
 
 
 @pytest.fixture
@@ -51,17 +53,16 @@ def test_register_short_password(client, cleanup_dummy_user):
             "password_confirm": "42",
         },
     )
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/login"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == (
-        'Your account has been created, but the password you chose does not comply '
-        'with the policy (Constraint violation: Password is too short) and has thus '
-        'been set as expired. You will be asked to change it after logging in.'
+    assert_redirects_with_flash(
+        result,
+        expected_url="/login",
+        expected_message=(
+            'Your account has been created, but the password you chose does not comply '
+            'with the policy (Constraint violation: Password is too short) and has thus '
+            'been set as expired. You will be asked to change it after logging in.'
+        ),
+        expected_category="warning",
     )
-    assert category == "warning"
 
 
 @pytest.mark.vcr()
@@ -178,16 +179,15 @@ def test_register_generic_pwchange_error(client, cleanup_dummy_user):
                 "password_confirm": "password",
             },
         )
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/login"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == (
-        'Your account has been created, but an error occurred while setting your '
-        'password (something went wrong). You may need to change it after logging in.'
+    assert_redirects_with_flash(
+        result,
+        expected_url="/login",
+        expected_message=(
+            'Your account has been created, but an error occurred while setting your '
+            'password (something went wrong). You may need to change it after logging in.'
+        ),
+        expected_category="warning",
     )
-    assert category == "warning"
 
 
 def test_register_get(client):

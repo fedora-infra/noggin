@@ -6,11 +6,12 @@ import jwt
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
-from flask import get_flashed_messages, current_app
+from flask import current_app
 
 from securitas import ipa_admin, mailer
 from securitas.security.ipa import untouched_ipa_client
 from securitas.utility.password_reset import PasswordResetLock
+from securitas.tests.unit.utilities import assert_redirects_with_flash
 
 
 @pytest.fixture
@@ -54,16 +55,16 @@ def test_ask_get(client):
 def test_ask_post(client, dummy_user, patched_lock):
     with mailer.record_messages() as outbox:
         result = client.post('/forgot-password/ask', data={"username": "dummy"})
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/"
     # Confirmation message
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == (
-        "An email has been sent to your address with instructions on how to reset your password"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message=(
+            "An email has been sent to your address with instructions on how to reset "
+            "your password"
+        ),
+        expected_category="success",
     )
-    assert category == "success"
     # Sent email
     assert len(outbox) == 1
     message = outbox[0]
@@ -100,17 +101,17 @@ def test_ask_no_smtp(client, dummy_user, patched_lock):
         mailer.send.side_effect = ConnectionRefusedError
         with mock.patch("securitas.controller.password.app.logger") as logger:
             result = client.post('/forgot-password/ask', data={"username": "dummy"})
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/"
+    # Email
     mailer.send.assert_called_once()
     # Lock untouched
     patched_lock["store"].assert_not_called()
     # Error message
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "We could not send you an email, please retry later"
-    assert category == "danger"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="We could not send you an email, please retry later",
+        expected_category="danger",
+    )
     # Log message
     logger.error.assert_called_once()
 
@@ -135,37 +136,34 @@ def test_ask_still_valid(client, patched_lock_active):
 
 def test_change_no_token(client):
     result = client.get('/forgot-password/change')
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/forgot-password/ask"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "No token provided, please request one."
-    assert category == "warning"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/forgot-password/ask",
+        expected_message="No token provided, please request one.",
+        expected_category="warning",
+    )
 
 
 def test_change_invalid_token(client):
     result = client.get('/forgot-password/change?token=this-is-invalid')
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/forgot-password/ask"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "The token is invalid, please request a new one."
-    assert category == "warning"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/forgot-password/ask",
+        expected_message="The token is invalid, please request a new one.",
+        expected_category="warning",
+    )
 
 
 @pytest.mark.vcr()
 def test_change_not_active(client, token_for_dummy_user, patched_lock):
     result = client.get(f'/forgot-password/change?token={token_for_dummy_user}')
     patched_lock["delete"].assert_called_once()
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/forgot-password/ask"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "The token has expired, please request a new one."
-    assert category == "warning"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/forgot-password/ask",
+        expected_message="The token has expired, please request a new one.",
+        expected_category="warning",
+    )
 
 
 @pytest.mark.vcr()
@@ -174,13 +172,12 @@ def test_change_too_old(client, token_for_dummy_user, patched_lock):
     patched_lock["valid_until"].return_value = passed_expiry
     result = client.get(f'/forgot-password/change?token={token_for_dummy_user}')
     patched_lock["delete"].assert_called_once()
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/forgot-password/ask"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "The token has expired, please request a new one."
-    assert category == "warning"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/forgot-password/ask",
+        expected_message="The token has expired, please request a new one.",
+        expected_category="warning",
+    )
 
 
 @pytest.mark.vcr()
@@ -197,15 +194,15 @@ def test_change_recent_password_change(
     ipa.change_password("dummy", "dummy_password", "dummy_password")
     result = client.get(f'/forgot-password/change?token={token_for_dummy_user}')
     patched_lock_active["delete"].assert_called_once()
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/forgot-password/ask"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == (
-        "Your password has been changed since you requested this token, please request a new one."
+    assert_redirects_with_flash(
+        result,
+        expected_url="/forgot-password/ask",
+        expected_message=(
+            "Your password has been changed since you requested this token, please "
+            "request a new one."
+        ),
+        expected_category="warning",
     )
-    assert category == "warning"
 
 
 @pytest.mark.vcr()
@@ -228,13 +225,12 @@ def test_change_post(client, dummy_user, token_for_dummy_user, patched_lock_acti
             data={"password": "newpassword", "password_confirm": "newpassword"},
         )
     patched_lock_active["delete"].assert_called()
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "Your password has been changed."
-    assert category == "success"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Your password has been changed.",
+        expected_category="success",
+    )
     # Log message
     logger.info.assert_called_once()
     log_msg = logger.info.call_args[0][0]
@@ -251,17 +247,16 @@ def test_change_post_password_too_short(
             f'/forgot-password/change?token={token_for_dummy_user}',
             data={"password": "42", "password_confirm": "42"},
         )
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/login"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == (
-        'Your password has been changed, but it does not comply '
-        'with the policy (Constraint violation: Password is too short) and has thus '
-        'been set as expired. You will be asked to change it after logging in.'
+    assert_redirects_with_flash(
+        result,
+        expected_url="/login",
+        expected_message=(
+            'Your password has been changed, but it does not comply '
+            'with the policy (Constraint violation: Password is too short) and has thus '
+            'been set as expired. You will be asked to change it after logging in.'
+        ),
+        expected_category="warning",
     )
-    assert category == "warning"
     patched_lock_active["delete"].assert_called()
     logger.info.assert_called_with(
         "Password for dummy was changed to a non-compliant password after completing "

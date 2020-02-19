@@ -2,7 +2,8 @@ import python_freeipa
 import mock
 import pytest
 from bs4 import BeautifulSoup
-from flask import get_flashed_messages
+
+from securitas.tests.unit.utilities import assert_redirects_with_flash
 
 
 POST_CONTENTS = {
@@ -35,13 +36,12 @@ def test_user(client, logged_in_dummy_user):
 def test_user_unauthed(client):
     """Check that when unauthed, the user page redirects back to /."""
     result = client.get('/user/dudemcpants/')
-    assert result.status_code == 302
-    assert result.location == "http://localhost/"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "Please log in to continue."
-    assert category == "warning"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Please log in to continue.",
+        expected_category="warning",
+    )
 
 
 @pytest.mark.vcr()
@@ -67,13 +67,12 @@ def test_user_edit(client, logged_in_dummy_user):
 def test_user_edit_post(client, logged_in_dummy_user):
     """Test posting to the user edit page: /user/<username>/edit/"""
     result = client.post('/user/dummy/edit/', data=POST_CONTENTS)
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/user/dummy/"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "Profile has been succesfully updated."
-    assert category == "success"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/",
+        expected_message="Profile has been succesfully updated.",
+        expected_category="success",
+    )
 
 
 @pytest.mark.parametrize("method", ["GET", "POST"])
@@ -85,13 +84,12 @@ def test_user_edit_no_permission(method, client, logged_in_dummy_user):
         method=method,
         data=POST_CONTENTS if method == "POST" else None,
     )
-    assert result.status_code == 302
-    assert result.location == "http://localhost/user/dudemcpants/"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "You do not have permission to edit this account."
-    assert category == "danger"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dudemcpants/",
+        expected_message="You do not have permission to edit this account.",
+        expected_category="danger",
+    )
 
 
 @pytest.mark.vcr()
