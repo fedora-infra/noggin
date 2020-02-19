@@ -7,18 +7,6 @@ def guess_locale():
     locale = request.accept_languages.best_match(LOCALES)
     if locale is not None:
         return locale
-    # Try the short versions of the locales.
-    # build from a reversed list so the first locale gets priority
-    short_locales = dict([(l.split("-")[0], l) for l in reversed(LOCALES)])
-    locale = request.accept_languages.best_match(short_locales.keys())
-    if locale is not None:
-        # We still want the long form
-        # First, is there a "generic" long form?
-        generic = f"{locale}-{locale.upper()}"
-        if generic in LOCALES:
-            return generic
-        else:
-            return short_locales[locale]
     # Unspecified or unsupported locale, fallback.
     return DEFAULTS["user_locale"]
 
@@ -125,8 +113,8 @@ LOCALES = [
     'ha-Latn-NG',
     'he-IL',
     'hi-IN',
-    'hr-BA',
     'hr-HR',
+    'hr-BA',
     'hsb-DE',
     'hu-HU',
     'hy-AM',
@@ -134,8 +122,8 @@ LOCALES = [
     'ig-NG',
     'ii-CN',
     'is-IS',
-    'it-CH',
     'it-IT',
+    'it-CH',
     'iu-Cans-CA',
     'iu-Latn-CA',
     'ja-JP',
@@ -163,8 +151,8 @@ LOCALES = [
     'mt-MT',
     'nb-NO',
     'ne-NP',
-    'nl-BE',
     'nl-NL',
+    'nl-BE',
     'nn-NO',
     'nso-ZA',
     'oc-FR',
@@ -173,8 +161,8 @@ LOCALES = [
     'pl-PL',
     'prs-AF',
     'ps-AF',
-    'pt-BR',
     'pt-PT',
+    'pt-BR',
     'qut-GT',
     'quz-BO',
     'quz-EC',
@@ -185,9 +173,9 @@ LOCALES = [
     'rw-RW',
     'sah-RU',
     'sa-IN',
+    'se-SE',
     'se-FI',
     'se-NO',
-    'se-SE',
     'si-LK',
     'sk-SK',
     'sl-SI',
