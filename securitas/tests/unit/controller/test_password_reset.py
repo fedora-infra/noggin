@@ -5,7 +5,10 @@ import python_freeipa
 from bs4 import BeautifulSoup
 
 from securitas import ipa_admin
-from securitas.tests.unit.utilities import assert_redirects_with_flash
+from securitas.tests.unit.utilities import (
+    assert_redirects_with_flash,
+    assert_form_field_error,
+)
 
 
 def test_password_reset(client):
@@ -89,12 +92,9 @@ def test_non_matching_passwords_user(client, logged_in_dummy_user):
             "password_confirm": "password2",
         },
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    password_input = page.select("input[name='password']")[0]
-    assert 'is-invalid' in password_input['class']
-    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert invalidfeedback.get_text(strip=True) == "Passwords must match"
+    assert_form_field_error(
+        result, field_name="password", expected_message="Passwords must match"
+    )
 
 
 @pytest.mark.vcr()
@@ -110,15 +110,10 @@ def test_password_user(client, logged_in_dummy_user):
         },
         follow_redirects=True,
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    print(page.prettify())
-    password_input = page.select("input[name='current_password']")[0]
-    assert 'is-invalid' in password_input['class']
-    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert (
-        invalidfeedback.get_text(strip=True)
-        == "The old password or username is not correct"
+    assert_form_field_error(
+        result,
+        field_name="current_password",
+        expected_message="The old password or username is not correct",
     )
 
 
@@ -132,12 +127,9 @@ def test_non_matching_passwords(client):
             "password_confirm": "password2",
         },
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    password_input = page.select("input[name='password']")[0]
-    assert 'is-invalid' in password_input['class']
-    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert invalidfeedback.get_text(strip=True) == "Passwords must match"
+    assert_form_field_error(
+        result, field_name="password", expected_message="Passwords must match"
+    )
 
 
 @pytest.mark.vcr()
@@ -152,14 +144,10 @@ def test_password(client, dummy_user):
         },
         follow_redirects=True,
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    password_input = page.select("input[name='current_password']")[0]
-    assert 'is-invalid' in password_input['class']
-    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert (
-        invalidfeedback.get_text(strip=True)
-        == "The old password or username is not correct"
+    assert_form_field_error(
+        result,
+        field_name="current_password",
+        expected_message="The old password or username is not correct",
     )
 
 
@@ -175,14 +163,10 @@ def test_password_no_user(client):
         },
         follow_redirects=True,
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    password_input = page.select("input[name='current_password']")[0]
-    assert 'is-invalid' in password_input['class']
-    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert (
-        invalidfeedback.get_text(strip=True)
-        == "The old password or username is not correct"
+    assert_form_field_error(
+        result,
+        field_name="current_password",
+        expected_message="The old password or username is not correct",
     )
 
 

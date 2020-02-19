@@ -6,7 +6,10 @@ from bs4 import BeautifulSoup
 from flask import session, get_flashed_messages
 
 from securitas import ipa_admin
-from securitas.tests.unit.utilities import assert_redirects_with_flash
+from securitas.tests.unit.utilities import (
+    assert_redirects_with_flash,
+    assert_form_field_error,
+)
 
 
 @pytest.fixture
@@ -71,12 +74,9 @@ def test_login(client, dummy_user):
 def test_login_no_password(client, dummy_user):
     """Test not giving a password"""
     result = client.post('/login', data={"username": "dummy"}, follow_redirects=True)
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    password_input = page.select("input[name='password']")[0]
-    assert 'is-invalid' in password_input['class']
-    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert invalidfeedback.get_text(strip=True) == "You must provide a password"
+    assert_form_field_error(
+        result, field_name="password", expected_message="You must provide a password"
+    )
     assert "securitas_session" not in session
     assert "securitas_username" not in session
 
@@ -86,12 +86,9 @@ def test_login_no_username(client):
     result = client.post(
         '/login', data={"password": "n:nPv{P].9}]!q$RE%w<38@"}, follow_redirects=True
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    username_input = page.select("input[name='username']")[0]
-    assert 'is-invalid' in username_input['class']
-    invalidfeedback = username_input.find_next('div', class_='invalid-feedback')
-    assert invalidfeedback.get_text(strip=True) == "You must provide a user name"
+    assert_form_field_error(
+        result, field_name="username", expected_message="You must provide a user name"
+    )
     assert "securitas_session" not in session
     assert "securitas_username" not in session
 

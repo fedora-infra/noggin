@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from flask import get_flashed_messages
 
 
@@ -13,3 +14,12 @@ def assert_redirects_with_flash(
     category, message = messages[0]
     assert message == expected_message
     assert category == expected_category
+
+
+def assert_form_field_error(response, field_name, expected_message):
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data, 'html.parser')
+    field = page.select_one(f"input[name='{field_name}']")
+    assert 'is-invalid' in field['class']
+    invalidfeedback = field.find_next('div', class_='invalid-feedback')
+    assert invalidfeedback.get_text(strip=True) == expected_message
