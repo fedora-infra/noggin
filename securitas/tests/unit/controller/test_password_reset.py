@@ -3,9 +3,9 @@ from unittest import mock
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
-from flask import get_flashed_messages
 
 from securitas import ipa_admin
+from securitas.tests.unit.utilities import assert_redirects_with_flash
 
 
 def test_password_reset(client):
@@ -46,12 +46,12 @@ def test_password_changes_wrong_user(client, logged_in_dummy_user):
             "password_confirm": "secretpw",
         },
     )
-    assert result.status_code == 302
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "You do not have permission to edit this account."
-    assert category == "danger"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="You do not have permission to edit this account.",
+        expected_category="danger",
+    )
 
 
 @pytest.mark.vcr()
@@ -69,12 +69,12 @@ def test_password_changes_user(
             "password_confirm": "secretpw",
         },
     )
-    assert result.status_code == 302
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "Your password has been changed"
-    assert category == "success"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Your password has been changed",
+        expected_category="success",
+    )
 
 
 @pytest.mark.vcr()
@@ -271,11 +271,9 @@ def test_password_changes(client, dummy_user, no_password_min_time):
             "password_confirm": "secretpw",
         },
     )
-    assert result.status_code == 302
-    assert result.location == f"http://localhost/"
-    messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1
-    category, message = messages[0]
-    assert message == "Your password has been changed"
-    assert category == "success"
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Your password has been changed",
+        expected_category="success",
     )
