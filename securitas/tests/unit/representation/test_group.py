@@ -39,3 +39,10 @@ def test_group_no_dn(dummy_group_dict):
     del dummy_group_dict["dn"]
     group = Group(dummy_group_dict)
     assert group.dn is None
+
+
+def test_group_eq(dummy_group_dict):
+    """Test that Groups can be compared based on their content"""
+    group_1 = Group(dummy_group_dict)
+    group_2 = Group(dummy_group_dict)
+    assert group_1 == group_2
