@@ -3,7 +3,10 @@ import mock
 import pytest
 from bs4 import BeautifulSoup
 
-from securitas.tests.unit.utilities import assert_redirects_with_flash
+from securitas.tests.unit.utilities import (
+    assert_redirects_with_flash,
+    assert_form_generic_error,
+)
 
 
 POST_CONTENTS = {
@@ -100,10 +103,7 @@ def test_user_edit_post_no_change(client, logged_in_dummy_user):
     assert result.status_code == 302
     # Now do it again
     result = client.post('/user/dummy/edit/', data=POST_CONTENTS)
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    error_message = page.select("#formerrors .text-danger")[0]
-    assert error_message.string == 'no modifications to be performed'
+    assert_form_generic_error(result, 'no modifications to be performed')
 
 
 @pytest.mark.vcr()
@@ -114,7 +114,4 @@ def test_user_edit_post_bad_request(client, logged_in_dummy_user):
             message="something went wrong", code="4242"
         )
         result = client.post('/user/dummy/edit/', data=POST_CONTENTS)
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    error_message = page.select("#formerrors .text-danger")[0]
-    assert error_message.string == 'something went wrong'
+    assert_form_generic_error(result, 'something went wrong')

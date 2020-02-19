@@ -10,6 +10,7 @@ from securitas.security.ipa import maybe_ipa_login
 from securitas.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_field_error,
+    assert_form_generic_error,
 )
 
 
@@ -124,10 +125,7 @@ def test_register_invalid_first_name(client):
                 "password_confirm": "password",
             },
         )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    error_message = page.select("#formerrors .text-danger")[0]
-    assert error_message.string == 'invalid first name'
+    assert_form_generic_error(result, 'invalid first name')
 
 
 def test_register_generic_error(client):
@@ -146,12 +144,8 @@ def test_register_generic_error(client):
                 "password_confirm": "password",
             },
         )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    error_message = page.select("#formerrors .text-danger")[0]
-    assert (
-        error_message.string
-        == 'An error occurred while creating the account, please try again.'
+    assert_form_generic_error(
+        result, 'An error occurred while creating the account, please try again.'
     )
 
 

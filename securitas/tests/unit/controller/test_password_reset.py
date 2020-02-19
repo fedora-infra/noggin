@@ -8,6 +8,7 @@ from securitas import ipa_admin
 from securitas.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_field_error,
+    assert_form_generic_error,
 )
 
 
@@ -182,15 +183,12 @@ def test_time_sensitive_password_policy(client, dummy_user):
         },
         follow_redirects=True,
     )
-    page = BeautifulSoup(result.data, 'html.parser')
-    password_input = page.select("input[name='password']")[0]
-    assert 'is-invalid' in password_input['class']
     # the dummy user is created and has its password immediately changed,
     # so this next attempt should failt with a constraint error.
-    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert (
-        invalidfeedback.get_text(strip=True)
-        == "Constraint violation: Too soon to change password"
+    assert_form_field_error(
+        result,
+        field_name="password",
+        expected_message="Constraint violation: Too soon to change password",
     )
 
 
@@ -206,13 +204,10 @@ def test_short_password(client, dummy_user, no_password_min_time):
         },
         follow_redirects=True,
     )
-    page = BeautifulSoup(result.data, 'html.parser')
-    password_input = page.select("input[name='password']")[0]
-    assert 'is-invalid' in password_input['class']
-    invalidfeedback = password_input.find_next('div', class_='invalid-feedback')
-    assert (
-        invalidfeedback.get_text(strip=True)
-        == "Constraint violation: Password is too short"
+    assert_form_field_error(
+        result,
+        field_name="password",
+        expected_message="Constraint violation: Password is too short",
     )
 
 
@@ -234,14 +229,7 @@ def test_reset_generic_error(client):
                 "password_confirm": "password",
             },
         )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    submit_button = page.select("button[type='submit']")[0]
-    form_errors = submit_button.find_previous("div", id="formerrors")
-    assert form_errors is not None
-    form_error = form_errors.find("div", class_="text-danger")
-    assert form_error is not None
-    assert form_error.get_text(strip=True) == 'Could not change password.'
+    assert_form_generic_error(result, 'Could not change password.')
 
 
 @pytest.mark.vcr()

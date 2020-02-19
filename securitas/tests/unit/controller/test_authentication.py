@@ -9,6 +9,7 @@ from securitas import ipa_admin
 from securitas.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_field_error,
+    assert_form_generic_error,
 )
 
 
@@ -101,10 +102,7 @@ def test_login_incorrect_password(client, dummy_user):
         data={"username": "dummy", "password": "an incorrect password"},
         follow_redirects=True,
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    error_message = page.select("#formerrors .text-danger")[0]
-    assert error_message.get_text(strip=True) == 'Unauthorized: bad credentials.'
+    assert_form_generic_error(result, "Unauthorized: bad credentials.")
     assert "securitas_session" not in session
     assert "securitas_username" not in session
 
@@ -118,10 +116,7 @@ def test_login_generic_error(client):
         result = client.post(
             '/login', data={"username": "dummy", "password": "password"}
         )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    error_message = page.select("#formerrors .text-danger")[0]
-    assert error_message.string == 'Could not log in to the IPA server.'
+    assert_form_generic_error(result, "Could not log in to the IPA server.")
     assert "securitas_session" not in session
     assert "securitas_username" not in session
 
@@ -132,10 +127,7 @@ def test_login_cant_login(client):
         result = client.post(
             '/login', data={"username": "dummy", "password": "password"}
         )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    error_message = page.select("#formerrors .text-danger")[0]
-    assert error_message.string == 'Could not log in to the IPA server.'
+    assert_form_generic_error(result, "Could not log in to the IPA server.")
     assert "securitas_session" not in session
     assert "securitas_username" not in session
 

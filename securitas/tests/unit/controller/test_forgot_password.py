@@ -14,6 +14,7 @@ from securitas.utility.password_reset import PasswordResetLock
 from securitas.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_field_error,
+    assert_form_generic_error,
 )
 
 
@@ -121,12 +122,9 @@ def test_ask_still_valid(client, patched_lock_active):
     # Error message
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    submit_button = page.select("button[type='submit']")[0]
-    form_errors = submit_button.find_previous("div", id="formerrors")
-    assert form_errors is not None
-    form_error = form_errors.find("div", class_="text-danger")
-    assert form_error is not None
-    assert form_error.get_text(strip=True).startswith(
+    error_message = page.select_one("#formerrors .text-danger")
+    assert error_message is not None
+    assert error_message.get_text(strip=True).startswith(
         "You have already requested a password reset, you need to wait "
     )
     # No sent email
@@ -278,11 +276,5 @@ def test_change_post_generic_error(
                 f'/forgot-password/change?token={token_for_dummy_user}',
                 data={"password": "newpassword", "password_confirm": "newpassword"},
             )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    error_message = page.select_one("#formerrors .text-danger")
-    assert (
-        error_message.get_text(strip=True)
-        == 'Could not change password, please try again.'
-    )
+    assert_form_generic_error(result, 'Could not change password, please try again.')
     logger.error.assert_called_once()
