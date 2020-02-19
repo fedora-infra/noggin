@@ -25,7 +25,7 @@ class EditUserForm(FlaskForm):
     )
 
     sshpubkeys = FieldList(
-        TextAreaField('SSH Keys', validators=[Optional()], render_kw={"rows": 4})
+        TextAreaField(validators=[Optional()], render_kw={"rows": 4}), label='SSH Keys'
     )
 
     locale = SelectField(
@@ -40,7 +40,7 @@ class EditUserForm(FlaskForm):
     ircnick = StringField('IRC Nickname', validators=[Optional()])
 
     gpgkeys = FieldList(
-        StringField('GPG Keys', validators=[Optional(), Length(max=16)])
+        StringField(validators=[Optional(), Length(max=16)]), label='GPG Keys'
     )
 
     timezone = SelectField(

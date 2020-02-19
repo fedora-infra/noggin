@@ -102,15 +102,10 @@ def test_user_edit_post_no_change(client, logged_in_dummy_user):
     assert result.status_code == 302
     # Now do it again
     result = client.post('/user/dummy/edit/', data=POST_CONTENTS)
-    assert result.status_code == 302
-    messages = get_flashed_messages(with_categories=True)
-    # There should be 2 messages because contratry to what the docs say, get_flashed_message does
-    # not seem to remove messages from the stack when used here.
-    assert len(messages) >= 1
-    category, message = messages[-1]
-    # Nothing changed, last message should be OK
-    assert message == "Profile has been succesfully updated."
-    assert category == "success"
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    error_message = page.select("#formerrors .text-danger")[0]
+    assert error_message.string == 'no modifications to be performed'
 
 
 @pytest.mark.vcr()

@@ -17,7 +17,7 @@
 {% macro with_errors(field) %}
   {% if field.type == 'FieldList' %}
     {% if kwargs.pop('label', True) %}
-      <label for="{{ field.name }}" class="mb-0 font-weight-bold">{{ field[0].label }}</label>
+      <label for="{{ field.name }}" class="mb-0 font-weight-bold">{{ field.label }}</label>
     {% endif %}
     {% for subfield in field %}
       {{ form_field(subfield, label=False, **kwargs) }}
