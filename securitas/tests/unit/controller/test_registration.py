@@ -7,7 +7,10 @@ from flask import current_app, session
 
 from securitas import ipa_admin
 from securitas.security.ipa import maybe_ipa_login
-from securitas.tests.unit.utilities import assert_redirects_with_flash
+from securitas.tests.unit.utilities import (
+    assert_redirects_with_flash,
+    assert_form_field_error,
+)
 
 
 @pytest.fixture
@@ -78,13 +81,10 @@ def test_register_duplicate(client, dummy_user):
             "password_confirm": "password",
         },
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    username_input = page.select("input[name='username']")[0]
-    assert 'is-invalid' in username_input['class']
-    invalidfeedback = username_input.find_next('div', class_='invalid-feedback')
-    assert (
-        invalidfeedback.get_text(strip=True) == 'user with name "dummy" already exists'
+    assert_form_field_error(
+        result,
+        field_name="username",
+        expected_message='user with name "dummy" already exists',
     )
 
 
@@ -101,14 +101,10 @@ def test_register_invalid_username(client):
             "password_confirm": "password",
         },
     )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    username_input = page.select("input[name='username']")[0]
-    assert 'is-invalid' in username_input['class']
-    invalidfeedback = username_input.find_next('div', class_='invalid-feedback')
-    assert (
-        invalidfeedback.get_text(strip=True)
-        == 'may only include letters, numbers, _, -, . and $'
+    assert_form_field_error(
+        result,
+        field_name="username",
+        expected_message='may only include letters, numbers, _, -, . and $',
     )
 
 

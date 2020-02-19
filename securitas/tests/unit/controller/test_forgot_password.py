@@ -11,7 +11,10 @@ from flask import current_app
 from securitas import ipa_admin, mailer
 from securitas.security.ipa import untouched_ipa_client
 from securitas.utility.password_reset import PasswordResetLock
-from securitas.tests.unit.utilities import assert_redirects_with_flash
+from securitas.tests.unit.utilities import (
+    assert_redirects_with_flash,
+    assert_form_field_error,
+)
 
 
 @pytest.fixture
@@ -86,13 +89,9 @@ def test_ask_post(client, dummy_user, patched_lock):
 @pytest.mark.vcr()
 def test_ask_post_non_existant_user(client):
     result = client.post('/forgot-password/ask', data={"username": "nosuchuser"})
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    username_input = page.select_one("input[name='username']")
-    assert username_input is not None
-    assert 'is-invalid' in username_input['class']
-    invalidfeedback = username_input.find_next('div', class_='invalid-feedback')
-    assert invalidfeedback.get_text(strip=True) == "User nosuchuser does not exist"
+    assert_form_field_error(
+        result, field_name="username", expected_message="User nosuchuser does not exist"
+    )
 
 
 @pytest.mark.vcr()
