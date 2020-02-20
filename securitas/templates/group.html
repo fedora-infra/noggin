@@ -6,8 +6,9 @@
 
 {% block content %}
   {{ super() }}
+  <div class="bg-light border-bottom">
   <div class="container section">
-    <div class="row" data-section="identity">
+    <div class="row py-4" data-section="identity">
       <div class="col">
           <h3>{{ group.name }}</h3>
           {% if group.description %}<div>{{ group.description }}</div>{% endif %}
@@ -22,34 +23,45 @@
       </form>
       {% endif %}
     </div>
+  </div>
+  </div>
+  {% if current_user.username not in group.members %}
+  <div class="alert alert-info rounded-0">
+    <div class="container text-center">
+      To join this group, contact a group sponsor.
+    </div>
+  </div>
+  {% endif %}
+  <div class="container">
     <div class="row">
-      <div class="col-12" data-section="sponsors">
-        <h4>Sponsors</h4>
+      <div class="col-12 my-4" data-section="sponsors">
+        <h4>Sponsors <span class="badge badge-secondary">{{sponsors|length}}</span></h4>
+        <ul class="list-group">
         {% if sponsors|length == 0 %}
-        <p>No sponsors yet.</p>
+        <li class="list-group-item text-center bg-light text-muted">
+          <strong>no sponsors</strong>
+        </li>
         {% else %}
-        <div class="row">
           {% for sponsor in sponsors|sort(attribute='username') %}
-            <div class="col-4 mb-4">
-              <div class="card">
-              <div class="media align-items-center card-body">
-                <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 80) }}">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="media align-items-center">
+                <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 50) }}">
                 <div class="media-body ml-2">
-                <a href="{{ url_for('user', username=sponsor.username) }}">
-                  {{ sponsor.username }}
-                </a>
-                <div>{{ sponsor.name }}</div>
+                    <div class="my-0 font-weight-bold">
+                      <a href="{{ url_for('user', username=sponsor.username) }}">
+                        <span class="title">{{ sponsor.username }}</span>
+                      </a>
+                    </div>
+                    <div>{{ sponsor.name }}</div>
                 </div>
               </div>
-              </div>
-            </div>
+            </li>
           {% endfor %}
-        </div>
         {% endif %}
       </div>
       <div class="col-12" data-section="members">
         <div class="d-flex justify-content-between">
-          <div class="h4">Members</div>
+          <div class="h4">Members <span class="badge badge-secondary">{{members|length}}</span></div>
           {% if current_user_is_sponsor and sponsor_form %}
           {# TODO: not require a double enter here maybe #}
              <form action="{{ url_for('group_add_member', groupname=group.name) }}" method="post">
@@ -96,8 +108,8 @@
         </form>
         {% endif %}
       </div>
+      </div>
     </div>
-  </div>
 {% endblock %}
 
 {% block scripts %}

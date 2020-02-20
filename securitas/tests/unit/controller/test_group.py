@@ -50,7 +50,7 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     assert title.get_text(strip=True) == "dummy-group"
     assert title.find_next_sibling("div").get_text(strip=True) == "A dummy group"
     # Check the sponsors list
-    sponsors = page.select("div[data-section='sponsors'] .row > div")
+    sponsors = page.select("div[data-section='sponsors'] .list-group .list-group-item")
     assert len(sponsors) == 2, str(sponsors)
     assert sponsors[0].find("a")["href"] == "/user/dummy/"
     assert sponsors[0].find("a").get_text(strip=True) == "dummy"
