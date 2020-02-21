@@ -8,7 +8,7 @@ def test_root(client):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert page.title.string == 'The Fedora Project'
+    assert page.title.string == 'securitas'
 
 
 @pytest.mark.vcr()

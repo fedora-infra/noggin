@@ -17,7 +17,7 @@ def test_password_reset(client):
     result = client.get('/password-reset?username=fred')
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert page.title.string == 'Password Reset - The Fedora Project'
+    assert page.title.string == 'Password Reset - securitas'
 
 
 def test_password_reset_no_username(client):

@@ -30,7 +30,7 @@ def test_user(client, logged_in_dummy_user):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert page.title.string == 'dummy\'s Profile - The Fedora Project'
+    assert page.title.string == 'dummy\'s Profile - securitas'
     user_fullname = page.select("#user_fullname")
     assert len(user_fullname) == 1
     assert user_fullname[0].get_text(strip=True) == "Dummy User"
@@ -54,7 +54,7 @@ def test_user_edit(client, logged_in_dummy_user):
     page = BeautifulSoup(result.data, 'html.parser')
     # print(page.prettify())
     assert page.title
-    assert page.title.string == 'dummy\'s Settings - The Fedora Project'
+    assert page.title.string == 'dummy\'s Settings - securitas'
     form = page.select("form[action='/user/dummy/edit/']")
     assert len(form) == 2
     assert form[0].find("input", attrs={"name": "firstname"})["value"] == "Dummy"
