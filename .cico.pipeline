@@ -13,6 +13,15 @@
 
 // fedoraInfraTox()
 
+/**
+ * Distros we want to test on
+ */
+//def ACTIVE_DISTROS = ["f31", "epel7", "rawhide"]
+def ACTIVE_DISTROS = ["f31", "rawhide"]
+
+
+
+
 def stages = [:]
 def fedora_containers = [
                 containerTemplate(name: 'jnlp',
@@ -21,17 +30,23 @@ def fedora_containers = [
                                   args: '${computer.jnlpmac} ${computer.name}',
                                   workingDir: "/workdir")
 ]
-def active_fedoras = ["f30", "f31", "rawhide"]
 
-active_fedoras.each { fedora ->
+ACTIVE_DISTROS.each { fedora ->
     stages["tox-${fedora}"] = {
         stage("tox-${fedora}"){
             container("${fedora}"){
-                withEnv(['HOME=/workdir/workspace']) {
+                sh "mkdir -p /workdir/home/${fedora}"
+                withEnv(["HOME=/workdir/home/${fedora}"]) {
                     sh "cp -al ./ ../${fedora}/"
                     dir( "../${fedora}" ){
                         sh "rm -rf .tox"
-                        sh "tox"
+                        try {
+                            sh "tox --skip-missing-interpreters"
+                            githubNotify context: "CI on ${fedora}", status: 'SUCCESS'
+                        } catch(error) {
+                            githubNotify context: "CI on ${fedora}", status: 'FAILURE'
+                            throw error
+                        }
                     }
                 }
             }
