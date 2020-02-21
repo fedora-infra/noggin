@@ -9,7 +9,7 @@ from securitas.security.ipa import maybe_ipa_session
 
 def gravatar(email, size):
     return (
-        "https://www.gravatar.com/avatar/"
+        "https://seccdn.libravatar.org/avatar/"
         + hashlib.md5(email.lower().encode('utf8')).hexdigest()  # nosec
         + "?s="
         + str(size)
