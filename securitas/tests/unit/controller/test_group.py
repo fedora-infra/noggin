@@ -45,7 +45,7 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert page.title.string == 'dummy-group Group - The Fedora Project'
+    assert page.title.string == 'dummy-group Group - securitas'
     title = page.select_one("div[data-section='identity'] > .col > h3")
     assert title.get_text(strip=True) == "dummy-group"
     assert title.find_next_sibling("div").get_text(strip=True) == "A dummy group"
