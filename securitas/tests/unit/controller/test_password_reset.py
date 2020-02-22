@@ -35,7 +35,7 @@ def test_password_reset_user(client, logged_in_dummy_user):
     result = client.get('/password-reset', follow_redirects=True)
     page = BeautifulSoup(result.data, 'html.parser')
     pageheading = page.select("#pageheading")[0]
-    assert pageheading.get_text(strip=True) == "Password Reset for dummy"
+    assert pageheading.get_text(strip=True) == "Change Password"
 
 
 @pytest.mark.vcr()

@@ -1,23 +1,18 @@
 {% import '_form_macros.html' as macros %}
 
-<div class="h4 text-center mb-4">
-    Create New Account
-</div>
 <form action="{{ url_for('register') }}" method="post" novalidate>
   {{ register_form.csrf_token }}
-  <div class="form-row">
-    <div class="form-group col">{{ macros.with_errors(register_form.username, tabindex="4") }}</div>
-    <div class="form-group col">{{ macros.with_errors(register_form.firstname, tabindex="5") }}</div>
-    <div class="form-group col">{{ macros.with_errors(register_form.lastname, tabindex="6") }}</div>
-  </div>
-  <div class="form-row">
-    <div class="form-group col">{{ macros.with_errors(register_form.password, class="validate", tabindex="7") }}</div>
-    <div class="form-group col">{{ macros.with_errors(register_form.password_confirm, class="validate", tabindex="8") }}</div>
-  </div>
-  <div class="form-row">
-    {{ macros.non_field_errors(register_form) }}
-    <div class="form-group col">
-      <button class="btn btn-outline-primary btn-block" id="submit" type="submit" tabindex="9">Submit</button>
+  <div class="card-body">
+    <div class="form-group">{{ macros.with_errors(register_form.username, tabindex="4") }}</div>
+    <div class="form-row">
+      <div class="form-group col">{{ macros.with_errors(register_form.firstname, tabindex="5") }}</div>
+      <div class="form-group col">{{ macros.with_errors(register_form.lastname, tabindex="6") }}</div>
     </div>
+    <div class="form-group">{{ macros.with_errors(register_form.password, class="validate", tabindex="7") }}</div>
+    <div class="form-group mb-0">{{ macros.with_errors(register_form.password_confirm, class="validate", tabindex="8") }}</div>
+  </div>
+  <div class="card-footer d-flex justify-content-between">
+    <div>{{ macros.non_field_errors(register_form) }}</div>
+    <button class="btn btn-primary" id="submit" type="submit" tabindex="9">Submit</button>
   </div>
 </form>

@@ -4,7 +4,7 @@
     {% set css_class = css_class + ' is-invalid ' %}
   {% endif %}
   {% if kwargs.pop('label', True) %}
-    <label for="{{ field.name }}" class="mb-0 font-weight-bold">{{ field.label }}</label>
+    {{ field.label }}
   {% endif %}
   {{ field(class=css_class, **kwargs) }}
   {% if field.errors %}
@@ -17,7 +17,7 @@
 {% macro with_errors(field) %}
   {% if field.type == 'FieldList' %}
     {% if kwargs.pop('label', True) %}
-      <label for="{{ field.name }}" class="mb-0 font-weight-bold">{{ field.label }}</label>
+      {{ field.label }}
     {% endif %}
     {% for subfield in field %}
       {{ form_field(subfield, label=False, **kwargs) }}

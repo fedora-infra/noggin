@@ -45,12 +45,14 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert page.title.string == 'Group: dummy-group - The Fedora Project'
+    assert page.title.string == 'dummy-group Group - The Fedora Project'
     title = page.select_one("div[data-section='identity'] > .col > h3")
     assert title.get_text(strip=True) == "dummy-group"
     assert title.find_next_sibling("div").get_text(strip=True) == "A dummy group"
     # Check the sponsors list
-    sponsors = page.select("div[data-section='sponsors'] .list-group .list-group-item")
+    sponsors = page.select(
+        "div[data-section='sponsors'] .list-unstyled.row .col-lg-3.col-md-4.col-sm-6"
+    )
     assert len(sponsors) == 2, str(sponsors)
     assert sponsors[0].find("a")["href"] == "/user/dummy/"
     assert sponsors[0].find("a").get_text(strip=True) == "dummy"

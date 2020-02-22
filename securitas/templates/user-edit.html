@@ -1,56 +1,77 @@
 {% extends "main.html" %}
 
-{% block title %}Edit User: {{ user.username }}{% endblock %}
+{% block title %}{{ user.username }}'s Settings{% endblock %}
 
 {% import '_form_macros.html' as macros %}
 {% block content %}
   {{ super() }}
-  <div class="container pt-4 section">
+  <div class="container py-4 section">
     <div class="row form-group">
-      <div class="col s12">
-        <h3 class="header light-blue-text text-darken-4 fw300">
-          Edit user: {{ user.username }}
-        </h3>
-        
-        <form class="needs-validation" action="{{ url_for('user_edit', username=user.username) }}" method="post" novalidate>
-          {{ form.csrf_token }}
-          
-          <div class="form-row">
-            <div class="form-group col">{{ macros.with_errors(form.firstname) }}</div>
-            <div class="form-group col">{{ macros.with_errors(form.lastname) }}</div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col">{{ macros.with_errors(form.mail) }}</div>
-            <div class="form-group col">{{ macros.with_errors(form.locale, class="custom-select") }}</div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col">{{ macros.with_errors(form.ircnick) }}</div>
-            <div class="form-group col">{{ macros.with_errors(form.timezone, class="custom-select") }}</div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col">{{ macros.with_errors(form.github) }}</div>
-            <div class="form-group col">{{ macros.with_errors(form.gitlab) }}</div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col">{{ macros.with_errors(form.rhbz_mail) }}</div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col">{{ macros.with_errors(form.gpgkeys, maxlength="16", class="text-monospace mb-1", placeholder="add a GPG Key ID") }}</div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col">{{ macros.with_errors(form.sshpubkeys, class="text-monospace mb-1", placeholder="add a SSH Public Key") }}</div>
-          </div>
-          <div class="form-row">
-            {{ macros.non_field_errors(form) }}
-            <div class="form-group col">
-              <button class="btn btn-primary" id="submit" type="submit" tabindex="9">Submit</button>
+      <div class="col-md-8 mx-auto">
+        <div class="card">
+          <ul class="card-header nav nav-pills" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" data-toggle="pill" href="#settings-personal" role="tab">Personal</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="pill" href="#settings-contact" role="tab">Contact</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="pill" href="#settings-security" role="tab">Privacy and Security</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="settings-personal" role="tabpanel">
+              <form class="needs-validation" action="{{ url_for('user_edit', username=user.username) }}" method="post" novalidate>
+                {{ form.csrf_token }}
+                <div class="card-body">
+                  <div class="form-group">
+                    <label for="username">Username</label>
+                    <input class="form-control" disabled id="username" name="username" type="text" value="{{ user.username }}">
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group col">{{ macros.with_errors(form.firstname) }}</div>
+                    <div class="form-group col">{{ macros.with_errors(form.lastname) }}</div>
+                  </div>
+                  <div class="form-group">{{ macros.with_errors(form.locale, class="custom-select") }}</div>
+                  <div class="form-group">{{ macros.with_errors(form.timezone, class="custom-select") }}</div>
+                  <div class="form-group">{{ macros.with_errors(form.gpgkeys, maxlength="16", class="text-monospace mb-1", placeholder="GPG Key ID") }}</div>
+                  <div class="form-group">{{ macros.with_errors(form.sshpubkeys, class="text-monospace mb-1", placeholder="SSH Public Key") }}</div>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                  <div>{{ macros.non_field_errors(form) }}</div>
+                  <button class="btn btn-primary" id="submit" type="submit" tabindex="9">Save</button>
+                </div>
+              </form>
+            </div>
+            <div class="tab-pane fade" id="settings-contact" role="tabpanel">
+              <form class="needs-validation" action="{{ url_for('user_edit', username=user.username) }}" method="post" novalidate>
+                {{ form.csrf_token }}
+                <div class="card-body">
+                  <div class="form-group">{{ macros.with_errors(form.mail) }}</div>
+                  <div class="form-group">{{ macros.with_errors(form.ircnick) }}</div>
+                  <div class="form-group">{{ macros.with_errors(form.github) }}</div>
+                  <div class="form-group">{{ macros.with_errors(form.gitlab) }}</div>
+                  <div class="form-group">{{ macros.with_errors(form.rhbz_mail) }}</div>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                  <div>{{ macros.non_field_errors(form) }}</div>
+                  <button class="btn btn-primary" id="submit" type="submit" tabindex="10">Save</button>
+                </div>
+              </form>
+            </div>
+            <div class="tab-pane fade" id="settings-security" role="tabpanel">
+              {% include '_password_reset_form.html' %}
+              {%- if request_disable_account is defined  %}
+              <div class="border-top">
+                <h5>Personal data requests</h5>
+                {{ request_disable_account() }}
+              {%- endif %}
+              </div>
             </div>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
-    <div class="row form-group">
-      {{ request_disable_account() if request_disable_account is defined }}
     </div>
   </div>
 {% endblock %}

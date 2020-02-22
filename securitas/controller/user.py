@@ -6,6 +6,7 @@ from securitas.form.edit_user import EditUserForm
 from securitas.representation.group import Group
 from securitas.representation.user import User
 from securitas.utility import with_ipa, user_or_404
+from securitas.form.password_reset import PasswordResetForm
 
 
 @app.route('/user/<username>/')
@@ -35,6 +36,7 @@ def user_edit(ipa, username):
 
     user = User(user_or_404(ipa, username))
     form = EditUserForm(obj=user)
+    password_reset_form = PasswordResetForm()
 
     if form.validate_on_submit():
         try:
@@ -74,4 +76,6 @@ def user_edit(ipa, username):
             form.gpgkeys.append_entry()
             form.sshpubkeys.append_entry()
 
-    return render_template('user-edit.html', user=user, form=form)
+    return render_template(
+        'user-edit.html', user=user, form=form, password_reset_form=password_reset_form
+    )
