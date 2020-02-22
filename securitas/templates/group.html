@@ -2,7 +2,7 @@
 
 {# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
 
-{% block title %}Group: {{ group.name }}{% endblock %}
+{% block title %}{{ group.name }} Group{% endblock %}
 
 {% block content %}
   {{ super() }}
@@ -36,14 +36,17 @@
     <div class="row">
       <div class="col-12 my-4" data-section="sponsors">
         <h4>Sponsors <span class="badge badge-secondary">{{sponsors|length}}</span></h4>
-        <ul class="list-group">
         {% if sponsors|length == 0 %}
-        <li class="list-group-item text-center bg-light text-muted">
-          <strong>no sponsors</strong>
-        </li>
+        <ul class="list-group">
+          <li class="list-group-item text-center bg-light text-muted">
+            <strong>no sponsors</strong>
+          </li>
+        </ul>
         {% else %}
+        <ul class="list-unstyled row">
           {% for sponsor in sponsors|sort(attribute='username') %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li class="col-lg-3 col-md-4 col-sm-6">
+              <div class="card card-body mb-4">
               <div class="media align-items-center">
                 <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 50) }}">
                 <div class="media-body ml-2">
@@ -54,6 +57,7 @@
                     </div>
                     <div>{{ sponsor.name }}</div>
                 </div>
+              </div>
               </div>
             </li>
           {% endfor %}
@@ -80,10 +84,11 @@
         {% else %}
         <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
           {{ sponsor_form.hidden_tag() }}
-          <ul class="list-group">
+          <ul class="list-unstyled row">
             {% set sponsor_usernames = sponsors|map(attribute='username') %}
             {% for member in members|sort(attribute='username') %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
+              <li class="col-lg-3 col-md-4 col-sm-6">
+              <div class="card card-body mb-4">
                 <div class="media align-items-center">
                   <img src="{{ gravatar(member.mail if member.mail else 'default', 50) }}">
                   <div class="media-body ml-2">
@@ -101,6 +106,7 @@
                       <i class="fa fa-trash"></i>
                     </button>
                   {% endif %}
+                </div>
                 </div>
               </li>
             {% endfor %}

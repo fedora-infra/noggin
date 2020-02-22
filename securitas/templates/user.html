@@ -1,84 +1,106 @@
 {% extends "main.html" %}
 
-{% block title %}User: {{ user.username }}{% endblock %}
+{% block title %}{{ user.username }}'s Profile{% endblock %}
 
 {% block content %}
   {{ super() }}
-  <div class="container pt-4">
+  <div class="container py-4">
     <div class="row">
-      <div class="col-4">
-        <h4 class="" id="user_username">{{ user.username }}</h4>
-        <div id="user_fullname">{{ user.name if user.name else user.username }}</div>
-        <img class="img-thumbnail" src="{{ gravatar(user.mail if user.mail else 'default', 400) }}">
-        {% if user.username == current_user.username %}
-          <a href="{{ url_for('user_edit', username=user.username) }}" class="btn btn-outline-primary btn-block mb-2 mt-1">Edit profile</a>
-          <a href="{{ url_for('auth_password_reset', username=user.username) }}" class="btn btn-outline-primary btn-block mb-2 mt-1">Change Password</a>
-        {% endif %}
-        <div>
-              {% if user.timezone %}
-                <div><b>Timezone:</b> {{ user.timezone }}</div>
+      <div class="col-md-6 mx-auto">
+        <div class="row mb-3">
+          <div class="col-4">
+            <img class="w-100 border rounded" src="{{ gravatar(user.mail if user.mail else 'default', 400) }}">
+          </div>
+          <div class="col my-auto">
+            <h3 class="mb-0" id="user_fullname">{{ user.name if user.name else user.username }}</h3>
+            <h5 class="mb-0" id="user_username">{{ user.username }}</h5>
+          </div>
+        </div>
+        <ul class="nav nav-pills mb-3 justify-content-center" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" data-toggle="pill" href="#profile" role="tab">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#groups" role="tab">Groups <span class="badge badge-primary badge-pill">{{groups | count }}</span></a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="profile" role="tabpanel">
+            <div class="card">
+                  <ul class="list-group list-group-flush">
+                  {% if user.timezone %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><b>Timezone</b> {{ user.timezone }}</li>
+                  {% endif %}
+                  {% if user.ircnick %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><b>IRC Nickname</b> {{ user.ircnick }}</li>
+                  {% endif %}
+                  {% if user.locale %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><b>Locale</b> {{ user.locale }}</li>
+                  {% endif %}
+                  {% if user.gpgkeys %}
+                    <li class="list-group-item d-flex justify-content-between"><b>GPG Keys</b> <div class="text-right">{% for pgpkey in user.gpgkeys %}<pre class="mb-0">{{ pgpkey }}</pre>{% endfor %}</div></li>
+                  {% endif %}
+                  {% if user.rhbz_mail %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><b>RHBZ E-Mail</b> {{ user.rhbz_mail }}</li>
+                  {% endif %}
+                  {% if user.github %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <b>GitHub</b>
+                      <a href="https://github.com/{{ user.github }}">@{{ user.github }}</a>
+                    </li>
+                  {% endif %}
+                  {% if user.gitlab %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <b>GitLab</b>
+                      <a href="https://gitlab.com/{{ user.gitlab }}">@{{ user.gitlab }}</a>
+                    </li>
+                  {% endif %}
+                  {# TODO: What all do we want to link to here? #}
+                  {# TODO: And should these links be configurable somehow for other deployments? #}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <b>Wiki</b>
+                    <a href="https://fedoraproject.org/wiki/User:{{ user.username }}">User:{{ user.username }}</a>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <b>Fedora People</b>
+                    <a href="https://{{ user.username }}.fedorapeople.org/">{{ user.username }}</a>
+                  </li>
+              </ul>
+              {% if user.username == current_user.username %}
+              <div class="card-footer">
+                <a href="{{ url_for('user_edit', username=user.username) }}" class="btn btn-secondary btn-block">Settings</a>
+              </div>
               {% endif %}
-              {% if user.ircnick %}
-                <div><b>IRC Nickname:</b> {{ user.ircnick }}</div>
-              {% endif %}
-              {% if user.locale %}
-                <div><b>Locale:</b> {{ user.locale }}</div>
-              {% endif %}
-              {% if user.gpgkeys %}
-                <div><b>GPG Keys:</b> {{ user.gpgkeys|join(', ') }}</div>
-              {% endif %}
-              {% if user.rhbz_mail %}
-                <div><b>RHBZ E-Mail:</b> {{ user.rhbz_mail }}</div>
-              {% endif %}
-              {% if user.github %}
-                <div>
-                  <b>GitHub:</b>
-                  <a href="https://github.com/{{ user.github }}">@{{ user.github }}</a>
-                </div>
-              {% endif %}
-              {% if user.gitlab %}
-                <div>
-                  <b>GitLab:</b>
-                  <a href="https://gitlab.com/{{ user.gitlab }}">@{{ user.gitlab }}</a>
-                </div>
-              {% endif %}
-            <div>
-              {# TODO: What all do we want to link to here? #}
-              {# TODO: And should these links be configurable somehow for other deployments? #}
-              <a href="https://fedoraproject.org/wiki/User:{{ user.username }}">Wiki</a> | 
-              <a href="https://{{ user.username }}.fedorapeople.org/">Fedora People</a>
             </div>
+          </div>
+          <div class="tab-pane fade" id="groups" role="tabpanel">
+            <div>
+              <ul class="list-group">
+                {% for group in groups %}
+                  {% with is_sponsor = group in managed_groups %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <div class="media align-items-center">
+                        <i class="fa fa-group fa-2x text-muted mr-3"></i>
+                        <div class="media-body">
+                            <div class="my-0 font-weight-bold">
+                              <a href="{{ url_for('group', groupname=group.name) }}">
+                                <span class="title">{{ group.name }}</span>
+                              </a>
+                            </div>
+                            {% if group.description %}
+                              <div>{{ group.description }}</div>
+                            {% endif %}  
+                        </div>
+                      </div>
+                      <div class=" {{ 'text-warning' if is_sponsor else 'text-success' }}">{{ 'sponsor' if is_sponsor else 'member' }} </div>
+                    </li>
+                  {% endwith %}
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
         </div>
       </div> 
-      <div class="col">
-
-        <div>
-          <h4>{{groups | count }} Groups</h4>
-          <ul class="list-group">
-            {% for group in groups %}
-              {% with is_sponsor = group in managed_groups %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <div class="media align-items-center">
-                    <i class="fa fa-group fa-2x text-muted mr-3"></i>
-                    <div class="media-body">
-                        <div class="my-0 font-weight-bold">
-                          <a href="{{ url_for('group', groupname=group.name) }}">
-                            <span class="title">{{ group.name }}</span>
-                          </a>
-                        </div>
-                        {% if group.description %}
-                          <div>{{ group.description }}</div>
-                        {% endif %}  
-                    </div>
-                  </div>
-                  <div class=" {{ 'text-warning' if is_sponsor else 'text-success' }}">{{ 'sponsor' if is_sponsor else 'member' }} </div>
-                </li>
-              {% endwith %}
-            {% endfor %}
-          </ul>
-        </div>
-
-      </div>
     </div>
 
   </div>

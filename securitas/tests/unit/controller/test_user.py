@@ -30,7 +30,7 @@ def test_user(client, logged_in_dummy_user):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert page.title.string == 'User: dummy - The Fedora Project'
+    assert page.title.string == 'dummy\'s Profile - The Fedora Project'
     user_fullname = page.select("#user_fullname")
     assert len(user_fullname) == 1
     assert user_fullname[0].get_text(strip=True) == "Dummy User"
@@ -54,12 +54,12 @@ def test_user_edit(client, logged_in_dummy_user):
     page = BeautifulSoup(result.data, 'html.parser')
     # print(page.prettify())
     assert page.title
-    assert page.title.string == 'Edit User: dummy - The Fedora Project'
+    assert page.title.string == 'dummy\'s Settings - The Fedora Project'
     form = page.select("form[action='/user/dummy/edit/']")
-    assert len(form) == 1
+    assert len(form) == 2
     assert form[0].find("input", attrs={"name": "firstname"})["value"] == "Dummy"
     assert form[0].find("input", attrs={"name": "lastname"})["value"] == "User"
-    assert form[0].find("input", attrs={"name": "mail"})["value"] == "dummy@example.com"
+    assert form[1].find("input", attrs={"name": "mail"})["value"] == "dummy@example.com"
     assert (
         form[0].find("textarea", attrs={"name": "sshpubkeys-0"}).get_text(strip=True)
         == ""
