@@ -12,9 +12,7 @@ from securitas.utility import gravatar
 
 @app.context_processor
 def inject_global_template_vars():
-    # TODO: move project out to config var
     return dict(
-        project="The Fedora Project",
         gravatar=gravatar,
         ipa=g.ipa if 'ipa' in g else None,
         current_user=g.current_user if 'current_user' in g else None,

@@ -55,16 +55,7 @@
                       <a href="https://gitlab.com/{{ user.gitlab }}">@{{ user.gitlab }}</a>
                     </li>
                   {% endif %}
-                  {# TODO: What all do we want to link to here? #}
-                  {# TODO: And should these links be configurable somehow for other deployments? #}
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <b>Wiki</b>
-                    <a href="https://fedoraproject.org/wiki/User:{{ user.username }}">User:{{ user.username }}</a>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <b>Fedora People</b>
-                    <a href="https://{{ user.username }}.fedorapeople.org/">{{ user.username }}</a>
-                  </li>
+                  {{ userlinks() if userlinks is defined }}
               </ul>
               {% if user.username == current_user.username %}
               <div class="card-footer">

@@ -1,5 +1,5 @@
 {% extends "master.html" %}
-
+{% block website %}Fedora Accounts{% endblock %}
 
 {% block head %}
     <link href="{{ url_for('theme.static', filename='js/fedora-bootstrap/fedora-bootstrap.css') }}" rel="stylesheet" />
@@ -49,14 +49,14 @@
 {% endblock %}
 
 {% block bodycontent %}
-    <div class="bg-white py-5">
+    <div class="bodycontent mb-auto">
         {% block content %}{% endblock %}
     </div>
 {% endblock %}
 
 {% block footer %}
     <footer class="footer text-light">
-        <div class="container h4 text-center py-5">
+        <div class="container text-center py-4">
             <div>Powered by <a href="https://github.com/fedora-infra/securitas" class="text-white font-weight-bold">securitas</a></div>
             <div>{{ ipa.ipa_version|default('') }}</div>
         </div>
@@ -69,6 +69,16 @@
     {{ super() }}
 {% endblock %}
 
+{% block userlinks %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <b>Wiki</b>
+      <a href="https://fedoraproject.org/wiki/User:{{ user.username }}">User:{{ user.username }}</a>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <b>Fedora People</b>
+      <a href="https://{{ user.username }}.fedorapeople.org/">{{ user.username }}</a>
+    </li>
+{% endblock %}
 
 {# an optional macro defining an element to show for editing group details #}
 {# typically, it used to link to a ticket tracker for an admin to edit a group #}
