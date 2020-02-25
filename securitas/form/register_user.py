@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired, EqualTo
+from wtforms.fields.html5 import EmailField
+from wtforms.validators import DataRequired, EqualTo, Email
 
 
 class RegisterUserForm(FlaskForm):
@@ -28,3 +29,11 @@ class RegisterUserForm(FlaskForm):
     )
 
     password_confirm = PasswordField('Confirm Password')
+
+    mail = EmailField(
+        'E-mail Address',
+        validators=[
+            DataRequired(message='Email must not be empty'),
+            Email(message='Email must be valid'),
+        ],
+    )
