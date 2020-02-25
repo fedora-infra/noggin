@@ -24,21 +24,15 @@
             <div class="tab-pane fade show active" id="settings-personal" role="tabpanel">
               <div class="card-body pb-0">
                 <label>Avatar</label>
-                <div class="row">
-                  <div class="col-auto">
-                    <img src="{{ gravatar(user.mail if user.mail else 'default', 64) }}" class="border rounded"/>
-                  </div>
-                  <div class="col">
-                    {%- if openid is defined %}
-                    <form method="GET" action="https://www.libravatar.org/openid/login/">
-                      <input type="hidden" name="openid_identifier" value="{{ openid % format(user.username) }}">
-                      <input class="btn btn-primary" name="change-avatar" type="submit" value="Change Avatar">
-                    </form>
-                    {%- else %}
-                    <a class="btn btn-primary" href="https://www.libravatar.org/accounts/login/">Change Avatar</a>
-                    {%- endif %}
-                  </div>
-                </div>
+                <img src="{{ gravatar(user.mail if user.mail else 'default', 64) }}" class="border rounded"/>
+                {%- if openid is defined %}
+                <form method="GET" action="https://www.libravatar.org/openid/login/">
+                  <input type="hidden" name="openid_identifier" value="{{ openid % format(user.username) }}">
+                  <input name="change-avatar" type="submit" value="Change Avatar">
+                </form>
+                {%- else %}
+                <a href="https://www.libravatar.org/accounts/login/">Change Avatar</a>
+                {%- endif %}
               </div>
               <form class="needs-validation" action="{{ url_for('user_edit', username=user.username) }}" method="post" novalidate>
                 {{ form.csrf_token }}
