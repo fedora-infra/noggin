@@ -28,6 +28,7 @@ def test_register(client, cleanup_dummy_user):
         data={
             "firstname": "First",
             "lastname": "Last",
+            "mail": "firstlast@name.org",
             "username": "dummy",
             "password": "password",
             "password_confirm": "password",
@@ -52,6 +53,7 @@ def test_register_short_password(client, cleanup_dummy_user):
         data={
             "firstname": "First",
             "lastname": "Last",
+            "mail": "firstlast@name.org",
             "username": "dummy",
             "password": "42",
             "password_confirm": "42",
@@ -77,6 +79,7 @@ def test_register_duplicate(client, dummy_user):
         data={
             "firstname": "First",
             "lastname": "Last",
+            "mail": "dummy@dummy.org",
             "username": "dummy",
             "password": "password",
             "password_confirm": "password",
@@ -97,6 +100,7 @@ def test_register_invalid_username(client):
         data={
             "firstname": "First",
             "lastname": "Last",
+            "mail": "firstlast@name.org",
             "username": "this is invalid",
             "password": "password",
             "password_confirm": "password",
@@ -110,7 +114,7 @@ def test_register_invalid_username(client):
 
 
 def test_register_invalid_first_name(client):
-    """Register a user with an unhandled invalid value"""
+    """Register a user with an invalid first name"""
     with mock.patch("securitas.controller.registration.ipa_admin") as ipa_admin:
         ipa_admin.user_add.side_effect = python_freeipa.exceptions.ValidationError(
             message="invalid first name", code="4242"
@@ -120,12 +124,50 @@ def test_register_invalid_first_name(client):
             data={
                 "firstname": "This \n is \n invalid",
                 "lastname": "Last",
+                "mail": "firstlast@name.org",
                 "username": "dummy",
                 "password": "password",
                 "password_confirm": "password",
             },
         )
     assert_form_generic_error(result, 'invalid first name')
+
+
+@pytest.mark.vcr()
+def test_register_invalid_email(client):
+    """Register a user with an invalid email address"""
+    result = client.post(
+        '/register',
+        data={
+            "firstname": "First",
+            "lastname": "Last",
+            "mail": "firstlast at name dot org",
+            "username": "dummy",
+            "password": "password",
+            "password_confirm": "password",
+        },
+    )
+    assert_form_field_error(
+        result, field_name="mail", expected_message='Email must be valid'
+    )
+
+
+@pytest.mark.vcr()
+def test_register_empty_email(client):
+    """Register a user with an empty email address"""
+    result = client.post(
+        '/register',
+        data={
+            "firstname": "First",
+            "lastname": "Last",
+            "username": "dummy",
+            "password": "password",
+            "password_confirm": "password",
+        },
+    )
+    assert_form_field_error(
+        result, field_name="mail", expected_message='Email must not be empty'
+    )
 
 
 def test_register_generic_error(client):
@@ -139,6 +181,7 @@ def test_register_generic_error(client):
             data={
                 "firstname": "First",
                 "lastname": "Last",
+                "mail": "firstlast@name.org",
                 "username": "dummy",
                 "password": "password",
                 "password_confirm": "password",
@@ -164,6 +207,7 @@ def test_register_generic_pwchange_error(client, cleanup_dummy_user):
             data={
                 "firstname": "First",
                 "lastname": "Last",
+                "mail": "firstlast@name.org",
                 "username": "dummy",
                 "password": "password",
                 "password_confirm": "password",
@@ -197,6 +241,7 @@ def test_register_default_values(client, cleanup_dummy_user):
         data={
             "firstname": "First",
             "lastname": "Last",
+            "mail": "firstlast@name.org",
             "username": "dummy",
             "password": "password",
             "password_confirm": "password",

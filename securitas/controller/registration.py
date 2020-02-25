@@ -25,6 +25,7 @@ def register():
                 form.lastname.data,
                 f'{form.firstname.data} {form.lastname.data}',  # TODO ???
                 user_password=password,
+                mail=form.mail.data,
                 login_shell='/bin/bash',
                 fascreationtime=f"{now.isoformat()}Z",
                 faslocale=guess_locale(),
