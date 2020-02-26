@@ -22,6 +22,19 @@
           </ul>
           <div class="tab-content">
             <div class="tab-pane fade show active" id="settings-personal" role="tabpanel">
+              <div class="card-body pb-0">
+                <img src="{{ gravatar(user.mail if user.mail else 'default', 64) }}" class="border rounded"/>
+                <p class="mb-0">
+                {%- if openid is defined %}
+                <form method="GET" action="https://www.libravatar.org/openid/login/">
+                  <input type="hidden" name="openid_identifier" value="{{ openid % format(user.username) }}">
+                  <input name="change-avatar" type="submit" value="Change Avatar">
+                </form>
+                {%- else %}
+                <a href="https://www.libravatar.org/accounts/login/">Change Avatar</a>
+                {%- endif %}
+                </p>
+              </div>
               <form class="needs-validation" action="{{ url_for('user_edit', username=user.username) }}" method="post" novalidate>
                 {{ form.csrf_token }}
                 <div class="card-body">
