@@ -1,0 +1,97 @@
+{% extends "with_navbar.html" %}
+
+{% block title %}User: {{ user.username }}{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  {{ css("user") }}
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  <div class="container section">
+
+    <div class="row">
+      <div class="col s12 l3">
+        <h3 class="header light-blue-text text-darken-4 fw300">
+          {{ user.name if user.name else user.username }}
+        </h3>
+        <div class="card">
+          <div class="card-image">
+            <img src="{{ gravatar(user.mail if user.mail else 'default', 400) }}" alt="gravatar">
+          </div>
+          <div class="card-stacked">
+            <div class="card-content">
+              <span class="card-title">{{ user.username }}</span>
+              {% if user.username == current_user.username %}
+                <p>
+                  <a href="{{ url_for('user_edit', username=user.username) }}">Edit profile</a>
+                </p>
+              {% endif %}
+              {% if user.timezone %}
+                <p><b>Timezone:</b> {{ user.timezone }}</p>
+              {% endif %}
+              {% if user.ircnick %}
+                <p><b>IRC Nickname:</b> {{ user.ircnick }}</p>
+              {% endif %}
+              {% if user.locale %}
+                <p><b>Locale:</b> {{ user.locale }}</p>
+              {% endif %}
+              {% if user.gpgkeys %}
+                <p><b>GPG Keys:</b> {{ user.gpgkeys|join(', ') }}</p>
+              {% endif %}
+              {% if user.rhbz_mail %}
+                <p><b>RHBZ E-Mail:</b> {{ user.rhbz_mail }}</p>
+              {% endif %}
+              {% if user.github %}
+                <p>
+                  <b>GitHub:</b>
+                  <a href="https://github.com/{{ user.github }}">@{{ user.github }}</a>
+                </p>
+              {% endif %}
+              {% if user.gitlab %}
+                <p>
+                  <b>GitLab:</b>
+                  <a href="https://gitlab.com/{{ user.gitlab }}">@{{ user.gitlab }}</a>
+                </p>
+              {% endif %}
+            </div>
+            <div class="card-action">
+              {# TODO: What all do we want to link to here? #}
+              {# TODO: And should these links be configurable somehow for other deployments? #}
+              <a class="light-blue-text text-darken-4" href="https://fedoraproject.org/wiki/User:{{ user.username }}">Wiki</a>
+              <a class="light-blue-text text-darken-4" href="https://{{ user.username }}.fedorapeople.org/">Fedora People</a>
+            </div>
+          </div>
+        </div> <!-- ./card -->
+
+      </div> <!-- ./col s3 -->
+      <div class="col s12 l9">
+
+        <div class="section">
+          <h4 class="header fw300">Groups</h4>
+          <ul class="collection">
+            {% for group in groups %}
+              {% with is_sponsor = user.username in group.sponsors %}
+                <li class="collection-item avatar">
+                  <!-- TODO: .red if sponsor/admin -->
+                  <i class="material-icons circle {{ 'red' if is_sponsor else 'green' }}">group</i>
+                  <a href="/group/{{ group.name }}">
+                    <span class="title">{{ group.name }}</span>
+                  </a>
+                  {% if group.description %}
+                    <p>{{ group.description }}</p>
+                  {% endif %}
+                  {# TODO: sponsor if sponsor #}
+                  <p>{{ 'sponsor' if is_sponsor else 'member' }} </p>
+                </li>
+              {% endwith %}
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+{% endblock %}
