@@ -30,7 +30,7 @@ def ipa_cert():
         cert.close()
         app.config['FREEIPA_CACERT'] = cert.name
         print(cert.name)
-        yield
+        yield 
 
 
 @pytest.fixture
