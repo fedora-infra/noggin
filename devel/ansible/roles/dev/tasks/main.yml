@@ -1,7 +1,7 @@
 ---
 - name: Install RPM packages
   dnf:
-      name: ['git', 'vim', 'poetry', 'python3-flask', 'python3-pip', 'python3-cryptography', 'freeipa-server']
+      name: ['git', 'vim', 'poetry', 'python3-flask', 'python3-pip', 'python3-cryptography', 'freeipa-server', 'fedora-messaging']
       state: present
 
 - name: install python deps with poetry
@@ -59,3 +59,5 @@
     name: securitas
     daemon_reload: yes
     enabled: yes
+
+- import_tasks: rabbitmq.yml
