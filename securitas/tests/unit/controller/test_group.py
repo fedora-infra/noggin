@@ -2,8 +2,10 @@ import mock
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
+from fedora_messaging import testing as fml_testing
 
 from securitas import ipa_admin
+from securitas_messages import MemberSponsorV1
 from securitas.tests.unit.utilities import assert_redirects_with_flash
 
 
@@ -79,9 +81,14 @@ def test_group_does_not_exist(client, logged_in_dummy_user):
 def test_group_add_member(client, dummy_user_as_group_manager, make_user):
     """Test adding a member to a group"""
     make_user("testuser")
-    result = client.post(
-        '/group/dummy-group/members/', data={"new_member_username": "testuser"}
-    )
+    with fml_testing.mock_sends(
+        MemberSponsorV1(
+            {"msg": {"agent": "dummy", "user": "testuser", "group": "dummy-group"}}
+        )
+    ):
+        result = client.post(
+            '/group/dummy-group/members/', data={"new_member_username": "testuser"}
+        )
     assert_redirects_with_flash(
         result,
         expected_url="/group/dummy-group/",
