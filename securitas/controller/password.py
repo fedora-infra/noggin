@@ -121,7 +121,6 @@ def forgot_password_ask():
                 email = Message(
                     body=render_template("forgot-password-email.txt", **email_context),
                     html=render_template("forgot-password-email.html", **email_context),
-                    sender=app.config["MAIL_FROM"],
                     recipients=[user["mail"][0]],
                     subject="Password reset procedure",
                 )
