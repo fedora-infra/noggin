@@ -6,6 +6,7 @@ from securitas.form.edit_user import UserSettingsProfileForm, UserSettingsKeysFo
 from securitas.representation.group import Group
 from securitas.representation.user import User
 from securitas.utility import with_ipa, user_or_404
+from securitas.form.disable_user import DisableUserForm
 
 
 @app.route('/user/<username>/')
@@ -110,4 +111,31 @@ def user_settings_keys(ipa, username):
 
     return render_template(
         'user-settings-keys.html', user=user, form=form, select="keys"
+    )
+
+
+@app.route('/user/<username>/disable/', methods=['POST'])
+@with_ipa(app, session)
+def user_disable(ipa, username):
+    if session.get('securitas_username') != username:
+        flash('You do not have permission to edit this account.', 'danger')
+        return redirect(url_for('user', username=session.get('securitas_username')))
+
+    user = User(user_or_404(ipa, username))
+    form = DisableUserForm(obj=user)
+
+    if form.disable.data == 'yes':
+        try:
+            session.clear()
+            ipa.logout()
+            ipa.user_disable(username)
+            flash(
+                'Your account has now been disabled. You will be unable to login.',
+                'success',
+            )
+        except python_freeipa.exceptions.FreeIPAError as e:
+            form.errors['non_field_errors'] = [e.message]
+
+    return render_template(
+        'user-settings-disable.html', user=user, form=form, select="disable"
     )

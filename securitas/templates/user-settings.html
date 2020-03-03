@@ -21,6 +21,11 @@
             <li class="nav-item">
               <a class="nav-link {{'active' if select == 'password'}}" href="{{ url_for('user_settings_password', username=user.username) }}">Password</a>
             </li>
+            {% if request_disable_account is defined or request_delete_account is defined %}
+            <li class="nav-item">
+              <a class="nav-link {{'active' if select == 'disable'}}" href="{{ url_for('user_disable', username=user.username) }}">Danger Zone</a>
+            </li>
+            {% endif %}
           </ul>
           <div class="card-body pb-0">
               {% block settings_content %}

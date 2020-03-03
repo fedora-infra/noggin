@@ -25,6 +25,8 @@ POST_CONTENTS_KEYS = {
     "sshpubkeys-0": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtX/SK86GrOa0xUadeZVbDXCj6wseamJQTpvjzNdKLgIBuQnA2dnR+jBS54rxUzHD1In/yI9r1VXr+KVZG4ULHmSuP3Icl0SUiVs+u+qeHP77Fa9rnQaxxCFL7uZgDSGSgMx0XtiQUrcumlD/9mrahCefU0BIKfS6e9chWwJnDnPSpyWf0y0NpaGYqPaV6Ukg2Z5tBvei6ghBb0e9Tusg9dHGvpv2B23dCzps6s5WBYY2TqjTHAEuRe6xR0agtPUE1AZ/DvSBKgwEz6RXIFOtv/fnZ0tERh238+n2nohMZNo1QAtQ6I0U9Kx2gdAgHRaMN6GzmbThji/MLgKlIJPSh"  # noqa: E501
 }
 
+DISABLE_POST_CONTENTS = {"disable": "yes"}
+
 
 @pytest.mark.vcr()
 def test_user(client, logged_in_dummy_user):
@@ -55,7 +57,6 @@ def test_user_edit(client, logged_in_dummy_user):
     """Test getting the user edit page: /user/<username>/settings/profile/"""
     result = client.get('/user/dummy/settings/profile/')
     page = BeautifulSoup(result.data, 'html.parser')
-    # print(page.prettify())
     assert page.title
     assert page.title.string == 'dummy\'s Settings - securitas'
     form = page.select("form[action='/user/dummy/settings/profile/']")
@@ -185,4 +186,42 @@ def test_user_settings_keys_post_bad_request(client, logged_in_dummy_user):
             message="something went wrong", code="4242"
         )
         result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
+    assert_form_generic_error(result, 'something went wrong')
+
+
+@pytest.mark.vcr()
+def test_user_disable(client, logged_in_dummy_user_no_logout):
+    """Test disabling a user"""
+    result = client.post(
+        '/user/dummy/disable/', data=DISABLE_POST_CONTENTS, follow_redirects=True
+    )
+    page = BeautifulSoup(result.data, 'html.parser')
+    messages = page.select(".flash-messages .alert-success")
+    assert len(messages) == 1
+    assert (
+        messages[0].get_text(strip=True)
+        == 'Your account has now been disabled. You will be unable to login.×'
+    )
+
+
+@pytest.mark.vcr()
+def test_user_disable_no_permissions(client, logged_in_dummy_user_no_logout):
+    """Test disabling a user"""
+    result = client.post('/user/dudemcpants/disable/', data=DISABLE_POST_CONTENTS)
+    assert_redirects_with_flash(
+        result,
+        expected_url='/user/dummy/',
+        expected_message='You do not have permission to edit this account.',
+        expected_category='danger',
+    )
+
+
+@pytest.mark.vcr()
+def test_user_disable_bad_request(client, logged_in_dummy_user_no_logout):
+    """Test handling of FreeIPA errors when disabling"""
+    with mock.patch("securitas.security.ipa.Client.user_disable") as user_disable:
+        user_disable.side_effect = python_freeipa.exceptions.FreeIPAError(
+            message="something went wrong", code="4242"
+        )
+        result = client.post('/user/dummy/disable/', data=DISABLE_POST_CONTENTS)
     assert_form_generic_error(result, 'something went wrong')

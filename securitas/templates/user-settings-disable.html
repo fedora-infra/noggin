@@ -1,0 +1,20 @@
+{% extends "user-settings.html" %}
+
+{% import '_form_macros.html' as macros %}
+{% block settings_content %}
+<form action="{{ url_for('user_disable', username=current_user.username) }}" method="post">
+  {{ form.csrf_token }}
+  <div class="card-body">
+    <h5 id="pageheading" >Disable Account?</h5>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="form-group">{{ macros.with_errors(form.disable, tabindex="1")}}</div>
+    <p>Note: If you disable your account you will be unable to login and will need to contact an admin to re-enable it.</p>
+  </div>
+  <div class="card-footer d-flex justify-content-between">
+    <div>{{ macros.non_field_errors(form) }}</div>
+    <button class="btn btn-primary" id="submit" type="submit" tabindex="2">Submit</button>
+  </div>
+</form>
+{{ request_delete_account() if request_delete_account is defined }}
+{% endblock %}
+

@@ -22,6 +22,13 @@
     {% for subfield in field %}
       {{ form_field(subfield, label=False, **kwargs) }}
     {% endfor %}
+  {% elif field.type == 'RadioField' %}
+  {% for subfield in field %}
+  <tr>
+      <td> {{ subfield }} </td>
+      <td> {{ subfield.label }} </td>
+  </tr>
+  {% endfor %}
   {% else %}
     {{ form_field(field, **kwargs) }}
   {% endif %}

@@ -97,6 +97,11 @@
 {# an optional macro defining an element to show for account disable #}
 {# typically, it used to link to a ticket tracker for an admin to perform the disable #}
 {% macro request_disable_account() %}
+<div class="tab-pane fade" id="settings-privacy" role="tabpanel">
+    {% include '_disable_user_form.html' %}
+</div>
+{% endmacro %}
+{% macro request_delete_account() %}
     <div class="col-auto ml-auto">
         <a class="btn btn-sm btn-outline-primary" href="https://pagure.io/fedora-pdr/new_issue" title="Create a PDR request to disable your account">
             Request account deletion

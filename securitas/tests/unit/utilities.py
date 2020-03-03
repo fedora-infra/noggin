@@ -28,6 +28,7 @@ def assert_form_field_error(response, field_name, expected_message):
 def assert_form_generic_error(response, expected_message):
     assert response.status_code == 200
     page = BeautifulSoup(response.data, 'html.parser')
+    print(page)
     error_message = page.select_one("#formerrors .text-danger")
     assert error_message is not None
     assert error_message.get_text(strip=True) == expected_message

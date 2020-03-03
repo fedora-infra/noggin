@@ -113,3 +113,12 @@ def logged_in_dummy_user(client, dummy_user):
     ipa.logout()
     with client.session_transaction() as sess:
         sess.clear()
+
+
+@pytest.fixture
+def logged_in_dummy_user_no_logout(client, dummy_user):
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_login(app, sess, "dummy", "dummy_password")
+    yield ipa
+    with client.session_transaction() as sess:
+        sess.clear()
