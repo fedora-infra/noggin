@@ -7,7 +7,8 @@ import jwt
 
 from securitas import app, ipa_admin, mailer
 from securitas.security.ipa import untouched_ipa_client, maybe_ipa_session
-from securitas.utility import with_ipa
+from securitas.representation.user import User
+from securitas.utility import with_ipa, user_or_404
 from securitas.utility.password_reset import PasswordResetLock
 from securitas.form.password_reset import (
     PasswordResetForm,
@@ -53,7 +54,7 @@ def password_reset():
     ipa = maybe_ipa_session(app, session)
     username = session.get('securitas_username')
     if ipa and username:
-        return redirect(url_for('auth_password_reset', username=username))
+        return redirect(url_for('user_settings_password', username=username))
 
     username = request.args.get('username')
     if not username:
@@ -70,13 +71,15 @@ def password_reset():
     )
 
 
-@app.route('/user/<username>/password-reset', methods=['GET', 'POST'])
+@app.route('/user/<username>/settings/password', methods=['GET', 'POST'])
 @with_ipa(app, session)
-def auth_password_reset(ipa, username):
+def user_settings_password(ipa, username):
+    # TODO: Maybe make this a decorator some day?
     if session.get('securitas_username') != username:
         flash('You do not have permission to edit this account.', 'danger')
         return redirect(url_for('root'))
 
+    user = User(user_or_404(ipa, username))
     form = PasswordResetForm()
 
     if form.validate_on_submit():
@@ -84,7 +87,12 @@ def auth_password_reset(ipa, username):
         if res and res.ok:
             return redirect(url_for('root'))
 
-    return render_template('password-reset.html', password_reset_form=form)
+    return render_template(
+        'user-settings-password.html',
+        user=user,
+        password_reset_form=form,
+        select="password",
+    )
 
 
 @app.route('/forgot-password/ask', methods=['GET', 'POST'])
