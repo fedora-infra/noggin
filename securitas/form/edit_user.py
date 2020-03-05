@@ -7,7 +7,7 @@ from securitas.utility.locales import LOCALES
 from securitas.utility.timezones import TIMEZONES
 
 
-class EditUserForm(FlaskForm):
+class UserSettingsProfileForm(FlaskForm):
     firstname = StringField(
         'First Name', validators=[DataRequired(message='First name must not be empty')]
     )
@@ -24,10 +24,6 @@ class EditUserForm(FlaskForm):
         ],
     )
 
-    sshpubkeys = FieldList(
-        TextAreaField(validators=[Optional()], render_kw={"rows": 4}), label='SSH Keys'
-    )
-
     locale = SelectField(
         'Locale',
         choices=[(l, l) for l in LOCALES],
@@ -38,10 +34,6 @@ class EditUserForm(FlaskForm):
     )
 
     ircnick = StringField('IRC Nickname', validators=[Optional()])
-
-    gpgkeys = FieldList(
-        StringField(validators=[Optional(), Length(max=16)]), label='GPG Keys'
-    )
 
     timezone = SelectField(
         'Timezone',
@@ -57,3 +49,13 @@ class EditUserForm(FlaskForm):
     gitlab = StringField('GitLab Username', validators=[Optional()])
 
     rhbz_mail = EmailField('Red Hat Bugzilla Email', validators=[Optional()])
+
+
+class UserSettingsKeysForm(FlaskForm):
+    sshpubkeys = FieldList(
+        TextAreaField(validators=[Optional()], render_kw={"rows": 4}), label='SSH Keys'
+    )
+
+    gpgkeys = FieldList(
+        StringField(validators=[Optional(), Length(max=16)]), label='GPG Keys'
+    )

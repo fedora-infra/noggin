@@ -1,0 +1,34 @@
+{% extends "main.html" %}
+
+{% block title %}{{ user.username }}'s Settings{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  <div class="container py-4 section">
+    <div class="row form-group">
+      <div class="col-md-8 mx-auto">
+        <div class="row">
+          <h3>Settings for {{user.username}}</h3>
+        </div>
+        <div class="card">
+          <ul class="card-header nav nav-tabs pb-0" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link {{'active' if select == 'profile'}}" href="{{ url_for('user_settings_profile', username=user.username) }}">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{'active' if select == 'keys'}}" href="{{ url_for('user_settings_keys', username=user.username) }}">SSH &amp; GPG Keys</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{'active' if select == 'password'}}" href="{{ url_for('user_settings_password', username=user.username) }}">Password</a>
+            </li>
+          </ul>
+          <div class="card-body pb-0">
+              {% block settings_content %}
+              {% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
