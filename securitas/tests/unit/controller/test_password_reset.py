@@ -17,7 +17,7 @@ def test_password_reset(client):
     result = client.get('/password-reset?username=fred')
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert page.title.string == 'Password Reset - securitas'
+    assert page.title.string == 'Expired Password Reset - securitas'
 
 
 def test_password_reset_no_username(client):
@@ -30,7 +30,7 @@ def test_password_reset_no_username(client):
 def test_password_reset_user(client, logged_in_dummy_user):
     """Test the redirect to the authed password reset"""
     result = client.get('/password-reset')
-    assert result.location == f"http://localhost/user/dummy/password-reset"
+    assert result.location == f"http://localhost/user/dummy/settings/password"
 
     result = client.get('/password-reset', follow_redirects=True)
     page = BeautifulSoup(result.data, 'html.parser')
@@ -42,7 +42,7 @@ def test_password_reset_user(client, logged_in_dummy_user):
 def test_password_changes_wrong_user(client, logged_in_dummy_user):
     """Verify that we error if trying to change another user's password"""
     result = client.post(
-        '/user/admin/password-reset',
+        '/user/admin/settings/password',
         data={
             "username": "admin",
             "current_password": "dummy_password",
@@ -65,7 +65,7 @@ def test_password_changes_user(
     """Verify that password changes"""
     ipa_admin.group_add_member("dummy-group", users="dummy")
     result = client.post(
-        '/user/dummy/password-reset',
+        '/user/dummy/settings/password',
         data={
             "username": "dummy",
             "current_password": "dummy_password",
@@ -85,7 +85,7 @@ def test_password_changes_user(
 def test_non_matching_passwords_user(client, logged_in_dummy_user):
     """Verify that passwords that dont match are caught"""
     result = client.post(
-        '/user/dummy/password-reset',
+        '/user/dummy/settings/password',
         data={
             "username": "jbloggs",
             "current_password": "sdsds",
@@ -102,7 +102,7 @@ def test_non_matching_passwords_user(client, logged_in_dummy_user):
 def test_password_user(client, logged_in_dummy_user):
     """Verify that current password must be correct"""
     result = client.post(
-        '/user/dummy/password-reset',
+        '/user/dummy/settings/password',
         data={
             "username": "dummy",
             "current_password": "1",
