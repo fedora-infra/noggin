@@ -1,7 +1,99 @@
 from cryptography.fernet import Fernet
 import python_freeipa
-from python_freeipa import Client
+from python_freeipa.client_legacy import ClientLegacy as IPAClient
+from python_freeipa.exceptions import ValidationError, BadRequest
 import random
+
+
+def parse_group_management_error(data):
+    """
+    An extension of freeipa's function to handle membermanagers.
+
+    TODO: send this upstream.
+    """
+    try:
+        failed = data['failed']
+    except KeyError:
+        return
+    targets = ('member', 'membermanager')
+    for target in targets:
+        if target in failed and (failed[target]['group'] or failed[target]['user']):
+            raise ValidationError(failed)
+
+
+class Client(IPAClient):
+    """
+    Subclass the official client to add a missing method that we need.
+
+    TODO: send this upstream.
+    """
+
+    def group_add_member_manager(
+        self, group, users=None, groups=None, skip_errors=False, **kwargs
+    ):
+        """
+        Add member managers to a group.
+
+        :param group: Group name.
+        :param users: Users to add.
+        :type users: string or list
+        :param groups: Groups to add.
+        :type groups: string or list
+        :param skip_errors: Skip processing errors.
+        :type skip_errors: bool
+        """
+        params = {'all': True, 'raw': True, 'user': users, 'group': groups}
+        params.update(kwargs)
+        data = self._request('group_add_member_manager', group, params)
+        if not skip_errors:
+            parse_group_management_error(data)
+        return data['result']
+
+    def batch(self, methods=None, raise_errors=True):
+        """
+        Make multiple ipa calls via one remote procedure call.
+
+        :param methods: Nested Methods to execute.
+        :type methods: dict
+        :param skip_errors: Raise errors from RPC calls.
+        :type skip_errors: bool
+        """
+        data = self._request('batch', methods)
+        for idx, result in enumerate(data['results']):
+            error = result['error']
+            if error:
+                exception = BadRequest(message=error, code=result['error_code'])
+                if raise_errors:
+                    raise exception
+                else:
+                    data['results'][idx] = exception
+        return data
+
+    def pwpolicy_add(
+        self,
+        group,
+        krbminpwdlife=None,
+        krbpwdminlength=None,
+        cospriority=None,
+        **kwargs
+    ):
+        """
+        Create the password policy
+
+        :param cn: Group name.
+        :param krbminpwdlife: The minimum password lifetime
+        :param krbpwdminlength: The minimum password length
+        """
+        params = {
+            'all': True,
+            'raw': True,
+            'krbminpwdlife': krbminpwdlife,
+            'cospriority': cospriority,
+            'krbpwdminlength': krbpwdminlength,
+        }
+        params.update(kwargs)
+        data = self._request('pwpolicy_add', group, params)
+        return data['result']
 
 
 # Construct an IPA client from app config, but don't attempt to log in with it

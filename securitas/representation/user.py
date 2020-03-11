@@ -29,6 +29,10 @@ class User(Representation):
         return self._attr('mail')
 
     @property
+    def sshpubkeys(self):
+        return self._attrlist('ipasshpubkey')
+
+    @property
     def timezone(self):
         return self._attr('fastimezone')
 

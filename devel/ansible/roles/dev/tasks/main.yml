@@ -1,7 +1,7 @@
 ---
 - name: Install RPM packages
   dnf:
-      name: ['git', 'vim', 'poetry', 'python3-flask', 'python3-pip', 'python3-cryptography', 'freeipa-server']
+      name: ['git', 'vim', 'poetry', 'python3-flask', 'python3-pip', 'python3-cryptography', 'freeipa-server', 'fedora-messaging']
       state: present
 
 - name: install python deps with poetry
@@ -40,14 +40,10 @@
       owner: vagrant
       group: vagrant
 
-- name: Install dummy data deps
-  pip:
-    name:
-      - python-freeipa
-      - Faker
-
 - name: Create dummy freeipa data
-  shell: python3 /vagrant/devel/create-test-data.py
+  shell: poetry run python /vagrant/devel/create-test-data.py
+  become: yes
+  become_user: vagrant
 
 - name: Install the systemd unit files for securitas services
   copy:
@@ -63,3 +59,5 @@
     name: securitas
     daemon_reload: yes
     enabled: yes
+
+- import_tasks: rabbitmq.yml

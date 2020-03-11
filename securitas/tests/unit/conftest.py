@@ -1,3 +1,4 @@
+import datetime
 import os
 import tempfile
 
@@ -5,7 +6,7 @@ import pytest
 
 from securitas import ipa_admin
 from securitas.app import app
-from securitas.security.ipa import untouched_ipa_client
+from securitas.security.ipa import untouched_ipa_client, maybe_ipa_login
 
 
 @pytest.fixture(scope="session")
@@ -29,8 +30,7 @@ def ipa_cert():
             pass
         cert.close()
         app.config['FREEIPA_CACERT'] = cert.name
-        print(cert.name)
-        yield 
+        yield
 
 
 @pytest.fixture
@@ -52,18 +52,64 @@ def vcr_cassette_dir(request):
 
 
 @pytest.fixture
-def dummy_user():
-    try:
+def make_user():
+    created_users = []
+
+    def _make_user(name):
+        now = datetime.datetime.utcnow().replace(microsecond=0)
+        password = f'{name}_password'
         ipa_admin.user_add(
-            'dummy',
-            'Dummy',
+            name,
+            name.title(),
             'User',
-            'Dummy User',
-            user_password='dummy_password',
+            f'{name.title()} User',
+            user_password=password,
             login_shell='/bin/bash',
+            fascreationtime=f"{now.isoformat()}Z",
         )
         ipa = untouched_ipa_client(app)
-        ipa.change_password('dummy', 'dummy_password', 'dummy_password')
-        yield
-    finally:
-        ipa_admin.user_del('dummy')
+        ipa.change_password(name, password, password)
+        created_users.append(name)
+
+    yield _make_user
+
+    for username in created_users:
+        ipa_admin.user_del(username)
+
+
+@pytest.fixture
+def dummy_user(make_user):
+    make_user("dummy")
+    yield
+
+
+@pytest.fixture
+def dummy_group():
+    ipa_admin.group_add('dummy-group', description="A dummy group")
+    yield
+    ipa_admin.group_del('dummy-group')
+
+
+@pytest.fixture
+def dummy_user_as_group_manager(logged_in_dummy_user, dummy_group):
+    """Make the dummy user a manager of the dummy-group group."""
+    ipa_admin.group_add_member("dummy-group", users="dummy")
+    ipa_admin.group_add_member_manager("dummy-group", users="dummy")
+    yield
+
+
+@pytest.fixture
+def no_password_min_time(dummy_group):
+    ipa_admin.pwpolicy_add(
+        "dummy-group", krbminpwdlife=0, cospriority=10, krbpwdminlength=8
+    )
+
+
+@pytest.fixture
+def logged_in_dummy_user(client, dummy_user):
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_login(app, sess, "dummy", "dummy_password")
+    yield ipa
+    ipa.logout()
+    with client.session_transaction() as sess:
+        sess.clear()

@@ -1,70 +1,35 @@
-{% extends "with_navbar.html" %}
-{% block title %}Self-Service Portal{% endblock %}
-
-{% block head %}
-  {{ super() }}
-  {{ css("index") }}
-{% endblock %}
+{% extends "main.html" %}
 
 {% block content %}
   {{ super() }}
 
-  <div class="container section">
-    <div class="row">
-      <div class="col s12">
-        <h2 class="header light-blue-text text-darken-4 fw300">Welcome to sēcūritās!</h2>
-        <p>
-          This is the open source, community self-service portal for FreeIPA.
-          It allows you to do things like create an account, change your
-          password, manage group membership, and more.
-        </p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col s5">
-        {% include '_register_form.html' %}
-      </div>
-
-      <div class="col s5 offset-s2">
-        <form action="/login" method="post">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <div class="bg-light border-bottom py-5">
+    <div class="container section">
+      <div class="row">
+        <div class="col-md-7">
+          <h2 class="display-4">Welcome to sēcūritās!</h2>
+          <p class="lead">
+            This is the open source, community self-service portal for FreeIPA.
+            It allows you to do things like create an account, change your
+            password, manage group membership, and more.
+          </p>
+        </div>
+        <div class="col">
           <div class="card">
-            <div class="card-content">
-
-              <span class="card-title">Log In</span>
-
-              <div class="row">
-                <div class="input-field col s12">
-                  <input placeholder="jdoe" id="login_username" name="username" type="text" class="validate" tabindex="1">
-                  <label for="login_username">Username</label>
-                </div>
-
-                <div class="input-field col s12">
-                  <input placeholder="password" id="login_password" name="password" type="password" class="validate" tabindex="2">
-                  <label for="login_password">Password</label>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="input-field col s12">
-                  <button class="btn waves-effect waves-light light-blue darken-4 w100" id="submit" type="submit" tabindex="3">Log In</button>
-                </div>
-
-                <p class="col s12">
-                  <small><a href="{{ url_for('password_reset') }}">Expired password?</a></small>
-                </p>
-
-                <p class="col s12">
-                  <small><a href="#">Forgot password?</a></small>
-                </p>
-              </div>
-
-            </div>
-            <div class="clearfix"></div>
+          <ul class="card-header nav nav-tabs pb-0" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="login-tab" data-toggle="pill" href="#login" role="tab">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="register-tab" data-toggle="pill" href="#register" role="tab">Register</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="login" role="tabpanel">{% include '_login_form.html' %}</div>
+            <div class="tab-pane fade" id="register" role="tabpanel">{% include '_register_form.html' %}</div>
           </div>
-
-        </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
