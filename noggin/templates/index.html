@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+
+{% block content %}
+  {{ super() }}
+
+  <div class="bg-light border-bottom py-5">
+    <div class="container section">
+      <div class="row">
+        <div class="col-md-7">
+          <h2 class="display-4">Welcome to noggin!</h2>
+          <p class="lead">
+            This is the open source, community self-service portal for FreeIPA.
+            It allows you to do things like create an account, change your
+            password, manage group membership, and more.
+          </p>
+        </div>
+        <div class="col">
+          <div class="card">
+          <ul class="card-header nav nav-tabs pb-0" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="login-tab" data-toggle="pill" href="#login" role="tab">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="register-tab" data-toggle="pill" href="#register" role="tab">Register</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="login" role="tabpanel">{% include '_login_form.html' %}</div>
+            <div class="tab-pane fade" id="register" role="tabpanel">{% include '_register_form.html' %}</div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

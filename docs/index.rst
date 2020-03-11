@@ -1,12 +1,12 @@
 ========================
-Securitas' documentation
+Noggin's documentation
 ========================
 
-*securitas* is a self-service portal for FreeIPA.
+*noggin* is a self-service portal for FreeIPA.
 The primary purpose of the portal is to allow users to sign up and manage their
 account information and group membership.
 
-Immediate goals of *securitas* are:
+Immediate goals of *noggin* are:
 
 * Allow users to register (i.e., create FreeIPA accounts)
 * Allow users to see select information about other users
@@ -26,7 +26,7 @@ Here is what works so far:
 * Allowing group member managers to remove people from groups
 * Editing user profile information
 
-.. image:: https://images.elrod.me/securitas-screenshot.png?2
+.. image:: https://images.elrod.me/noggin-screenshot.png?2
     :alt: screenshot
 
 

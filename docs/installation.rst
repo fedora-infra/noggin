@@ -9,7 +9,7 @@ This covers installation in a development context.
 
 * Use relrod's `containerdev`_ project for development. (Or don't, but at least follow the steps in the Dockerfile to set up your own environment.)
 * Copy your IPA server's ``/etc/ipa/ca.crt`` to ``.containerdev-public/ipa01``
-* Copy ``securitas.cfg.default`` to ``securitas.cfg`` and edit it accordingly. It's in .gitignore, so you are safe to put whatever in it.
+* Copy ``noggin.cfg.default`` to ``noggin.cfg`` and edit it accordingly. It's in .gitignore, so you are safe to put whatever in it.
 
   * The ``FREEIPA_ADMIN_USER``/``FREEIPA_ADMIN_PASSWORD`` combination doesn't need to be a full admin user. It just needs to be a user in a role with a privilege that has the following permissions:
 
