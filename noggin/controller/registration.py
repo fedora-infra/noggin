@@ -1,11 +1,13 @@
 import datetime
 
 from flask import flash, redirect, url_for, render_template
+from noggin_messages import UserCreateV1
 import python_freeipa
 
 from noggin import app, ipa_admin
 from noggin.form.register_user import RegisterUserForm
 from noggin.utility.locales import guess_locale
+from noggin.utility import messaging
 from noggin.security.ipa import untouched_ipa_client
 
 
@@ -54,7 +56,12 @@ def register():
             ]
 
         else:
-            # User creation succeeded. Now we fake a password change, so that it's not immediately
+            # User creation succeeded. Send message.
+            messaging.publish(
+                UserCreateV1({"msg": {"agent": username, "user": username}})
+            )
+
+            # Now we fake a password change, so that it's not immediately
             # expired. This also logs the user in right away.
             try:
                 ipa = untouched_ipa_client(app)

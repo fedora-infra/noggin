@@ -3,7 +3,9 @@ from unittest import mock
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
+from fedora_messaging import testing as fml_testing
 from flask import current_app, session
+from noggin_messages import UserCreateV1
 
 from noggin import ipa_admin
 from noggin.security.ipa import maybe_ipa_login
@@ -23,18 +25,21 @@ def cleanup_dummy_user():
 @pytest.mark.vcr()
 def test_register(client, cleanup_dummy_user):
     """Register a user"""
-    result = client.post(
-        '/register',
-        data={
-            "firstname": "First",
-            "lastname": "Last",
-            "mail": "firstlast@name.org",
-            "username": "dummy",
-            "password": "password",
-            "password_confirm": "password",
-        },
-        follow_redirects=True,
-    )
+    with fml_testing.mock_sends(
+        UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+    ):
+        result = client.post(
+            '/register',
+            data={
+                "firstname": "First",
+                "lastname": "Last",
+                "mail": "firstlast@name.org",
+                "username": "dummy",
+                "password": "password",
+                "password_confirm": "password",
+            },
+            follow_redirects=True,
+        )
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     messages = page.select(".flash-messages .alert-success")
@@ -48,17 +53,20 @@ def test_register(client, cleanup_dummy_user):
 @pytest.mark.vcr()
 def test_register_short_password(client, cleanup_dummy_user):
     """Register a user with too short a password"""
-    result = client.post(
-        '/register',
-        data={
-            "firstname": "First",
-            "lastname": "Last",
-            "mail": "firstlast@name.org",
-            "username": "dummy",
-            "password": "42",
-            "password_confirm": "42",
-        },
-    )
+    with fml_testing.mock_sends(
+        UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+    ):
+        result = client.post(
+            '/register',
+            data={
+                "firstname": "First",
+                "lastname": "Last",
+                "mail": "firstlast@name.org",
+                "username": "dummy",
+                "password": "42",
+                "password_confirm": "42",
+            },
+        )
     assert_redirects_with_flash(
         result,
         expected_url="/login",
@@ -202,17 +210,20 @@ def test_register_generic_pwchange_error(client, cleanup_dummy_user):
     with mock.patch(
         "noggin.controller.registration.untouched_ipa_client", lambda a: ipa_client
     ):
-        result = client.post(
-            '/register',
-            data={
-                "firstname": "First",
-                "lastname": "Last",
-                "mail": "firstlast@name.org",
-                "username": "dummy",
-                "password": "password",
-                "password_confirm": "password",
-            },
-        )
+        with fml_testing.mock_sends(
+            UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+        ):
+            result = client.post(
+                '/register',
+                data={
+                    "firstname": "First",
+                    "lastname": "Last",
+                    "mail": "firstlast@name.org",
+                    "username": "dummy",
+                    "password": "password",
+                    "password_confirm": "password",
+                },
+            )
     assert_redirects_with_flash(
         result,
         expected_url="/login",
@@ -236,17 +247,20 @@ def test_register_get(client):
 @pytest.mark.vcr()
 def test_register_default_values(client, cleanup_dummy_user):
     """Verify that the default attributes are added to the user"""
-    result = client.post(
-        '/register',
-        data={
-            "firstname": "First",
-            "lastname": "Last",
-            "mail": "firstlast@name.org",
-            "username": "dummy",
-            "password": "password",
-            "password_confirm": "password",
-        },
-    )
+    with fml_testing.mock_sends(
+        UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+    ):
+        result = client.post(
+            '/register',
+            data={
+                "firstname": "First",
+                "lastname": "Last",
+                "mail": "firstlast@name.org",
+                "username": "dummy",
+                "password": "password",
+                "password_confirm": "password",
+            },
+        )
     assert result.status_code == 302
     ipa = maybe_ipa_login(current_app, session, "dummy", "password")
     user = ipa.user_show("dummy")
