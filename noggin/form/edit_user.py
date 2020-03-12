@@ -59,3 +59,10 @@ class UserSettingsKeysForm(FlaskForm):
     gpgkeys = FieldList(
         StringField(validators=[Optional(), Length(max=16)]), label='GPG Keys'
     )
+
+
+class UserSettingsAddOTPForm(FlaskForm):
+    description = StringField(
+        'Description',
+        validators=[DataRequired(message='Description must not be empty')],
+    )

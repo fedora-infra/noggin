@@ -19,13 +19,14 @@
               <a class="nav-link {{'active' if select == 'keys'}}" href="{{ url_for('user_settings_keys', username=user.username) }}">SSH &amp; GPG Keys</a>
             </li>
             <li class="nav-item">
+              <a class="nav-link {{'active' if select == 'otp'}}" href="{{ url_for('user_settings_otp', username=user.username) }}">OTP</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link {{'active' if select == 'password'}}" href="{{ url_for('user_settings_password', username=user.username) }}">Password</a>
             </li>
           </ul>
-          <div class="card-body pb-0">
-              {% block settings_content %}
-              {% endblock %}
-          </div>
+          {% block settings_content %}
+          {% endblock %}
         </div>
       </div>
     </div>

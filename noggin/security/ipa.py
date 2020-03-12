@@ -23,7 +23,7 @@ def parse_group_management_error(data):
 
 class Client(IPAClient):
     """
-    Subclass the official client to add a missing method that we need.
+    Subclass the official client to add missing methods that we need.
 
     TODO: send this upstream.
     """
@@ -47,6 +47,27 @@ class Client(IPAClient):
         data = self._request('group_add_member_manager', group, params)
         if not skip_errors:
             parse_group_management_error(data)
+        return data['result']
+
+    def otptoken_add(
+        self, ipatokenowner=None, ipatokenotpalgorithm=None, description=False
+    ):
+        """
+        Add an otptoken for a user.
+
+        :param ipatokenowner: the username
+        :type ipatokenowner: string
+        :param ipatokenotpalgorithm: the token algorithim
+        :type ipatokenotpalgorithm: string
+        :param description: Groups to add.
+        :type description: string
+        """
+        params = {
+            'ipatokenowner': ipatokenowner,
+            'ipatokenotpalgorithm': ipatokenotpalgorithm,
+            'description': description,
+        }
+        data = self._request('otptoken_add', [], params)
         return data['result']
 
     def batch(self, methods=None, raise_errors=True):

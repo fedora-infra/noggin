@@ -2,9 +2,14 @@ from flask import flash, redirect, render_template, session, url_for
 import python_freeipa
 
 from noggin import app
-from noggin.form.edit_user import UserSettingsProfileForm, UserSettingsKeysForm
+from noggin.form.edit_user import (
+    UserSettingsProfileForm,
+    UserSettingsKeysForm,
+    UserSettingsAddOTPForm,
+)
 from noggin.representation.group import Group
 from noggin.representation.user import User
+from noggin.representation.otptoken import OTPToken
 from noggin.utility import with_ipa, user_or_404
 
 
@@ -111,3 +116,75 @@ def user_settings_keys(ipa, username):
     return render_template(
         'user-settings-keys.html', user=user, form=form, select="keys"
     )
+
+
+@app.route('/user/<username>/settings/otp/')
+@with_ipa(app, session)
+def user_settings_otp(ipa, username):
+    # TODO: Maybe make this a decorator some day?
+    if session.get('noggin_username') != username:
+        flash('You do not have permission to edit this account.', 'danger')
+        return redirect(url_for('user', username=username))
+
+    addotpform = UserSettingsAddOTPForm()
+    user = User(user_or_404(ipa, username))
+
+    otp_uri = session.get('otp_uri')
+    session['otp_uri'] = None
+
+    tokens = [
+        OTPToken(t)
+        for t in ipa._request(
+            'otptoken_find', [], {'ipatokenowner': username, 'all': True}
+        )['result']
+    ]
+    return render_template(
+        'user-settings-otp.html',
+        addotpform=addotpform,
+        user=user,
+        select="otp",
+        tokens=tokens,
+        otp_uri=otp_uri,
+    )
+
+
+@app.route('/user/<username>/settings/otp/add/', methods=['POST'])
+@with_ipa(app, session)
+def user_settings_otp_add(ipa, username):
+    # TODO: Maybe make this a decorator some day?
+    if session.get('noggin_username') != username:
+        flash('You do not have permission to edit this account.', 'danger')
+        return redirect(url_for('user', username=username))
+
+    form = UserSettingsAddOTPForm()
+    user = User(user_or_404(ipa, username))
+
+    # we don't show the form in the template if there arent gpgkeys, but check on form
+    # submit here anyways.
+    if not user.gpgkeys:
+        flash(
+            'Cannot create an OTP token without a GPG Key. Please add a GPG Key', 'info'
+        )
+        return redirect(url_for('user_settings_otp', username=username))
+
+    if form.validate_on_submit():
+        username = session.get('noggin_username')
+        description = form.description.data
+        try:
+            result = ipa.otptoken_add(
+                ipatokenowner=username,
+                ipatokenotpalgorithm='sha512',
+                description=description,
+            )
+            session['otp_uri'] = result['uri']
+        except python_freeipa.exceptions.FreeIPAError as e:
+            flash('Cannot create the token.', 'danger')
+            app.logger.error(
+                f'An error happened while creating an OTP token for user {username}: {e.message}'
+            )
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'danger')
+
+    return redirect(url_for('user_settings_otp', username=username))

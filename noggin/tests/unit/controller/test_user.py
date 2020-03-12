@@ -186,3 +186,145 @@ def test_user_settings_keys_post_bad_request(client, logged_in_dummy_user):
         )
         result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
     assert_form_generic_error(result, 'something went wrong')
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp(client, logged_in_dummy_user):
+    """Test getting the user OTP settings page: /user/<username>/settings/otp/"""
+    result = client.get('/user/dummy/settings/otp/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert page.title
+    assert page.title.string == 'dummy\'s Settings - noggin'
+    # check the pageheading
+    pageheading = page.select("#pageheading")[0]
+    assert pageheading.get_text(strip=True) == "OTP Tokens"
+    # check that there arent any tokens
+    tokenlist = page.select("div.list-group")
+    assert len(tokenlist) == 1
+    assert (
+        tokenlist[0].select(".list-group-item")[0].get_text(strip=True)
+        == "You have no OTP tokens"
+    )
+    # we shouldnt see a form, because there is no GPGkey
+    form = page.select("form[action='/user/dummy/settings/otp/add/']")
+    assert len(form) == 0
+
+    # add a GPG key
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    result = client.get('/user/dummy/settings/otp/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert page.title
+    assert page.title.string == 'dummy\'s Settings - noggin'
+    # now with a GPG key, we should see the form.
+    form = page.select("form[action='/user/dummy/settings/otp/add/']")
+    assert len(form) == 1
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_no_permission(client, logged_in_dummy_user):
+    """Verify that a user's OTP settings page can't be viewed by another user."""
+    result = client.get("/user/dudemcpants/settings/otp/")
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dudemcpants/",
+        expected_message="You do not have permission to edit this account.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_add(client, logged_in_dummy_user):
+    """Test posting to the create OTP endpoint"""
+    # first, add a GPG key
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    result = client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants token"},
+        follow_redirects=True,
+    )
+    page = BeautifulSoup(result.data, 'html.parser')
+    tokenlist = page.select("div.list-group")
+    assert len(tokenlist) == 1
+
+    # check the token is in the list
+    assert (
+        tokenlist[0].select(".list-group-item .h6")[0].get_text(strip=True)
+        == "pants token"
+    )
+
+    # check the modal is on the page
+    assert len(page.select("#otpModal")) == 1
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_add_nogpg(client, logged_in_dummy_user):
+    """Test trying to make an otp token without a gpgkey"""
+    result = client.post(
+        '/user/dummy/settings/otp/add/', data={"description": "pants token"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot create an OTP token without a GPG Key. Please add a GPG Key",
+        expected_category="info",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_add_no_permission(client, logged_in_dummy_user):
+    """Verify that another user can't make an otp token. """
+    result = client.post(
+        "/user/dudemcpants/settings/otp/add/", data={"description": "pants token"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dudemcpants/",
+        expected_message="You do not have permission to edit this account.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_add_invalid_form(client, logged_in_dummy_user):
+    """Test an invalid form when adding an otp token"""
+    client.post(
+        '/user/dummy/settings/keys/',
+        data={"gpgkeys-0": "fcd8ae3e6005d76a"},
+        follow_redirects=True,
+    )
+    result = client.post('/user/dummy/settings/otp/add/', data={})
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Description must not be empty",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_add_invalid(client, logged_in_dummy_user):
+    """Test failure when adding an otptoken"""
+    client.post(
+        '/user/dummy/settings/keys/',
+        data={"gpgkeys-0": "fcd8ae3e6005d76a"},
+        follow_redirects=True,
+    )
+    with mock.patch("noggin.security.ipa.Client.otptoken_add") as method:
+        method.side_effect = python_freeipa.exceptions.ValidationError(
+            message={
+                "member": {"user": [("testuser", "something went wrong")], "group": []}
+            },
+            code="4242",
+        )
+        result = client.post(
+            '/user/dummy/settings/otp/add/', data={"description": "pants token"}
+        )
+
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot create the token.",
+        expected_category="danger",
+    )
