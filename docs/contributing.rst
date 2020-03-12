@@ -2,17 +2,17 @@
 Contributing
 ============
 
-Thanks for considering contributing to securitas, we really appreciate it!
+Thanks for considering contributing to noggin, we really appreciate it!
 
 Quickstart:
 
 1. Look for an `existing issue
-   <https://github.com/fedora-infra/securitas/issues>`_ about the bug or
+   <https://github.com/fedora-infra/noggin/issues>`_ about the bug or
    feature you're interested in. If you can't find an existing issue, create a
-   `new one <https://github.com/fedora-infra/securitas/issues/new>`_.
+   `new one <https://github.com/fedora-infra/noggin/issues/new>`_.
 
 2. Fork the `repository on GitHub
-   <https://github.com/fedora-infra/securitas>`_.
+   <https://github.com/fedora-infra/noggin>`_.
 
 3. Fix the bug or add the feature, and then write one or more tests which show
    the bug is fixed or the feature works.
@@ -27,7 +27,7 @@ below.
 
 Development Environment
 =======================
-Vagrant allows contributors to get quickly up and running with a Securitas development environment by
+Vagrant allows contributors to get quickly up and running with a Noggin development environment by
 automatically configuring a virtual machine. To get started, first install the Vagrant and Virtualization 
 packages needed, and start the libvirt service::
 
@@ -37,8 +37,8 @@ packages needed, and start the libvirt service::
 
 Check out the code and run ``vagrant up``::
 
-    $ git clone https://github.com/fedora-infra/securitas
-    $ cd securitas
+    $ git clone https://github.com/fedora-infra/noggin
+    $ cd noggin
     $ vagrant up
 
 Next, SSH into your newly provisioned development environment:
@@ -47,13 +47,13 @@ Next, SSH into your newly provisioned development environment:
 
 where you can run the following commands:
 
-    $ securitas-restart
-    $ securitas-stop
-    $ securitas-logs
-    $ securitas-start
-    $ securitas-unit-tests
+    $ noggin-restart
+    $ noggin-stop
+    $ noggin-logs
+    $ noggin-start
+    $ noggin-unit-tests
 
-The securitas web application should be running automatically. To access it, go to http://ipa.example.com:5000/ in the browser on your
+The noggin web application should be running automatically. To access it, go to http://ipa.example.com:5000/ in the browser on your
 host machine to see the web application. http://ipa.example.com will give you access to the regular freeIPA
 webUI.
 
@@ -66,7 +66,7 @@ Guidelines
 
 Python Support
 --------------
-Securitas supports Python 3.6 or greater. This is automatically enforced by the
+Noggin supports Python 3.6 or greater. This is automatically enforced by the
 continuous integration (CI) suite.
 
 
@@ -136,7 +136,7 @@ you want to be credited as. There is a script to generate a list of authors that
 before releasing, but creating the file manually allows you to set a custom name.
 
 A preview of the release notes can be generated with
-``SECURITAS_CONFIG_PATH=`pwd`/securitas.cfg.default towncrier --draft``.
+``NOGGIN_CONFIG_PATH=`pwd`/noggin.cfg.default towncrier --draft``.
 
 
 Licensing
@@ -196,7 +196,7 @@ When cutting a new release, follow these steps:
 #. Add missing authors to the release notes fragments by changing to the ``news`` directory and
    running the ``get-authors.py`` script, but check for duplicates and errors
 #. Generate the release notes by running
-   ``SECURITAS_CONFIG_PATH=`pwd`/securitas.cfg.default towncrier``
+   ``NOGGIN_CONFIG_PATH=`pwd`/noggin.cfg.default towncrier``
 #. Commit the changes
 #. Tag the commit with ``-s`` to generate a signed tag
 #. Push those changes to the upstream Github repository (via a PR or not)
