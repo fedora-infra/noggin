@@ -3,7 +3,7 @@
 import python_freeipa
 from faker import Faker
 
-from securitas.security.ipa import Client
+from noggin.security.ipa import Client
 
 
 fake = Faker()

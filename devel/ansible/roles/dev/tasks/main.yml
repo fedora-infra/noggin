@@ -32,10 +32,10 @@
       owner: vagrant
       group: vagrant
 
-- name: Install securitas.cfg
+- name: Install noggin.cfg
   copy:
-      src: /vagrant/securitas.cfg.default
-      dest: /home/vagrant/securitas.cfg
+      src: /vagrant/noggin.cfg.default
+      dest: /home/vagrant/noggin.cfg
       remote_src: yes
       owner: vagrant
       group: vagrant
@@ -45,18 +45,18 @@
   become: yes
   become_user: vagrant
 
-- name: Install the systemd unit files for securitas services
+- name: Install the systemd unit files for noggin services
   copy:
       src: "{{ item }}"
       dest: /etc/systemd/system/{{ item }}
       mode: 0644
   with_items:
-      - securitas.service
+      - noggin.service
 
-- name: Start securitas service using systemd
+- name: Start noggin service using systemd
   systemd:
     state: started
-    name: securitas
+    name: noggin
     daemon_reload: yes
     enabled: yes
 

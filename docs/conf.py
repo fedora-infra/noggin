@@ -15,20 +15,20 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../"))  # NOQA
 
-import securitas
+import noggin
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'Securitas'
+project = 'Noggin'
 copyright = '2020, Red Hat, Inc'
 author = 'Fedora Infrastructure'
 
 # The short X.Y version
-version = ".".join(securitas.__version__.split(".")[:2])
+version = ".".join(noggin.__version__.split(".")[:2])
 
 # The full version, including alpha/beta/rc tags
-release = securitas.__version__
+release = noggin.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -70,7 +70,7 @@ html_theme = 'alabaster'
 # documentation.
 html_theme_options = {
     "github_user": "fedora-infra",
-    "github_repo": "securitas",
+    "github_repo": "noggin",
     "page_width": "1040px",
     "show_related": True,
     "sidebar_collapse": True,
@@ -91,7 +91,7 @@ html_static_path = ['_static']
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 extlinks = {
-    "commit": ("https://github.com/fedora-infra/securitas/commit/%s", ""),
-    "issue": ("https://github.com/fedora-infra/securitas/issues/%s", "#"),
-    "pr": ("https://github.com/fedora-infra/securitas/pull/%s", "PR#"),
+    "commit": ("https://github.com/fedora-infra/noggin/commit/%s", ""),
+    "issue": ("https://github.com/fedora-infra/noggin/issues/%s", "#"),
+    "pr": ("https://github.com/fedora-infra/noggin/pull/%s", "PR#"),
 }
