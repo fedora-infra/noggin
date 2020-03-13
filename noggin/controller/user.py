@@ -208,14 +208,13 @@ def user_settings_otp_disable(ipa, username):
         return redirect(url_for('user', username=username))
 
     form = UserSettingsDisableOTPForm()
-    user = User(user_or_404(ipa, username))
 
     if form.validate_on_submit():
         username = session.get('noggin_username')
         token = form.token.data
 
         try:
-            result = ipa.otptoken_mod(ipatokenuniqueid=token, ipatokendisabled=True)
+            ipa.otptoken_mod(ipatokenuniqueid=token, ipatokendisabled=True)
         except python_freeipa.exceptions.FreeIPAError as e:
             flash('Cannot disable the token.', 'danger')
             app.logger.error(

@@ -373,7 +373,7 @@ def test_user_settings_otp_disable(client, logged_in_dummy_user):
     )
     with mock.patch("noggin.security.ipa.Client.otptoken_mod") as method:
         method.side_effect = python_freeipa.exceptions.FreeIPAError(
-            message="Cannot disable the token.", code="4242",
+            message="Cannot disable the token.", code="4242"
         )
         result = client.post(
             '/user/dummy/settings/otp/disable/',
@@ -392,11 +392,9 @@ def test_user_settings_otp_disable_with_multiple(client, logged_in_dummy_user):
     """Test failure when disabling the last remaining active otptoken"""
     client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
+    client.post('/user/dummy/settings/otp/add/', data={"description": "pants token"})
     client.post(
-        '/user/dummy/settings/otp/add/', data={"description": "pants token"},
-    )
-    client.post(
-        '/user/dummy/settings/otp/add/', data={"description": "pants other token"},
+        '/user/dummy/settings/otp/add/', data={"description": "pants other token"}
     )
     client.post(
         '/user/dummy/settings/otp/add/',
