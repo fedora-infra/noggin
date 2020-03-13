@@ -42,8 +42,20 @@
 
 <div class="list-group">
 {% for token in tokens %}
-  <div class="list-group-item">
-    <div class="h6">{{token.description}}</div>
+  <div class="list-group-item {{ 'disabled' if token.disabled }}">
+    <div class="row">
+      <div class="h6 col">{{token.description}}</div>
+      <div class="h6 col">
+        {% if not token.disabled %}
+        <form action="{{ url_for('user_settings_otp_disable', username=current_user.username, token=token) }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type='submit' class="pull-right btn btn-sm btn-warning" name="token" value="{{ token.uniqueid }}">Disable</button>
+        </form>
+        {% else %}
+        <i class="pull-right">disabled</i>
+        {% endif %}
+      </div>
+    </div>
     <div class="text-monospace">{{token.uniqueid}}</div>
   </div>
 {% else %}

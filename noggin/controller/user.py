@@ -6,6 +6,7 @@ from noggin.form.edit_user import (
     UserSettingsProfileForm,
     UserSettingsKeysForm,
     UserSettingsAddOTPForm,
+    UserSettingsDisableOTPForm
 )
 from noggin.representation.group import Group
 from noggin.representation.user import User
@@ -187,4 +188,50 @@ def user_settings_otp_add(ipa, username):
         for error in field_errors:
             flash(error, 'danger')
 
+    return redirect(url_for('user_settings_otp', username=username))
+
+@app.route('/user/<username>/settings/otp/disable/', methods=['POST'])
+@with_ipa(app, session)
+def user_settings_otp_disable(ipa, username):
+    # TODO: Maybe make this a decorator some day?
+    if session.get('noggin_username') != username:
+        flash('You do not have permission to edit this account.', 'danger')
+        return redirect(url_for('user', username=username))
+
+    form = UserSettingsDisableOTPForm()
+    user = User(user_or_404(ipa, username))
+
+    if form.validate_on_submit():
+        username = session.get('noggin_username')
+        token = form.token.data
+
+        tokens = [
+            OTPToken(t)
+            for t in ipa._request(
+                'otptoken_find', [], {'ipatokenowner': username, 'all': True}
+            )['result']
+        ]
+        enabled_count = 0
+        for otp in tokens:
+            if not otp.disabled:
+                enabled_count += 1
+                if enabled_count > 1: break
+
+        if enabled_count > 1:
+            try:
+                result = ipa.otptoken_mod(
+                    ipatokenuniqueid=token,
+                    ipatokendisabled=True
+                )
+            except python_freeipa.exceptions.FreeIPAError as e:
+                flash('Cannot disable the token.', 'danger')
+                app.logger.error(
+                    f'Something went wrong disabling an OTP token for user {username}: {e.message}'
+                )
+        else:
+            flash("Unable to disable last active token.", 'danger')
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'danger')
     return redirect(url_for('user_settings_otp', username=username))

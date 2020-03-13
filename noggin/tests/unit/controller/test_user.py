@@ -328,3 +328,141 @@ def test_user_settings_otp_add_invalid(client, logged_in_dummy_user):
         expected_message="Cannot create the token.",
         expected_category="danger",
     )
+
+@pytest.mark.vcr()
+def test_user_settings_otp_disable_no_permission(client, logged_in_dummy_user):
+    """Verify that another user can't disable an otp token. """
+    result = client.post(
+        "/user/dudemcpants/settings/otp/disable/", data={"description": "pants token"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dudemcpants/",
+        expected_message="You do not have permission to edit this account.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_disable_invalid_form(client, logged_in_dummy_user):
+    """Test an invalid form when disabling an otp token"""
+    result = client.post('/user/dummy/settings/otp/disable/', data={})
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="token must not be empty",
+        expected_category="danger",
+    )
+
+@pytest.mark.vcr()
+def test_user_settings_otp_disable(client, logged_in_dummy_user):
+    """Test failure when disabling an otptoken"""
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants token"},
+        follow_redirects=True,
+    )
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants' other token"},
+        follow_redirects=True,
+    )
+    with mock.patch("noggin.security.ipa.Client.otptoken_mod") as method:
+        method.side_effect = python_freeipa.exceptions.FreeIPAError(
+            message="Cannot disable the token.",
+            code="4242",
+        )
+        result = client.post(
+            '/user/dummy/settings/otp/disable/',
+            data={"token": "0be795bd-b7d3-49b2-89d7-889522d7f1ba"}
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot disable the token.",
+        expected_category="danger",
+    )
+
+@pytest.mark.vcr()
+def test_user_settings_otp_disable_last_active(client, logged_in_dummy_user):
+    """Test failure when disabling the last remaining active otptoken"""
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants token"},
+        follow_redirects=True,
+    )
+    with mock.patch("noggin.security.ipa.Client.otptoken_mod") as method:
+        method.side_effect = python_freeipa.exceptions.FreeIPAError(
+            message="Unable to disable last active token.",
+            code="4242",
+        )
+        result = client.post(
+            '/user/dummy/settings/otp/disable/',
+            data={"token": "0be795bd-b7d3-49b2-89d7-889522d7f1ba"}
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Unable to disable last active token.",
+        expected_category="danger",
+    )
+
+@pytest.mark.vcr()
+def test_user_settings_otp_disable_with_multiple(client, logged_in_dummy_user):
+    """Test failure when disabling the last remaining active otptoken"""
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants token"},
+    )
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants other token"},
+    )
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants other other token"},
+        follow_redirects=True,
+    )
+
+    fetch = client.get(
+        '/user/dummy/settings/otp/'
+    )
+
+    page = BeautifulSoup(fetch.data, 'html.parser')
+    tokenlist = page.select("div.list-group")
+
+    id = (tokenlist[0].select(".list-group-item")[0]
+          .select(".text-monospace")[0].get_text(strip=True))
+    result = client.post(
+        '/user/dummy/settings/otp/disable/',
+        data={"token": id},
+        follow_redirects=True
+    )
+
+    id = (tokenlist[0].select(".list-group-item")[2]
+          .select(".text-monospace")[0].get_text(strip=True))
+    result = client.post(
+        '/user/dummy/settings/otp/disable/',
+        data={"token": id},
+        follow_redirects=True
+    )
+
+    fetch = client.get(
+        '/user/dummy/settings/otp/'
+    )
+
+    page = BeautifulSoup(fetch.data, 'html.parser')
+    tokenlist = page.select("div.list-group")
+
+    assert (
+        "disabled" in tokenlist[0].select("div.list-group-item")[0].get_text(strip=True)
+    )
+
+    assert result.status_code == 200
+
