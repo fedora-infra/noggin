@@ -47,10 +47,12 @@
       <div class="h6 col">{{token.description}}</div>
       <div class="h6 col">
         {% if not token.disabled %}
-        <form action="{{ url_for('user_settings_otp_disable', username=current_user.username, token=token) }}" method="post">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-          <button type='submit' class="pull-right btn btn-sm btn-warning" name="token" value="{{ token.uniqueid }}">Disable</button>
-        </form>
+          {% if enabled_count > 1 %}
+          <form action="{{ url_for('user_settings_otp_disable', username=current_user.username, token=token) }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type='submit' class="pull-right btn btn-sm btn-warning" name="token" value="{{ token.uniqueid }}">Disable</button>
+          </form>
+          {% endif %}
         {% else %}
         <i class="pull-right">disabled</i>
         {% endif %}

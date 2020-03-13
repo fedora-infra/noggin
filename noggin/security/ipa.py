@@ -70,9 +70,7 @@ class Client(IPAClient):
         data = self._request('otptoken_add', [], params)
         return data['result']
 
-    def otptoken_mod(
-        self, ipatokenuniqueid, ipatokendisabled=False
-    ):
+    def otptoken_mod(self, ipatokenuniqueid, ipatokendisabled=False):
         """
         Mod an otptoken for a user.
 
