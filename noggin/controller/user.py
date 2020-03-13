@@ -153,7 +153,7 @@ def user_settings_otp(ipa, username):
         select="otp",
         tokens=tokens,
         otp_uri=otp_uri,
-        enabled_count=enabled_count
+        enabled_count=enabled_count,
     )
 
 
