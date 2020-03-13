@@ -9,3 +9,7 @@ class OTPToken(Representation):
     @property
     def description(self):
         return self._attr('description')
+
+    @property
+    def disabled(self):
+        return self._attr('ipatokendisabled')
