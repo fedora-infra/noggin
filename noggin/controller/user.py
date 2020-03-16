@@ -139,12 +139,6 @@ def user_settings_otp(ipa, username):
             'otptoken_find', [], {'ipatokenowner': username, 'all': True}
         )['result']
     ]
-    enabled_count = 0
-    for otp in tokens:
-        if not otp.disabled:
-            enabled_count += 1
-            if enabled_count > 1:
-                break
 
     return render_template(
         'user-settings-otp.html',
@@ -153,7 +147,6 @@ def user_settings_otp(ipa, username):
         select="otp",
         tokens=tokens,
         otp_uri=otp_uri,
-        enabled_count=enabled_count,
     )
 
 
