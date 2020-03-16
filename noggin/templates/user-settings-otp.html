@@ -42,21 +42,27 @@
 
 <div class="list-group">
 {% for token in tokens %}
-  <div class="list-group-item {{ 'disabled' if token.disabled }}">
-    <div class="row">
-      <div class="h6 col">{{token.description}}</div>
-      <div class="h6 col">
+  <div class="list-group-item">
+    <div class="row align-items-center">
+      <div class="col h6">
+        <div data-role="token-description">{{token.description}}</div>
+        <div class="text-monospace">{{token.uniqueid}}</div>
+      </div>
+      <div class="col-auto">
         {% if not token.disabled %}
-          <form action="{{ url_for('user_settings_otp_disable', username=current_user.username, token=token) }}" method="post">
+          <form action="{{ url_for('user_settings_otp_disable', username=current_user.username) }}" method="post" class="d-inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <button type='submit' class="pull-right btn btn-sm btn-warning" name="token" value="{{ token.uniqueid }}">Disable</button>
+            <button type='submit' class="btn btn-sm btn-outline-secondary" name="token" value="{{ token.uniqueid }}">Disable</button>
           </form>
         {% else %}
-        <i class="pull-right">disabled</i>
+        <button class="btn btn-sm btn-link disabled">Disabled</button>
         {% endif %}
+        <form action="{{ url_for('user_settings_otp_delete', username=current_user.username) }}" method="post" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type='submit' class="btn btn-sm btn-outline-danger" name="token" value="{{ token.uniqueid }}"><i class="fa fa-trash"></i></button>
+        </form>
       </div>
     </div>
-    <div class="text-monospace">{{token.uniqueid}}</div>
   </div>
 {% else %}
   <div class="list-group-item text-center bg-light text-muted font-weight-bold">You have no OTP tokens</div>

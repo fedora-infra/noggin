@@ -7,6 +7,7 @@ from noggin.form.edit_user import (
     UserSettingsKeysForm,
     UserSettingsAddOTPForm,
     UserSettingsDisableOTPForm,
+    UserSettingsDeleteOTPForm,
 )
 from noggin.representation.group import Group
 from noggin.representation.user import User
@@ -208,10 +209,59 @@ def user_settings_otp_disable(ipa, username):
 
         try:
             ipa.otptoken_mod(ipatokenuniqueid=token, ipatokendisabled=True)
+        except python_freeipa.exceptions.BadRequest as e:
+            if (
+                e.message
+                == "Server is unwilling to perform: Can't disable last active token"
+            ):
+                flash('Sorry, You cannot disable your last active token.', 'warning')
+            else:
+                flash('Cannot disable the token.', 'danger')
+                app.logger.error(
+                    f'Something went wrong disabling an OTP token for user {username}: {e}'
+                )
         except python_freeipa.exceptions.FreeIPAError as e:
             flash('Cannot disable the token.', 'danger')
             app.logger.error(
-                f'Something went wrong disabling an OTP token for user {username}: {e.message}'
+                f'Something went wrong disabling an OTP token for user {username}: {e}'
+            )
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'danger')
+    return redirect(url_for('user_settings_otp', username=username))
+
+
+@app.route('/user/<username>/settings/otp/delete/', methods=['POST'])
+@with_ipa(app, session)
+def user_settings_otp_delete(ipa, username):
+    # TODO: Maybe make this a decorator some day?
+    if session.get('noggin_username') != username:
+        flash('You do not have permission to edit this account.', 'danger')
+        return redirect(url_for('user', username=username))
+
+    form = UserSettingsDeleteOTPForm()
+
+    if form.validate_on_submit():
+        username = session.get('noggin_username')
+        token = form.token.data
+        try:
+            ipa.otptoken_del(ipatokenuniqueid=token)
+        except python_freeipa.exceptions.BadRequest as e:
+            if (
+                e.message
+                == "Server is unwilling to perform: Can't delete last active token"
+            ):
+                flash('Sorry, You cannot delete your last active token.', 'warning')
+            else:
+                flash('Cannot delete the token.', 'danger')
+                app.logger.error(
+                    f'Something went wrong deleting OTP token for user {username}: {e}'
+                )
+        except python_freeipa.exceptions.FreeIPAError as e:
+            flash('Cannot delete the token.', 'danger')
+            app.logger.error(
+                f'Something went wrong deleting OTP token for user {username}: {e}'
             )
 
     for field_errors in form.errors.values():
