@@ -86,6 +86,17 @@ class Client(IPAClient):
         data = self._request('otptoken_mod', [], params)
         return data['result']
 
+    def otptoken_del(self, ipatokenuniqueid):
+        """
+        Mod an otptoken for a user.
+
+        :param ipatokenuniqueid: the unique id of the token
+        :type ipatokenuniqueid: string
+        """
+        params = {'ipatokenuniqueid': ipatokenuniqueid}
+        data = self._request('otptoken_del', [], params)
+        return data['result']
+
     def batch(self, methods=None, raise_errors=True):
         """
         Make multiple ipa calls via one remote procedure call.

@@ -250,7 +250,9 @@ def test_user_settings_otp_add(client, logged_in_dummy_user):
 
     # check the token is in the list
     assert (
-        tokenlist[0].select(".list-group-item .h6")[0].get_text(strip=True)
+        tokenlist[0]
+        .select(".list-group-item .h6 div[data-role='token-description']")[0]
+        .get_text(strip=True)
         == "pants token"
     )
 
@@ -357,7 +359,7 @@ def test_user_settings_otp_disable_invalid_form(client, logged_in_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_user_settings_otp_disable(client, logged_in_dummy_user):
+def test_user_settings_otp_disable_ipaerror(client, logged_in_dummy_user):
     """Test failure when disabling an otptoken"""
     client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
@@ -388,51 +390,276 @@ def test_user_settings_otp_disable(client, logged_in_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_user_settings_otp_disable_with_multiple(client, logged_in_dummy_user):
-    """Test failure when disabling the last remaining active otptoken"""
+def test_user_settings_otp_disable(client, logged_in_dummy_user):
+    """Test deleting an otptoken"""
     client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
-    client.post('/user/dummy/settings/otp/add/', data={"description": "pants token"})
-    client.post(
-        '/user/dummy/settings/otp/add/', data={"description": "pants other token"}
-    )
+    # add an OTP Token
     client.post(
         '/user/dummy/settings/otp/add/',
-        data={"description": "pants other other token"},
+        data={"description": "token"},
         follow_redirects=True,
     )
 
-    fetch = client.get('/user/dummy/settings/otp/')
-
-    page = BeautifulSoup(fetch.data, 'html.parser')
-    tokenlist = page.select("div.list-group")
-    id = (
-        tokenlist[0]
-        .select(".list-group-item")[0]
-        .select(".text-monospace")[0]
-        .get_text(strip=True)
-    )
+    # add another OTP Token
     result = client.post(
-        '/user/dummy/settings/otp/disable/', data={"token": id}, follow_redirects=True
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants token"},
+        follow_redirects=True,
     )
 
-    id = (
-        tokenlist[0]
-        .select(".list-group-item")[2]
-        .select(".text-monospace")[0]
-        .get_text(strip=True)
-    )
+    page = BeautifulSoup(result.data, 'html.parser')
+    tokenlist = page.select("div.list-group .list-group-item")
+
+    # check we are showing 2 tokens
+    assert len(tokenlist) == 2
+
+    # grab the id of the first token
+    tokenid = tokenlist[0].select(".text-monospace")[0].get_text(strip=True)
+
+    # disable that token
     result = client.post(
-        '/user/dummy/settings/otp/disable/', data={"token": id}, follow_redirects=True
+        '/user/dummy/settings/otp/disable/',
+        data={"token": tokenid},
+        follow_redirects=True,
     )
 
-    fetch = client.get('/user/dummy/settings/otp/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    tokenlist = page.select("div.list-group .list-group-item")
 
-    page = BeautifulSoup(fetch.data, 'html.parser')
-    tokenlist = page.select("div.list-group")
+    # check we are still showing 2 item
+    assert len(tokenlist) == 2
 
-    assert "disabled" in tokenlist[0].select("div.list-group-item")[0].get_text(
-        strip=True
+
+@pytest.mark.vcr()
+def test_user_settings_otp_disable_lasttoken(client, logged_in_dummy_user):
+    """Test trying to disable the last token"""
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    # add an OTP Token
+    result = client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "token"},
+        follow_redirects=True,
     )
 
-    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    tokenlist = page.select("div.list-group .list-group-item")
+
+    # check we are showing 1 token
+    assert len(tokenlist) == 1
+
+    # check the one item is not the no tokens message
+    assert "You have no OTP tokens" not in tokenlist[0].get_text(strip=True)
+
+    # grab the id of the token
+    tokenid = tokenlist[0].select(".text-monospace")[0].get_text(strip=True)
+
+    # try to disable that token
+    result = client.post('/user/dummy/settings/otp/disable/', data={"token": tokenid})
+
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Sorry, You cannot disable your last active token.",
+        expected_category="warning",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_disable_ipabadrequest(client, logged_in_dummy_user):
+    """Test IPA badrequest failure when disabling an otptoken"""
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants token"},
+        follow_redirects=True,
+    )
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants' other token"},
+        follow_redirects=True,
+    )
+    with mock.patch("noggin.security.ipa.Client.otptoken_mod") as method:
+        method.side_effect = python_freeipa.exceptions.BadRequest(
+            message="Cannot delete the token.", code="4242"
+        )
+        result = client.post(
+            '/user/dummy/settings/otp/disable/',
+            data={"token": "0be795bd-b7d3-49b2-89d7-889522d7f1ba"},
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot disable the token.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_delete_no_permission(client, logged_in_dummy_user):
+    """Verify that another user can't delete an otp token. """
+    result = client.post(
+        "/user/dudemcpants/settings/otp/delete/", data={"token": "aabbcc-aabbcc"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dudemcpants/",
+        expected_message="You do not have permission to edit this account.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_delete_invalid_form(client, logged_in_dummy_user):
+    """Test an invalid form when deleting an otp token"""
+    result = client.post('/user/dummy/settings/otp/delete/', data={})
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="token must not be empty",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_delete_ipafailure(client, logged_in_dummy_user):
+    """Test IPA failure when deleting an otptoken"""
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants token"},
+        follow_redirects=True,
+    )
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants' other token"},
+        follow_redirects=True,
+    )
+    with mock.patch("noggin.security.ipa.Client.otptoken_del") as method:
+        method.side_effect = python_freeipa.exceptions.FreeIPAError(
+            message="Cannot delete the token.", code="4242"
+        )
+        result = client.post(
+            '/user/dummy/settings/otp/delete/',
+            data={"token": "0be795bd-b7d3-49b2-89d7-889522d7f1ba"},
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot delete the token.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_delete_ipabadrequest(client, logged_in_dummy_user):
+    """Test IPA badrequest failure when deleting an otptoken"""
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants token"},
+        follow_redirects=True,
+    )
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants' other token"},
+        follow_redirects=True,
+    )
+    with mock.patch("noggin.security.ipa.Client.otptoken_del") as method:
+        method.side_effect = python_freeipa.exceptions.BadRequest(
+            message="Cannot delete the token.", code="4242"
+        )
+        result = client.post(
+            '/user/dummy/settings/otp/delete/',
+            data={"token": "0be795bd-b7d3-49b2-89d7-889522d7f1ba"},
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot delete the token.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_delete(client, logged_in_dummy_user):
+    """Test deleting an otptoken"""
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    # add an OTP Token
+    client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "token"},
+        follow_redirects=True,
+    )
+
+    # add another OTP Token
+    result = client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "pants token"},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(result.data, 'html.parser')
+    tokenlist = page.select("div.list-group .list-group-item")
+
+    # check we are showing 2 tokens
+    assert len(tokenlist) == 2
+
+    # grab the id of the first token
+    tokenid = tokenlist[0].select(".text-monospace")[0].get_text(strip=True)
+
+    # delete that token
+    result = client.post(
+        '/user/dummy/settings/otp/delete/',
+        data={"token": tokenid},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(result.data, 'html.parser')
+    tokenlist = page.select("div.list-group .list-group-item")
+
+    # check we are showing 1 item
+    assert len(tokenlist) == 1
+
+    # check the one item is not the no tokens message
+    assert "You have no OTP tokens" not in tokenlist[0].get_text(strip=True)
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_delete_lasttoken(client, logged_in_dummy_user):
+    """Test trying to delete the last token"""
+    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
+
+    # add an OTP Token
+    result = client.post(
+        '/user/dummy/settings/otp/add/',
+        data={"description": "token"},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(result.data, 'html.parser')
+    tokenlist = page.select("div.list-group .list-group-item")
+
+    # check we are showing 1 token
+    assert len(tokenlist) == 1
+
+    # check the one item is not the no tokens message
+    assert "You have no OTP tokens" not in tokenlist[0].get_text(strip=True)
+
+    # grab the id of the token
+    tokenid = tokenlist[0].select(".text-monospace")[0].get_text(strip=True)
+
+    # try to delete that token
+    result = client.post('/user/dummy/settings/otp/delete/', data={"token": tokenid})
+
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Sorry, You cannot delete your last active token.",
+        expected_category="warning",
+    )
