@@ -8,7 +8,7 @@ import jwt
 from noggin import app, ipa_admin, mailer
 from noggin.security.ipa import untouched_ipa_client, maybe_ipa_session
 from noggin.representation.user import User
-from noggin.utility import with_ipa, user_or_404
+from noggin.utility import with_ipa, user_or_404, FormError, handle_form_errors
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.form.password_reset import (
     PasswordResetForm,
@@ -103,55 +103,50 @@ def forgot_password_ask():
         lock = PasswordResetLock(username)
         valid_until = lock.valid_until()
         now = datetime.datetime.now()
-        if valid_until is not None and now < valid_until:
-            wait_min = int((valid_until - now).total_seconds() / 60)
-            wait_sec = int((valid_until - now).total_seconds() % 60)
-            form.errors['non_field_errors'] = [
-                f'You have already requested a password reset, you need to wait {wait_min} '
-                f'minute(s) and {wait_sec} seconds before you can request another.'
-            ]
-        else:
+        with handle_form_errors(form):
+            if valid_until is not None and now < valid_until:
+                wait_min = int((valid_until - now).total_seconds() / 60)
+                wait_sec = int((valid_until - now).total_seconds() % 60)
+                raise FormError(
+                    "non_field_errors",
+                    f'You have already requested a password reset, you need to wait {wait_min} '
+                    f'minute(s) and {wait_sec} seconds before you can request another.',
+                )
             try:
                 user = ipa_admin.user_show(username)
             except python_freeipa.exceptions.NotFound:
-                form.username.errors.append(f"User {username} does not exist")
-            else:
-                token = str(
-                    jwt.encode(
-                        {"username": username, "last_change": user["krblastpwdchange"]},
-                        app.config["SECRET_KEY"],
-                        algorithm="HS256",
-                    ),
-                    "ascii",
-                )
-                # Send the email
-                email_context = {"token": token, "username": username}
-                email = Message(
-                    body=render_template("forgot-password-email.txt", **email_context),
-                    html=render_template("forgot-password-email.html", **email_context),
-                    recipients=[user["mail"][0]],
-                    subject="Password reset procedure",
-                )
-                try:
-                    mailer.send(email)
-                except ConnectionRefusedError as e:
-                    app.logger.error(f"Impossible to send a password reset email: {e}")
-                    flash(
-                        "We could not send you an email, please retry later", "danger"
-                    )
-                    return redirect(url_for('root'))
-
-                app.logger.debug(email)
-                lock.store()
-                app.logger.info(
-                    f'{username} forgot their password and requested a token'
-                )
-                flash(
-                    "An email has been sent to your address with instructions on how to reset "
-                    "your password",
-                    "success",
-                )
+                raise FormError("username", f"User {username} does not exist")
+            token = str(
+                jwt.encode(
+                    {"username": username, "last_change": user["krblastpwdchange"]},
+                    app.config["SECRET_KEY"],
+                    algorithm="HS256",
+                ),
+                "ascii",
+            )
+            # Send the email
+            email_context = {"token": token, "username": username}
+            email = Message(
+                body=render_template("forgot-password-email.txt", **email_context),
+                html=render_template("forgot-password-email.html", **email_context),
+                recipients=[user["mail"][0]],
+                subject="Password reset procedure",
+            )
+            try:
+                mailer.send(email)
+            except ConnectionRefusedError as e:
+                app.logger.error(f"Impossible to send a password reset email: {e}")
+                flash("We could not send you an email, please retry later", "danger")
                 return redirect(url_for('root'))
+            app.logger.debug(email)
+            lock.store()
+            app.logger.info(f'{username} forgot their password and requested a token')
+            flash(
+                "An email has been sent to your address with instructions on how to reset "
+                "your password",
+                "success",
+            )
+            return redirect(url_for('root'))
     return render_template('forgot-password-ask.html', form=form)
 
 

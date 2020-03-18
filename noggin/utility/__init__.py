@@ -1,5 +1,7 @@
 import hashlib
 from functools import wraps
+from contextlib import contextmanager
+
 from flask import abort, flash, g, redirect, url_for
 import python_freeipa
 
@@ -48,3 +50,29 @@ def user_or_404(ipa, username):
         return ipa.user_show(username)
     except python_freeipa.exceptions.NotFound:
         abort(404)
+
+
+class FormError(Exception):
+    def __init__(self, field, message):
+        self.field = field
+        self.message = message
+
+    def populate_form(self, form):
+        try:
+            field = getattr(form, self.field)
+        except AttributeError:
+            # probably non_field_errors
+            if self.field not in form.errors:
+                form.errors[self.field] = []
+            error_list = form.errors[self.field]
+        else:
+            error_list = field.errors
+        error_list.append(self.message)
+
+
+@contextmanager
+def handle_form_errors(form):
+    try:
+        yield
+    except FormError as e:
+        e.populate_form(form)

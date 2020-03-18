@@ -7,7 +7,7 @@ import python_freeipa
 from noggin import app, ipa_admin
 from noggin.form.register_user import RegisterUserForm
 from noggin.utility.locales import guess_locale
-from noggin.utility import messaging
+from noggin.utility import messaging, FormError, handle_form_errors
 from noggin.security.ipa import untouched_ipa_client
 
 
@@ -19,48 +19,47 @@ def register():
         username = form.username.data
         password = form.password.data
         now = datetime.datetime.utcnow().replace(microsecond=0)
-        # First, create the user.
-        try:
-            ipa_admin.user_add(
-                username,
-                form.firstname.data,
-                form.lastname.data,
-                f'{form.firstname.data} {form.lastname.data}',  # TODO ???
-                user_password=password,
-                mail=form.mail.data,
-                login_shell='/bin/bash',
-                fascreationtime=f"{now.isoformat()}Z",
-                faslocale=guess_locale(),
-                fastimezone=app.config["USER_DEFAULTS"]["user_timezone"],
-            )
-        except python_freeipa.exceptions.DuplicateEntry as e:
-            # the username already exists
-            form.username.errors.append(e.message)
-        except python_freeipa.exceptions.ValidationError as e:
-            # for example: invalid username. We don't know which field to link it to
-            if e.message.startswith("invalid 'login': "):
-                form.username.errors.append(e.message[len("invalid 'login': ") :])
-            else:
+        with handle_form_errors(form):
+            # First, create the user.
+            try:
+                ipa_admin.user_add(
+                    username,
+                    form.firstname.data,
+                    form.lastname.data,
+                    f'{form.firstname.data} {form.lastname.data}',  # TODO ???
+                    user_password=password,
+                    mail=form.mail.data,
+                    login_shell='/bin/bash',
+                    fascreationtime=f"{now.isoformat()}Z",
+                    faslocale=guess_locale(),
+                    fastimezone=app.config["USER_DEFAULTS"]["user_timezone"],
+                )
+            except python_freeipa.exceptions.DuplicateEntry as e:
+                # the username already exists
+                raise FormError("username", e.message)
+            except python_freeipa.exceptions.ValidationError as e:
+                # for example: invalid username. We don't know which field to link it to
+                if e.message.startswith("invalid 'login': "):
+                    raise FormError("username", e.message[len("invalid 'login': ") :])
+                else:
+                    app.logger.error(
+                        f'An unhandled invalid value happened while registering user '
+                        f'{username}: {e.message}'
+                    )
+                    raise FormError("non_field_errors", e.message)
+            except python_freeipa.exceptions.FreeIPAError as e:
                 app.logger.error(
-                    f'An unhandled invalid value happened while registering user '
+                    f'An unhandled error {e.__class__.__name__} happened while registering user '
                     f'{username}: {e.message}'
                 )
-                form.errors['non_field_errors'] = [e.message]
-        except python_freeipa.exceptions.FreeIPAError as e:
-            app.logger.error(
-                f'An unhandled error {e.__class__.__name__} happened while registering user '
-                f'{username}: {e.message}'
-            )
-            form.errors['non_field_errors'] = [
-                'An error occurred while creating the account, please try again.'
-            ]
-
-        else:
+                raise FormError(
+                    "non_field_errors",
+                    'An error occurred while creating the account, please try again.',
+                )
             # User creation succeeded. Send message.
             messaging.publish(
                 UserCreateV1({"msg": {"agent": username, "user": username}})
             )
-
             # Now we fake a password change, so that it's not immediately
             # expired. This also logs the user in right away.
             try:
@@ -91,11 +90,10 @@ def register():
                     'warning',
                 )
                 return redirect(url_for('login'))
-            else:
-                flash(
-                    'Congratulations, you now have an account! Go ahead and sign in to proceed.',
-                    'success',
-                )
-                return redirect(url_for('root'))
+            flash(
+                'Congratulations, you now have an account! Go ahead and sign in to proceed.',
+                'success',
+            )
+            return redirect(url_for('root'))
 
     return render_template('register.html', register_form=form)
