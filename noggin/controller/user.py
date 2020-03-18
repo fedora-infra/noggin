@@ -12,7 +12,7 @@ from noggin.form.edit_user import (
 from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.representation.otptoken import OTPToken
-from noggin.utility import with_ipa, user_or_404
+from noggin.utility import with_ipa, user_or_404, FormError, handle_form_errors
 
 
 @app.route('/user/<username>/')
@@ -33,17 +33,17 @@ def user(ipa, username):
 
 
 def _user_mod(ipa, form, username, details):
-    try:
-        ipa.user_mod(username, **details)
-    except python_freeipa.exceptions.BadRequest as e:
-        if e.message == 'no modifications to be performed':
-            form.errors['non_field_errors'] = [e.message]
-        else:
-            app.logger.error(
-                f'An error happened while editing user {username}: {e.message}'
-            )
-            form.errors['non_field_errors'] = [e.message]
-    else:
+    with handle_form_errors(form):
+        try:
+            ipa.user_mod(username, **details)
+        except python_freeipa.exceptions.BadRequest as e:
+            if e.message == 'no modifications to be performed':
+                raise FormError("non_field_errors", e.message)
+            else:
+                app.logger.error(
+                    f'An error happened while editing user {username}: {e.message}'
+                )
+                raise FormError("non_field_errors", e.message)
         flash('Profile has been succesfully updated.', 'success')
         return redirect(url_for('user', username=username))
 
