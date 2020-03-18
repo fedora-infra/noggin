@@ -8,9 +8,9 @@
     <div class="form-group mb-0">
       {{ macros.with_errors(login_form.password, class="validate", placeholder="Password or Password + One-Time-Password", tabindex="2", label=False) }}
       {% if lost_otp_token is not defined %}
-      <small><a href="{{ url_for('forgot_password_ask') }}">Forgot password?</a></small>
+      <small><a href="{{ url_for('forgot_password_ask') }}">Forgot password?</a></small><br><small><a href="{{ url_for('otp_sync') }}">Sync Token</a></small>
       {% else %}
-      <small><a href="{{ url_for('forgot_password_ask') }}">Forgotten password or lost OTP token?</a></small>
+      <small><a href="{{ url_for('forgot_password_ask') }}">Forgotten password or lost OTP token?</a></small><br><small><a href="{{ url_for('otp_sync') }}">Sync Token</a></small>
       {% endif %}
     </div>
   </div>
