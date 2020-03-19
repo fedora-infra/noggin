@@ -12,6 +12,7 @@ from noggin.form.edit_user import (
 from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.representation.otptoken import OTPToken
+from noggin.security.ipa import maybe_ipa_login
 from noggin.utility import (
     with_ipa,
     user_or_404,
@@ -164,12 +165,15 @@ def user_settings_otp_add(ipa, username):
         username = session.get('noggin_username')
         description = form.description.data
         try:
+            maybe_ipa_login(app, session, username, form.password.data)
             result = ipa.otptoken_add(
                 ipatokenowner=username,
                 ipatokenotpalgorithm='sha512',
                 description=description,
             )
             session['otp_uri'] = result['uri']
+        except python_freeipa.exceptions.InvalidSessionPassword:
+            flash('incorrect password', 'danger')
         except python_freeipa.exceptions.FreeIPAError as e:
             flash('Cannot create the token.', 'danger')
             app.logger.error(
