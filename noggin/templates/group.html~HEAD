@@ -1,0 +1,136 @@
+{% extends "main.html" %}
+
+{# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
+
+{% block title %}{{ group.name }} Group{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  <div class="bg-light border-bottom">
+  <div class="container section">
+    <div class="row py-4" data-section="identity">
+      <div class="col">
+          <h3>{{ group.name }}</h3>
+          {% if group.description %}<div>{{ group.description }}</div>{% endif %}
+      </div>
+      {{ edit_group_details() if edit_group_details is defined }}
+      {% if current_user.username in group.members %}
+      <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
+        {{ sponsor_form.hidden_tag() }}
+        <button type="submit" class="btn btn-outline-danger" name="username" value="{{ current_user.username }}" id="leave-group-btn">
+          Leave group
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  </div>
+  {% if current_user.username not in group.members %}
+  <div class="alert alert-info rounded-0">
+    <div class="container text-center">
+      To join this group, contact a group sponsor.
+    </div>
+  </div>
+  {% endif %}
+  <div class="container">
+    <div class="row">
+      <div class="col-12 my-4" data-section="sponsors">
+        <h4>Sponsors <span class="badge badge-secondary">{{sponsors|length}}</span></h4>
+        {% if sponsors|length == 0 %}
+        <ul class="list-group">
+          <li class="list-group-item text-center bg-light text-muted">
+            <strong>no sponsors</strong>
+          </li>
+        </ul>
+        {% else %}
+        <ul class="list-unstyled row">
+          {% for sponsor in sponsors|sort(attribute='username') %}
+            <li class="col-lg-3 col-md-4 col-sm-6">
+              <div class="card card-body mb-4">
+              <div class="media align-items-center">
+                <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 50) }}" alt="gravatar">
+                <div class="media-body ml-2">
+                    <div class="my-0 font-weight-bold">
+                      <a href="{{ url_for('user', username=sponsor.username) }}">
+                        <span class="title">{{ sponsor.username }}</span>
+                      </a>
+                    </div>
+                    <div>{{ sponsor.name }}</div>
+                </div>
+              </div>
+              </div>
+            </li>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <div class="col-12" data-section="members">
+        <div class="d-flex justify-content-between">
+          <div class="h4">Members <span class="badge badge-secondary">{{members|length}}</span></div>
+          {% if current_user_is_sponsor and sponsor_form %}
+          {# TODO: not require a double enter here maybe #}
+             <form action="{{ url_for('group_add_member', groupname=group.name) }}" method="post">
+              <div class="row">
+                <div class="col">
+                  {{ sponsor_form.hidden_tag() }}
+                  {{ sponsor_form.new_member_username(class='typeahead form-control form-control-sm mb-2', autocomplete="off", placeholder="add user...") }}
+                  <button class="d-none" id="submit" type="submit" tabindex="9">Submit</button>
+                </div>
+              </div>
+            </form>
+          {% endif %}
+          </div>
+        {% if members|length == 0 %}
+        <p>No members yet.</p>
+        {% else %}
+        <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
+          {{ sponsor_form.hidden_tag() }}
+          <ul class="list-unstyled row">
+            {% set sponsor_usernames = sponsors|map(attribute='username') %}
+            {% for member in members|sort(attribute='username') %}
+              <li class="col-lg-3 col-md-4 col-sm-6">
+              <div class="card card-body mb-4">
+                <div class="media align-items-center">
+                  <img src="{{ gravatar(member.mail if member.mail else 'default', 50) }}" alt="gravatar">
+                  <div class="media-body ml-2">
+                      <div class="my-0 font-weight-bold">
+                        <a href="{{ url_for('user', username=member.username) }}">
+                          <span class="title">{{ member.username }}</span>
+                        </a>
+                      </div>
+                      <div>{{ member.name }}</div>
+                  </div>
+                </div>
+                <div class="text-muted">
+                  {% if current_user_is_sponsor %}
+                    <button type="submit" class="btn btn-outline-danger border-0" name="username" value="{{ member.username }}">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  {% endif %}
+                </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </form>
+        {% endif %}
+      </div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super () }}
+  <script>
+    {% if current_user_is_sponsor and sponsor_form %}
+      var typeahead = $('#new_member_username').typeahead(
+        { highlight: true},
+        { name: 'users',
+          display: 'uid',
+          source: bloodhound_users,
+          templates: { }
+        }
+      );
+      typeahead.unwrap();
+    {% endif %}
+  </script>
+{% endblock %}
