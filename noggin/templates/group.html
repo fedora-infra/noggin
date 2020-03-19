@@ -87,26 +87,6 @@
           <ul class="list-unstyled row">
             {% set sponsor_usernames = sponsors|map(attribute='username') %}
             {% for member in members|sort(attribute='username') %}
-<<<<<<< HEAD
-              <li class="collection-item avatar">
-                <!-- TODO: .red if sponsor/admin -->
-                {% if member.mail %}
-                  <img src="{{ gravatar(member.mail, 200) }}" class="circle" alt="gravatar">
-                {% else %}
-                  <i class="material-icons circle">person</i>
-                {% endif %}
-                <a href="/user/{{ member.username }}">
-                  <span class="title">{{ member.username }}</span>
-                </a>
-                <p>{{ member.name }}</p>
-                {# TODO: sponsor if sponsor #}
-                <p>member</p>
-                {% if current_user_is_sponsor %}
-                  <div class="secondary-content">
-                    <button type="submit" class="btn-flat waves-effect waves-light red-text" name="username" value="{{ member.username }}">
-                      <i class="material-icons">remove_circle_outline</i>
-                    </button>
-=======
               <li class="col-lg-3 col-md-4 col-sm-6">
               <div class="card card-body mb-4">
                 <div class="media align-items-center">
@@ -118,7 +98,6 @@
                         </a>
                       </div>
                       <div>{{ member.name }}</div>
->>>>>>> c304c88e6b1ae7c062d3b954c158bba77abf004c
                   </div>
                 </div>
                 <div class="text-muted">
