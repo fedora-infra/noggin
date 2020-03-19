@@ -12,7 +12,13 @@ from noggin.form.edit_user import (
 from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.representation.otptoken import OTPToken
-from noggin.utility import with_ipa, user_or_404, FormError, handle_form_errors
+from noggin.utility import (
+    with_ipa,
+    user_or_404,
+    FormError,
+    handle_form_errors,
+    require_self,
+)
 
 
 @app.route('/user/<username>/')
@@ -50,12 +56,8 @@ def _user_mod(ipa, form, username, details):
 
 @app.route('/user/<username>/settings/profile/', methods=['GET', 'POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_profile(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
     user = User(user_or_404(ipa, username))
     form = UserSettingsProfileForm(obj=user)
 
@@ -88,12 +90,8 @@ def user_settings_profile(ipa, username):
 
 @app.route('/user/<username>/settings/keys/', methods=['GET', 'POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_keys(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
     user = User(user_or_404(ipa, username))
     form = UserSettingsKeysForm(obj=user)
 
@@ -122,12 +120,8 @@ def user_settings_keys(ipa, username):
 
 @app.route('/user/<username>/settings/otp/')
 @with_ipa(app, session)
+@require_self
 def user_settings_otp(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
     addotpform = UserSettingsAddOTPForm()
     user = User(user_or_404(ipa, username))
 
@@ -153,12 +147,8 @@ def user_settings_otp(ipa, username):
 
 @app.route('/user/<username>/settings/otp/add/', methods=['POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_otp_add(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
     form = UserSettingsAddOTPForm()
     user = User(user_or_404(ipa, username))
 
@@ -195,12 +185,8 @@ def user_settings_otp_add(ipa, username):
 
 @app.route('/user/<username>/settings/otp/disable/', methods=['POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_otp_disable(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
     form = UserSettingsDisableOTPForm()
 
     if form.validate_on_submit():
@@ -234,12 +220,8 @@ def user_settings_otp_disable(ipa, username):
 
 @app.route('/user/<username>/settings/otp/delete/', methods=['POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_otp_delete(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
     form = UserSettingsDeleteOTPForm()
 
     if form.validate_on_submit():

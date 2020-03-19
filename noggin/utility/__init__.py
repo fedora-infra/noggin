@@ -2,7 +2,7 @@ import hashlib
 from functools import wraps
 from contextlib import contextmanager
 
-from flask import abort, flash, g, redirect, url_for
+from flask import abort, flash, g, redirect, url_for, session
 import python_freeipa
 
 from noggin.representation.user import User
@@ -36,6 +36,27 @@ def with_ipa(app, session):
         return fn
 
     return decorator
+
+
+def require_self(f):
+    """Require the logged-in user to be the user that is currently being edited"""
+
+    @wraps(f)
+    def fn(*args, **kwargs):
+        try:
+            username = kwargs["username"]
+        except KeyError:
+            abort(
+                500,
+                "The require_self decorator only works on routes that have 'username' "
+                "as a component.",
+            )
+        if session.get('noggin_username') != username:
+            flash('You do not have permission to edit this account.', 'danger')
+            return redirect(url_for('user', username=username))
+        return f(*args, **kwargs)
+
+    return fn
 
 
 def group_or_404(ipa, groupname):

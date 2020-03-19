@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 from flask import current_app, g, session, get_flashed_messages
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, InternalServerError
 
 from noggin.security.ipa import maybe_ipa_login
 from noggin.utility import (
@@ -11,6 +11,7 @@ from noggin.utility import (
     with_ipa,
     FormError,
     handle_form_errors,
+    require_self,
 )
 from noggin.form.login_user import LoginUserForm
 
@@ -126,3 +127,10 @@ def test_handle_form_errors(client):
             with handle_form_errors(form):
                 raise error
     populate_form.assert_called_once_with(form)
+
+
+def test_require_self_wrong_route(client):
+    view = mock.Mock()
+    with current_app.test_request_context('/password-reset'):
+        with pytest.raises(InternalServerError):
+            require_self(view)()
