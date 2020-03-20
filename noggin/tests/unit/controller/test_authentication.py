@@ -185,7 +185,7 @@ def test_login_expired_password(client, dummy_user_expired_password):
 
 
 @pytest.mark.vcr()
-def test_sync_no_username(client, dummy_user):
+def test_otp_sync_no_username(client, dummy_user):
     """Test not giving a username"""
     result = client.post(
         '/otp/sync/',
