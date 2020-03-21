@@ -27,14 +27,14 @@ def handle_login_form(form):
             f'An unhandled error {e.__class__.__name__} happened while logging in user '
             f'{username}: {e.message}'
         )
-        raise FormError("non_field_errors", "Could not log in to the IPA server.")
+        raise FormError("non_field_errors", _('Could not log in to the IPA server.'))
 
     if not ipa:
         app.logger.error(
             f'An unhandled situation happened while logging in user {username}: '
             f'could not connect to the IPA server'
         )
-        raise FormError("non_field_errors", "Could not log in to the IPA server.")
+        raise FormError("non_field_errors", _('Could not log in to the IPA server.'))
 
     flash(f'Welcome, {username}!', 'success')
     return redirect(url_for('user', username=username))
