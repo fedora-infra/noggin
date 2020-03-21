@@ -39,7 +39,7 @@ def login():
                 f'An unhandled error {e.__class__.__name__} happened while logging in user '
                 f'{username}: {e.message}'
             )
-            form.errors['non_field_errors'] = ['Could not log in to the IPA server.']
+            form.errors['non_field_errors'] = [_('Could not log in to the IPA server.')]
         else:
             if ipa:
                 flash(f'Welcome, {username}!', 'success')
@@ -50,6 +50,6 @@ def login():
                     f'could not connect to the IPA server'
                 )
                 form.errors['non_field_errors'] = [
-                    'Could not log in to the IPA server.'
+                    _('Could not log in to the IPA server.')
                 ]
     return render_template('login.html', login_form=form)
