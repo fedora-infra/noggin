@@ -137,11 +137,8 @@ class Client(IPAClient):
             'second_code': second_code,
             'token': token,
         }
-        try:
-            url = "https://" + self._host + "/ipa/session/sync_token"
-            response = requests.post(url=url, data=data, verify=self._verify_ssl)
-        except requests.RequestException:
-            raise
+        url = "https://" + self._host + "/ipa/session/sync_token"
+        response = requests.post(url=url, data=data, verify=self._verify_ssl)
         return response
 
     def batch(self, methods=None, raise_errors=True):
