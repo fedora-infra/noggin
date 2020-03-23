@@ -1,4 +1,3 @@
-import requests
 from cryptography.fernet import Fernet
 import python_freeipa
 from python_freeipa.client_legacy import ClientLegacy as IPAClient
@@ -138,7 +137,7 @@ class Client(IPAClient):
             'token': token,
         }
         url = "https://" + self._host + "/ipa/session/sync_token"
-        response = requests.post(url=url, data=data, verify=self._verify_ssl)
+        response = self._session.post(url=url, data=data, verify=self._verify_ssl)
         return response
 
     def batch(self, methods=None, raise_errors=True):
