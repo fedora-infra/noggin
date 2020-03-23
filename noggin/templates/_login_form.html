@@ -6,8 +6,12 @@
       {{ macros.with_errors(login_form.username, class="validate", placeholder="Username", tabindex="1", label=False) }}
     </div>
     <div class="form-group mb-0">
-      {{ macros.with_errors(login_form.password, class="validate", placeholder="Password", tabindex="2", label=False) }}
+      {{ macros.with_errors(login_form.password, class="validate", placeholder="Password or Password + One-Time-Password", tabindex="2", label=False) }}
+      {% if lost_otp_token is not defined %}
       <small><a href="{{ url_for('forgot_password_ask') }}">Forgot password?</a></small>
+      {% else %}
+      <small><a href="{{ url_for('forgot_password_ask') }}">Forgotten password or lost OTP token?</a></small>
+      {% endif %}
     </div>
   </div>
   <div class="card-footer d-flex justify-content-between">
