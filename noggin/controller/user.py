@@ -151,15 +151,6 @@ def user_settings_otp(ipa, username):
 @require_self
 def user_settings_otp_add(ipa, username):
     form = UserSettingsAddOTPForm()
-    user = User(user_or_404(ipa, username))
-
-    # we don't show the form in the template if there arent gpgkeys, but check on form
-    # submit here anyways.
-    if not user.gpgkeys:
-        flash(
-            'Cannot create an OTP token without a GPG Key. Please add a GPG Key', 'info'
-        )
-        return redirect(url_for('user_settings_otp', username=username))
 
     if form.validate_on_submit():
         username = session.get('noggin_username')

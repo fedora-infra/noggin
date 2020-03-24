@@ -205,18 +205,12 @@ def test_user_settings_otp(client, logged_in_dummy_user):
         tokenlist[0].select(".list-group-item")[0].get_text(strip=True)
         == "You have no OTP tokens"
     )
-    # we shouldnt see a form, because there is no GPGkey
-    form = page.select("form[action='/user/dummy/settings/otp/add/']")
-    assert len(form) == 0
-
-    # add a GPG key
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
     result = client.get('/user/dummy/settings/otp/')
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
     assert page.title.string == 'dummy\'s Settings - noggin'
-    # now with a GPG key, we should see the form.
+
     form = page.select("form[action='/user/dummy/settings/otp/add/']")
     assert len(form) == 1
 
@@ -236,8 +230,6 @@ def test_user_settings_otp_no_permission(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_add(client, logged_in_dummy_user):
     """Test posting to the create OTP endpoint"""
-    # first, add a GPG key
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
     result = client.post(
         '/user/dummy/settings/otp/add/',
@@ -261,21 +253,6 @@ def test_user_settings_otp_add(client, logged_in_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_user_settings_otp_add_nogpg(client, logged_in_dummy_user):
-    """Test trying to make an otp token without a gpgkey"""
-    result = client.post(
-        '/user/dummy/settings/otp/add/',
-        data={"description": "pants token", "password": "dummy_password"},
-    )
-    assert_redirects_with_flash(
-        result,
-        expected_url="/user/dummy/settings/otp/",
-        expected_message="Cannot create an OTP token without a GPG Key. Please add a GPG Key",
-        expected_category="info",
-    )
-
-
-@pytest.mark.vcr()
 def test_user_settings_otp_add_no_permission(client, logged_in_dummy_user):
     """Verify that another user can't make an otp token. """
     result = client.post(
@@ -293,11 +270,6 @@ def test_user_settings_otp_add_no_permission(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_add_invalid_form(client, logged_in_dummy_user):
     """Test an invalid form when adding an otp token"""
-    client.post(
-        '/user/dummy/settings/keys/',
-        data={"gpgkeys-0": "fcd8ae3e6005d76a"},
-        follow_redirects=True,
-    )
     result = client.post('/user/dummy/settings/otp/add/', data={"password": "pants"})
     assert_redirects_with_flash(
         result,
@@ -310,11 +282,6 @@ def test_user_settings_otp_add_invalid_form(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_add_invalid(client, logged_in_dummy_user):
     """Test failure when adding an otptoken"""
-    client.post(
-        '/user/dummy/settings/keys/',
-        data={"gpgkeys-0": "fcd8ae3e6005d76a"},
-        follow_redirects=True,
-    )
     with mock.patch("noggin.security.ipa.Client.otptoken_add") as method:
         method.side_effect = python_freeipa.exceptions.ValidationError(
             message={
@@ -365,8 +332,6 @@ def test_user_settings_otp_disable_invalid_form(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_disable_ipaerror(client, logged_in_dummy_user):
     """Test failure when disabling an otptoken"""
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
-
     client.post(
         '/user/dummy/settings/otp/add/',
         data={"description": "pants token", "password": "dummy_password"},
@@ -396,7 +361,6 @@ def test_user_settings_otp_disable_ipaerror(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_disable(client, logged_in_dummy_user):
     """Test deleting an otptoken"""
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
     # add an OTP Token
     client.post(
@@ -438,7 +402,6 @@ def test_user_settings_otp_disable(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_disable_lasttoken(client, logged_in_dummy_user):
     """Test trying to disable the last token"""
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
     # add an OTP Token
     result = client.post(
@@ -473,7 +436,6 @@ def test_user_settings_otp_disable_lasttoken(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_disable_ipabadrequest(client, logged_in_dummy_user):
     """Test IPA badrequest failure when disabling an otptoken"""
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
     client.post(
         '/user/dummy/settings/otp/add/',
@@ -530,7 +492,6 @@ def test_user_settings_otp_delete_invalid_form(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_delete_ipafailure(client, logged_in_dummy_user):
     """Test IPA failure when deleting an otptoken"""
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
     client.post(
         '/user/dummy/settings/otp/add/',
@@ -561,7 +522,6 @@ def test_user_settings_otp_delete_ipafailure(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_delete_ipabadrequest(client, logged_in_dummy_user):
     """Test IPA badrequest failure when deleting an otptoken"""
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
     client.post(
         '/user/dummy/settings/otp/add/',
@@ -592,7 +552,6 @@ def test_user_settings_otp_delete_ipabadrequest(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_delete(client, logged_in_dummy_user):
     """Test deleting an otptoken"""
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
     # add an OTP Token
     result = client.post(
@@ -637,7 +596,6 @@ def test_user_settings_otp_delete(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_delete_lasttoken(client, logged_in_dummy_user):
     """Test trying to delete the last token"""
-    client.post('/user/dummy/settings/keys/', data={"gpgkeys-0": "fcd8ae3e6005d76a"})
 
     # add an OTP Token
     result = client.post(
