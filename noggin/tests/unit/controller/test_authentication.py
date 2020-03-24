@@ -214,11 +214,8 @@ def test_otp_sync_invalid_codes(client, dummy_user_with_otp):
         },
         follow_redirects=False,
     )
-    assert_redirects_with_flash(
-        result,
-        expected_url="/",
-        expected_message="Something went wrong trying to sync OTP token.",
-        expected_category="danger",
+    assert_form_generic_error(
+        result, "The username, password or token codes are not correct."
     )
 
 
@@ -226,8 +223,8 @@ def test_otp_sync_invalid_codes(client, dummy_user_with_otp):
 def test_otp_sync_http_error(client, dummy_user_with_otp):
     """Test synchronising OTP token with mocked http error"""
     with mock.patch("noggin.controller.authentication.app.logger") as logger:
-        with mock.patch("noggin.security.ipa.Client.otptoken_sync") as method:
-            method.side_effect = requests.RequestException()
+        with mock.patch("requests.sessions.Session.post") as method:
+            method.side_effect = requests.exceptions.RequestException
             result = client.post(
                 '/otp/sync/',
                 data={
@@ -239,12 +236,7 @@ def test_otp_sync_http_error(client, dummy_user_with_otp):
                 follow_redirects=False,
             )
     logger.error.assert_called_once()
-    assert_redirects_with_flash(
-        result,
-        expected_url="/",
-        expected_message="Something went wrong trying to sync OTP token.",
-        expected_category="danger",
-    )
+    assert_form_generic_error(result, "Something went wrong trying to sync OTP token.")
 
 
 @pytest.mark.vcr()
@@ -263,11 +255,8 @@ def test_otp_sync_rejected(client, dummy_user_with_otp):
             },
             follow_redirects=False,
         )
-    assert_redirects_with_flash(
-        result,
-        expected_url="/",
-        expected_message="Something went wrong trying to sync OTP token.",
-        expected_category="danger",
+    assert_form_generic_error(
+        result, "The username, password or token codes are not correct."
     )
 
 

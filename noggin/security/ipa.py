@@ -1,4 +1,5 @@
 from cryptography.fernet import Fernet
+from requests import RequestException
 import python_freeipa
 from python_freeipa.client_legacy import ClientLegacy as IPAClient
 from python_freeipa.exceptions import (
@@ -137,7 +138,10 @@ class Client(IPAClient):
             'token': token,
         }
         url = "https://" + self._host + "/ipa/session/sync_token"
-        response = self._session.post(url=url, data=data, verify=self._verify_ssl)
+        try:
+            response = self._session.post(url=url, data=data, verify=self._verify_ssl)
+        except RequestException:
+            raise BadRequest(message="Something went wrong trying to sync OTP token.")
         return response
 
     def batch(self, methods=None, raise_errors=True):
