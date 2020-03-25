@@ -36,12 +36,15 @@ def assert_form_generic_error(response, expected_message):
     assert error_message.get_text(strip=True) == expected_message
 
 
-def extract_otp_secret(page):
+def otp_secret_from_page(page):
     """
     Takes a page with an OTP QR code on it, and returns the secret
     """
-    otpuri = page.select_one("#otp-uri").attrs['value']
-    return parse.parse_qs(parse.urlparse(otpuri).query)['secret'][0]
+    return otp_secret_from_uri(page.select_one("#otp-uri").attrs['value'])
+
+
+def otp_secret_from_uri(uri):
+    return parse.parse_qs(parse.urlparse(uri).query)['secret'][0]
 
 
 def get_otp(secret):
