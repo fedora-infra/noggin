@@ -119,12 +119,32 @@ def user_settings_keys(ipa, username):
     )
 
 
-@app.route('/user/<username>/settings/otp/')
+@app.route('/user/<username>/settings/otp/', methods=['GET', 'POST'])
 @with_ipa(app, session)
 @require_self
 def user_settings_otp(ipa, username):
     addotpform = UserSettingsAddOTPForm()
     user = User(user_or_404(ipa, username))
+
+    if addotpform.validate_on_submit():
+        username = session.get('noggin_username')
+        try:
+            maybe_ipa_login(app, session, username, addotpform.password.data)
+            result = ipa.otptoken_add(
+                ipatokenowner=username,
+                ipatokenotpalgorithm='sha512',
+                description=addotpform.description.data,
+            )
+            session['otp_uri'] = result['uri']
+        except python_freeipa.exceptions.InvalidSessionPassword:
+            addotpform.password.errors.append("Incorrect password")
+        except python_freeipa.exceptions.FreeIPAError as e:
+            app.logger.error(
+                f'An error happened while creating an OTP token for user {username}: {e.message}'
+            )
+            addotpform.errors['non_field_errors'] = ['Cannot create the token.']
+        else:
+            return redirect(url_for('user_settings_otp', username=username))
 
     otp_uri = session.get('otp_uri')
     session['otp_uri'] = None
@@ -144,38 +164,6 @@ def user_settings_otp(ipa, username):
         tokens=tokens,
         otp_uri=otp_uri,
     )
-
-
-@app.route('/user/<username>/settings/otp/add/', methods=['POST'])
-@with_ipa(app, session)
-@require_self
-def user_settings_otp_add(ipa, username):
-    form = UserSettingsAddOTPForm()
-
-    if form.validate_on_submit():
-        username = session.get('noggin_username')
-        description = form.description.data
-        try:
-            maybe_ipa_login(app, session, username, form.password.data)
-            result = ipa.otptoken_add(
-                ipatokenowner=username,
-                ipatokenotpalgorithm='sha512',
-                description=description,
-            )
-            session['otp_uri'] = result['uri']
-        except python_freeipa.exceptions.InvalidSessionPassword:
-            flash('incorrect password', 'danger')
-        except python_freeipa.exceptions.FreeIPAError as e:
-            flash('Cannot create the token.', 'danger')
-            app.logger.error(
-                f'An error happened while creating an OTP token for user {username}: {e.message}'
-            )
-
-    for field_errors in form.errors.values():
-        for error in field_errors:
-            flash(error, 'danger')
-
-    return redirect(url_for('user_settings_otp', username=username))
 
 
 @app.route('/user/<username>/settings/otp/disable/', methods=['POST'])
