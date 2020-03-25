@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from flask import flash, redirect, render_template, session, url_for
 import python_freeipa
 
@@ -134,7 +136,14 @@ def user_settings_otp(ipa, username):
                 ipatokenotpalgorithm='sha512',
                 description=addotpform.description.data,
             )
-            session['otp_uri'] = result['uri']
+            uri = urlparse(result["uri"])
+            # Use the provided description in the token, so it shows up in the user's app instead of
+            # the token's UUID
+            principal = uri.path.split(":", 1)[0]
+            new_uri = uri._replace(
+                path=f"{principal.lower()}:{addotpform.description.data}"
+            )
+            session['otp_uri'] = new_uri.geturl()
         except python_freeipa.exceptions.InvalidSessionPassword:
             addotpform.password.errors.append("Incorrect password")
         except python_freeipa.exceptions.FreeIPAError as e:

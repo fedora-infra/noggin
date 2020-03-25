@@ -40,7 +40,7 @@ def extract_otp_secret(page):
     """
     Takes a page with an OTP QR code on it, and returns the secret
     """
-    otpuri = page.select("pre#otpuri")[0].attrs['data-otpuri']
+    otpuri = page.select_one("#otp-uri").attrs['value']
     return parse.parse_qs(parse.urlparse(otpuri).query)['secret'][0]
 
 

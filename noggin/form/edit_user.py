@@ -70,12 +70,13 @@ class UserSettingsKeysForm(FlaskForm):
 
 class UserSettingsAddOTPForm(FlaskForm):
     description = StringField(
-        'Description',
+        'Token description',
         validators=[DataRequired(message='Description must not be empty')],
     )
 
     password = PasswordField(
-        'Password', validators=[DataRequired(message='You must provide a password')]
+        'Enter your current password',
+        validators=[DataRequired(message='You must provide a password')],
     )
 
 
