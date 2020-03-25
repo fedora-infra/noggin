@@ -13,16 +13,16 @@
         <div class="card">
           <ul class="card-header nav nav-tabs pb-0" role="tablist">
             <li class="nav-item">
-              <a class="nav-link {{'active' if select == 'profile'}}" href="{{ url_for('user_settings_profile', username=user.username) }}">Profile</a>
+              <a class="nav-link {{'active' if activetab == 'profile'}}" href="{{ url_for('user_settings_profile', username=user.username) }}">Profile</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {{'active' if select == 'keys'}}" href="{{ url_for('user_settings_keys', username=user.username) }}">SSH &amp; GPG Keys</a>
+              <a class="nav-link {{'active' if activetab == 'keys'}}" href="{{ url_for('user_settings_keys', username=user.username) }}">SSH &amp; GPG Keys</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {{'active' if select == 'otp'}}" href="{{ url_for('user_settings_otp', username=user.username) }}">OTP</a>
+              <a class="nav-link {{'active' if activetab == 'otp'}}" href="{{ url_for('user_settings_otp', username=user.username) }}">OTP</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {{'active' if select == 'password'}}" href="{{ url_for('user_settings_password', username=user.username) }}">Password</a>
+              <a class="nav-link {{'active' if activetab == 'password'}}" href="{{ url_for('user_settings_password', username=user.username) }}">Password</a>
             </li>
           </ul>
           {% block settings_content %}

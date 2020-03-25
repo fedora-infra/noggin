@@ -85,7 +85,7 @@ def user_settings_profile(ipa, username):
             return result
 
     return render_template(
-        'user-settings-profile.html', user=user, form=form, select="profile"
+        'user-settings-profile.html', user=user, form=form, activetab="profile"
     )
 
 
@@ -115,7 +115,7 @@ def user_settings_keys(ipa, username):
             form.sshpubkeys.append_entry()
 
     return render_template(
-        'user-settings-keys.html', user=user, form=form, select="keys"
+        'user-settings-keys.html', user=user, form=form, activetab="keys"
     )
 
 
@@ -140,7 +140,7 @@ def user_settings_otp(ipa, username):
         'user-settings-otp.html',
         addotpform=addotpform,
         user=user,
-        select="otp",
+        activetab="otp",
         tokens=tokens,
         otp_uri=otp_uri,
     )
