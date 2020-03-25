@@ -127,7 +127,6 @@ def user_settings_otp(ipa, username):
     user = User(user_or_404(ipa, username))
 
     if addotpform.validate_on_submit():
-        username = session.get('noggin_username')
         try:
             maybe_ipa_login(app, session, username, addotpform.password.data)
             result = ipa.otptoken_add(
@@ -173,9 +172,7 @@ def user_settings_otp_disable(ipa, username):
     form = UserSettingsDisableOTPForm()
 
     if form.validate_on_submit():
-        username = session.get('noggin_username')
         token = form.token.data
-
         try:
             ipa.otptoken_mod(ipatokenuniqueid=token, ipatokendisabled=True)
         except python_freeipa.exceptions.BadRequest as e:
