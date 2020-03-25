@@ -23,14 +23,15 @@
 <div class="card-body">
   <div class="d-flex">
       <h5 id="pageheading">OTP Tokens</h5>
-      <div class="dropdown ml-auto">
+      <div class="dropdown ml-auto {% if addotpform.errors %}show{% endif %}">
         <div class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">Add OTP Token</div>
-        <div class="dropdown-menu dropdown-menu-right" style="min-width:20em;">
-            <form action="{{ url_for('user_settings_otp_add', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
+        <div class="dropdown-menu dropdown-menu-right {% if addotpform.errors %}show{% endif %}" style="min-width:20em;">
+            <form action="{{ url_for('user_settings_otp', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <div class="form-group">{{ macros.with_errors(addotpform.description, tabindex="2")}}</div>
               <div class="form-group">{{ macros.with_errors(addotpform.password, tabindex="3", placeholder="Password or Password + One-Time-Password")}}</div>
-              <button class="btn btn-primary" id="submit" type="submit" tabindex="14">Submit</button>
+              <div>{{ macros.non_field_errors(addotpform) }}</div>
+              <button class="btn btn-primary" id="submit" type="submit" tabindex="4">Generate</button>
             </form>
           </div>
       </div>
