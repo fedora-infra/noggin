@@ -6,16 +6,15 @@ from .ipa import Client
 
 class IPAAdmin(object):
 
-    __WRAPPED_METHODS = (
-        "user_add",
+    __WRAPPED_METHODS = ("user_add", "user_show", "user_mod", "group_add_member")
+    __WRAPPED_METHODS_TESTING = (
         "user_del",
-        "user_show",
-        "user_mod",
         "group_add",
         "group_del",
-        "group_add_member",
         "group_add_member_manager",
         "pwpolicy_add",
+        "otptoken_add",
+        "otptoken_del",
     )
 
     def __init__(self, app):
@@ -47,6 +46,9 @@ class IPAAdmin(object):
         return wrapper
 
     def __getattr__(self, name):
-        if name in self.__WRAPPED_METHODS:
+        wrapped_methods = list(self.__WRAPPED_METHODS)
+        if self.__app.config['TESTING']:  # pragma: no cover
+            wrapped_methods.extend(self.__WRAPPED_METHODS_TESTING)
+        if name in wrapped_methods:
             return self.__wrap_method(name)
         raise AttributeError(name)
