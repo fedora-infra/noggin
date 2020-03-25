@@ -59,7 +59,7 @@ class Client(IPAClient):
         :type ipatokenowner: string
         :param ipatokenotpalgorithm: the token algorithim
         :type ipatokenotpalgorithm: string
-        :param description: Groups to add.
+        :param description: the token's description.
         :type description: string
         """
         params = {
@@ -77,7 +77,7 @@ class Client(IPAClient):
         :param ipatokenuniqueid: the unique id of the token
         :type ipatokenuniqueid: string
         :param ipatokendisabled: whether it should be disabled
-        :type ipatokendisabled: string
+        :type ipatokendisabled: boolean
         """
         params = {
             'ipatokenuniqueid': ipatokenuniqueid,
@@ -95,6 +95,17 @@ class Client(IPAClient):
         """
         params = {'ipatokenuniqueid': ipatokenuniqueid}
         data = self._request('otptoken_del', [], params)
+        return data['result']
+
+    def otptoken_find(self, ipatokenowner=None):
+        """
+        Find otptokens for a user.
+
+        :param ipatokenowner: the username
+        :type ipatokenowner: string
+        """
+        params = {'ipatokenowner': ipatokenowner}
+        data = self._request('otptoken_find', [], params)
         return data['result']
 
     def batch(self, methods=None, raise_errors=True):

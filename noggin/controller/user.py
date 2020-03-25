@@ -148,12 +148,8 @@ def user_settings_otp(ipa, username):
     otp_uri = session.get('otp_uri')
     session['otp_uri'] = None
 
-    tokens = [
-        OTPToken(t)
-        for t in ipa._request(
-            'otptoken_find', [], {'ipatokenowner': username, 'all': True}
-        )['result']
-    ]
+    tokens = [OTPToken(t) for t in ipa.otptoken_find(ipatokenowner=username)]
+    tokens.sort(key=lambda t: t.description)
 
     return render_template(
         'user-settings-otp.html',
