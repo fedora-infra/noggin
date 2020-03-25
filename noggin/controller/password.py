@@ -91,7 +91,7 @@ def user_settings_password(ipa, username):
         'user-settings-password.html',
         user=user,
         password_reset_form=form,
-        select="password",
+        activetab="password",
     )
 
 
