@@ -15,6 +15,7 @@ class IPAAdmin(object):
         "pwpolicy_add",
         "otptoken_add",
         "otptoken_del",
+        "otptoken_find",
     )
 
     def __init__(self, app):
