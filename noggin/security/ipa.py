@@ -140,9 +140,14 @@ class Client(IPAClient):
         url = "https://" + self._host + "/ipa/session/sync_token"
         try:
             response = self._session.post(url=url, data=data, verify=self._verify_ssl)
+            if response.ok and "Token sync rejected" not in response.text:
+                return response
+            else:
+                raise BadRequest(
+                    message="The username, password or token codes are not correct."
+                )
         except RequestException:
             raise BadRequest(message="Something went wrong trying to sync OTP token.")
-        return response
 
     def batch(self, methods=None, raise_errors=True):
         """
