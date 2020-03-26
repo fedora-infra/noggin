@@ -52,7 +52,7 @@ def test_password_changes_wrong_user(client, logged_in_dummy_user):
     )
     assert_redirects_with_flash(
         result,
-        expected_url="/",
+        expected_url="/user/admin/",
         expected_message="You do not have permission to edit this account.",
         expected_category="danger",
     )
