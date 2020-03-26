@@ -44,24 +44,25 @@ def handle_login_form(form):
 def otp_sync():
     form = SyncTokenForm()
     if form.validate_on_submit():
-        try:
-            ipa = untouched_ipa_client(app)
-            ipa.otptoken_sync(
-                user=form.username.data,
-                password=form.password.data,
-                first_code=form.first_code.data,
-                second_code=form.second_code.data,
-                token=form.token.data,
-            )
+        with handle_form_errors(form):
+            try:
+                ipa = untouched_ipa_client(app)
+                ipa.otptoken_sync(
+                    user=form.username.data,
+                    password=form.password.data,
+                    first_code=form.first_code.data,
+                    second_code=form.second_code.data,
+                    token=form.token.data,
+                )
 
-            flash('Token successfully synchronized', category='success')
-            return redirect(url_for('root'))
+                flash('Token successfully synchronized', category='success')
+                return redirect(url_for('root'))
 
-        except python_freeipa.exceptions.BadRequest as e:
-            app.logger.error(
-                f'An error {e.__class__.__name__} happened while syncing a token for user '
-                f'{form.username}: {e}'
-            )
-            raise FormError("non_field_errors", e.message)
+            except python_freeipa.exceptions.BadRequest as e:
+                app.logger.error(
+                    f'An error {e.__class__.__name__} happened while syncing a token for user '
+                    f'{form.username}: {e}'
+                )
+                raise FormError("non_field_errors", e.message)
 
     return render_template('sync-token.html', sync_form=form)
