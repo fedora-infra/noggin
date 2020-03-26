@@ -1,7 +1,13 @@
 from cryptography.fernet import Fernet
 import python_freeipa
 from python_freeipa.client_legacy import ClientLegacy as IPAClient
-from python_freeipa.exceptions import ValidationError, BadRequest
+from python_freeipa.exceptions import (
+    ValidationError,
+    BadRequest,
+    FreeIPAError,
+    PWChangeInvalidPassword,
+    PWChangePolicyError,
+)
 import random
 
 
@@ -153,6 +159,56 @@ class Client(IPAClient):
         params.update(kwargs)
         data = self._request('pwpolicy_add', group, params)
         return data['result']
+
+    def change_password(self, username, new_password, old_password, otp=None):
+        """
+        Override change_password to allow an OTP token to be provided.
+
+        :param username: User login (username)
+        :type username: string
+        :param new_password: New password for the user
+        :type new_password: string
+        :param old_password: Users old password
+        :type old_password: string
+        :param otp: Users OTP token
+        :type otp: string
+        """
+
+        password_url = '{0}/session/change_password'.format(self._base_url)
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'text/plain',
+        }
+        data = {
+            'user': username,
+            'new_password': new_password,
+            'old_password': old_password,
+        }
+        if otp:
+            data['otp'] = otp
+        response = self._session.post(
+            password_url, headers=headers, data=data, verify=self._verify_ssl
+        )
+
+        if not response.ok:
+            raise FreeIPAError(message=response.text, code=response.status_code)
+
+        pwchange_result = response.headers.get('X-IPA-Pwchange-Result', None)
+        if pwchange_result != 'ok':
+            if pwchange_result == 'invalid-password':
+                raise PWChangeInvalidPassword(
+                    message=response.text, code=response.status_code
+                )
+            elif pwchange_result == 'policy-error':
+                policy_error = response.headers.get('X-IPA-Pwchange-Policy-Error', None)
+                raise PWChangePolicyError(
+                    message=response.text,
+                    code=response.status_code,
+                    policy_error=policy_error,
+                )
+            else:
+                raise FreeIPAError(message=response.text, code=response.status_code)
+        return response
 
 
 # Construct an IPA client from app config, but don't attempt to log in with it

@@ -7,6 +7,9 @@
     {{ field.label }}
   {% endif %}
   {{ field(class=css_class, **kwargs) }}
+  {% if field.description %}
+    <small class="form-text text-muted">{{ field.description }}</small>
+  {% endif %}
   {% if field.errors %}
     <div class="invalid-feedback">
       {{ field.errors|map('escape')|join(' ') }}
