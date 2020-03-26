@@ -8,7 +8,13 @@ import jwt
 from noggin import app, ipa_admin, mailer
 from noggin.security.ipa import untouched_ipa_client, maybe_ipa_session
 from noggin.representation.user import User
-from noggin.utility import with_ipa, user_or_404, FormError, handle_form_errors
+from noggin.utility import (
+    with_ipa,
+    user_or_404,
+    FormError,
+    handle_form_errors,
+    require_self,
+)
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.form.password_reset import (
     PasswordResetForm,
@@ -23,10 +29,11 @@ def _validate_change_pw_form(form, username, ipa=None):
 
     current_password = form.current_password.data
     password = form.password.data
+    otp = form.otp.data
 
     res = None
     try:
-        res = ipa.change_password(username, password, current_password)
+        res = ipa.change_password(username, password, current_password, otp)
     except python_freeipa.exceptions.PWChangeInvalidPassword:
         form.current_password.errors.append(
             "The old password or username is not correct"
@@ -73,12 +80,8 @@ def password_reset():
 
 @app.route('/user/<username>/settings/password', methods=['GET', 'POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_password(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('root'))
-
     user = User(user_or_404(ipa, username))
     form = PasswordResetForm()
 
