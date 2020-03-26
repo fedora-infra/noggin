@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 from noggin.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_generic_error,
+    extract_otp_secret,
+    get_otp,
 )
 
 
@@ -363,16 +365,21 @@ def test_user_settings_otp_disable(client, logged_in_dummy_user):
     """Test deleting an otptoken"""
 
     # add an OTP Token
-    client.post(
+    result = client.post(
         '/user/dummy/settings/otp/add/',
         data={"description": "token", "password": "dummy_password"},
         follow_redirects=True,
     )
 
+    otp_secret = extract_otp_secret(BeautifulSoup(result.data, 'html.parser'))
+
     # add another OTP Token
     result = client.post(
         '/user/dummy/settings/otp/add/',
-        data={"description": "pants token", "password": "dummy_password"},
+        data={
+            "description": "pants token",
+            "password": f"dummy_password{get_otp(otp_secret)}",
+        },
         follow_redirects=True,
     )
 
@@ -559,11 +566,15 @@ def test_user_settings_otp_delete(client, logged_in_dummy_user):
         data={"description": "token", "password": "dummy_password"},
         follow_redirects=True,
     )
+    otp_secret = extract_otp_secret(BeautifulSoup(result.data, 'html.parser'))
 
     # add another OTP Token
     result = client.post(
         '/user/dummy/settings/otp/add/',
-        data={"description": "pants token", "password": "dummy_password"},
+        data={
+            "description": "pants token",
+            "password": f"dummy_password{get_otp(otp_secret)}",
+        },
         follow_redirects=True,
     )
 

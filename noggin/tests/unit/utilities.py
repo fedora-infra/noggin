@@ -1,5 +1,8 @@
 from bs4 import BeautifulSoup
 from flask import get_flashed_messages
+from urllib import parse
+import hashlib
+import pyotp
 
 
 def assert_redirects_with_flash(
@@ -31,3 +34,19 @@ def assert_form_generic_error(response, expected_message):
     error_message = page.select_one("#formerrors .text-danger")
     assert error_message is not None
     assert error_message.get_text(strip=True) == expected_message
+
+
+def extract_otp_secret(page):
+    """
+    Takes a page with an OTP QR code on it, and returns the secret
+    """
+    otpuri = page.select("pre#otpuri")[0].attrs['data-otpuri']
+    return parse.parse_qs(parse.urlparse(otpuri).query)['secret'][0]
+
+
+def get_otp(secret):
+    """
+    Return an TOTP OTP from the given secret
+    """
+    totp = pyotp.TOTP(secret, 6, hashlib.sha512)
+    return totp.now()
