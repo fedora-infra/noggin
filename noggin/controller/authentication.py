@@ -1,9 +1,11 @@
-from flask import flash, redirect, session, url_for
+from flask import flash, redirect, session, url_for, render_template
 import python_freeipa
 
 from noggin import app
 from noggin.security.ipa import maybe_ipa_login
 from noggin.utility import FormError
+from noggin.form.sync_token import SyncTokenForm
+from noggin.security.ipa import untouched_ipa_client
 
 
 def handle_login_form(form):
@@ -36,3 +38,30 @@ def handle_login_form(form):
 
     flash(f'Welcome, {username}!', 'success')
     return redirect(url_for('user', username=username))
+
+
+@app.route('/otp/sync/', methods=['GET', 'POST'])
+def otp_sync():
+    form = SyncTokenForm()
+    if form.validate_on_submit():
+        try:
+            ipa = untouched_ipa_client(app)
+            ipa.otptoken_sync(
+                user=form.username.data,
+                password=form.password.data,
+                first_code=form.first_code.data,
+                second_code=form.second_code.data,
+                token=form.token.data,
+            )
+
+            flash('Token successfully synchronized', category='success')
+            return redirect(url_for('root'))
+
+        except python_freeipa.exceptions.BadRequest as e:
+            app.logger.error(
+                f'An error {e.__class__.__name__} happened while syncing a token for user '
+                f'{form.username}: {e}'
+            )
+            raise FormError("non_field_errors", e.message)
+
+    return render_template('sync-token.html', sync_form=form)

@@ -263,7 +263,7 @@ def test_otp_sync_rejected(client, dummy_user_with_otp):
 @pytest.mark.vcr()
 def test_otp_sync_success(client, dummy_user_with_otp):
     """Test synchronising OTP token"""
-    with mock.patch("noggin.security.ipa.Client.otptoken_sync") as method:
+    with mock.patch("requests.sessions.Session.post") as method:
         method.return_value.status_code = 200
         method.return_value.text = "All good!"
         result = client.post(

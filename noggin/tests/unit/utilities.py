@@ -33,7 +33,6 @@ def assert_form_generic_error(response, expected_message):
     page = BeautifulSoup(response.data, 'html.parser')
     error_message = page.select_one("#formerrors .text-danger")
     assert error_message is not None
-    print(error_message)
     assert error_message.get_text(strip=True) == expected_message
 
 
