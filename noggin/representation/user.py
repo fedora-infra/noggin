@@ -63,3 +63,7 @@ class User(Representation):
     @property
     def rhbz_mail(self):
         return self._attr('fasrhbzemail')
+
+    @property
+    def last_password_change(self):
+        return self._attr('krblastpwdchange')

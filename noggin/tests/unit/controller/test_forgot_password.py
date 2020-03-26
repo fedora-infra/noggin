@@ -9,26 +9,22 @@ from bs4 import BeautifulSoup
 from flask import current_app
 
 from noggin import ipa_admin, mailer
+from noggin.representation.user import User
 from noggin.security.ipa import untouched_ipa_client
-from noggin.utility.password_reset import PasswordResetLock
+from noggin.utility.password_reset import PasswordResetLock, JWTToken
 from noggin.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_field_error,
     assert_form_generic_error,
+    get_otp,
+    otp_secret_from_uri,
 )
 
 
 @pytest.fixture
 def token_for_dummy_user(dummy_user):
-    last_change = ipa_admin.user_show("dummy")["krblastpwdchange"]
-    return str(
-        jwt.encode(
-            {"username": "dummy", "last_change": last_change},
-            current_app.config["SECRET_KEY"],
-            algorithm="HS256",
-        ),
-        "ascii",
-    )
+    token = JWTToken.from_user(User(ipa_admin.user_show("dummy")))
+    return token.as_string()
 
 
 @pytest.fixture
@@ -277,4 +273,57 @@ def test_change_post_generic_error(
                 data={"password": "newpassword", "password_confirm": "newpassword"},
             )
     assert_form_generic_error(result, 'Could not change password, please try again.')
+    patched_lock_active["delete"].assert_not_called()
     logger.error.assert_called_once()
+
+
+@pytest.mark.vcr()
+def test_change_post_with_otp(
+    client, dummy_user, dummy_user_with_otp, token_for_dummy_user, patched_lock_active
+):
+    otp = get_otp(otp_secret_from_uri(dummy_user_with_otp.uri))
+    result = client.post(
+        f'/forgot-password/change?token={token_for_dummy_user}',
+        data={"password": "newpassword", "password_confirm": "newpassword", "otp": otp},
+    )
+    patched_lock_active["delete"].assert_called()
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Your password has been changed.",
+        expected_category="success",
+    )
+
+
+@pytest.mark.vcr()
+def test_change_post_password_with_otp_not_given(
+    client, dummy_user, dummy_user_with_otp, token_for_dummy_user, patched_lock_active
+):
+    with mock.patch("noggin.controller.password.app.logger") as logger:
+        result = client.post(
+            f'/forgot-password/change?token={token_for_dummy_user}',
+            data={"password": "42", "password_confirm": "42"},
+        )
+    assert_form_field_error(result, "otp", "Incorrect value.")
+    patched_lock_active["delete"].assert_not_called()
+    logger.info.assert_called_with(
+        "Password for dummy was changed to a random string because the OTP token "
+        "they provided was wrong."
+    )
+
+
+@pytest.mark.vcr()
+def test_change_post_password_with_otp_wrong_value(
+    client, dummy_user, dummy_user_with_otp, token_for_dummy_user, patched_lock_active
+):
+    with mock.patch("noggin.controller.password.app.logger") as logger:
+        result = client.post(
+            f'/forgot-password/change?token={token_for_dummy_user}',
+            data={"password": "42", "password_confirm": "42", "otp": "42"},
+        )
+    assert_form_field_error(result, "otp", "Incorrect value.")
+    patched_lock_active["delete"].assert_not_called()
+    logger.info.assert_called_with(
+        "Password for dummy was changed to a random string because the OTP token "
+        "they provided was wrong."
+    )
