@@ -36,7 +36,7 @@ class ButtonWidget:
         # CSS classes
         classes = ["btn"]
         if "color" in kwargs:
-            classes.append("btn-{}".format(kwargs["color"]))
+            classes.append("btn-{}".format(kwargs.pop("color")))
         classes.append(kwargs.get("class"))
         kwargs["class"] = " ".join(c for c in classes if c)
         # Rendering

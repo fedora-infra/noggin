@@ -242,7 +242,7 @@ def test_change_post_password_too_short(
         )
     assert_redirects_with_flash(
         result,
-        expected_url="/login",
+        expected_url="/",
         expected_message=(
             'Your password has been changed, but it does not comply '
             'with the policy (Constraint violation: Password is too short) and has thus '

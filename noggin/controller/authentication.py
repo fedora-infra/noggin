@@ -35,3 +35,4 @@ def handle_login_form(form):
         raise FormError("non_field_errors", "Could not log in to the IPA server.")
 
     flash(f'Welcome, {username}!', 'success')
+    return redirect(url_for('user', username=username))

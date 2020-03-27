@@ -71,7 +71,7 @@ def handle_register_form(form):
         )
         # Send them to the login page, they will have to change their password
         # after login.
-        return redirect(url_for('login'))
+        return redirect(url_for('root'))
     except python_freeipa.exceptions.FreeIPAError as e:
         app.logger.error(
             f'An unhandled error {e.__class__.__name__} happened while changing initial '
@@ -84,9 +84,10 @@ def handle_register_form(form):
             f'password ({e.message}). You may need to change it after logging in.',
             'warning',
         )
-        return redirect(url_for('login'))
+        return redirect(url_for('root'))
 
     flash(
         'Congratulations, you now have an account! Go ahead and sign in to proceed.',
         'success',
     )
+    return redirect(url_for('root'))

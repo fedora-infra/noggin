@@ -28,13 +28,11 @@ def root():
 
     if login_form.validate_on_submit():
         with handle_form_errors(login_form):
-            handle_login_form(login_form)
-            return redirect(url_for('user', username=login_form.username.data))
+            return handle_login_form(login_form)
 
     if register_form.validate_on_submit():
         with handle_form_errors(register_form):
-            handle_register_form(register_form)
-            return redirect(url_for('root'))
+            return handle_register_form(register_form)
 
     return render_template(
         'index.html',
