@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 
-from flask import flash, redirect, render_template, session, url_for
+from flask import flash, redirect, render_template, session, url_for, Markup
 import python_freeipa
 
 from noggin import app
@@ -41,7 +41,7 @@ def user(ipa, username):
     )
 
 
-def _user_mod(ipa, form, username, details):
+def _user_mod(ipa, form, username, details, redirect_to):
     with handle_form_errors(form):
         try:
             ipa.user_mod(username, **details)
@@ -53,8 +53,14 @@ def _user_mod(ipa, form, username, details):
                     f'An error happened while editing user {username}: {e.message}'
                 )
                 raise FormError("non_field_errors", e.message)
-        flash('Profile has been succesfully updated.', 'success')
-        return redirect(url_for('user', username=username))
+        flash(
+            Markup(
+                f'Profile Updated: <a href=\"{url_for("user", username=username)}\">'
+                'view your profile</a>'
+            ),
+            'success',
+        )
+        return redirect(url_for(redirect_to, username=username))
 
 
 @app.route('/user/<username>/settings/profile/', methods=['GET', 'POST'])
@@ -82,6 +88,7 @@ def user_settings_profile(ipa, username):
                 'fasgitlabusername': form.gitlab.data.lstrip('@'),
                 'fasrhbzemail': form.rhbz_mail.data,
             },
+            "user_settings_profile",
         )
         if result:
             return result
@@ -104,6 +111,7 @@ def user_settings_keys(ipa, username):
             form,
             username,
             {'ipasshpubkey': form.sshpubkeys.data, 'fasgpgkeyid': form.gpgkeys.data},
+            "user_settings_keys",
         )
         if result:
             return result

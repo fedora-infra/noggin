@@ -15,8 +15,12 @@ def assert_redirects_with_flash(
     messages = get_flashed_messages(with_categories=True)
     assert len(messages) == 1
     category, message = messages[0]
-    assert message == expected_message
-    assert category == expected_category
+    assert (
+        message == expected_message
+    ), f"\nExpected message: {expected_message}\nActual message:   {message}"
+    assert (
+        category == expected_category
+    ), f"\nExpected category: {expected_category}\nActual category:   {category}"
 
 
 def assert_form_field_error(response, field_name, expected_message):
