@@ -75,8 +75,8 @@ def test_user_edit_post(client, logged_in_dummy_user):
     result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS)
     assert_redirects_with_flash(
         result,
-        expected_url="/user/dummy/",
-        expected_message="Profile has been succesfully updated.",
+        expected_url="/user/dummy/settings/profile/",
+        expected_message="Profile Updated: <a href=\"/user/dummy/\">view your profile</a>",
         expected_category="success",
     )
 
@@ -142,8 +142,8 @@ def test_user_settings_keys_post(client, logged_in_dummy_user):
     result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
     assert_redirects_with_flash(
         result,
-        expected_url="/user/dummy/",
-        expected_message="Profile has been succesfully updated.",
+        expected_url="/user/dummy/settings/keys/",
+        expected_message="Profile Updated: <a href=\"/user/dummy/\">view your profile</a>",
         expected_category="success",
     )
 
