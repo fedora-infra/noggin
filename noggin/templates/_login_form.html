@@ -1,5 +1,5 @@
 {% import '_form_macros.html' as macros %}
-<form action="{{ url_for('login') }}" method="post" novalidate>
+<form action="{{ url_for('root') }}" method="post" novalidate>
   {{ login_form.csrf_token }}
   <div class="card-body">
     <div class="form-group">
@@ -16,6 +16,6 @@
   </div>
   <div class="card-footer d-flex justify-content-between">
     <div>{{ macros.non_field_errors(login_form) }}</div>
-    <button class="btn btn-primary" id="submit" type="submit" tabindex="3">Log In</button>
+    {{ login_form.submit(color="primary", tabindex="3") }}
   </div>
 </form>
