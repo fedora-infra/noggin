@@ -12,11 +12,11 @@ class SyncTokenForm(FlaskForm):
         'Password', validators=[DataRequired(message='You must provide a password')]
     )
 
-    first_code = PasswordField(
+    first_code = StringField(
         'First OTP', validators=[DataRequired(message='You must provide a first code')]
     )
 
-    second_code = PasswordField(
+    second_code = StringField(
         'Second OTP',
         validators=[DataRequired(message='You must provide a second code')],
     )
