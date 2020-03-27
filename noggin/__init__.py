@@ -1,6 +1,7 @@
 from flask import Flask, Blueprint
 from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
+from whitenoise import WhiteNoise
 
 from noggin.security.ipa_admin import IPAAdmin
 
@@ -30,6 +31,15 @@ app.register_blueprint(blueprint)
 
 # Flask-Mail
 mailer = Mail(app)
+
+# Whitenoise for static files
+app.wsgi_app = WhiteNoise(
+    app.wsgi_app, root=f"{app.root_path}/static", prefix="/static"
+)
+app.wsgi_app.add_files(
+    f"{app.root_path}/themes/{themename}/static/", prefix="/theme/static"
+)
+
 
 # Set the version
 try:
