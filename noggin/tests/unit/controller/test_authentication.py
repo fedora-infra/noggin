@@ -1,5 +1,6 @@
 from unittest import mock
 
+import requests
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
@@ -181,3 +182,103 @@ def test_login_expired_password(client, dummy_user_expired_password):
     # We are not logged in
     assert "noggin_session" not in session
     assert "noggin_username" not in session
+
+
+@pytest.mark.vcr()
+def test_otp_sync_no_username(client, dummy_user):
+    """Test not giving a username"""
+    result = client.post(
+        '/otp/sync/',
+        data={
+            "password": "dummy_password",
+            "first_code": "123456",
+            "second_code": "234567",
+        },
+        follow_redirects=False,
+    )
+    assert_form_field_error(
+        result, field_name="username", expected_message="You must provide a user name"
+    )
+
+
+@pytest.mark.vcr()
+def test_otp_sync_invalid_codes(client, dummy_user_with_otp):
+    """Test synchronising OTP token with madeup codes"""
+    result = client.post(
+        '/otp/sync/',
+        data={
+            "username": "dummy",
+            "password": "dummy_password",
+            "first_code": "123456",
+            "second_code": "234567",
+        },
+        follow_redirects=False,
+    )
+    assert_form_generic_error(
+        result, "The username, password or token codes are not correct."
+    )
+
+
+@pytest.mark.vcr()
+def test_otp_sync_http_error(client, dummy_user_with_otp):
+    """Test synchronising OTP token with mocked http error"""
+    with mock.patch("noggin.controller.authentication.app.logger") as logger:
+        with mock.patch("requests.sessions.Session.post") as method:
+            method.side_effect = requests.exceptions.RequestException
+            result = client.post(
+                '/otp/sync/',
+                data={
+                    "username": "dummy",
+                    "password": "dummy_password",
+                    "first_code": "123456",
+                    "second_code": "234567",
+                },
+                follow_redirects=False,
+            )
+    logger.error.assert_called_once()
+    assert_form_generic_error(result, "Something went wrong trying to sync OTP token.")
+
+
+@pytest.mark.vcr()
+def test_otp_sync_rejected(client, dummy_user_with_otp):
+    """Test synchronising OTP token when freeipa rejects the request"""
+    with mock.patch("requests.post") as method:
+        method.return_value.status_code = 200
+        method.return_value.text = "Token sync rejected"
+        result = client.post(
+            '/otp/sync/',
+            data={
+                "username": "dummy",
+                "password": "dummy_password",
+                "first_code": "123456",
+                "second_code": "234567",
+            },
+            follow_redirects=False,
+        )
+    assert_form_generic_error(
+        result, "The username, password or token codes are not correct."
+    )
+
+
+@pytest.mark.vcr()
+def test_otp_sync_success(client, dummy_user_with_otp):
+    """Test synchronising OTP token"""
+    with mock.patch("requests.sessions.Session.post") as method:
+        method.return_value.status_code = 200
+        method.return_value.text = "All good!"
+        result = client.post(
+            '/otp/sync/',
+            data={
+                "username": "dummy",
+                "password": "dummy_password",
+                "first_code": "123456",
+                "second_code": "234567",
+            },
+            follow_redirects=False,
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Token successfully synchronized",
+        expected_category="success",
+    )

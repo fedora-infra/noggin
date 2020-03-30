@@ -1,4 +1,5 @@
 from cryptography.fernet import Fernet
+from requests import RequestException
 import python_freeipa
 from python_freeipa.client_legacy import ClientLegacy as IPAClient
 from python_freeipa.exceptions import (
@@ -113,6 +114,40 @@ class Client(IPAClient):
         params = {'ipatokenowner': ipatokenowner}
         data = self._request('otptoken_find', [], params)
         return data['result']
+
+    def otptoken_sync(self, user, password, first_code, second_code, token=None):
+        """
+        Sync an otptoken for a user.
+
+        :param user: the user to sync the token for
+        :type user: string
+        :param password: the user's password
+        :type password: string
+        :param first_code: the first OTP token
+        :type first_code: string
+        :param second_code: the second OTP token
+        :type second_code: string
+        :param token: the token description (optional)
+        :type token: string
+        """
+        data = {
+            'user': user,
+            'password': password,
+            'first_code': first_code,
+            'second_code': second_code,
+            'token': token,
+        }
+        url = "https://" + self._host + "/ipa/session/sync_token"
+        try:
+            response = self._session.post(url=url, data=data, verify=self._verify_ssl)
+            if response.ok and "Token sync rejected" not in response.text:
+                return response
+            else:
+                raise BadRequest(
+                    message="The username, password or token codes are not correct."
+                )
+        except RequestException:
+            raise BadRequest(message="Something went wrong trying to sync OTP token.")
 
     def batch(self, methods=None, raise_errors=True):
         """
