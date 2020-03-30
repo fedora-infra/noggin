@@ -211,7 +211,7 @@ def forgot_password_change():
             )
             # Send them to the login page, they will have to change their password
             # after login.
-            return redirect(url_for('login'))
+            return redirect(url_for('root'))
         except python_freeipa.exceptions.PWChangeInvalidPassword:
             # The provided OTP was wrong
             app.logger.info(

@@ -29,14 +29,15 @@ def test_register(client, cleanup_dummy_user):
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
     ):
         result = client.post(
-            '/register',
+            '/',
             data={
-                "firstname": "First",
-                "lastname": "Last",
-                "mail": "firstlast@name.org",
-                "username": "dummy",
-                "password": "password",
-                "password_confirm": "password",
+                "register-firstname": "First",
+                "register-lastname": "Last",
+                "register-mail": "firstlast@name.org",
+                "register-username": "dummy",
+                "register-password": "password",
+                "register-password_confirm": "password",
+                "register-submit": "1",
             },
             follow_redirects=True,
         )
@@ -57,19 +58,20 @@ def test_register_short_password(client, cleanup_dummy_user):
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
     ):
         result = client.post(
-            '/register',
+            '/',
             data={
-                "firstname": "First",
-                "lastname": "Last",
-                "mail": "firstlast@name.org",
-                "username": "dummy",
-                "password": "42",
-                "password_confirm": "42",
+                "register-firstname": "First",
+                "register-lastname": "Last",
+                "register-mail": "firstlast@name.org",
+                "register-username": "dummy",
+                "register-password": "42",
+                "register-password_confirm": "42",
+                "register-submit": "1",
             },
         )
     assert_redirects_with_flash(
         result,
-        expected_url="/login",
+        expected_url="/",
         expected_message=(
             'Your account has been created, but the password you chose does not comply '
             'with the policy (Constraint violation: Password is too short) and has thus '
@@ -83,19 +85,20 @@ def test_register_short_password(client, cleanup_dummy_user):
 def test_register_duplicate(client, dummy_user):
     """Register a user that already exists"""
     result = client.post(
-        '/register',
+        '/',
         data={
-            "firstname": "First",
-            "lastname": "Last",
-            "mail": "dummy@dummy.org",
-            "username": "dummy",
-            "password": "password",
-            "password_confirm": "password",
+            "register-firstname": "First",
+            "register-lastname": "Last",
+            "register-mail": "dummy@dummy.org",
+            "register-username": "dummy",
+            "register-password": "password",
+            "register-password_confirm": "password",
+            "register-submit": "1",
         },
     )
     assert_form_field_error(
         result,
-        field_name="username",
+        field_name="register-username",
         expected_message='user with name "dummy" already exists',
     )
 
@@ -104,19 +107,20 @@ def test_register_duplicate(client, dummy_user):
 def test_register_invalid_username(client):
     """Register a user with an invalid username"""
     result = client.post(
-        '/register',
+        '/',
         data={
-            "firstname": "First",
-            "lastname": "Last",
-            "mail": "firstlast@name.org",
-            "username": "this is invalid",
-            "password": "password",
-            "password_confirm": "password",
+            "register-firstname": "First",
+            "register-lastname": "Last",
+            "register-mail": "firstlast@name.org",
+            "register-username": "this is invalid",
+            "register-password": "password",
+            "register-password_confirm": "password",
+            "register-submit": "1",
         },
     )
     assert_form_field_error(
         result,
-        field_name="username",
+        field_name="register-username",
         expected_message='may only include letters, numbers, _, -, . and $',
     )
 
@@ -128,14 +132,15 @@ def test_register_invalid_first_name(client):
             message="invalid first name", code="4242"
         )
         result = client.post(
-            '/register',
+            '/',
             data={
-                "firstname": "This \n is \n invalid",
-                "lastname": "Last",
-                "mail": "firstlast@name.org",
-                "username": "dummy",
-                "password": "password",
-                "password_confirm": "password",
+                "register-firstname": "This \n is \n invalid",
+                "register-lastname": "Last",
+                "register-mail": "firstlast@name.org",
+                "register-username": "dummy",
+                "register-password": "password",
+                "register-password_confirm": "password",
+                "register-submit": "1",
             },
         )
     assert_form_generic_error(result, 'invalid first name')
@@ -145,18 +150,19 @@ def test_register_invalid_first_name(client):
 def test_register_invalid_email(client):
     """Register a user with an invalid email address"""
     result = client.post(
-        '/register',
+        '/',
         data={
-            "firstname": "First",
-            "lastname": "Last",
-            "mail": "firstlast at name dot org",
-            "username": "dummy",
-            "password": "password",
-            "password_confirm": "password",
+            "register-firstname": "First",
+            "register-lastname": "Last",
+            "register-mail": "firstlast at name dot org",
+            "register-username": "dummy",
+            "register-password": "password",
+            "register-password_confirm": "password",
+            "register-submit": "1",
         },
     )
     assert_form_field_error(
-        result, field_name="mail", expected_message='Email must be valid'
+        result, field_name="register-mail", expected_message='Email must be valid'
     )
 
 
@@ -164,17 +170,18 @@ def test_register_invalid_email(client):
 def test_register_empty_email(client):
     """Register a user with an empty email address"""
     result = client.post(
-        '/register',
+        '/',
         data={
-            "firstname": "First",
-            "lastname": "Last",
-            "username": "dummy",
-            "password": "password",
-            "password_confirm": "password",
+            "register-firstname": "First",
+            "register-lastname": "Last",
+            "register-username": "dummy",
+            "register-password": "password",
+            "register-password_confirm": "password",
+            "register-submit": "1",
         },
     )
     assert_form_field_error(
-        result, field_name="mail", expected_message='Email must not be empty'
+        result, field_name="register-mail", expected_message='Email must not be empty'
     )
 
 
@@ -185,14 +192,15 @@ def test_register_generic_error(client):
             message="something went wrong", code="4242"
         )
         result = client.post(
-            '/register',
+            '/',
             data={
-                "firstname": "First",
-                "lastname": "Last",
-                "mail": "firstlast@name.org",
-                "username": "dummy",
-                "password": "password",
-                "password_confirm": "password",
+                "register-firstname": "First",
+                "register-lastname": "Last",
+                "register-mail": "firstlast@name.org",
+                "register-username": "dummy",
+                "register-password": "password",
+                "register-password_confirm": "password",
+                "register-submit": "1",
             },
         )
     assert_form_generic_error(
@@ -214,19 +222,20 @@ def test_register_generic_pwchange_error(client, cleanup_dummy_user):
             UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
         ):
             result = client.post(
-                '/register',
+                '/',
                 data={
-                    "firstname": "First",
-                    "lastname": "Last",
-                    "mail": "firstlast@name.org",
-                    "username": "dummy",
-                    "password": "password",
-                    "password_confirm": "password",
+                    "register-firstname": "First",
+                    "register-lastname": "Last",
+                    "register-mail": "firstlast@name.org",
+                    "register-username": "dummy",
+                    "register-password": "password",
+                    "register-password_confirm": "password",
+                    "register-submit": "1",
                 },
             )
     assert_redirects_with_flash(
         result,
-        expected_url="/login",
+        expected_url="/",
         expected_message=(
             'Your account has been created, but an error occurred while setting your '
             'password (something went wrong). You may need to change it after logging in.'
@@ -237,10 +246,10 @@ def test_register_generic_pwchange_error(client, cleanup_dummy_user):
 
 def test_register_get(client):
     """Display the registration page"""
-    result = client.get('/register')
+    result = client.get('/')
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    forms = page.select("form[action='/register']")
+    forms = page.select("form[action='/']")
     assert len(forms) == 1
 
 
@@ -251,14 +260,15 @@ def test_register_default_values(client, cleanup_dummy_user):
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
     ):
         result = client.post(
-            '/register',
+            '/',
             data={
-                "firstname": "First",
-                "lastname": "Last",
-                "mail": "firstlast@name.org",
-                "username": "dummy",
-                "password": "password",
-                "password_confirm": "password",
+                "register-firstname": "First",
+                "register-lastname": "Last",
+                "register-mail": "firstlast@name.org",
+                "register-username": "dummy",
+                "register-password": "password",
+                "register-password_confirm": "password",
+                "register-submit": "1",
             },
         )
     assert result.status_code == 302

@@ -1,10 +1,11 @@
-from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo, Email
 
+from .base import ModestForm, SubmitButtonField
 
-class RegisterUserForm(FlaskForm):
+
+class RegisterUserForm(ModestForm):
     firstname = StringField(
         'First Name', validators=[DataRequired(message='First name must not be empty')]
     )
@@ -37,3 +38,5 @@ class RegisterUserForm(FlaskForm):
             Email(message='Email must be valid'),
         ],
     )
+
+    submit = SubmitButtonField("Register")
