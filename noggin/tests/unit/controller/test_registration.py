@@ -19,7 +19,23 @@ from noggin.tests.unit.utilities import (
 @pytest.fixture
 def cleanup_dummy_user():
     yield
-    ipa_admin.user_del('dummy')
+    try:
+        ipa_admin.user_del('dummy')
+    except python_freeipa.exceptions.NotFound:
+        pass
+
+
+@pytest.fixture
+def post_data():
+    return {
+        "register-firstname": "First",
+        "register-lastname": "Last",
+        "register-mail": "firstlast@name.org",
+        "register-username": "dummy",
+        "register-password": "password",
+        "register-password_confirm": "password",
+        "register-submit": "1",
+    }
 
 
 @pytest.mark.vcr()
@@ -122,6 +138,40 @@ def test_register_invalid_username(client):
         result,
         field_name="register-username",
         expected_message='may only include letters, numbers, _, -, . and $',
+    )
+
+
+@pytest.mark.parametrize(
+    "field_name,server_name",
+    [
+        ("username", "login"),
+        ("firstname", "first"),
+        ("lastname", "last"),
+        ("password", "password"),
+        ("mail", "email"),
+    ],
+)
+def test_register_field_error(client, post_data, field_name, server_name):
+    """Register a user with fields that the server errors on"""
+    with mock.patch("noggin.controller.registration.ipa_admin") as ipa_admin:
+        ipa_admin.user_add.side_effect = python_freeipa.exceptions.ValidationError(
+            message=f"invalid '{server_name}': this is invalid", code="4242"
+        )
+        result = client.post('/', data=post_data)
+    assert_form_field_error(
+        result, field_name=f"register-{field_name}", expected_message="this is invalid"
+    )
+
+
+def test_register_field_error_unknown(client, post_data):
+    """Register a user with fields that the server errors on, but it's unknown to us"""
+    with mock.patch("noggin.controller.registration.ipa_admin") as ipa_admin:
+        ipa_admin.user_add.side_effect = python_freeipa.exceptions.ValidationError(
+            message=f"invalid 'unknown': this is invalid", code="4242"
+        )
+        result = client.post('/', data=post_data)
+    assert_form_generic_error(
+        result, expected_message="invalid 'unknown': this is invalid"
     )
 
 

@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from flask import flash, redirect, url_for
 from noggin_messages import UserCreateV1
@@ -8,6 +9,32 @@ from noggin import app, ipa_admin
 from noggin.utility.locales import guess_locale
 from noggin.utility import messaging, FormError
 from noggin.security.ipa import untouched_ipa_client
+
+
+# Errors coming from FreeIPA are specified by a field name that is different from our form field
+# name. This dict maps one to the other. See the `cli_name` in
+# https://pagure.io/freeipa/blob/master/f/ipaclient/remote_plugins/2_164/user.py
+IPA_TO_FORM_FIELDS = {
+    "login": "username",
+    "first": "firstname",
+    "last": "lastname",
+    "password": "password",
+    "email": "mail",
+}
+
+
+def _handle_registration_validation_error(username, e):
+    mo = re.match(r"^invalid '([^']+)': (.+)$", e.message)
+    if mo:
+        ipa_field_name = mo.group(1)
+        if ipa_field_name in IPA_TO_FORM_FIELDS:
+            raise FormError(IPA_TO_FORM_FIELDS[ipa_field_name], mo.group(2))
+    # Raise a generic error if we can't do better
+    app.logger.error(
+        f'An unhandled invalid value happened while registering user '
+        f'{username}: {e.message}'
+    )
+    raise FormError("non_field_errors", e.message)
 
 
 def handle_register_form(form):
@@ -34,14 +61,7 @@ def handle_register_form(form):
         raise FormError("username", e.message)
     except python_freeipa.exceptions.ValidationError as e:
         # for example: invalid username. We don't know which field to link it to
-        if e.message.startswith("invalid 'login': "):
-            raise FormError("username", e.message[len("invalid 'login': ") :])
-        else:
-            app.logger.error(
-                f'An unhandled invalid value happened while registering user '
-                f'{username}: {e.message}'
-            )
-            raise FormError("non_field_errors", e.message)
+        _handle_registration_validation_error(username, e)
     except python_freeipa.exceptions.FreeIPAError as e:
         app.logger.error(
             f'An unhandled error {e.__class__.__name__} happened while registering user '
