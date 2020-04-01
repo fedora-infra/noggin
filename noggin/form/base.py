@@ -61,3 +61,7 @@ class ButtonSubmitWidget(ButtonWidget):
 
 class SubmitButtonField(SubmitField):
     widget = ButtonSubmitWidget()
+
+
+def strip(value):
+    return value.strip() if value else value

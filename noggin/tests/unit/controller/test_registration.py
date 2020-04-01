@@ -8,6 +8,7 @@ from flask import current_app, session
 from noggin_messages import UserCreateV1
 
 from noggin import ipa_admin
+from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login
 from noggin.tests.unit.utilities import (
     assert_redirects_with_flash,
@@ -139,6 +140,17 @@ def test_register_invalid_username(client):
         field_name="register-username",
         expected_message='may only include letters, numbers, _, -, . and $',
     )
+
+
+@pytest.mark.parametrize("field_name", ["firstname", "lastname"])
+@pytest.mark.vcr()
+def test_register_strip(client, post_data, cleanup_dummy_user, field_name):
+    """Register a user with fields that contain trailing spaces"""
+    post_data[f"register-{field_name}"] = "Dummy "
+    result = client.post('/', data=post_data)
+    assert result.status_code == 302
+    user = User(ipa_admin.user_show("dummy"))
+    assert getattr(user, field_name) == "Dummy"
 
 
 @pytest.mark.parametrize(
