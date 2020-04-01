@@ -40,52 +40,28 @@ def post_data():
 
 
 @pytest.mark.vcr()
-def test_register(client, cleanup_dummy_user):
+def test_register(client, post_data, cleanup_dummy_user):
     """Register a user"""
     with fml_testing.mock_sends(
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
     ):
-        result = client.post(
-            '/',
-            data={
-                "register-firstname": "First",
-                "register-lastname": "Last",
-                "register-mail": "firstlast@name.org",
-                "register-username": "dummy",
-                "register-password": "password",
-                "register-password_confirm": "password",
-                "register-submit": "1",
-            },
-            follow_redirects=True,
-        )
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .alert-success")
-    assert len(messages) == 1
-    assert (
-        messages[0].get_text(strip=True)
-        == 'Congratulations, you now have an account! Go ahead and sign in to proceed.×'
+        result = client.post('/', data=post_data)
+    assert_redirects_with_flash(
+        result,
+        "/",
+        "Congratulations, you now have an account! Go ahead and sign in to proceed.",
+        "success",
     )
 
 
 @pytest.mark.vcr()
-def test_register_short_password(client, cleanup_dummy_user):
+def test_register_short_password(client, post_data, cleanup_dummy_user):
     """Register a user with too short a password"""
     with fml_testing.mock_sends(
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
     ):
-        result = client.post(
-            '/',
-            data={
-                "register-firstname": "First",
-                "register-lastname": "Last",
-                "register-mail": "firstlast@name.org",
-                "register-username": "dummy",
-                "register-password": "42",
-                "register-password_confirm": "42",
-                "register-submit": "1",
-            },
-        )
+        post_data["register-password"] = post_data["register-password_confirm"] = "42"
+        result = client.post('/', data=post_data)
     assert_redirects_with_flash(
         result,
         expected_url="/",
@@ -99,20 +75,9 @@ def test_register_short_password(client, cleanup_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_register_duplicate(client, dummy_user):
+def test_register_duplicate(client, post_data, dummy_user):
     """Register a user that already exists"""
-    result = client.post(
-        '/',
-        data={
-            "register-firstname": "First",
-            "register-lastname": "Last",
-            "register-mail": "dummy@dummy.org",
-            "register-username": "dummy",
-            "register-password": "password",
-            "register-password_confirm": "password",
-            "register-submit": "1",
-        },
-    )
+    result = client.post('/', data=post_data)
     assert_form_field_error(
         result,
         field_name="register-username",
@@ -121,20 +86,10 @@ def test_register_duplicate(client, dummy_user):
 
 
 @pytest.mark.vcr()
-def test_register_invalid_username(client):
+def test_register_invalid_username(client, post_data):
     """Register a user with an invalid username"""
-    result = client.post(
-        '/',
-        data={
-            "register-firstname": "First",
-            "register-lastname": "Last",
-            "register-mail": "firstlast@name.org",
-            "register-username": "this is invalid",
-            "register-password": "password",
-            "register-password_confirm": "password",
-            "register-submit": "1",
-        },
-    )
+    post_data["register-username"] = "this is invalid"
+    result = client.post('/', data=post_data)
     assert_form_field_error(
         result,
         field_name="register-username",
@@ -187,91 +142,51 @@ def test_register_field_error_unknown(client, post_data):
     )
 
 
-def test_register_invalid_first_name(client):
+def test_register_invalid_first_name(client, post_data):
     """Register a user with an invalid first name"""
     with mock.patch("noggin.controller.registration.ipa_admin") as ipa_admin:
         ipa_admin.user_add.side_effect = python_freeipa.exceptions.ValidationError(
             message="invalid first name", code="4242"
         )
-        result = client.post(
-            '/',
-            data={
-                "register-firstname": "This \n is \n invalid",
-                "register-lastname": "Last",
-                "register-mail": "firstlast@name.org",
-                "register-username": "dummy",
-                "register-password": "password",
-                "register-password_confirm": "password",
-                "register-submit": "1",
-            },
-        )
+        post_data["register-firstname"] = "This \n is \n invalid"
+        result = client.post('/', data=post_data)
     assert_form_generic_error(result, 'invalid first name')
 
 
 @pytest.mark.vcr()
-def test_register_invalid_email(client):
+def test_register_invalid_email(client, post_data):
     """Register a user with an invalid email address"""
-    result = client.post(
-        '/',
-        data={
-            "register-firstname": "First",
-            "register-lastname": "Last",
-            "register-mail": "firstlast at name dot org",
-            "register-username": "dummy",
-            "register-password": "password",
-            "register-password_confirm": "password",
-            "register-submit": "1",
-        },
-    )
+    post_data["register-mail"] = "firstlast at name dot org"
+    result = client.post('/', data=post_data)
     assert_form_field_error(
         result, field_name="register-mail", expected_message='Email must be valid'
     )
 
 
 @pytest.mark.vcr()
-def test_register_empty_email(client):
+def test_register_empty_email(client, post_data):
     """Register a user with an empty email address"""
-    result = client.post(
-        '/',
-        data={
-            "register-firstname": "First",
-            "register-lastname": "Last",
-            "register-username": "dummy",
-            "register-password": "password",
-            "register-password_confirm": "password",
-            "register-submit": "1",
-        },
-    )
+    del post_data["register-mail"]
+    result = client.post('/', data=post_data)
     assert_form_field_error(
         result, field_name="register-mail", expected_message='Email must not be empty'
     )
 
 
-def test_register_generic_error(client):
+def test_register_generic_error(client, post_data):
     """Register a user with an unhandled error"""
     with mock.patch("noggin.controller.registration.ipa_admin") as ipa_admin:
         ipa_admin.user_add.side_effect = python_freeipa.exceptions.FreeIPAError(
             message="something went wrong", code="4242"
         )
-        result = client.post(
-            '/',
-            data={
-                "register-firstname": "First",
-                "register-lastname": "Last",
-                "register-mail": "firstlast@name.org",
-                "register-username": "dummy",
-                "register-password": "password",
-                "register-password_confirm": "password",
-                "register-submit": "1",
-            },
-        )
+        result = client.post('/', data=post_data)
     assert_form_generic_error(
         result, 'An error occurred while creating the account, please try again.'
     )
 
 
 @pytest.mark.vcr()
-def test_register_generic_pwchange_error(client, cleanup_dummy_user):
+def test_register_generic_pwchange_error(client, post_data, cleanup_dummy_user):
     """Change user's password with an unhandled error"""
     ipa_client = mock.Mock()
     ipa_client.change_password.side_effect = python_freeipa.exceptions.FreeIPAError(
@@ -283,18 +198,7 @@ def test_register_generic_pwchange_error(client, cleanup_dummy_user):
         with fml_testing.mock_sends(
             UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
         ):
-            result = client.post(
-                '/',
-                data={
-                    "register-firstname": "First",
-                    "register-lastname": "Last",
-                    "register-mail": "firstlast@name.org",
-                    "register-username": "dummy",
-                    "register-password": "password",
-                    "register-password_confirm": "password",
-                    "register-submit": "1",
-                },
-            )
+            result = client.post('/', data=post_data)
     assert_redirects_with_flash(
         result,
         expected_url="/",
@@ -316,23 +220,12 @@ def test_register_get(client):
 
 
 @pytest.mark.vcr()
-def test_register_default_values(client, cleanup_dummy_user):
+def test_register_default_values(client, post_data, cleanup_dummy_user):
     """Verify that the default attributes are added to the user"""
     with fml_testing.mock_sends(
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
     ):
-        result = client.post(
-            '/',
-            data={
-                "register-firstname": "First",
-                "register-lastname": "Last",
-                "register-mail": "firstlast@name.org",
-                "register-username": "dummy",
-                "register-password": "password",
-                "register-password_confirm": "password",
-                "register-submit": "1",
-            },
-        )
+        result = client.post('/', data=post_data)
     assert result.status_code == 302
     ipa = maybe_ipa_login(current_app, session, "dummy", "password")
     user = ipa.user_show("dummy")
