@@ -1,4 +1,5 @@
-from flask import Flask, Blueprint
+from flask import Flask, Blueprint, request
+from flask_babel import Babel
 from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
 from whitenoise import WhiteNoise
@@ -6,7 +7,10 @@ from whitenoise import WhiteNoise
 from noggin.security.ipa_admin import IPAAdmin
 
 app = Flask(__name__)
+app.jinja_env.add_extension('jinja2.ext.i18n')
 csrf = CSRFProtect(app)
+
+LANGUAGES = ["en_US", "fr_FR"]
 
 # Load defaults
 app.config.from_pyfile('defaults.cfg')
@@ -32,6 +36,15 @@ app.register_blueprint(blueprint)
 # Flask-Mail
 mailer = Mail(app)
 
+
+babel = Babel(app)
+
+
+@babel.localeselector
+def get_locale():
+    return request.accept_languages.best_match(LANGUAGES)
+
+
 # Whitenoise for static files
 app.wsgi_app = WhiteNoise(
     app.wsgi_app, root=f"{app.root_path}/static", prefix="/static"
@@ -39,7 +52,6 @@ app.wsgi_app = WhiteNoise(
 app.wsgi_app.add_files(
     f"{app.root_path}/themes/{themename}/static/", prefix="/theme/static"
 )
-
 
 # Set the version
 try:

@@ -1,4 +1,5 @@
 from flask import flash, redirect, session, url_for, render_template
+from flask_babel import _
 import python_freeipa
 
 from noggin import app
