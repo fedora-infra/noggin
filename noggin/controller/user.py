@@ -32,7 +32,12 @@ def user(ipa, username):
     # As a speed optimization, we make two separate calls.
     # Just doing a group_find (with all=True) is super slow here, with a lot of
     # groups.
-    groups = [Group(g) for g in ipa.group_find(user=username, all=False)['result']]
+    hidden_groups = app.config.get('HIDDEN_GROUPS')
+    groups = [
+        Group(g)
+        for g in ipa.group_find(user=username, all=False)['result']
+        if Group(g).name not in hidden_groups
+    ]
     managed_groups = [
         Group(g)
         for g in ipa.group_find(membermanager_user=username, all=False)['result']

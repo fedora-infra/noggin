@@ -40,6 +40,7 @@ def client(ipa_cert):
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
     app.config['WTF_CSRF_ENABLED'] = False
+    app.config['HIDDEN_GROUPS'] = ['ipausers']
     with app.test_client() as client:
         with app.app_context():
             yield client

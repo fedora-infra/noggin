@@ -186,3 +186,19 @@ def test_user_settings_keys_post_bad_request(client, logged_in_dummy_user):
         )
         result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
     assert_form_generic_error(result, 'something went wrong')
+
+
+def test_user_cant_see_hidden_groups(client, logged_in_dummy_user):
+    result = client.get('/user/dummy/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert page.title
+    assert page.title.string == 'dummy\'s Profile - noggin'
+    assert page.select_one('.nav-link .badge-pill').get_text(strip=True) == '0'
+
+
+def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
+    result = client.get('/user/dummy/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert page.title
+    assert page.title.string == 'dummy\'s Profile - noggin'
+    assert page.select_one('.nav-link .badge-pill').get_text(strip=True) == '1'
