@@ -45,6 +45,11 @@
   become: yes
   become_user: vagrant
 
+- name: compile the translations
+  shell: poetry run pybabel compile -d /vagrant/noggin/translations
+  become: yes
+  become_user: vagrant
+
 - name: Install the systemd unit files for noggin services
   copy:
       src: "{{ item }}"

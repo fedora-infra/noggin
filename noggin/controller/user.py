@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 
 from flask import flash, redirect, render_template, session, url_for, Markup
+from flask_babel import _
 import python_freeipa
 
 from noggin import app
@@ -193,7 +194,7 @@ def user_settings_otp_disable(ipa, username):
                 e.message
                 == "Server is unwilling to perform: Can't disable last active token"
             ):
-                flash('Sorry, You cannot disable your last active token.', 'warning')
+                flash(_('Sorry, You cannot disable your last active token.'), 'warning')
             else:
                 flash('Cannot disable the token.', 'danger')
                 app.logger.error(
