@@ -206,23 +206,23 @@ When cutting a new release, follow these steps:
 Translations
 ------------
 
-* To extract the messages.pot that is in noggin/translations/messages.pot, use:
+To extract the messages.pot that is in noggin/translations/messages.pot, use::
 
-  ``poetry run pybabel extract -F babel.cfg -o noggin/translations/messages.pot noggin``
+  poetry run pybabel extract -F babel.cfg -o noggin/translations/messages.pot noggin
 
-  This will update the messages.pot with the newest strings that have been flagged in the
-  templates and code.
+This will update the messages.pot with the newest strings that have been flagged in the
+templates and code.
 
-* To add a new language, use the command:
+To add a new language, use the command::
 
-  ``poetry run pybabel init -i noggin/translations/messages.pot -d noggin/translations/ -l fr_FR``
+  poetry run pybabel init -i noggin/translations/messages.pot -d noggin/translations/ -l fr_FR
 
-* To update all created languages with the newest strings in messages.pot, use:
+To update all created languages with the newest strings in messages.pot, use::
 
-  ``poetry run pybabel update -i noggin/translations/messages.pot -d noggin/translations``
+  poetry run pybabel update -i noggin/translations/messages.pot -d noggin/translations
 
-* To compile the translations in updated .mo files into what noggin can use, use the command:
+To compile the translations in updated .mo files into what noggin can use, use the command::
 
-  ``poetry run pybabel compile -d noggin/translations``
+  poetry run pybabel compile -d noggin/translations
 
 
