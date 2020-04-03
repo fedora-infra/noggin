@@ -12,7 +12,6 @@ from noggin.form.edit_user import (
     UserSettingsDisableOTPForm,
     UserSettingsDeleteOTPForm,
 )
-from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.representation.otptoken import OTPToken
 from noggin.security.ipa import maybe_ipa_login
@@ -32,16 +31,8 @@ def user(ipa, username):
     # As a speed optimization, we make two separate calls.
     # Just doing a group_find (with all=True) is super slow here, with a lot of
     # groups.
-    hidden_groups = app.config.get('HIDDEN_GROUPS')
-    groups = [
-        Group(g)
-        for g in ipa.group_find(user=username, all=False)['result']
-        if Group(g).name not in hidden_groups
-    ]
-    managed_groups = [
-        Group(g)
-        for g in ipa.group_find(membermanager_user=username, all=False)['result']
-    ]
+    groups = ipa.group_find(user=username, all=False)
+    managed_groups = ipa.group_find(membermanager_user=username, all=False)
     return render_template(
         'user.html', user=user, groups=groups, managed_groups=managed_groups
     )
