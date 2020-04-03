@@ -79,7 +79,7 @@
   {% if otp_uri %}
   <script src="{{ url_for('static', filename='js/vendor/jquery-qrcode-1.0/jquery.qrcode.min.js') }}"></script>
   <script>
-    $(window).on('load',function(){
+    $(document).ready(function() {
         $('#otp-modal').modal('show');
         $('#otp-qrcode').qrcode("{{ otp_uri|safe }}");
         $('#otp-toggle').click(function() {
