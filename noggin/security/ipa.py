@@ -45,7 +45,7 @@ class Client(IPAClient):
         hidden_groups = current_app.config.get('HIDDEN_GROUPS')
         groups = [
             g
-            for g in IPAClient.group_find(self, *args, **kwargs)['result']
+            for g in IPAClient.group_find(self, **kwargs)['result']
             if g['cn'][0] not in hidden_groups
         ]
         return {'result': groups}
