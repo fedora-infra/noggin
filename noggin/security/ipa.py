@@ -11,7 +11,6 @@ from python_freeipa.exceptions import (
     PWChangePolicyError,
 )
 from flask import current_app
-from noggin.representation.group import Group
 
 
 def parse_group_management_error(data):
@@ -45,11 +44,11 @@ class Client(IPAClient):
         """
         hidden_groups = current_app.config.get('HIDDEN_GROUPS')
         groups = [
-            Group(g)
+            g
             for g in IPAClient.group_find(self, *args, **kwargs)['result']
-            if Group(g).name not in hidden_groups
+            if g['cn'][0] not in hidden_groups
         ]
-        return groups
+        return {'result': groups}
 
     def group_add_member_manager(
         self, group, users=None, groups=None, skip_errors=False, **kwargs
