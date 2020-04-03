@@ -188,6 +188,7 @@ def test_user_settings_keys_post_bad_request(client, logged_in_dummy_user):
     assert_form_generic_error(result, 'something went wrong')
 
 
+@pytest.mark.vcr()
 def test_user_cant_see_hidden_groups(client, logged_in_dummy_user):
     result = client.get('/user/dummy/')
     page = BeautifulSoup(result.data, 'html.parser')
@@ -196,6 +197,7 @@ def test_user_cant_see_hidden_groups(client, logged_in_dummy_user):
     assert page.select_one('.nav-link .badge-pill').get_text(strip=True) == '0'
 
 
+@pytest.mark.vcr()
 def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
     result = client.get('/user/dummy/')
     page = BeautifulSoup(result.data, 'html.parser')
