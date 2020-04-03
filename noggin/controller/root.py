@@ -4,6 +4,8 @@ from noggin import app
 from noggin.form.register_user import RegisterUserForm
 from noggin.form.login_user import LoginUserForm
 from noggin.representation.user import User
+from noggin.representation.group import Group
+
 from noggin.security.ipa import maybe_ipa_session
 from noggin.utility import with_ipa, handle_form_errors
 
@@ -68,7 +70,7 @@ def search_json(ipa):
             res.append({'uid': user_.username, 'cn': user_.name})
 
     if groupname:
-        groups_ = ipa.group_find(groupname)
+        groups_ = [Group(g) for g in ipa.group_find(groupname)['result']]
         for group_ in groups_:
             res.append({'cn': group_.name, 'description': group_.description})
 
