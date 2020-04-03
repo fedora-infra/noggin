@@ -1,6 +1,6 @@
 from cryptography.fernet import Fernet
 import python_freeipa
-from python_freeipa.client_legacy import ClientLegacy as IPAClient
+from python_freeipa import ClientMeta as IPAClient
 from python_freeipa.exceptions import ValidationError, BadRequest
 import random
 
