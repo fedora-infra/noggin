@@ -1,3 +1,4 @@
+import random
 from cryptography.fernet import Fernet
 from requests import RequestException
 import python_freeipa
@@ -9,7 +10,8 @@ from python_freeipa.exceptions import (
     PWChangeInvalidPassword,
     PWChangePolicyError,
 )
-import random
+from flask import current_app
+from noggin.representation.group import Group
 
 
 def parse_group_management_error(data):
@@ -34,6 +36,20 @@ class Client(IPAClient):
 
     TODO: send this upstream.
     """
+
+    def group_find(self, *args, **kwargs):
+        """
+        Find a group. A wrapped method to allow filtering of groups to be hidden from the user.
+
+        TODO: this needs to be retained when we migrate to the newer Client class.
+        """
+        hidden_groups = current_app.config.get('HIDDEN_GROUPS')
+        groups = [
+            Group(g)
+            for g in IPAClient.group_find(self, *args, **kwargs)['result']
+            if Group(g).name not in hidden_groups
+        ]
+        return groups
 
     def group_add_member_manager(
         self, group, users=None, groups=None, skip_errors=False, **kwargs
