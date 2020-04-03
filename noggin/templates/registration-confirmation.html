@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+{% block title %}Validate your email address{% endblock %}
+
+{% block content %}
+  {{ super() }}
+
+
+{% import '_form_macros.html' as macros %}
+
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-6 mx-auto">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">{{_("Account creation, step 2/3")}}</h4>
+            <p>{{_("Congratulations %(name)s, your account has been created!", name=user.name)}}<p>
+            <p>{{_("Before you can log in, your email address needs to be validated. Please check your inbox and click on the link to proceed.")}}</p>
+            <p>
+              {{_("If you can't find the email in a couple minutes, check your spam folder. If it's not there, you can ask for another validation email by clicking on the button below.")}}
+            </p>
+            <form action="{{ request.url }}" method="post">
+              <div class="text-right">
+              {{ form.csrf_token }}
+              {{ form.submit(color="secondary") }}
+              </div>
+            </form>
+        </div>
+      </div>
+    </div> <!-- ./row -->
+  </div>
+
+{% endblock %}

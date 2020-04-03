@@ -11,7 +11,8 @@ from flask import current_app
 from noggin import ipa_admin, mailer
 from noggin.representation.user import User
 from noggin.security.ipa import untouched_ipa_client
-from noggin.utility.password_reset import PasswordResetLock, JWTToken
+from noggin.utility.password_reset import PasswordResetLock
+from noggin.utility.token import PasswordResetToken
 from noggin.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_field_error,
@@ -23,7 +24,7 @@ from noggin.tests.unit.utilities import (
 
 @pytest.fixture
 def token_for_dummy_user(dummy_user):
-    token = JWTToken.from_user(User(ipa_admin.user_show("dummy")))
+    token = PasswordResetToken.from_user(User(ipa_admin.user_show("dummy")))
     return token.as_string()
 
 

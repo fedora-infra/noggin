@@ -1,4 +1,5 @@
 from flask_babel import lazy_gettext as _
+from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo, Email
@@ -25,6 +26,24 @@ class RegisterUserForm(ModestForm):
         filters=[strip],
     )
 
+    mail = EmailField(
+        _('E-mail Address'),
+        validators=[
+            DataRequired(message=_('Email must not be empty')),
+            Email(message=_('Email must be valid')),
+        ],
+        filters=[strip],
+    )
+
+    submit = SubmitButtonField(_("Register"))
+
+
+class ResendValidationEmailForm(FlaskForm):
+    submit = SubmitButtonField(_("Resend email"))
+
+
+class PasswordSetForm(FlaskForm):
+
     password = PasswordField(
         _('Password'),
         validators=[
@@ -37,13 +56,4 @@ class RegisterUserForm(ModestForm):
 
     password_confirm = PasswordField(_('Confirm Password'), filters=[strip])
 
-    mail = EmailField(
-        _('E-mail Address'),
-        validators=[
-            DataRequired(message=_('Email must not be empty')),
-            Email(message=_('Email must be valid')),
-        ],
-        filters=[strip],
-    )
-
-    submit = SubmitButtonField(_("Register"))
+    submit = SubmitButtonField(_("Activate"))
