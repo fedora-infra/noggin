@@ -2,8 +2,9 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, EqualTo, Email
+from wtforms.validators import DataRequired, EqualTo, Email, Length
 
+from noggin import app
 from .base import ModestForm, SubmitButtonField, strip
 
 
@@ -48,6 +49,10 @@ class PasswordSetForm(FlaskForm):
         _('Password'),
         validators=[
             DataRequired(message=_('Password must not be empty')),
+            Length(
+                min=app.config["PASSWORD_POLICY"].get("min", -1),
+                max=app.config["PASSWORD_POLICY"].get("max", -1),
+            ),
             EqualTo('password_confirm', message=_('Passwords must match')),
         ],
         filters=[strip],
