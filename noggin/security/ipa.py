@@ -270,6 +270,30 @@ class Client(IPAClient):
         data = self._request('stageuser_add', username, params)
         return data['result']
 
+    def stageuser_mod(self, username, **kwargs):
+        """
+        Add a new stage user. Basically the same arguments as user_add.
+
+        We only set the variables we use in noggin, it's too much of a pain to copy them all.
+        """
+        params = {'all': True}
+        args_mapping = {
+            "first_name": "givenname",
+            "last_name": "sn",
+            "full_name": "cn",
+            "user_password": "userpassword",
+            "login_shell": "loginshell",
+        }
+        for arg_name, arg_value in kwargs.items():
+            if arg_name in args_mapping:
+                # No need to check for coverage here, it's only used in the unit tests.
+                params[args_mapping[arg_name]] = arg_value  # pragma: no cover
+            else:
+                params[arg_name] = arg_value
+
+        data = self._request('stageuser_mod', username, params)
+        return data['result']
+
     def stageuser_show(self, username):
         """
         Display information about a stage user.
@@ -278,6 +302,18 @@ class Client(IPAClient):
         """
         data = self._request('stageuser_show', username, {'all': True, 'raw': False})
         return data['result']
+
+    def stageuser_del(self, username, skip_errors=False):
+        """
+        Delete a stage user.
+
+        :param username: User login.
+        :type username: string
+        :param skip_errors: Continuous mode: Don't stop on errors.
+        :type skip_errors: bool
+        """
+        params = {'continue': skip_errors}
+        return self._request('stageuser_del', username, params)
 
     def stageuser_activate(self, username, **kwargs):
         """

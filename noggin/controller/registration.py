@@ -38,7 +38,7 @@ def _send_validation_email(user):
         recipients=[user.mail],
         subject=_("Verify your email address"),
     )
-    if app.config["DEBUG"]:
+    if app.config["DEBUG"]:  # pragma: no cover
         app.logger.debug(email)
     try:
         mailer.send(email)

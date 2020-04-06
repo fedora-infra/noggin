@@ -10,7 +10,7 @@ class JWTToken:
 
     @classmethod
     def from_user(cls, user):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @classmethod
     def from_string(cls, token):
@@ -21,7 +21,7 @@ class JWTToken:
 
     @property
     def data(self):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def as_string(self):
         return str(

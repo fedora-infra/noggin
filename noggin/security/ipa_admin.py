@@ -24,6 +24,8 @@ class IPAAdmin(object):
         "otptoken_add",
         "otptoken_del",
         "otptoken_find",
+        "stageuser_del",
+        "stageuser_mod",
     )
 
     def __init__(self, app):
