@@ -21,7 +21,7 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAAwAAAP//AwAAAAAAAAAAAA==
+        H4sIAAAAAAAAAwMAAAAAAAAAAAA=
     headers:
       Cache-Control:
       - no-cache, private
@@ -29,20 +29,20 @@ interactions:
       - Keep-Alive
       Content-Encoding:
       - gzip
+      Content-Length:
+      - '20'
       Content-Security-Policy:
       - frame-ancestors 'none'
       Content-Type:
       - text/plain; charset=UTF-8
       Date:
-      - Tue, 14 Apr 2020 13:18:56 GMT
+      - Tue, 14 Apr 2020 13:20:35 GMT
       Keep-Alive:
       - timeout=30, max=100
       Server:
       - Apache/2.4.41 (Fedora) OpenSSL/1.1.1d mod_wsgi/4.6.6 Python/3.7 mod_auth_gssapi/1.6.1
       Set-Cookie:
-      - ipa_session=MagBearerToken=Wz%2fvqY68NX0IMhV6oPy0l1umVyKtrOEXeN76b6cfOll9z8MBemkaEwJsOXRXJ3A6fLOvxIVn%2baI1bHV%2b9k9aZM5tMRmcAE6NQte0WlSRIBSb%2bmLz3Fc6St8okj2wbPwnlGbGSCnH2UqVTScPA0hBeL0JQhA1ZL7bIO4UnjFYJWcK9pqdclydgr8q7MAf858%2b;path=/ipa;httponly;secure;
-      Transfer-Encoding:
-      - chunked
+      - ipa_session=MagBearerToken=ZgL5KXZ6LU6N3oIWCKl1oC%2fH9h54%2f0WPvffyWFVdUZqvZ2b3455GhjFKQOlok5blSqO8WVkmFQ1jREBlabmn1jcuxxlYIFgWO6D3AJ6bkFkq3uLeOpPkQ1Ltmg1d5xHYTrtC6dX4zEXf%2fOKliNtah4aMpuhDbKnf78g82dsc%2ffENymjGq5rElzUVaHoC85Oa;path=/ipa;httponly;secure;
       Vary:
       - Accept-Encoding
       X-Frame-Options:
@@ -64,7 +64,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=Wz%2fvqY68NX0IMhV6oPy0l1umVyKtrOEXeN76b6cfOll9z8MBemkaEwJsOXRXJ3A6fLOvxIVn%2baI1bHV%2b9k9aZM5tMRmcAE6NQte0WlSRIBSb%2bmLz3Fc6St8okj2wbPwnlGbGSCnH2UqVTScPA0hBeL0JQhA1ZL7bIO4UnjFYJWcK9pqdclydgr8q7MAf858%2b
+      - ipa_session=MagBearerToken=ZgL5KXZ6LU6N3oIWCKl1oC%2fH9h54%2f0WPvffyWFVdUZqvZ2b3455GhjFKQOlok5blSqO8WVkmFQ1jREBlabmn1jcuxxlYIFgWO6D3AJ6bkFkq3uLeOpPkQ1Ltmg1d5xHYTrtC6dX4zEXf%2fOKliNtah4aMpuhDbKnf78g82dsc%2ffENymjGq5rElzUVaHoC85Oa
       Referer:
       - https://ipa.example.com/ipa
       User-Agent:
@@ -91,7 +91,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 14 Apr 2020 13:18:56 GMT
+      - Tue, 14 Apr 2020 13:20:36 GMT
       Keep-Alive:
       - timeout=30, max=99
       Server:
@@ -106,8 +106,10 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "user_show", "params": [["nosuchuser"], {"all": true, "raw":
-      false}]}'
+    body: '{"method": "stageuser_add", "params": [["this is invalid"], {"all": true,
+      "givenname": "Dummy", "sn": "User", "mail": "dummy@example.com", "loginshell":
+      "/bin/bash", "fascreationtime": "2020-04-14T13:20:35Z", "faslocale": "en-US",
+      "fastimezone": "UTC"}]}'
     headers:
       Accept:
       - application/json
@@ -116,11 +118,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '80'
+      - '254'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=Wz%2fvqY68NX0IMhV6oPy0l1umVyKtrOEXeN76b6cfOll9z8MBemkaEwJsOXRXJ3A6fLOvxIVn%2baI1bHV%2b9k9aZM5tMRmcAE6NQte0WlSRIBSb%2bmLz3Fc6St8okj2wbPwnlGbGSCnH2UqVTScPA0hBeL0JQhA1ZL7bIO4UnjFYJWcK9pqdclydgr8q7MAf858%2b
+      - ipa_session=MagBearerToken=ZgL5KXZ6LU6N3oIWCKl1oC%2fH9h54%2f0WPvffyWFVdUZqvZ2b3455GhjFKQOlok5blSqO8WVkmFQ1jREBlabmn1jcuxxlYIFgWO6D3AJ6bkFkq3uLeOpPkQ1Ltmg1d5xHYTrtC6dX4zEXf%2fOKliNtah4aMpuhDbKnf78g82dsc%2ffENymjGq5rElzUVaHoC85Oa
       Referer:
       - https://ipa.example.com/ipa
       User-Agent:
@@ -130,9 +132,10 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA4SOMQvCQAyF/8qRWUqFDtJJEZ2sOrqGXtSDa1Jydy6l/927Cjq6hOTjvbw3gVJI
-        PkJrOHm/MkCqovmcoBdLeWnqep35QCHgowBgCal/pkDamjINSzR3SWwhCy1GXPxKGIT/GObsYByW
-        v2eJxy909tdpVMe9G9EXFdrB8fZw23XX06HaX7oS+iIN7hPWVJuqgfkNAAD//wMAR2vj5doAAAA=
+        H4sIAAAAAAAAA5SPPwsCMQzFv0oIgst5CDqokyK3KTqJm0RbpJCm0usdHOJ3Ny2Irm75937v5YnR
+        th0nXIF0zBWgjTFEbZ94C8ZqMZtOlzr3tm3pngfopCd2BsYc7k7GK/A0QBAewMmNO2OBbUo2tpVC
+        /bUUlwomFdRAYmCEyjOUqNgI+UItMPxJgH9jX6r+4E45IiUXpCm8vHPm++cjKtU9iPMxGe9k3Zw3
+        ++OuqbeHfc7Rq4PK835eL+o5vt4AAAD//wMAgOoRMC4BAAA=
     headers:
       Cache-Control:
       - no-cache, private
@@ -145,7 +148,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Tue, 14 Apr 2020 13:18:56 GMT
+      - Tue, 14 Apr 2020 13:20:36 GMT
       Keep-Alive:
       - timeout=30, max=98
       Server:
