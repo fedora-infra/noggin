@@ -1,5 +1,3 @@
-from unittest import mock
-
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
@@ -211,24 +209,24 @@ def test_short_password(client, dummy_user, no_password_min_time):
     )
 
 
-def test_reset_generic_error(client):
+def test_reset_generic_error(client, mocker):
     """Reset password with an unhandled error"""
-    client_mock = mock.Mock()
-    with mock.patch(
+    client_mock = mocker.Mock()
+    untouched_ipa_client = mocker.patch(
         "noggin.controller.password.untouched_ipa_client"
-    ) as untouched_ipa_client:
-        untouched_ipa_client.return_value = client_mock
-        client_mock.change_password.side_effect = python_freeipa.exceptions.FreeIPAError(
-            message="something went wrong", code="4242"
-        )
-        result = client.post(
-            '/password-reset?username=dummy',
-            data={
-                "current_password": "dummy_password",
-                "password": "password",
-                "password_confirm": "password",
-            },
-        )
+    )
+    untouched_ipa_client.return_value = client_mock
+    client_mock.change_password.side_effect = python_freeipa.exceptions.FreeIPAError(
+        message="something went wrong", code="4242"
+    )
+    result = client.post(
+        '/password-reset?username=dummy',
+        data={
+            "current_password": "dummy_password",
+            "password": "password",
+            "password_confirm": "password",
+        },
+    )
     assert_form_generic_error(result, 'Could not change password.')
 
 
