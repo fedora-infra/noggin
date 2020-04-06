@@ -47,7 +47,7 @@
         <div class="container flash-messages fixed-top mt-5">
             {% for category, flash in flashes %}
             <div class="alert alert-{{ category }} alert-dismissible fade show">
-                {{ flash|striptags }}
+                {{ flash }}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -85,6 +85,15 @@
       <a href="https://connect.opensuse.org/pg/profile/{{ user.username }}">{{ user.username }}</a>
     </li>
 {% endblock %}
+
+{% macro front_page_blurb() %}
+<h2 class="display-4">Welcome to noggin!</h2>
+<p class="lead">
+  This is the open source, community self-service portal for FreeIPA.
+  It allows you to do things like create an account, change your
+  password, manage group membership, and more.
+</p>
+{% endmacro %}
 
 {# an optional macro defining an element to show for editing group details #}
 {# typically, it used to link to a ticket tracker for an admin to edit a group #}

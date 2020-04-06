@@ -7,6 +7,9 @@
     {{ field.label }}
   {% endif %}
   {{ field(class=css_class, **kwargs) }}
+  {% if field.description %}
+    <small class="form-text text-muted">{{ field.description }}</small>
+  {% endif %}
   {% if field.errors %}
     <div class="invalid-feedback">
       {{ field.errors|map('escape')|join(' ') }}
@@ -35,4 +38,9 @@
     {% endfor %}
     </div>
   {% endif %}
+{% endmacro %}
+
+{% macro unsaved_changes() %}
+<script src="{{ url_for('static', filename='js/vendor/jquery.dirty-0.7.2/jquery.dirty.js') }}"></script>
+<script>$("form").dirty({preventLeaving: true})</script>
 {% endmacro %}

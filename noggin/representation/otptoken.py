@@ -13,3 +13,7 @@ class OTPToken(Representation):
     @property
     def disabled(self):
         return self._attr('ipatokendisabled')
+
+    @property
+    def uri(self):
+        return self.raw.get('uri')

@@ -3,9 +3,11 @@ import os
 import tempfile
 
 import pytest
+import python_freeipa
 
 from noggin import ipa_admin
 from noggin.app import app
+from noggin.representation.otptoken import OTPToken
 from noggin.security.ipa import untouched_ipa_client, maybe_ipa_login
 
 
@@ -113,3 +115,35 @@ def logged_in_dummy_user(client, dummy_user):
     ipa.logout()
     with client.session_transaction() as sess:
         sess.clear()
+
+
+@pytest.fixture
+def dummy_user_with_gpg_key(client, dummy_user):
+    ipa_admin.user_mod("dummy", fasgpgkeyid=["dummygpgkeyid"])
+
+
+@pytest.fixture
+def dummy_user_with_otp(client, logged_in_dummy_user):
+    ipa = logged_in_dummy_user
+    result = ipa.otptoken_add(
+        ipatokenowner="dummy",
+        ipatokenotpalgorithm='sha512',
+        description="dummy's token",
+    )
+    token = OTPToken(result)
+    yield token
+    # Deletion needs to be done as admin to remove the last token
+    try:
+        ipa_admin.otptoken_del(token.uniqueid)
+    except python_freeipa.exceptions.NotFound:
+        pass  # Already deleted
+
+
+@pytest.fixture
+def cleanup_dummy_tokens():
+    yield
+    tokens = ipa_admin.otptoken_find("dummy")
+    if tokens is None:
+        return
+    for token in [OTPToken(t) for t in tokens]:
+        ipa_admin.otptoken_del(token.uniqueid)

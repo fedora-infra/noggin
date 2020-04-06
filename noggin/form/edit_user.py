@@ -1,5 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import FieldList, StringField, SelectField, TextAreaField, HiddenField
+from wtforms import (
+    FieldList,
+    StringField,
+    SelectField,
+    TextAreaField,
+    HiddenField,
+    PasswordField,
+)
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import AnyOf, DataRequired, Email, Optional, Length
 
@@ -63,8 +70,13 @@ class UserSettingsKeysForm(FlaskForm):
 
 class UserSettingsAddOTPForm(FlaskForm):
     description = StringField(
-        'Description',
+        'Token description',
         validators=[DataRequired(message='Description must not be empty')],
+    )
+
+    password = PasswordField(
+        'Enter your current password',
+        validators=[DataRequired(message='You must provide a password')],
     )
 
 

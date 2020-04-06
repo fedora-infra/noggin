@@ -13,7 +13,11 @@ class NewPasswordForm(FlaskForm):
         ],
     )
 
-    password_confirm = PasswordField('Confirm Password')
+    password_confirm = PasswordField('Confirm New Password')
+
+    otp = StringField(
+        'OTP Token', description="Enter your OTP token if you have enrolled one"
+    )
 
 
 class PasswordResetForm(NewPasswordForm):
@@ -21,6 +25,7 @@ class PasswordResetForm(NewPasswordForm):
     current_password = PasswordField(
         'Current Password',
         validators=[DataRequired(message='Current password must not be empty')],
+        description="Just the password, don't add the OTP token if you have one",
     )
 
 

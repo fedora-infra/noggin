@@ -4,17 +4,23 @@
 {% block settings_content %}
 
 {% if otp_uri %}
-<div class="modal fade" id="otpModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="otp-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
+        <h5 class="modal-title">Scan your new token</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <div id="otp_qrcode"></div>
-        {{otp_uri}}
+        <!-- Only show the QR code when the user is ready, this gives them time to pick up their phone and check noone is looking over their shoulders -->
+        <p>Your new token is ready. Click on the button below to reveal the QR code and scan it.</p>
+        <div class="text-center"><button id="otp-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="false">Reveal</button></div>
+        <div id="otp-qrcode" class="text-center mt-3" style="display:none"></div>
+        <p class="mb-1 mt-4">or copy and paste the following token URL if you can't scan the QR code:</p>
+        <input id="otp-uri" class="form-control" readonly value="{{otp_uri|safe}}" />
+        <div class="alert alert-warning my-4">This will never be shown to you again, don't close this window until your token is saved.</div>
       </div>
     </div>
   </div>
@@ -23,18 +29,16 @@
 <div class="card-body">
   <div class="d-flex">
       <h5 id="pageheading">OTP Tokens</h5>
-      <div class="dropdown ml-auto">
+      <div class="dropdown ml-auto {% if addotpform.errors %}show{% endif %}">
         <div class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">Add OTP Token</div>
-        <div class="dropdown-menu dropdown-menu-right" style="min-width:20em;">
-            {% if user.gpgkeys %}
-            <form action="{{ url_for('user_settings_otp_add', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
+        <div class="dropdown-menu dropdown-menu-right {% if addotpform.errors %}show{% endif %}" style="min-width:20em;">
+            <form action="{{ url_for('user_settings_otp', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <div class="form-group">{{ macros.with_errors(addotpform.description, tabindex="2")}}</div>
-              <button class="btn btn-primary" id="submit" type="submit" tabindex="14">Submit</button>
+              <div class="form-group">{{ macros.with_errors(addotpform.password, tabindex="3", placeholder="Password or Password + One-Time-Password")}}</div>
+              <div>{{ macros.non_field_errors(addotpform) }}</div>
+              <button class="btn btn-primary" id="submit" type="submit" tabindex="4">Generate</button>
             </form>
-            {% else %}
-            <div class="p-3 text-center bg-light text-muted font-weight-bold">A GPG Key is required to create an OTP Token. Please add a GPG Key.</div>
-            {%endif%}
           </div>
       </div>
   </div>
@@ -74,13 +78,16 @@
   {{ super() }}
   {% if otp_uri %}
   <script src="{{ url_for('static', filename='js/vendor/jquery-qrcode-1.0/jquery.qrcode.min.js') }}"></script>
-  <script>$('#otp_qrcode').qrcode("{{ otp_uri|safe }}");</script>
   <script>
-    $(window).on('load',function(){
-        $('#otpModal').modal('show');
+    $(document).ready(function() {
+        $('#otp-modal').modal('show');
+        $('#otp-qrcode').qrcode("{{ otp_uri|safe }}");
+        $('#otp-toggle').click(function() {
+          $('#otp-qrcode').slideToggle("fast");
+        })
     });
   </script>
-  
+
   {% endif %}
 {% endblock %}
 

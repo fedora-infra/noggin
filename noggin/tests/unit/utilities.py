@@ -1,5 +1,8 @@
 from bs4 import BeautifulSoup
 from flask import get_flashed_messages
+from urllib import parse
+import hashlib
+import pyotp
 
 
 def assert_redirects_with_flash(
@@ -12,8 +15,12 @@ def assert_redirects_with_flash(
     messages = get_flashed_messages(with_categories=True)
     assert len(messages) == 1
     category, message = messages[0]
-    assert message == expected_message
-    assert category == expected_category
+    assert (
+        message == expected_message
+    ), f"\nExpected message: {expected_message}\nActual message:   {message}"
+    assert (
+        category == expected_category
+    ), f"\nExpected category: {expected_category}\nActual category:   {category}"
 
 
 def assert_form_field_error(response, field_name, expected_message):
@@ -31,3 +38,22 @@ def assert_form_generic_error(response, expected_message):
     error_message = page.select_one("#formerrors .text-danger")
     assert error_message is not None
     assert error_message.get_text(strip=True) == expected_message
+
+
+def otp_secret_from_page(page):
+    """
+    Takes a page with an OTP QR code on it, and returns the secret
+    """
+    return otp_secret_from_uri(page.select_one("#otp-uri").attrs['value'])
+
+
+def otp_secret_from_uri(uri):
+    return parse.parse_qs(parse.urlparse(uri).query)['secret'][0]
+
+
+def get_otp(secret):
+    """
+    Return an TOTP OTP from the given secret
+    """
+    totp = pyotp.TOTP(secret, 6, hashlib.sha512)
+    return totp.now()
