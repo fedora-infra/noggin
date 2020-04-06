@@ -182,7 +182,7 @@ def test_time_sensitive_password_policy(client, dummy_user):
         follow_redirects=True,
     )
     # the dummy user is created and has its password immediately changed,
-    # so this next attempt should failt with a constraint error.
+    # so this next attempt should fail with a constraint error.
     assert_form_field_error(
         result,
         field_name="password",

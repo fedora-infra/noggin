@@ -65,6 +65,7 @@ def make_user():
             name.title(),
             'User',
             f'{name.title()} User',
+            mail="dummy@example.com",
             user_password=password,
             login_shell='/bin/bash',
             fascreationtime=f"{now.isoformat()}Z",
