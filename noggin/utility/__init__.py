@@ -32,7 +32,7 @@ def with_ipa(app, session):
             ipa = maybe_ipa_session(app, session)
             if ipa:
                 g.ipa = ipa
-                g.current_user = User(g.ipa.user_find(whoami=True)['result'][0])
+                g.current_user = User(g.ipa.user_find(o_whoami=True)['result'][0])
                 return f(*args, **kwargs, ipa=ipa)
             flash('Please log in to continue.', 'warning')
             return redirect(url_for('root'))

@@ -31,15 +31,10 @@ def user(ipa, username):
     # As a speed optimization, we make two separate calls.
     # Just doing a group_find (with all=True) is super slow here, with a lot of
     # groups.
-    groups = [
-        Group(g)
-        for g in ipa.group_find(user=username, all=False, fasgroup=True)['result']
-    ]
+    groups = [Group(g) for g in ipa.group_find(o_user=username, o_all=False, fasgroup=True)['result']]
     managed_groups = [
         Group(g)
-        for g in ipa.group_find(membermanager_user=username, all=False, fasgroup=True)[
-            'result'
-        ]
+        for g in ipa.group_find(o_membermanager_user=username, o_all=False, fasgroup=True)['result']
     ]
     return render_template(
         'user.html', user=user, groups=groups, managed_groups=managed_groups
