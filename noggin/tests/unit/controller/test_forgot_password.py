@@ -241,6 +241,20 @@ def test_change_post_password_too_short(
         f'/forgot-password/change?token={token_for_dummy_user}',
         data={"password": "42", "password_confirm": "42"},
     )
+    assert_form_field_error(
+        result, "password", expected_message="Field must be at least 6 characters long."
+    )
+
+
+@pytest.mark.vcr()
+def test_change_post_password_policy_rejected(
+    client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
+):
+    logger = mocker.patch("noggin.controller.password.app.logger")
+    result = client.post(
+        f'/forgot-password/change?token={token_for_dummy_user}',
+        data={"password": "1234567", "password_confirm": "1234567"},
+    )
     assert_redirects_with_flash(
         result,
         expected_url="/",
@@ -308,7 +322,7 @@ def test_change_post_password_with_otp_not_given(
     logger = mocker.patch("noggin.controller.password.app.logger")
     result = client.post(
         f'/forgot-password/change?token={token_for_dummy_user}',
-        data={"password": "42", "password_confirm": "42"},
+        data={"password": "42424242", "password_confirm": "42424242"},
     )
     assert_form_field_error(result, "otp", "Incorrect value.")
     patched_lock_active["delete"].assert_not_called()
@@ -330,7 +344,7 @@ def test_change_post_password_with_otp_wrong_value(
     logger = mocker.patch("noggin.controller.password.app.logger")
     result = client.post(
         f'/forgot-password/change?token={token_for_dummy_user}',
-        data={"password": "42", "password_confirm": "42", "otp": "42"},
+        data={"password": "42424242", "password_confirm": "42424242", "otp": "42"},
     )
     assert_form_field_error(result, "otp", "Incorrect value.")
     patched_lock_active["delete"].assert_not_called()

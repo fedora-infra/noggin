@@ -191,14 +191,33 @@ def test_time_sensitive_password_policy(client, dummy_user):
 
 
 @pytest.mark.vcr()
-def test_short_password(client, dummy_user, no_password_min_time):
-    """Verify that new password policies are upheld"""
+def test_short_password_form(client, dummy_user, no_password_min_time):
+    """Verify that form password policies are upheld"""
     result = client.post(
         '/password-reset?username=dummy',
         data={
             "current_password": "dummy_password",
             "password": "1",
             "password_confirm": "1",
+        },
+        follow_redirects=True,
+    )
+    assert_form_field_error(
+        result,
+        field_name="password",
+        expected_message="Field must be at least 6 characters long.",
+    )
+
+
+@pytest.mark.vcr()
+def test_short_password_policy(client, dummy_user, no_password_min_time):
+    """Verify that server password policies are upheld"""
+    result = client.post(
+        '/password-reset?username=dummy',
+        data={
+            "current_password": "dummy_password",
+            "password": "1234567",
+            "password_confirm": "1234567",
         },
         follow_redirects=True,
     )
