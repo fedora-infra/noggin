@@ -5,12 +5,12 @@
               <form class="needs-validation" action="{{ url_for('user_settings_keys', username=user.username) }}" method="post" novalidate>
                 {{ form.csrf_token }}
                 <div class="card-body">
-                  <div class="form-group">{{ macros.with_errors(form.gpgkeys, maxlength="16", class="text-monospace mb-1", placeholder="GPG Key ID") }}</div>
-                  <div class="form-group">{{ macros.with_errors(form.sshpubkeys, class="text-monospace mb-1", placeholder="SSH Public Key") }}</div>
+                  <div class="form-group">{{ macros.with_errors(form.gpgkeys, maxlength="16", class="text-monospace mb-1", placeholder=_("GPG Key ID")) }}</div>
+                  <div class="form-group">{{ macros.with_errors(form.sshpubkeys, class="text-monospace mb-1", placeholder=_("SSH Public Key")) }}</div>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                   <div>{{ macros.non_field_errors(form) }}</div>
-                  <button class="btn btn-primary" id="submit" type="submit" tabindex="9">Save</button>
+                  <button class="btn btn-primary" id="submit" type="submit" tabindex="9">{{ _("Save") }}</button>
                 </div>
               </form>
 {% endblock %}

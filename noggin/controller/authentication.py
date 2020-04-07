@@ -17,7 +17,7 @@ def handle_login_form(form):
         # This call will set the cookie itself, we don't have to.
         ipa = maybe_ipa_login(app, session, username, password)
     except python_freeipa.exceptions.PasswordExpired:
-        flash('Password expired. Please reset it.', 'danger')
+        flash(_('Password expired. Please reset it.'), 'danger')
         return redirect(url_for('password_reset', username=username))
     except python_freeipa.exceptions.Unauthorized as e:
         raise FormError("non_field_errors", e.message)
@@ -37,7 +37,7 @@ def handle_login_form(form):
         )
         raise FormError("non_field_errors", _('Could not log in to the IPA server.'))
 
-    flash(f'Welcome, {username}!', 'success')
+    flash(_('Welcome, %(username)s!', username=username), 'success')
     return redirect(url_for('user', username=username))
 
 
@@ -56,7 +56,7 @@ def otp_sync():
                     token=form.token.data,
                 )
 
-                flash('Token successfully synchronized', category='success')
+                flash(_('Token successfully synchronized'), category='success')
                 return redirect(url_for('root'))
 
             except python_freeipa.exceptions.BadRequest as e:

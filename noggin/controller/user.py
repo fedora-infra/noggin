@@ -154,12 +154,12 @@ def user_settings_otp(ipa, username):
             )
             session['otp_uri'] = new_uri.geturl()
         except python_freeipa.exceptions.InvalidSessionPassword:
-            addotpform.password.errors.append("Incorrect password")
+            addotpform.password.errors.append(_("Incorrect password"))
         except python_freeipa.exceptions.FreeIPAError as e:
             app.logger.error(
                 f'An error happened while creating an OTP token for user {username}: {e.message}'
             )
-            addotpform.errors['non_field_errors'] = ['Cannot create the token.']
+            addotpform.errors['non_field_errors'] = [_('Cannot create the token.')]
         else:
             return redirect(url_for('user_settings_otp', username=username))
 
@@ -201,7 +201,7 @@ def user_settings_otp_disable(ipa, username):
                     f'Something went wrong disabling an OTP token for user {username}: {e}'
                 )
         except python_freeipa.exceptions.FreeIPAError as e:
-            flash('Cannot disable the token.', 'danger')
+            flash(_('Cannot disable the token.'), 'danger')
             app.logger.error(
                 f'Something went wrong disabling an OTP token for user {username}: {e}'
             )
@@ -228,14 +228,14 @@ def user_settings_otp_delete(ipa, username):
                 e.message
                 == "Server is unwilling to perform: Can't delete last active token"
             ):
-                flash('Sorry, You cannot delete your last active token.', 'warning')
+                flash(_('Sorry, You cannot delete your last active token.'), 'warning')
             else:
-                flash('Cannot delete the token.', 'danger')
+                flash(_('Cannot delete the token.'), 'danger')
                 app.logger.error(
                     f'Something went wrong deleting OTP token for user {username}: {e}'
                 )
         except python_freeipa.exceptions.FreeIPAError as e:
-            flash('Cannot delete the token.', 'danger')
+            flash(_('Cannot delete the token.'), 'danger')
             app.logger.error(
                 f'Something went wrong deleting OTP token for user {username}: {e}'
             )

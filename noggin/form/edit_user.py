@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_babel import lazy_gettext as _
 from wtforms import (
     FieldList,
     StringField,
@@ -16,77 +17,80 @@ from noggin.utility.timezones import TIMEZONES
 
 class UserSettingsProfileForm(FlaskForm):
     firstname = StringField(
-        'First Name', validators=[DataRequired(message='First name must not be empty')]
+        _('First Name'),
+        validators=[DataRequired(message=_('First name must not be empty'))],
     )
 
     lastname = StringField(
-        'Last Name', validators=[DataRequired(message='Last name must not be empty')]
+        _('Last Name'),
+        validators=[DataRequired(message=_('Last name must not be empty'))],
     )
 
     mail = EmailField(
-        'E-mail Address',
+        _('E-mail Address'),
         validators=[
-            DataRequired(message='Email must not be empty'),
-            Email(message='Email must be valid'),
+            DataRequired(message=_('Email must not be empty')),
+            Email(message=_('Email must be valid')),
         ],
     )
 
     locale = SelectField(
-        'Locale',
+        _('Locale'),
         choices=[(l, l) for l in LOCALES],
         validators=[
-            DataRequired(message='Locale must not be empty'),
-            AnyOf(LOCALES, message='Locale must be a valid locale short-code'),
+            DataRequired(message=_('Locale must not be empty')),
+            AnyOf(LOCALES, message=_('Locale must be a valid locale short-code')),
         ],
     )
 
-    ircnick = StringField('IRC Nickname', validators=[Optional()])
+    ircnick = StringField(_('IRC Nickname'), validators=[Optional()])
 
     timezone = SelectField(
-        'Timezone',
+        _('Timezone'),
         choices=[(t, t) for t in TIMEZONES],
         validators=[
-            DataRequired(message='Timezone must not be empty'),
-            AnyOf(TIMEZONES, message='Timezone must be a valid timezone'),
+            DataRequired(message=_('Timezone must not be empty')),
+            AnyOf(TIMEZONES, message=_('Timezone must be a valid timezone')),
         ],
     )
 
-    github = StringField('GitHub Username', validators=[Optional()])
+    github = StringField(_('GitHub Username'), validators=[Optional()])
 
-    gitlab = StringField('GitLab Username', validators=[Optional()])
+    gitlab = StringField(_('GitLab Username'), validators=[Optional()])
 
-    rhbz_mail = EmailField('Red Hat Bugzilla Email', validators=[Optional()])
+    rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
 
 
 class UserSettingsKeysForm(FlaskForm):
     sshpubkeys = FieldList(
-        TextAreaField(validators=[Optional()], render_kw={"rows": 4}), label='SSH Keys'
+        TextAreaField(validators=[Optional()], render_kw={"rows": 4}),
+        label=_('SSH Keys'),
     )
 
     gpgkeys = FieldList(
-        StringField(validators=[Optional(), Length(max=16)]), label='GPG Keys'
+        StringField(validators=[Optional(), Length(max=16)]), label=_('GPG Keys')
     )
 
 
 class UserSettingsAddOTPForm(FlaskForm):
     description = StringField(
-        'Token description',
-        validators=[DataRequired(message='Description must not be empty')],
+        _('Token description'),
+        validators=[DataRequired(message=_('Description must not be empty'))],
     )
 
     password = PasswordField(
-        'Enter your current password',
-        validators=[DataRequired(message='You must provide a password')],
+        _('Enter your current password'),
+        validators=[DataRequired(message=_('You must provide a password'))],
     )
 
 
 class UserSettingsDisableOTPForm(FlaskForm):
     token = HiddenField(
-        'token', validators=[DataRequired(message='token must not be empty')]
+        'token', validators=[DataRequired(message=_('token must not be empty'))]
     )
 
 
 class UserSettingsDeleteOTPForm(FlaskForm):
     token = HiddenField(
-        'token', validators=[DataRequired(message='token must not be empty')]
+        'token', validators=[DataRequired(message=_('token must not be empty'))]
     )
