@@ -35,6 +35,15 @@ def ipa_cert():
         yield
 
 
+@pytest.fixture(scope="session")
+def add_hidden_group():
+    hidden_group = app.config.get('HIDDEN_GROUPS')
+    parent_group = ipa_admin.group_find(hidden_group)
+    if not parent_group:
+        ipa_admin.group_add(cn=hidden_group)
+    ipa_admin.group_add_member(cn=hidden_group, group="ipausers")
+
+
 @pytest.fixture
 def client(ipa_cert):
     app.config['TESTING'] = True
