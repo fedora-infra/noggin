@@ -3,8 +3,8 @@ from flask import render_template, request, redirect, url_for, session, jsonify
 from noggin import app
 from noggin.form.register_user import RegisterUserForm
 from noggin.form.login_user import LoginUserForm
-from noggin.representation.user import User
 from noggin.representation.group import Group
+from noggin.representation.user import User
 
 from noggin.security.ipa import maybe_ipa_session
 from noggin.utility import with_ipa, handle_form_errors
