@@ -33,7 +33,7 @@ def test_user(client, logged_in_dummy_user):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert page.title.string == 'dummy\'s Profile - noggin'
+    assert page.title.string == 'Profile for dummy - noggin'
     user_fullname = page.select("#user_fullname")
     assert len(user_fullname) == 1
     assert user_fullname[0].get_text(strip=True) == "Dummy User"
@@ -57,7 +57,7 @@ def test_user_edit(client, logged_in_dummy_user):
     page = BeautifulSoup(result.data, 'html.parser')
     # print(page.prettify())
     assert page.title
-    assert page.title.string == 'dummy\'s Settings - noggin'
+    assert page.title.string == 'Settings for dummy - noggin'
     form = page.select("form[action='/user/dummy/settings/profile/']")
     assert len(form) == 1
     assert form[0].find("input", attrs={"name": "firstname"})["value"] == "Dummy"
@@ -127,7 +127,7 @@ def test_user_settings_keys(client, logged_in_dummy_user):
     result = client.get('/user/dummy/settings/keys/')
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert page.title.string == 'dummy\'s Settings - noggin'
+    assert page.title.string == 'Settings for dummy - noggin'
     form = page.select("form[action='/user/dummy/settings/keys/']")
     assert len(form) == 1
     assert (

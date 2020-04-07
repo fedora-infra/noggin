@@ -8,19 +8,19 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Scan your new token</h5>
+        <h5 class="modal-title">{{ _("Scan your new token") }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <!-- Only show the QR code when the user is ready, this gives them time to pick up their phone and check noone is looking over their shoulders -->
-        <p>Your new token is ready. Click on the button below to reveal the QR code and scan it.</p>
-        <div class="text-center"><button id="otp-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="false">Reveal</button></div>
+        {# Only show the QR code when the user is ready, this gives them time to pick up their phone and check noone is looking over their shoulders #}
+        <p>{{ _("Your new token is ready. Click on the button below to reveal the QR code and scan it.") }}</p>
+        <div class="text-center"><button id="otp-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="false">{{ _("Reveal") }}</button></div>
         <div id="otp-qrcode" class="text-center mt-3" style="display:none"></div>
-        <p class="mb-1 mt-4">or copy and paste the following token URL if you can't scan the QR code:</p>
+        <p class="mb-1 mt-4">{{ _("or copy and paste the following token URL if you can't scan the QR code:") }}</p>
         <input id="otp-uri" class="form-control" readonly value="{{otp_uri|safe}}" />
-        <div class="alert alert-warning my-4">This will never be shown to you again, don't close this window until your token is saved.</div>
+        <div class="alert alert-warning my-4">{{ _("This will never be shown to you again, don't close this window until your token is saved.") }}</div>
       </div>
     </div>
   </div>
@@ -28,16 +28,16 @@
 {% endif%}
 <div class="card-body">
   <div class="d-flex">
-      <h5 id="pageheading">OTP Tokens</h5>
+      <h5 id="pageheading">{{ _("OTP Tokens") }}</h5>
       <div class="dropdown ml-auto {% if addotpform.errors %}show{% endif %}">
-        <div class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">Add OTP Token</div>
+        <div class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">{{_("Add OTP Token")}}</div>
         <div class="dropdown-menu dropdown-menu-right {% if addotpform.errors %}show{% endif %}" style="min-width:20em;">
             <form action="{{ url_for('user_settings_otp', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <div class="form-group">{{ macros.with_errors(addotpform.description, tabindex="2")}}</div>
-              <div class="form-group">{{ macros.with_errors(addotpform.password, tabindex="3", placeholder="Password or Password + One-Time-Password")}}</div>
+              <div class="form-group">{{ macros.with_errors(addotpform.password, tabindex="3", placeholder=_("Password or Password + One-Time-Password"))}}</div>
               <div>{{ macros.non_field_errors(addotpform) }}</div>
-              <button class="btn btn-primary" id="submit" type="submit" tabindex="4">Generate</button>
+              <button class="btn btn-primary" id="submit" type="submit" tabindex="4">{{ _("Generate") }}</button>
             </form>
           </div>
       </div>
@@ -56,10 +56,10 @@
         {% if not token.disabled %}
           <form action="{{ url_for('user_settings_otp_disable', username=current_user.username) }}" method="post" class="d-inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <button type='submit' class="btn btn-sm btn-outline-secondary" name="token" value="{{ token.uniqueid }}">Disable</button>
+            <button type='submit' class="btn btn-sm btn-outline-secondary" name="token" value="{{ token.uniqueid }}">{{ _("Disable") }}</button>
           </form>
         {% else %}
-        <button class="btn btn-sm btn-link disabled">Disabled</button>
+        <button class="btn btn-sm btn-link disabled">{{ _("Disabled") }}</button>
         {% endif %}
         <form action="{{ url_for('user_settings_otp_delete', username=current_user.username) }}" method="post" class="d-inline">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -69,7 +69,7 @@
     </div>
   </div>
 {% else %}
-  <div class="list-group-item text-center bg-light text-muted font-weight-bold">You have no OTP tokens</div>
+  <div class="list-group-item text-center bg-light text-muted font-weight-bold">{{ _("You have no OTP tokens") }}</div>
 {% endfor %}
 </div>
 {% endblock %}

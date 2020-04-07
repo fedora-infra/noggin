@@ -36,7 +36,7 @@ def test_user_settings_otp(client, logged_in_dummy_user):
     result = client.get("/user/dummy/settings/otp/")
     page = BeautifulSoup(result.data, "html.parser")
     assert page.title
-    assert page.title.string == "dummy's Settings - noggin"
+    assert page.title.string == "Settings for dummy - noggin"
     # check the pageheading
     pageheading = page.select("#pageheading")[0]
     assert pageheading.get_text(strip=True) == "OTP Tokens"
@@ -51,7 +51,7 @@ def test_user_settings_otp(client, logged_in_dummy_user):
     result = client.get("/user/dummy/settings/otp/")
     page = BeautifulSoup(result.data, "html.parser")
     assert page.title
-    assert page.title.string == "dummy's Settings - noggin"
+    assert page.title.string == "Settings for dummy - noggin"
 
     form = page.select("form[action='/user/dummy/settings/otp/']")
     assert len(form) == 1

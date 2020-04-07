@@ -1,6 +1,6 @@
 {% extends "main.html" %}
 
-{% block title %}{{ user.username }}'s Profile{% endblock %}
+{% block title %}{{_("Profile for %(username)s", username=user.username)}}{% endblock %}
 
 {% block content %}
   {{ super() }}
@@ -18,10 +18,10 @@
         </div>
         <ul class="nav nav-pills mb-3 justify-content-center" role="tablist">
           <li class="nav-item">
-            <a class="nav-link active" data-toggle="pill" href="#profile" role="tab">Profile</a>
+            <a class="nav-link active" data-toggle="pill" href="#profile" role="tab">{{_("Profile")}}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#groups" role="tab">Groups <span class="badge badge-primary badge-pill">{{groups | count }}</span></a>
+            <a class="nav-link" data-toggle="pill" href="#groups" role="tab">{{_("Groups")}} <span class="badge badge-primary badge-pill">{{groups | count }}</span></a>
           </li>
         </ul>
         <div class="tab-content">
@@ -29,19 +29,19 @@
             <div class="card">
                   <ul class="list-group list-group-flush">
                   {% if user.timezone %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><b>Timezone</b> {{ user.timezone }}</li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("Timezone")}}</strong> {{ user.timezone }}</li>
                   {% endif %}
                   {% if user.ircnick %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><b>IRC Nickname</b> {{ user.ircnick }}</li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("IRC Nickname")}}</strong> {{ user.ircnick }}</li>
                   {% endif %}
                   {% if user.locale %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><b>Locale</b> {{ user.locale }}</li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("Locale")}}</strong> {{ user.locale }}</li>
                   {% endif %}
                   {% if user.gpgkeys %}
-                    <li class="list-group-item d-flex justify-content-between"><b>GPG Keys</b> <div class="text-right">{% for pgpkey in user.gpgkeys %}<pre class="mb-0">{{ pgpkey }}</pre>{% endfor %}</div></li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>{{_("GPG Keys")}}</strong> <div class="text-right">{% for pgpkey in user.gpgkeys %}<pre class="mb-0">{{ pgpkey }}</pre>{% endfor %}</div></li>
                   {% endif %}
                   {% if user.rhbz_mail %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><b>RHBZ E-Mail</b> {{ user.rhbz_mail }}</li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("RHBZ E-Mail")}}</strong> {{ user.rhbz_mail }}</li>
                   {% endif %}
                   {% if user.github %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -59,7 +59,7 @@
               </ul>
               {% if user.username == current_user.username %}
               <div class="card-footer">
-                <a href="{{ url_for('user_settings_profile', username=user.username) }}" class="btn btn-secondary btn-block">Settings</a>
+                <a href="{{ url_for('user_settings_profile', username=user.username) }}" class="btn btn-secondary btn-block">{{_("Settings")}}</a>
               </div>
               {% endif %}
             </div>
@@ -83,7 +83,7 @@
                             {% endif %}  
                         </div>
                       </div>
-                      <div class=" {{ 'text-warning' if is_sponsor else 'text-success' }}">{{ 'sponsor' if is_sponsor else 'member' }} </div>
+                      <div class=" {{ 'text-warning' if is_sponsor else 'text-success' }}">{{ _('sponsor') if is_sponsor else _('member') }} </div>
                     </li>
                   {% endwith %}
                 {% endfor %}

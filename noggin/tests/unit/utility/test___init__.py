@@ -102,12 +102,12 @@ def test_formerror_unknown_field(client):
 
 
 def test_formerror_existing_field(client):
-    with current_app.test_request_context('/'):
+    with current_app.test_request_context('/', method="POST", data={"username": "1"}):
         form = LoginUserForm()
         form.validate()
-        error = FormError("username", "error message")
+        error = FormError("username", "You must provide a user name")
         error.populate_form(form)
-    assert form.errors["username"] == ["You must provide a user name", "error message"]
+    assert form.errors["username"] == ["You must provide a user name"]
 
 
 def test_formerror_unknown_field_append(client):
