@@ -1,6 +1,7 @@
 import random
-from cryptography.fernet import Fernet
 from requests import RequestException
+
+from cryptography.fernet import Fernet
 import python_freeipa
 from python_freeipa.client_legacy import ClientLegacy as IPAClient
 from python_freeipa.exceptions import (
@@ -42,13 +43,8 @@ class Client(IPAClient):
 
         TODO: this needs to be retained when we migrate to the newer Client class.
         """
-        hidden_groups = current_app.config.get('HIDDEN_GROUPS')
-        groups = [
-            g
-            for g in IPAClient.group_find(self, **kwargs)['result']
-            if g['cn'][0] not in hidden_groups
-        ]
-        return {'result': groups}
+        kwargs.setdefault("not_in_group", current_app.config.get('HIDDEN_GROUPS'))
+        return super().group_find(*args, **kwargs)
 
     def group_add_member_manager(
         self, group, users=None, groups=None, skip_errors=False, **kwargs
