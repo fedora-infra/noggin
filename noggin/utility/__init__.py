@@ -60,10 +60,11 @@ def require_self(f):
 
 
 def group_or_404(ipa, groupname):
-    try:
-        return ipa.group_show(groupname)
-    except python_freeipa.exceptions.NotFound:
+    group = ipa.group_find(groupname)['result']
+    if ipa.group_find(groupname)['result'] == []:
         abort(404)
+    else:
+        return group[0]
 
 
 def user_or_404(ipa, username):

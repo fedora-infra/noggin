@@ -31,6 +31,24 @@ def test_groups_list(client, logged_in_dummy_user, dummy_group):
 
 
 @pytest.mark.vcr()
+def test_groups_list_no_hidden(client, logged_in_dummy_user, dummy_group):
+    """Test the groups list: /groups/"""
+    result = client.get('/groups/')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    groups = page.select("ul.list-group li")
+    group_names = [g.find("span", class_="title").get_text(strip=True) for g in groups]
+    assert "ipausers" not in group_names
+
+
+@pytest.mark.vcr()
+def test_group_hidden(client, logged_in_dummy_user):
+    """Test the hidden group: /group/ipausers"""
+    result = client.get('/groups/ipausers')
+    assert result.status_code == 404
+
+
+@pytest.mark.vcr()
 def test_group(client, dummy_user_as_group_manager, make_user):
     """Test the group detail page: /group/<groupname>"""
     test_users = ["testuser1", "testuser2", "testuser3"]
@@ -98,6 +116,16 @@ def test_group_add_member(client, dummy_user_as_group_manager, make_user):
 
 
 @pytest.mark.vcr()
+def test_group_add_member_hidden_group(client, dummy_user_as_group_manager, make_user):
+    """Test adding a member to a group"""
+    make_user("testuser")
+    result = client.post(
+        '/group/ipausers/members/', data={"new_member_username": "testuser"}
+    )
+    assert result.status_code == 404
+
+
+@pytest.mark.vcr()
 def test_group_add_unknown_member(client, dummy_user_as_group_manager):
     """Test adding a non-existent member to a group"""
     result = client.post(
@@ -159,6 +187,18 @@ def test_group_remove_member(client, dummy_user_as_group_manager, make_user):
         expected_message="You got it! testuser has been removed from dummy-group.",
         expected_category="success",
     )
+
+
+@pytest.mark.vcr()
+def test_group_remove_member_hidden_group(
+    client, dummy_user_as_group_manager, make_user
+):
+    """Test removing a member from a hidden group"""
+    make_user("testuser")
+    result = client.post(
+        '/group/ipausers/members/remove', data={"username": "testuser"}
+    )
+    assert result.status_code == 404
 
 
 @pytest.mark.vcr()
