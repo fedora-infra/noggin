@@ -74,13 +74,15 @@ class UserSettingsKeysForm(FlaskForm):
 
 class UserSettingsAddOTPForm(FlaskForm):
     description = StringField(
-        _('Token description'),
-        validators=[DataRequired(message=_('Description must not be empty'))],
+        _('Token name'),
+        validators=[Optional()],
+        description=_("add an optional name to help you identify this token"),
     )
 
     password = PasswordField(
         _('Enter your current password'),
         validators=[DataRequired(message=_('You must provide a password'))],
+        description=_("please reauthenticate so we know it is you"),
     )
 
 

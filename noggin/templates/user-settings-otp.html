@@ -26,21 +26,43 @@
   </div>
 </div>
 {% endif%}
+
+<div class="modal fade" id="add-token-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ _("Add OTP Token") }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% if not tokens %}
+          <div class="alert alert-info">
+            <div><small>{{_("Creating your first OTP token enables two-factor authentication using OTP.")}}</small></div> 
+            <div><small><strong>{{_("Once enabled, two-factor authentication cannot be disabled.")}}</strong></small></div>
+          </div>
+        {% endif %}
+        <form action="{{ url_for('user_settings_otp', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <div class="form-group">{{ macros.with_errors(addotpform.description, label=False, tabindex="2", placeholder=_("Token name"))}}</div>
+          {% if tokens %}
+          <div class="form-group">{{ macros.with_errors(addotpform.password, label=False, tabindex="3", placeholder=_("Password + One-Time-Password"))}}</div>
+          {% else %}
+          <div class="form-group">{{ macros.with_errors(addotpform.password, label=False, tabindex="3", placeholder=_("Password"))}}</div>
+          {% endif %}
+          <div>{{ macros.non_field_errors(addotpform) }}</div>
+          <button class="btn btn-primary btn-block" id="submit" type="submit" tabindex="4">{{ _("Generate OTP Token") }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card-body">
   <div class="d-flex">
       <h5 id="pageheading">{{ _("OTP Tokens") }}</h5>
-      <div class="dropdown ml-auto {% if addotpform.errors %}show{% endif %}">
-        <div class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">{{_("Add OTP Token")}}</div>
-        <div class="dropdown-menu dropdown-menu-right {% if addotpform.errors %}show{% endif %}" style="min-width:20em;">
-            <form action="{{ url_for('user_settings_otp', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-              <div class="form-group">{{ macros.with_errors(addotpform.description, tabindex="2")}}</div>
-              <div class="form-group">{{ macros.with_errors(addotpform.password, tabindex="3", placeholder=_("Password or Password + One-Time-Password"))}}</div>
-              <div>{{ macros.non_field_errors(addotpform) }}</div>
-              <button class="btn btn-primary" id="submit" type="submit" tabindex="4">{{ _("Generate") }}</button>
-            </form>
-          </div>
-      </div>
+      <div class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#add-token-modal">{{_("Add OTP Token")}}</div>
   </div>
 </div>
 
@@ -69,7 +91,10 @@
     </div>
   </div>
 {% else %}
-  <div class="list-group-item text-center bg-light text-muted font-weight-bold">{{ _("You have no OTP tokens") }}</div>
+  <div class="list-group-item text-center bg-light text-muted font-weight-bold">
+    <div>{{ _("You have no OTP tokens") }}</div>
+    <div><small>{{ _("Add an OTP token to enable two-factor authentication on your account.") }}</small></div>
+  </div>
 {% endfor %}
 </div>
 {% endblock %}
@@ -87,7 +112,9 @@
         })
     });
   </script>
-
+  {% endif %}
+  {% if addotpform.errors %}
+    <script>$(document).ready(function() {$('#add-token-modal').modal('show');});</script>
   {% endif %}
 {% endblock %}
 

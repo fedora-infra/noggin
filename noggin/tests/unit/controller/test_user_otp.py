@@ -45,7 +45,8 @@ def test_user_settings_otp(client, logged_in_dummy_user):
     assert len(tokenlist) == 1
     assert (
         tokenlist[0].select(".list-group-item")[0].get_text(strip=True)
-        == "You have no OTP tokens"
+        == "You have no OTP tokensAdd an OTP token to enable two-factor "
+        "authentication on your account."
     )
 
     result = client.get("/user/dummy/settings/otp/")
@@ -133,8 +134,8 @@ def test_user_settings_otp_add_no_permission(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_add_invalid_form(client, logged_in_dummy_user):
     """Test an invalid form when adding an otp token"""
-    result = client.post("/user/dummy/settings/otp/", data={"password": "pants"})
-    assert_form_field_error(result, "description", "Description must not be empty")
+    result = client.post("/user/dummy/settings/otp/", data={})
+    assert_form_field_error(result, "password", "You must provide a password")
 
 
 @pytest.mark.vcr()
