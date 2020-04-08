@@ -35,13 +35,18 @@ def ipa_cert():
         yield
 
 
-@pytest.fixture(scope="session")
-def add_hidden_group():
-    hidden_group = app.config.get('HIDDEN_GROUPS')
-    parent_group = ipa_admin.group_find(hidden_group)
-    if not parent_group:
-        ipa_admin.group_add(cn=hidden_group)
-    ipa_admin.group_add_member(cn=hidden_group, group="ipausers")
+@pytest.fixture
+def add_hidden_group(logged_in_dummy_user):
+    hidden_group = app.config.get('HIDE_GROUPS_IN')
+    ipa = logged_in_dummy_user
+    # We need to use request here as our ipa.group_find method will filter the hidden groups out
+    parent_group = ipa._request('group_find', [], {"cn": hidden_group})['result']
+    try:
+        if not parent_group:
+            ipa_admin.group_add(hidden_group, nonposix=True)
+        ipa_admin.group_add_member(group=hidden_group, groups="ipausers")
+    except python_freeipa.exceptions.ValidationError:
+        pass
 
 
 @pytest.fixture

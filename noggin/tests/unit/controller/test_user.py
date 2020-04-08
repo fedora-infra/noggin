@@ -189,7 +189,7 @@ def test_user_settings_keys_post_bad_request(client, logged_in_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_user_cant_see_hidden_groups(client, logged_in_dummy_user):
+def test_user_cant_see_hidden_groups(client, logged_in_dummy_user, add_hidden_group):
     result = client.get('/user/dummy/')
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
@@ -198,7 +198,9 @@ def test_user_cant_see_hidden_groups(client, logged_in_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
+def test_user_can_see_dummy_group(
+    client, dummy_user_as_group_manager, add_hidden_group
+):
     result = client.get('/user/dummy/')
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
