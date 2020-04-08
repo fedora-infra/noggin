@@ -86,13 +86,7 @@ class UserSettingsAddOTPForm(FlaskForm):
     )
 
 
-class UserSettingsDisableOTPForm(FlaskForm):
-    token = HiddenField(
-        'token', validators=[DataRequired(message=_('token must not be empty'))]
-    )
-
-
-class UserSettingsDeleteOTPForm(FlaskForm):
+class UserSettingsOTPStatusChange(FlaskForm):
     token = HiddenField(
         'token', validators=[DataRequired(message=_('token must not be empty'))]
     )
