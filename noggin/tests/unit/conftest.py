@@ -39,8 +39,7 @@ def ipa_cert():
 def add_hidden_group(logged_in_dummy_user):
     hidden_group = app.config.get('HIDE_GROUPS_IN')
     ipa = logged_in_dummy_user
-    # We need to use request here as our ipa.group_find method will filter the hidden groups out
-    parent_group = ipa._request('group_find', [], {"cn": hidden_group})['result']
+    parent_group = ipa.group_find(group=hidden_group, posix=False)
     try:
         if not parent_group:
             ipa_admin.group_add(hidden_group, nonposix=True)

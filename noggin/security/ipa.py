@@ -43,11 +43,10 @@ class Client(IPAClient):
 
         TODO: this needs to be retained when we migrate to the newer Client class.
         """
-        kwargs.setdefault("not_in_group", []).append(
-            current_app.config.get('HIDE_GROUPS_IN')
-        )
-        kwargs.update({"posix": True})
-        return super().group_find(*args, **kwargs)
+        final_kwargs = {"posix": True, "not_in_group": []}
+        final_kwargs.update(kwargs)
+        final_kwargs["not_in_group"].append(current_app.config.get('HIDE_GROUPS_IN'))
+        return super().group_find(*args, **final_kwargs)
 
     def group_add_member_manager(
         self, group, users=None, groups=None, skip_errors=False, **kwargs

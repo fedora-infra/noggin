@@ -3,6 +3,7 @@ from functools import wraps
 from contextlib import contextmanager
 
 from flask import abort, flash, g, redirect, url_for, session
+from flask_babel import lazy_gettext as _
 import python_freeipa
 
 from noggin.representation.user import User
@@ -62,7 +63,7 @@ def require_self(f):
 def group_or_404(ipa, groupname):
     group = ipa.group_find(groupname)['result']
     if not group:
-        abort(404, f"Group {groupname} could not be found.")
+        abort(404, _('Group %(groupname)s could not be found.', groupname=groupname))
     else:
         return group[0]
 
