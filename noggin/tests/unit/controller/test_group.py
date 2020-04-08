@@ -10,7 +10,7 @@ from noggin.tests.unit.utilities import assert_redirects_with_flash
 
 
 @pytest.mark.vcr()
-def test_groups_list(client, logged_in_dummy_user, dummy_group):
+def test_groups_list(client, logged_in_dummy_user, dummy_group, add_hidden_group):
     """Test the groups list: /groups/"""
     result = client.get('/groups/')
     assert result.status_code == 200
@@ -31,7 +31,9 @@ def test_groups_list(client, logged_in_dummy_user, dummy_group):
 
 
 @pytest.mark.vcr()
-def test_groups_list_no_hidden(client, logged_in_dummy_user, dummy_group):
+def test_groups_list_no_hidden(
+    client, logged_in_dummy_user, dummy_group, add_hidden_group
+):
     """Test the groups list: /groups/"""
     result = client.get('/groups/')
     assert result.status_code == 200
@@ -42,7 +44,7 @@ def test_groups_list_no_hidden(client, logged_in_dummy_user, dummy_group):
 
 
 @pytest.mark.vcr()
-def test_group_hidden(client, logged_in_dummy_user):
+def test_group_hidden(client, logged_in_dummy_user, add_hidden_group):
     """Test the hidden group: /group/ipausers"""
     result = client.get('/groups/ipausers')
     assert result.status_code == 404
@@ -116,7 +118,9 @@ def test_group_add_member(client, dummy_user_as_group_manager, make_user):
 
 
 @pytest.mark.vcr()
-def test_group_add_member_hidden_group(client, dummy_user_as_group_manager, make_user):
+def test_group_add_member_hidden_group(
+    client, dummy_user_as_group_manager, make_user, add_hidden_group
+):
     """Test adding a member to a group"""
     make_user("testuser")
     result = client.post(
@@ -191,7 +195,7 @@ def test_group_remove_member(client, dummy_user_as_group_manager, make_user):
 
 @pytest.mark.vcr()
 def test_group_remove_member_hidden_group(
-    client, dummy_user_as_group_manager, make_user
+    client, dummy_user_as_group_manager, make_user, add_hidden_group
 ):
     """Test removing a member from a hidden group"""
     make_user("testuser")
