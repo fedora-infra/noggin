@@ -407,3 +407,105 @@ def test_user_settings_otp_delete_lasttoken(
         expected_message="Sorry, You cannot delete your last active token.",
         expected_category="warning",
     )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_enable_no_permission(client, logged_in_dummy_user):
+    """Verify that another user can't enable an otp token. """
+    result = client.post(
+        "/user/dudemcpants/settings/otp/enable/",
+        data={"description": "pants token", "password": "dummy_password"},
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dudemcpants/",
+        expected_message="You do not have permission to edit this account.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_enable_invalid_form(client, logged_in_dummy_user):
+    """Test an invalid form when enabling an otp token"""
+    result = client.post("/user/dummy/settings/otp/enable/", data={})
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="token must not be empty",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_enable_ipaerror(
+    client, logged_in_dummy_user, dummy_user_with_2_otp
+):
+    """Test failure when enabling an otptoken"""
+    with mock.patch("noggin.security.ipa.Client.otptoken_mod") as method:
+        method.side_effect = python_freeipa.exceptions.FreeIPAError(
+            message="Cannot enable the token.", code="4242"
+        )
+        result = client.post(
+            "/user/dummy/settings/otp/enable/",
+            data={"token": dummy_user_with_2_otp[1].uniqueid},
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot enable the token. Cannot enable the token.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_enable(client, logged_in_dummy_user, dummy_user_with_2_otp):
+    """Test enabling an otptoken"""
+    # add another OTP Token
+    result = client.get("/user/dummy/settings/otp/")
+
+    page = BeautifulSoup(result.data, "html.parser")
+    tokenlist = page.select("div.list-group .list-group-item")
+
+    # check we are showing 2 tokens
+    assert len(tokenlist) == 2
+
+    # grab the id of the first token
+    tokenid = tokenlist[0].select(".text-monospace")[0].get_text(strip=True)
+
+    # disable that token
+    result = client.post(
+        "/user/dummy/settings/otp/disable/",
+        data={"token": tokenid},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(result.data, "html.parser")
+
+    # select all the tokens, disabled and enabled
+    tokenlist = page.select("div.list-group .list-group-item")
+    # check we are showing 2 tokens
+    assert len(tokenlist) == 2
+
+    # select just the disabled tokens
+    tokenlist = page.select("div.list-group .list-group-item.text-muted")
+    # check we are showing 1 disabled item
+    assert len(tokenlist) == 1
+
+    # enable that token
+    result = client.post(
+        "/user/dummy/settings/otp/enable/",
+        data={"token": tokenid},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(result.data, "html.parser")
+
+    # select all the tokens, disabled and enabled
+    tokenlist = page.select("div.list-group .list-group-item")
+    # check we are showing 2 tokens
+    assert len(tokenlist) == 2
+
+    # try to select just the disabled tokens
+    tokenlist = page.select("div.list-group .list-group-item.text-muted")
+    # check we are showing 0 disabled tokens
+    assert len(tokenlist) == 0

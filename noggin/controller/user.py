@@ -9,8 +9,7 @@ from noggin.form.edit_user import (
     UserSettingsProfileForm,
     UserSettingsKeysForm,
     UserSettingsAddOTPForm,
-    UserSettingsDisableOTPForm,
-    UserSettingsDeleteOTPForm,
+    UserSettingsOTPStatusChange,
 )
 from noggin.representation.group import Group
 from noggin.representation.user import User
@@ -188,7 +187,7 @@ def user_settings_otp(ipa, username):
 @with_ipa(app, session)
 @require_self
 def user_settings_otp_disable(ipa, username):
-    form = UserSettingsDisableOTPForm()
+    form = UserSettingsOTPStatusChange()
 
     if form.validate_on_submit():
         token = form.token.data
@@ -217,11 +216,38 @@ def user_settings_otp_disable(ipa, username):
     return redirect(url_for('user_settings_otp', username=username))
 
 
+@app.route('/user/<username>/settings/otp/enable/', methods=['POST'])
+@with_ipa(app, session)
+@require_self
+def user_settings_otp_enable(ipa, username):
+    form = UserSettingsOTPStatusChange()
+
+    if form.validate_on_submit():
+        token = form.token.data
+        try:
+            ipa.otptoken_mod(ipatokenuniqueid=token, ipatokendisabled=None)
+        except (
+            python_freeipa.exceptions.BadRequest,
+            python_freeipa.exceptions.FreeIPAError,
+        ) as e:
+            flash(
+                _('Cannot enable the token. %(errormessage)s', errormessage=e), 'danger'
+            )
+            app.logger.error(
+                f'Something went wrong enabling an OTP token for user {username}: {e}'
+            )
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'danger')
+    return redirect(url_for('user_settings_otp', username=username))
+
+
 @app.route('/user/<username>/settings/otp/delete/', methods=['POST'])
 @with_ipa(app, session)
 @require_self
 def user_settings_otp_delete(ipa, username):
-    form = UserSettingsDeleteOTPForm()
+    form = UserSettingsOTPStatusChange()
 
     if form.validate_on_submit():
         username = session.get('noggin_username')
