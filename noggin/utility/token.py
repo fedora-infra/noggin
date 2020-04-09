@@ -56,7 +56,7 @@ class EmailValidationToken(JWTToken):
                 minutes=current_app.config["ACTIVATION_TOKEN_EXPIRATION"]
             )
         else:
-            self.valid_until = datetime.fromisoformat(valid_until)
+            self.valid_until = datetime.fromtimestamp(valid_until)
 
     @classmethod
     def from_user(cls, user):
@@ -67,7 +67,7 @@ class EmailValidationToken(JWTToken):
         return {
             "username": self.username,
             "mail": self.mail,
-            "valid_until": self.valid_until.isoformat(),
+            "valid_until": self.valid_until.timestamp(),
         }
 
     def is_valid(self):
