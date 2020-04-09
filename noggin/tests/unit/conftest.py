@@ -36,19 +36,6 @@ def ipa_cert():
 
 
 @pytest.fixture
-def add_hidden_group(logged_in_dummy_user):
-    hidden_group = app.config.get('HIDE_GROUPS_IN')
-    ipa = logged_in_dummy_user
-    parent_group = ipa.group_find(group=hidden_group, posix=False)
-    try:
-        if not parent_group:
-            ipa_admin.group_add(hidden_group, nonposix=True)
-        ipa_admin.group_add_member(group=hidden_group, groups="ipausers")
-    except python_freeipa.exceptions.ValidationError:
-        pass
-
-
-@pytest.fixture
 def client(ipa_cert):
     app.config['TESTING'] = True
     app.config['DEBUG'] = True
@@ -100,7 +87,7 @@ def dummy_user(make_user):
 
 @pytest.fixture
 def dummy_group():
-    ipa_admin.group_add('dummy-group', description="A dummy group")
+    ipa_admin.group_add('dummy-group', description="A dummy group", fasgroup=True)
     yield
     ipa_admin.group_del('dummy-group')
 
