@@ -136,5 +136,5 @@ def group_remove_member(ipa, groupname):
 @app.route('/groups/')
 @with_ipa(app, session)
 def groups(ipa):
-    groups = [Group(g) for g in ipa.group_find()['result']]
+    groups = [Group(g) for g in ipa.group_find(fasgroup=True)['result']]
     return render_template('groups.html', groups=groups)

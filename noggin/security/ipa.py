@@ -11,7 +11,6 @@ from python_freeipa.exceptions import (
     PWChangeInvalidPassword,
     PWChangePolicyError,
 )
-from flask import current_app
 
 
 def parse_group_management_error(data):
@@ -36,17 +35,6 @@ class Client(IPAClient):
 
     TODO: send this upstream.
     """
-
-    def group_find(self, *args, **kwargs):
-        """
-        Find a group. A wrapped method to allow filtering of groups to be hidden from the user.
-
-        TODO: this needs to be retained when we migrate to the newer Client class.
-        """
-        final_kwargs = {"posix": True, "not_in_group": []}
-        final_kwargs.update(kwargs)
-        final_kwargs["not_in_group"].append(current_app.config.get('HIDE_GROUPS_IN'))
-        return super().group_find(*args, **final_kwargs)
 
     def group_add_member_manager(
         self, group, users=None, groups=None, skip_errors=False, **kwargs

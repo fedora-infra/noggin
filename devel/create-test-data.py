@@ -16,7 +16,7 @@ ipa.login(ipa_user, ipa_pw)
 
 # create a developers group
 try:
-    ipa.group_add("developers", "A group for developers")
+    ipa.group_add("developers", "A group for developers", fasgroup=True, non_posix=True)
 except python_freeipa.exceptions.FreeIPAError as e:
     print(e)
 

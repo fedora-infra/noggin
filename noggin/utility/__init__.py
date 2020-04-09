@@ -61,7 +61,7 @@ def require_self(f):
 
 
 def group_or_404(ipa, groupname):
-    group = ipa.group_find(groupname)['result']
+    group = ipa.group_find(cn=groupname, fasgroup=True)['result']
     if not group:
         abort(404, _('Group %(groupname)s could not be found.', groupname=groupname))
     else:
