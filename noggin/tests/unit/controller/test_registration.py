@@ -343,7 +343,9 @@ def test_field_error_step_1(client, post_data_step_1, mocker, field_name, server
 
 
 @pytest.mark.vcr()
-def test_field_error_step_3(client, token_for_dummy_user, mocker, post_data_step_3):
+def test_field_error_step_3(
+    client, token_for_dummy_user, mocker, post_data_step_3, cleanup_dummy_user
+):
     """Activate a user with a password that the server errors on"""
     user_mod = mocker.patch("noggin.controller.registration.ipa_admin.user_mod")
     user_mod.side_effect = python_freeipa.exceptions.ValidationError(
@@ -417,8 +419,10 @@ def test_generic_activate_error(
     client, token_for_dummy_user, post_data_step_3, cleanup_dummy_user, mocker
 ):
     """Activate the user with an unhandled error"""
-    ipa_client = mocker.Mock()
-    ipa_client.stageuser_activate.side_effect = python_freeipa.exceptions.FreeIPAError(
+    ipa_admin_activate = mocker.patch(
+        "noggin.controller.registration.ipa_admin.stageuser_activate"
+    )
+    ipa_admin_activate.side_effect = python_freeipa.exceptions.FreeIPAError(
         message="something went wrong", code="4242"
     )
     with fml_testing.mock_sends():
