@@ -18,7 +18,7 @@ def group(ipa, groupname):
     sponsor_form = AddGroupMemberForm(groupname=groupname)
     remove_form = RemoveGroupMemberForm(groupname=groupname)
 
-    members = [User(u) for u in ipa.user_find(in_group=groupname)['result']]
+    members = [User(u) for u in ipa.user_find(o_in_group=groupname)['result']]
 
     batch_methods = [
         {"method": "user_find", "params": [[], {"uid": sponsorname, 'all': True}]}
