@@ -2,7 +2,7 @@
 
 {# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
 
-{% block title %}{{ group.name }} Group{% endblock %}
+{% block title %}{{ _('%(groupname)s Group', groupname=group.name) }}{% endblock %}
 
 {% block content %}
   {{ super() }}
@@ -25,21 +25,21 @@
     </div>
   </div>
   </div>
-  {% if current_user.username not in group.members %}
+  {% if current_user.username not in group.members or not current_user_is_sponsor %}
   <div class="alert alert-info rounded-0">
     <div class="container text-center">
-      To join this group, contact a group sponsor.
+      {{ _("To join this group, contact a group sponsor.") }}
     </div>
   </div>
   {% endif %}
   <div class="container">
     <div class="row">
       <div class="col-12 my-4" data-section="sponsors">
-        <h4>Sponsors <span class="badge badge-secondary">{{sponsors|length}}</span></h4>
+        <h4>{{ _("Sponsors") }} <span class="badge badge-secondary">{{sponsors|length}}</span></h4>
         {% if sponsors|length == 0 %}
         <ul class="list-group">
           <li class="list-group-item text-center bg-light text-muted">
-            <strong>no sponsors</strong>
+            <strong>{{ _("no sponsors") }}</strong>
           </li>
         </ul>
         {% else %}
@@ -65,14 +65,14 @@
       </div>
       <div class="col-12" data-section="members">
         <div class="d-flex justify-content-between">
-          <div class="h4">Members <span class="badge badge-secondary">{{members|length}}</span></div>
+          <div class="h4">{{ _("Members") }} <span class="badge badge-secondary">{{members|length}}</span></div>
           {% if current_user_is_sponsor and sponsor_form %}
           {# TODO: not require a double enter here maybe #}
              <form action="{{ url_for('group_add_member', groupname=group.name) }}" method="post">
               <div class="row">
                 <div class="col">
                   {{ sponsor_form.hidden_tag() }}
-                  {{ sponsor_form.new_member_username(class='typeahead form-control form-control-sm mb-2', autocomplete="off", placeholder="add user...") }}
+                  {{ sponsor_form.new_member_username(class='typeahead form-control form-control-sm mb-2', autocomplete="off", placeholder=_("add user...")) }}
                   <button class="d-none" id="submit" type="submit" tabindex="9">Submit</button>
                 </div>
               </div>
@@ -80,7 +80,7 @@
           {% endif %}
           </div>
         {% if members|length == 0 %}
-        <p>No members yet.</p>
+        <p>{{ _("No members yet.") }}</p>
         {% else %}
         <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
           {{ sponsor_form.hidden_tag() }}

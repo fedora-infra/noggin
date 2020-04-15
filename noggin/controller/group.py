@@ -1,4 +1,5 @@
 from flask import flash, g, render_template, redirect, session, url_for
+from flask_babel import _
 import python_freeipa
 from noggin_messages import MemberSponsorV1
 
@@ -44,6 +45,7 @@ def group(ipa, groupname):
 @app.route('/group/<groupname>/members/', methods=['POST'])
 @with_ipa(app, session)
 def group_add_member(ipa, groupname):
+    group_or_404(ipa, groupname)
     sponsor_form = AddGroupMemberForm()
     if sponsor_form.validate_on_submit():
         username = sponsor_form.new_member_username.data
@@ -51,18 +53,35 @@ def group_add_member(ipa, groupname):
         try:
             ipa.user_show(username)
         except python_freeipa.exceptions.NotFound:
-            flash('User %s was not found in the system.' % username, 'danger')
+            flash(
+                _('User %(username)s was not found in the system.', username=username),
+                'danger',
+            )
             return redirect(url_for('group', groupname=groupname))
         try:
-            ipa.group_add_member(groupname, users=username)
+            ipa.group_add_member(group=groupname, users=username)
         except python_freeipa.exceptions.ValidationError as e:
             # e.message is a dict that we have to process ourselves for now:
             # https://github.com/opennode/python-freeipa/issues/24
             for error in e.message['member']['user']:
-                flash('Unable to add user %s: %s' % (error[0], error[1]), 'danger')
+                flash(
+                    _(
+                        'Unable to add user %(username)s: %(errormessage)s',
+                        username=error[0],
+                        errormessage=error[1],
+                    ),
+                    'danger',
+                )
             return redirect(url_for('group', groupname=groupname))
 
-        flash('You got it! %s has been added to %s.' % (username, groupname), 'success')
+        flash(
+            _(
+                'You got it! %(username)s has been added to %(groupname)s.',
+                username=username,
+                groupname=groupname,
+            ),
+            'success',
+        )
         messaging.publish(
             MemberSponsorV1(
                 {
@@ -86,20 +105,24 @@ def group_add_member(ipa, groupname):
 @app.route('/group/<groupname>/members/remove', methods=['POST'])
 @with_ipa(app, session)
 def group_remove_member(ipa, groupname):
+    group_or_404(ipa, groupname)
     form = RemoveGroupMemberForm()
     if form.validate_on_submit():
         username = form.username.data
         try:
-            ipa.group_remove_member(groupname, users=username)
+            ipa.group_remove_member(group=groupname, users=username)
         except python_freeipa.exceptions.ValidationError as e:
             # e.message is a dict that we have to process ourselves for now:
             # https://github.com/opennode/python-freeipa/issues/24
             for error in e.message['member']['user']:
                 flash('Unable to remove user %s: %s' % (error[0], error[1]), 'danger')
             return redirect(url_for('group', groupname=groupname))
-
         flash(
-            'You got it! %s has been removed from %s.' % (username, groupname),
+            _(
+                'You got it! %(username)s has been removed from %(groupname)s.',
+                username=username,
+                groupname=groupname,
+            ),
             'success',
         )
         return redirect(url_for('group', groupname=groupname))
@@ -113,5 +136,5 @@ def group_remove_member(ipa, groupname):
 @app.route('/groups/')
 @with_ipa(app, session)
 def groups(ipa):
-    groups = [Group(g) for g in ipa.group_find()['result']]
+    groups = [Group(g) for g in ipa.group_find(fasgroup=True)['result']]
     return render_template('groups.html', groups=groups)

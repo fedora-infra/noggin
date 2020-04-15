@@ -1,39 +1,49 @@
-from flask_wtf import FlaskForm
+from flask_babel import lazy_gettext as _
 from wtforms import StringField, PasswordField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo, Email
 
+from .base import ModestForm, SubmitButtonField, strip
 
-class RegisterUserForm(FlaskForm):
+
+class RegisterUserForm(ModestForm):
     firstname = StringField(
-        'First Name', validators=[DataRequired(message='First name must not be empty')]
+        _('First Name'),
+        validators=[DataRequired(message=_('First name must not be empty'))],
+        filters=[strip],
     )
 
     lastname = StringField(
-        'Last Name', validators=[DataRequired(message='Last name must not be empty')]
+        _('Last Name'),
+        validators=[DataRequired(message=_('Last name must not be empty'))],
+        filters=[strip],
     )
 
     username = StringField(
-        'Username',
-        validators=[DataRequired(message='User name must not be empty')],
-        description="No spaces please",
+        _('Username'),
+        validators=[DataRequired(message=_('User name must not be empty'))],
+        filters=[strip],
     )
 
     password = PasswordField(
-        'Password',
+        _('Password'),
         validators=[
-            DataRequired(message='Password must not be empty'),
-            EqualTo('password_confirm', message='Passwords must match'),
+            DataRequired(message=_('Password must not be empty')),
+            EqualTo('password_confirm', message=_('Passwords must match')),
         ],
-        description="Please choose a strong password",
+        filters=[strip],
+        description=_("Please choose a strong password"),
     )
 
-    password_confirm = PasswordField('Confirm Password')
+    password_confirm = PasswordField(_('Confirm Password'), filters=[strip])
 
     mail = EmailField(
-        'E-mail Address',
+        _('E-mail Address'),
         validators=[
-            DataRequired(message='Email must not be empty'),
-            Email(message='Email must be valid'),
+            DataRequired(message=_('Email must not be empty')),
+            Email(message=_('Email must be valid')),
         ],
+        filters=[strip],
     )
+
+    submit = SubmitButtonField(_("Register"))

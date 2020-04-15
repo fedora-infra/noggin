@@ -1,6 +1,9 @@
 import datetime
+import random
+import string
 
 from flask import abort, flash, render_template, redirect, request, url_for, session
+from flask_babel import _
 from flask_mail import Message
 import python_freeipa
 import jwt
@@ -8,8 +11,14 @@ import jwt
 from noggin import app, ipa_admin, mailer
 from noggin.security.ipa import untouched_ipa_client, maybe_ipa_session
 from noggin.representation.user import User
-from noggin.utility import with_ipa, user_or_404
-from noggin.utility.password_reset import PasswordResetLock
+from noggin.utility import (
+    with_ipa,
+    user_or_404,
+    FormError,
+    handle_form_errors,
+    require_self,
+)
+from noggin.utility.password_reset import PasswordResetLock, JWTToken
 from noggin.form.password_reset import (
     PasswordResetForm,
     ForgottenPasswordForm,
@@ -23,13 +32,14 @@ def _validate_change_pw_form(form, username, ipa=None):
 
     current_password = form.current_password.data
     password = form.password.data
+    otp = form.otp.data
 
     res = None
     try:
-        res = ipa.change_password(username, password, current_password)
+        res = ipa.change_password(username, password, current_password, otp)
     except python_freeipa.exceptions.PWChangeInvalidPassword:
         form.current_password.errors.append(
-            "The old password or username is not correct"
+            _("The old password or username is not correct")
         )
     except python_freeipa.exceptions.PWChangePolicyError as e:
         form.password.errors.append(e.policy_error)
@@ -40,10 +50,10 @@ def _validate_change_pw_form(form, username, ipa=None):
             f'An unhandled error {e.__class__.__name__} happened while reseting '
             f'the password for user {username}: {e.message}'
         )
-        form.errors['non_field_errors'] = ['Could not change password.']
+        form.errors['non_field_errors'] = [_('Could not change password.')]
 
     if res and res.ok:
-        flash('Your password has been changed', 'success')
+        flash(_('Your password has been changed'), 'success')
         app.logger.info(f'Password for {username} was changed')
     return res
 
@@ -73,12 +83,8 @@ def password_reset():
 
 @app.route('/user/<username>/settings/password', methods=['GET', 'POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_password(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('root'))
-
     user = User(user_or_404(ipa, username))
     form = PasswordResetForm()
 
@@ -91,7 +97,7 @@ def user_settings_password(ipa, username):
         'user-settings-password.html',
         user=user,
         password_reset_form=form,
-        select="password",
+        activetab="password",
     )
 
 
@@ -103,55 +109,52 @@ def forgot_password_ask():
         lock = PasswordResetLock(username)
         valid_until = lock.valid_until()
         now = datetime.datetime.now()
-        if valid_until is not None and now < valid_until:
-            wait_min = int((valid_until - now).total_seconds() / 60)
-            wait_sec = int((valid_until - now).total_seconds() % 60)
-            form.errors['non_field_errors'] = [
-                f'You have already requested a password reset, you need to wait {wait_min} '
-                f'minute(s) and {wait_sec} seconds before you can request another.'
-            ]
-        else:
-            try:
-                user = ipa_admin.user_show(username)
-            except python_freeipa.exceptions.NotFound:
-                form.username.errors.append(f"User {username} does not exist")
-            else:
-                token = str(
-                    jwt.encode(
-                        {"username": username, "last_change": user["krblastpwdchange"]},
-                        app.config["SECRET_KEY"],
-                        algorithm="HS256",
+        with handle_form_errors(form):
+            if valid_until is not None and now < valid_until:
+                wait_min = int((valid_until - now).total_seconds() / 60)
+                wait_sec = int((valid_until - now).total_seconds() % 60)
+                raise FormError(
+                    "non_field_errors",
+                    _(
+                        'You have already requested a password reset, you need to wait '
+                        '%(wait_min)s minute(s) and %(wait_sec)s seconds before you can request '
+                        'another.',
+                        wait_min=wait_min,
+                        wait_sec=wait_sec,
                     ),
-                    "ascii",
                 )
-                # Send the email
-                email_context = {"token": token, "username": username}
-                email = Message(
-                    body=render_template("forgot-password-email.txt", **email_context),
-                    html=render_template("forgot-password-email.html", **email_context),
-                    recipients=[user["mail"][0]],
-                    subject="Password reset procedure",
+            try:
+                user = User(ipa_admin.user_show(username))
+            except python_freeipa.exceptions.NotFound:
+                raise FormError(
+                    "username", _("User %(username)s does not exist", username=username)
                 )
-                try:
-                    mailer.send(email)
-                except ConnectionRefusedError as e:
-                    app.logger.error(f"Impossible to send a password reset email: {e}")
-                    flash(
-                        "We could not send you an email, please retry later", "danger"
-                    )
-                    return redirect(url_for('root'))
-
-                app.logger.debug(email)
-                lock.store()
-                app.logger.info(
-                    f'{username} forgot their password and requested a token'
-                )
-                flash(
-                    "An email has been sent to your address with instructions on how to reset "
-                    "your password",
-                    "success",
-                )
+            token = JWTToken.from_user(user).as_string()
+            # Send the email
+            email_context = {"token": token, "username": username}
+            email = Message(
+                body=render_template("forgot-password-email.txt", **email_context),
+                html=render_template("forgot-password-email.html", **email_context),
+                recipients=[user.mail],
+                subject="Password reset procedure",
+            )
+            try:
+                mailer.send(email)
+            except ConnectionRefusedError as e:
+                app.logger.error(f"Impossible to send a password reset email: {e}")
+                flash(_("We could not send you an email, please retry later"), "danger")
                 return redirect(url_for('root'))
+            app.logger.debug(email)
+            lock.store()
+            app.logger.info(f'{username} forgot their password and requested a token')
+            flash(
+                _(
+                    'An email has been sent to your address with instructions on how to reset '
+                    'your password'
+                ),
+                "success",
+            )
+            return redirect(url_for('root'))
     return render_template('forgot-password-ask.html', form=form)
 
 
@@ -162,24 +165,26 @@ def forgot_password_change():
         flash('No token provided, please request one.', 'warning')
         return redirect(url_for('forgot_password_ask'))
     try:
-        token_data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
+        token_obj = JWTToken.from_string(token)
     except jwt.exceptions.DecodeError:
-        flash("The token is invalid, please request a new one.", "warning")
+        flash(_("The token is invalid, please request a new one."), "warning")
         return redirect(url_for('forgot_password_ask'))
-    username = token_data["username"]
+    username = token_obj.username
     lock = PasswordResetLock(username)
     valid_until = lock.valid_until()
     now = datetime.datetime.now()
     if valid_until is None or now > valid_until:
         lock.delete()
-        flash("The token has expired, please request a new one.", "warning")
+        flash(_("The token has expired, please request a new one."), "warning")
         return redirect(url_for('forgot_password_ask'))
-    user = ipa_admin.user_show(username)
-    if user["krblastpwdchange"] != token_data["last_change"]:
+    user = User(ipa_admin.user_show(username))
+    if not token_obj.validate_last_change(user):
         lock.delete()
         flash(
-            "Your password has been changed since you requested this token, please request "
-            "a new one.",
+            _(
+                "Your password has been changed since you requested this token, please request "
+                "a new one."
+            ),
             "warning",
         )
         return redirect(url_for('forgot_password_ask'))
@@ -187,17 +192,32 @@ def forgot_password_change():
     form = NewPasswordForm()
     if form.validate_on_submit():
         password = form.password.data
+        # Generate a random temporary number.
+        temp_password = ''.join(
+            random.choices(string.ascii_letters + string.digits, k=24)
+        )
         try:
-            ipa_admin.user_mod(username, userpassword=password)
+            # Force change password to the random password, so that the password is not actually
+            # changed to the given one in case the next step fails (because the OTP is wrong for
+            # example)
+            ipa_admin.user_mod(username, userpassword=temp_password)
             # Change the password as the user, so it's not expired.
             ipa = untouched_ipa_client(app)
-            ipa.change_password(username, password, password)
+            ipa.change_password(
+                username,
+                new_password=password,
+                old_password=temp_password,
+                otp=form.otp.data,
+            )
         except python_freeipa.exceptions.PWChangePolicyError as e:
             lock.delete()
             flash(
-                f'Your password has been changed, but it does not comply with '
-                f'the policy ({e.policy_error}) and has thus been set as expired. '
-                f'You will be asked to change it after logging in.',
+                _(
+                    'Your password has been changed, but it does not comply with the policy '
+                    '(%(policy_error)s) and has thus been set as expired. You will be asked to '
+                    'change it after logging in.',
+                    policy_error=e.policy_error,
+                ),
                 'warning',
             )
             app.logger.info(
@@ -206,7 +226,18 @@ def forgot_password_change():
             )
             # Send them to the login page, they will have to change their password
             # after login.
-            return redirect(url_for('login'))
+            return redirect(url_for('root'))
+        except python_freeipa.exceptions.PWChangeInvalidPassword:
+            # The provided OTP was wrong
+            app.logger.info(
+                f"Password for {username} was changed to a random string because "
+                f"the OTP token they provided was wrong."
+            )
+            # Oh noes, the token is now invalid since the user's password was changed! Let's
+            # re-generate a token so they can keep going.
+            user = User(ipa_admin.user_show(username))
+            token = JWTToken.from_user(user).as_string()
+            form.otp.errors.append(_("Incorrect value."))
         except python_freeipa.exceptions.FreeIPAError as e:
             # If we made it here, we hit something weird not caught above.
             app.logger.error(
@@ -214,11 +245,11 @@ def forgot_password_change():
                 f'the password for user {username}: {e.message}'
             )
             form.errors['non_field_errors'] = [
-                'Could not change password, please try again.'
+                _('Could not change password, please try again.')
             ]
         else:
             lock.delete()
-            flash('Your password has been changed.', 'success')
+            flash(_('Your password has been changed.'), 'success')
             app.logger.info(
                 f"Password for {username} was changed after completing the forgotten "
                 f"password process."

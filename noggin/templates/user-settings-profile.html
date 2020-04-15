@@ -19,8 +19,13 @@
     </div>
     <div class="card-footer d-flex justify-content-between">
       <div>{{ macros.non_field_errors(form) }}</div>
-      <button class="btn btn-primary" id="submit" type="submit" tabindex="9">Save</button>
+      <button class="btn btn-primary" id="submit" type="submit" tabindex="9">{{_("Save")}}</button>
     </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+  {{ super () }}
+  {{ macros.unsaved_changes() }}
 {% endblock %}
 

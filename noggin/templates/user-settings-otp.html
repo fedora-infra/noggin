@@ -4,45 +4,71 @@
 {% block settings_content %}
 
 {% if otp_uri %}
-<div class="modal fade" id="otpModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="otp-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
+        <h5 class="modal-title">{{ _("Scan your new token") }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <div id="otp_qrcode"></div>
-        {{otp_uri}}
+        {# Only show the QR code when the user is ready, this gives them time to pick up their phone and check noone is looking over their shoulders #}
+        <p>{{ _("Your new token is ready. Click on the button below to reveal the QR code and scan it.") }}</p>
+        <div class="text-center"><button id="otp-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="false">{{ _("Reveal") }}</button></div>
+        <div id="otp-qrcode" class="text-center mt-3" style="display:none"></div>
+        <p class="mb-1 mt-4">{{ _("or copy and paste the following token URL if you can't scan the QR code:") }}</p>
+        <input id="otp-uri" class="form-control" readonly value="{{otp_uri|safe}}" />
+        <div class="alert alert-warning my-4">{{ _("This will never be shown to you again, don't close this window until your token is saved.") }}</div>
       </div>
     </div>
   </div>
 </div>
 {% endif%}
+
+<div class="modal fade" id="add-token-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ _("Add OTP Token") }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% if not tokens %}
+          <div class="alert alert-info">
+            <div><small>{{_("Creating your first OTP token enables two-factor authentication using OTP.")}}</small></div> 
+            <div><small><strong>{{_("Once enabled, two-factor authentication cannot be disabled.")}}</strong></small></div>
+          </div>
+        {% endif %}
+        <form action="{{ url_for('user_settings_otp', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <div class="form-group">{{ macros.with_errors(addotpform.description, label=False, tabindex="2", placeholder=_("Token name"))}}</div>
+          {% if tokens %}
+          <div class="form-group">{{ macros.with_errors(addotpform.password, label=False, tabindex="3", placeholder=_("Password + One-Time-Password"))}}</div>
+          {% else %}
+          <div class="form-group">{{ macros.with_errors(addotpform.password, label=False, tabindex="3", placeholder=_("Password"))}}</div>
+          {% endif %}
+          <div>{{ macros.non_field_errors(addotpform) }}</div>
+          <button class="btn btn-primary btn-block" id="submit" type="submit" tabindex="4">{{ _("Generate OTP Token") }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card-body">
   <div class="d-flex">
-      <h5 id="pageheading">OTP Tokens</h5>
-      <div class="dropdown ml-auto">
-        <div class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">Add OTP Token</div>
-        <div class="dropdown-menu dropdown-menu-right" style="min-width:20em;">
-            {% if user.gpgkeys %}
-            <form action="{{ url_for('user_settings_otp_add', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-              <div class="form-group">{{ macros.with_errors(addotpform.description, tabindex="2")}}</div>
-              <button class="btn btn-primary" id="submit" type="submit" tabindex="14">Submit</button>
-            </form>
-            {% else %}
-            <div class="p-3 text-center bg-light text-muted font-weight-bold">A GPG Key is required to create an OTP Token. Please add a GPG Key.</div>
-            {%endif%}
-          </div>
-      </div>
+      <h5 id="pageheading">{{ _("OTP Tokens") }}</h5>
+      <div class="btn btn-primary btn-sm ml-auto" data-toggle="modal" data-target="#add-token-modal">{{_("Add OTP Token")}}</div>
   </div>
 </div>
 
 <div class="list-group">
 {% for token in tokens %}
-  <div class="list-group-item">
+  <div class="list-group-item {{'text-muted bg-light' if token.disabled}}">
     <div class="row align-items-center">
       <div class="col h6">
         <div data-role="token-description">{{token.description}}</div>
@@ -52,10 +78,13 @@
         {% if not token.disabled %}
           <form action="{{ url_for('user_settings_otp_disable', username=current_user.username) }}" method="post" class="d-inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <button type='submit' class="btn btn-sm btn-outline-secondary" name="token" value="{{ token.uniqueid }}">Disable</button>
+            <button type='submit' class="btn btn-sm btn-outline-secondary" name="token" value="{{ token.uniqueid }}">{{ _("Disable") }}</button>
           </form>
         {% else %}
-        <button class="btn btn-sm btn-link disabled">Disabled</button>
+          <form action="{{ url_for('user_settings_otp_enable', username=current_user.username) }}" method="post" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type='submit' class="btn btn-sm btn-outline-secondary" name="token" value="{{ token.uniqueid }}">{{ _("Enable") }}</button>
+          </form>
         {% endif %}
         <form action="{{ url_for('user_settings_otp_delete', username=current_user.username) }}" method="post" class="d-inline">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -65,7 +94,10 @@
     </div>
   </div>
 {% else %}
-  <div class="list-group-item text-center bg-light text-muted font-weight-bold">You have no OTP tokens</div>
+  <div class="list-group-item text-center bg-light text-muted font-weight-bold">
+    <div>{{ _("You have no OTP tokens") }}</div>
+    <div><small>{{ _("Add an OTP token to enable two-factor authentication on your account.") }}</small></div>
+  </div>
 {% endfor %}
 </div>
 {% endblock %}
@@ -74,13 +106,18 @@
   {{ super() }}
   {% if otp_uri %}
   <script src="{{ url_for('static', filename='js/vendor/jquery-qrcode-1.0/jquery.qrcode.min.js') }}"></script>
-  <script>$('#otp_qrcode').qrcode("{{ otp_uri|safe }}");</script>
   <script>
-    $(window).on('load',function(){
-        $('#otpModal').modal('show');
+    $(document).ready(function() {
+        $('#otp-modal').modal('show');
+        $('#otp-qrcode').qrcode("{{ otp_uri|safe }}");
+        $('#otp-toggle').click(function() {
+          $('#otp-qrcode').slideToggle("fast");
+        })
     });
   </script>
-  
+  {% endif %}
+  {% if addotpform.errors %}
+    <script>$(document).ready(function() {$('#add-token-modal').modal('show');});</script>
   {% endif %}
 {% endblock %}
 

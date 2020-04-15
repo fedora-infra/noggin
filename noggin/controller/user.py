@@ -1,4 +1,7 @@
-from flask import flash, redirect, render_template, session, url_for
+from urllib.parse import urlparse
+
+from flask import flash, redirect, render_template, session, url_for, Markup
+from flask_babel import _
 import python_freeipa
 
 from noggin import app
@@ -6,13 +9,19 @@ from noggin.form.edit_user import (
     UserSettingsProfileForm,
     UserSettingsKeysForm,
     UserSettingsAddOTPForm,
-    UserSettingsDisableOTPForm,
-    UserSettingsDeleteOTPForm,
+    UserSettingsOTPStatusChange,
 )
 from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.representation.otptoken import OTPToken
-from noggin.utility import with_ipa, user_or_404
+from noggin.security.ipa import maybe_ipa_login
+from noggin.utility import (
+    with_ipa,
+    user_or_404,
+    FormError,
+    handle_form_errors,
+    require_self,
+)
 
 
 @app.route('/user/<username>/')
@@ -22,40 +31,47 @@ def user(ipa, username):
     # As a speed optimization, we make two separate calls.
     # Just doing a group_find (with all=True) is super slow here, with a lot of
     # groups.
-    groups = [Group(g) for g in ipa.group_find(user=username, all=False)['result']]
+    groups = [
+        Group(g)
+        for g in ipa.group_find(user=username, all=False, fasgroup=True)['result']
+    ]
     managed_groups = [
         Group(g)
-        for g in ipa.group_find(membermanager_user=username, all=False)['result']
+        for g in ipa.group_find(membermanager_user=username, all=False, fasgroup=True)[
+            'result'
+        ]
     ]
     return render_template(
         'user.html', user=user, groups=groups, managed_groups=managed_groups
     )
 
 
-def _user_mod(ipa, form, username, details):
-    try:
-        ipa.user_mod(username, **details)
-    except python_freeipa.exceptions.BadRequest as e:
-        if e.message == 'no modifications to be performed':
-            form.errors['non_field_errors'] = [e.message]
-        else:
-            app.logger.error(
-                f'An error happened while editing user {username}: {e.message}'
-            )
-            form.errors['non_field_errors'] = [e.message]
-    else:
-        flash('Profile has been succesfully updated.', 'success')
-        return redirect(url_for('user', username=username))
+def _user_mod(ipa, form, username, details, redirect_to):
+    with handle_form_errors(form):
+        try:
+            ipa.user_mod(username, **details)
+        except python_freeipa.exceptions.BadRequest as e:
+            if e.message == 'no modifications to be performed':
+                raise FormError("non_field_errors", e.message)
+            else:
+                app.logger.error(
+                    f'An error happened while editing user {username}: {e.message}'
+                )
+                raise FormError("non_field_errors", e.message)
+        flash(
+            Markup(
+                f'Profile Updated: <a href=\"{url_for("user", username=username)}\">'
+                'view your profile</a>'
+            ),
+            'success',
+        )
+        return redirect(url_for(redirect_to, username=username))
 
 
 @app.route('/user/<username>/settings/profile/', methods=['GET', 'POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_profile(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
     user = User(user_or_404(ipa, username))
     form = UserSettingsProfileForm(obj=user)
 
@@ -77,23 +93,20 @@ def user_settings_profile(ipa, username):
                 'fasgitlabusername': form.gitlab.data.lstrip('@'),
                 'fasrhbzemail': form.rhbz_mail.data,
             },
+            "user_settings_profile",
         )
         if result:
             return result
 
     return render_template(
-        'user-settings-profile.html', user=user, form=form, select="profile"
+        'user-settings-profile.html', user=user, form=form, activetab="profile"
     )
 
 
 @app.route('/user/<username>/settings/keys/', methods=['GET', 'POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_keys(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
     user = User(user_or_404(ipa, username))
     form = UserSettingsKeysForm(obj=user)
 
@@ -103,6 +116,7 @@ def user_settings_keys(ipa, username):
             form,
             username,
             {'ipasshpubkey': form.sshpubkeys.data, 'fasgpgkeyid': form.gpgkeys.data},
+            "user_settings_keys",
         )
         if result:
             return result
@@ -116,97 +130,67 @@ def user_settings_keys(ipa, username):
             form.sshpubkeys.append_entry()
 
     return render_template(
-        'user-settings-keys.html', user=user, form=form, select="keys"
+        'user-settings-keys.html', user=user, form=form, activetab="keys"
     )
 
 
-@app.route('/user/<username>/settings/otp/')
+@app.route('/user/<username>/settings/otp/', methods=['GET', 'POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_otp(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
     addotpform = UserSettingsAddOTPForm()
     user = User(user_or_404(ipa, username))
+
+    if addotpform.validate_on_submit():
+        try:
+            maybe_ipa_login(app, session, username, addotpform.password.data)
+            result = ipa.otptoken_add(
+                ipatokenowner=username,
+                ipatokenotpalgorithm='sha512',
+                description=addotpform.description.data,
+            )
+            uri = urlparse(result["uri"])
+            # Use the provided description in the token, so it shows up in the user's app instead of
+            # the token's UUID
+            principal = uri.path.split(":", 1)[0]
+            new_uri = uri._replace(
+                path=f"{principal.lower()}:{addotpform.description.data}"
+            )
+            session['otp_uri'] = new_uri.geturl()
+        except python_freeipa.exceptions.InvalidSessionPassword:
+            addotpform.password.errors.append(_("Incorrect password"))
+        except python_freeipa.exceptions.FreeIPAError as e:
+            app.logger.error(
+                f'An error happened while creating an OTP token for user {username}: {e.message}'
+            )
+            addotpform.errors['non_field_errors'] = [_('Cannot create the token.')]
+        else:
+            return redirect(url_for('user_settings_otp', username=username))
 
     otp_uri = session.get('otp_uri')
     session['otp_uri'] = None
 
-    tokens = [
-        OTPToken(t)
-        for t in ipa._request(
-            'otptoken_find', [], {'ipatokenowner': username, 'all': True}
-        )['result']
-    ]
+    tokens = [OTPToken(t) for t in ipa.otptoken_find(ipatokenowner=username)]
+    tokens.sort(key=lambda t: t.description)
 
     return render_template(
         'user-settings-otp.html',
         addotpform=addotpform,
         user=user,
-        select="otp",
+        activetab="otp",
         tokens=tokens,
         otp_uri=otp_uri,
     )
 
 
-@app.route('/user/<username>/settings/otp/add/', methods=['POST'])
-@with_ipa(app, session)
-def user_settings_otp_add(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
-    form = UserSettingsAddOTPForm()
-    user = User(user_or_404(ipa, username))
-
-    # we don't show the form in the template if there arent gpgkeys, but check on form
-    # submit here anyways.
-    if not user.gpgkeys:
-        flash(
-            'Cannot create an OTP token without a GPG Key. Please add a GPG Key', 'info'
-        )
-        return redirect(url_for('user_settings_otp', username=username))
-
-    if form.validate_on_submit():
-        username = session.get('noggin_username')
-        description = form.description.data
-        try:
-            result = ipa.otptoken_add(
-                ipatokenowner=username,
-                ipatokenotpalgorithm='sha512',
-                description=description,
-            )
-            session['otp_uri'] = result['uri']
-        except python_freeipa.exceptions.FreeIPAError as e:
-            flash('Cannot create the token.', 'danger')
-            app.logger.error(
-                f'An error happened while creating an OTP token for user {username}: {e.message}'
-            )
-
-    for field_errors in form.errors.values():
-        for error in field_errors:
-            flash(error, 'danger')
-
-    return redirect(url_for('user_settings_otp', username=username))
-
-
 @app.route('/user/<username>/settings/otp/disable/', methods=['POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_otp_disable(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
-    form = UserSettingsDisableOTPForm()
+    form = UserSettingsOTPStatusChange()
 
     if form.validate_on_submit():
-        username = session.get('noggin_username')
         token = form.token.data
-
         try:
             ipa.otptoken_mod(ipatokenuniqueid=token, ipatokendisabled=True)
         except python_freeipa.exceptions.BadRequest as e:
@@ -214,14 +198,14 @@ def user_settings_otp_disable(ipa, username):
                 e.message
                 == "Server is unwilling to perform: Can't disable last active token"
             ):
-                flash('Sorry, You cannot disable your last active token.', 'warning')
+                flash(_('Sorry, You cannot disable your last active token.'), 'warning')
             else:
                 flash('Cannot disable the token.', 'danger')
                 app.logger.error(
                     f'Something went wrong disabling an OTP token for user {username}: {e}'
                 )
         except python_freeipa.exceptions.FreeIPAError as e:
-            flash('Cannot disable the token.', 'danger')
+            flash(_('Cannot disable the token.'), 'danger')
             app.logger.error(
                 f'Something went wrong disabling an OTP token for user {username}: {e}'
             )
@@ -232,15 +216,38 @@ def user_settings_otp_disable(ipa, username):
     return redirect(url_for('user_settings_otp', username=username))
 
 
+@app.route('/user/<username>/settings/otp/enable/', methods=['POST'])
+@with_ipa(app, session)
+@require_self
+def user_settings_otp_enable(ipa, username):
+    form = UserSettingsOTPStatusChange()
+
+    if form.validate_on_submit():
+        token = form.token.data
+        try:
+            ipa.otptoken_mod(ipatokenuniqueid=token, ipatokendisabled=None)
+        except (
+            python_freeipa.exceptions.BadRequest,
+            python_freeipa.exceptions.FreeIPAError,
+        ) as e:
+            flash(
+                _('Cannot enable the token. %(errormessage)s', errormessage=e), 'danger'
+            )
+            app.logger.error(
+                f'Something went wrong enabling an OTP token for user {username}: {e}'
+            )
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'danger')
+    return redirect(url_for('user_settings_otp', username=username))
+
+
 @app.route('/user/<username>/settings/otp/delete/', methods=['POST'])
 @with_ipa(app, session)
+@require_self
 def user_settings_otp_delete(ipa, username):
-    # TODO: Maybe make this a decorator some day?
-    if session.get('noggin_username') != username:
-        flash('You do not have permission to edit this account.', 'danger')
-        return redirect(url_for('user', username=username))
-
-    form = UserSettingsDeleteOTPForm()
+    form = UserSettingsOTPStatusChange()
 
     if form.validate_on_submit():
         username = session.get('noggin_username')
@@ -252,14 +259,14 @@ def user_settings_otp_delete(ipa, username):
                 e.message
                 == "Server is unwilling to perform: Can't delete last active token"
             ):
-                flash('Sorry, You cannot delete your last active token.', 'warning')
+                flash(_('Sorry, You cannot delete your last active token.'), 'warning')
             else:
-                flash('Cannot delete the token.', 'danger')
+                flash(_('Cannot delete the token.'), 'danger')
                 app.logger.error(
                     f'Something went wrong deleting OTP token for user {username}: {e}'
                 )
         except python_freeipa.exceptions.FreeIPAError as e:
-            flash('Cannot delete the token.', 'danger')
+            flash(_('Cannot delete the token.'), 'danger')
             app.logger.error(
                 f'Something went wrong deleting OTP token for user {username}: {e}'
             )

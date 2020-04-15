@@ -1,9 +1,10 @@
 from unittest.mock import patch
 
 import pytest
+import requests
 from cryptography.fernet import Fernet
 from flask import current_app
-from python_freeipa.exceptions import ValidationError, BadRequest
+from python_freeipa.exceptions import ValidationError, BadRequest, FreeIPAError
 
 from noggin.security.ipa import (
     maybe_ipa_session,
@@ -165,3 +166,23 @@ def test_ipa_client_batch_unknown_option(client, logged_in_dummy_user):
                 methods=[{"method": "user_find", "params": [[], {"pants": "pants"}]}]
             )
             assert "invalid 'params': Unknown option: pants" in e
+
+
+def test_ipa_client_change_password_error():
+    client = Client("ipa.example.com")
+    with patch.object(client, "_session") as request:
+        response = requests.Response()
+        response.status_code = 400
+        request.post.return_value = response
+        with pytest.raises(FreeIPAError):
+            client.change_password("dummy", "password", "password")
+
+
+def test_ipa_client_change_password_empty_response():
+    client = Client("ipa.example.com")
+    with patch.object(client, "_session") as request:
+        response = requests.Response()
+        response.status_code = 200
+        request.post.return_value = response
+        with pytest.raises(FreeIPAError):
+            client.change_password("dummy", "password", "password")

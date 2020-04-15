@@ -1,0 +1,40 @@
+{% extends "main.html" %}
+{% block title %}{{ _("Sync OTP Token") }}{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  {% import '_form_macros.html' as macros %}
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-6 mx-auto">
+        <h4>{{ _("Synchronize OTP Token") }}</h4>
+        <div class="card">
+          <form action="{{ url_for('otp_sync') }}" method="post" novalidate>
+            {{ sync_form.csrf_token }}
+            <div class="card-body">
+              <div class="form-group">
+                {{ macros.with_errors(sync_form.username, class="validate", placeholder=_("Username"), tabindex="1", label=False) }}
+              </div>
+              <div class="form-group">
+                {{ macros.with_errors(sync_form.password, class="validate", placeholder=_("Password"), tabindex="2", label=False) }}
+              </div>
+              <div class="form-group">
+                {{ macros.with_errors(sync_form.first_code, class="validate", placeholder=_("First OTP"), tabindex="3", label=False) }}
+              </div>
+              <div class="form-group">
+                {{ macros.with_errors(sync_form.second_code, class="validate", placeholder=_("Second OTP"), tabindex="4", label=False) }}
+              </div>
+              <div class="form-group">
+                {{ macros.with_errors(sync_form.token, class="validate", placeholder=_("Token ID"), tabindex="5", label=False) }}
+              </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+              <div>{{ macros.non_field_errors(sync_form) }}</div>
+              <button class="btn btn-primary" id="submit" type="submit" tabindex="6">{{ _("Sync") }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

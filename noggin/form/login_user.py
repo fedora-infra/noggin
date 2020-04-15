@@ -1,13 +1,19 @@
-from flask_wtf import FlaskForm
+from flask_babel import lazy_gettext as _
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired
 
+from .base import ModestForm, SubmitButtonField
 
-class LoginUserForm(FlaskForm):
+
+class LoginUserForm(ModestForm):
     username = StringField(
-        'Username', validators=[DataRequired(message='You must provide a user name')]
+        _('Username'),
+        validators=[DataRequired(message=_('You must provide a user name'))],
     )
 
     password = PasswordField(
-        'Password', validators=[DataRequired(message='You must provide a password')]
+        _('Password'),
+        validators=[DataRequired(message=_('You must provide a password'))],
     )
+
+    submit = SubmitButtonField(_('Log In'))

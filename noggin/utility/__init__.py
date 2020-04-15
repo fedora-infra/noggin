@@ -1,6 +1,9 @@
 import hashlib
 from functools import wraps
-from flask import abort, flash, g, redirect, url_for
+from contextlib import contextmanager
+
+from flask import abort, flash, g, redirect, url_for, session
+from flask_babel import lazy_gettext as _
 import python_freeipa
 
 from noggin.representation.user import User
@@ -36,11 +39,33 @@ def with_ipa(app, session):
     return decorator
 
 
+def require_self(f):
+    """Require the logged-in user to be the user that is currently being edited"""
+
+    @wraps(f)
+    def fn(*args, **kwargs):
+        try:
+            username = kwargs["username"]
+        except KeyError:
+            abort(
+                500,
+                "The require_self decorator only works on routes that have 'username' "
+                "as a component.",
+            )
+        if session.get('noggin_username') != username:
+            flash('You do not have permission to edit this account.', 'danger')
+            return redirect(url_for('user', username=username))
+        return f(*args, **kwargs)
+
+    return fn
+
+
 def group_or_404(ipa, groupname):
-    try:
-        return ipa.group_show(groupname)
-    except python_freeipa.exceptions.NotFound:
-        abort(404)
+    group = ipa.group_find(cn=groupname, fasgroup=True)['result']
+    if not group:
+        abort(404, _('Group %(groupname)s could not be found.', groupname=groupname))
+    else:
+        return group[0]
 
 
 def user_or_404(ipa, username):
@@ -48,3 +73,85 @@ def user_or_404(ipa, username):
         return ipa.user_show(username)
     except python_freeipa.exceptions.NotFound:
         abort(404)
+
+
+class FormError(Exception):
+    def __init__(self, field, message):
+        self.field = field
+        self.message = message
+
+    def populate_form(self, form):
+        try:
+            field = getattr(form, self.field)
+        except AttributeError:
+            # probably non_field_errors
+            if self.field not in form.errors:
+                form.errors[self.field] = []
+            error_list = form.errors[self.field]
+        else:
+            error_list = field.errors
+        error_list.append(self.message)
+
+
+@contextmanager
+def handle_form_errors(form):
+    """Handle form errors by raising exceptions.
+
+    The point of this context manager is to let controller developers create form errors by raising
+    exceptions instead of setting variables. This is particularly useful when you are making
+    multiple API calls in a row and handling exceptions separately: instead of doing nested
+    ``try..except..else`` statements they would have non-nested code raising exceptions.
+
+    For example, without this function you would have something similar to::
+
+        if form.validate_on_submit():
+            try:
+                api_call_1()
+            except UserError as e:
+                form.user.errors.append(e.msg)
+            else:
+                try:
+                    api_call_2()
+                except PasswordError as e:
+                    form.password.errors.append(e.msg)
+                else:
+                    try:
+                        api_call_3()
+                    except GenericError as e:
+                        form.errors['non_field_errors'] = [e.msg]
+                    else:
+                        flash("Success!")
+                        return redirect("/")
+        return render_template(..., form=form)
+
+    Every API call causes an additional level of nesting because the code must fall through the
+    initial ``if`` statement to reach the ``render_template`` call. With this function this could be
+    rewritten as::
+
+        if form.validate_on_submit():
+            with handle_form_errors(form):
+                try:
+                    api_call_1()
+                except UserError as e:
+                    raise FormError("user", e.msg)
+                try:
+                    api_call_2()
+                except PasswordError as e:
+                    raise FormError("password", e.msg)
+                try:
+                    api_call_3()
+                except GenericError as e:
+                    raise FormError("non_field_errors", e.msg)
+                flash("Success!")
+                return redirect("/")
+        return render_template(..., form=form)
+
+    This code does not nest more on each API call, which is (arguably) clearer as the number of
+    necessary API call increases.
+
+    Args: form (wtforms.Form): The form that errors should be stored to
+    """
+    try:
+        yield
+    except FormError as e:
+        e.populate_form(form)

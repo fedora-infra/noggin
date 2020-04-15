@@ -1,5 +1,6 @@
 from unittest import mock
 
+import requests
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
@@ -59,8 +60,12 @@ def test_logout(client, logged_in_dummy_user):
 def test_login(client, dummy_user):
     """Test a successful Login"""
     result = client.post(
-        '/login',
-        data={"username": "dummy", "password": "dummy_password"},
+        '/',
+        data={
+            "login-username": "dummy",
+            "login-password": "dummy_password",
+            "login-submit": "1",
+        },
         follow_redirects=True,
     )
     page = BeautifulSoup(result.data, 'html.parser')
@@ -74,21 +79,31 @@ def test_login(client, dummy_user):
 @pytest.mark.vcr()
 def test_login_no_password(client, dummy_user):
     """Test not giving a password"""
-    result = client.post('/login', data={"username": "dummy"}, follow_redirects=True)
+    result = client.post(
+        '/',
+        data={"login-username": "dummy", "login-submit": "1"},
+        follow_redirects=True,
+    )
     assert_form_field_error(
-        result, field_name="password", expected_message="You must provide a password"
+        result,
+        field_name="login-password",
+        expected_message="You must provide a password",
     )
     assert "noggin_session" not in session
     assert "noggin_username" not in session
 
 
 def test_login_no_username(client):
-    """Test not giving a password"""
+    """Test not giving a username"""
     result = client.post(
-        '/login', data={"password": "n:nPv{P].9}]!q$RE%w<38@"}, follow_redirects=True
+        '/',
+        data={"login-password": "n:nPv{P].9}]!q$RE%w<38@", "login-submit": "1"},
+        follow_redirects=True,
     )
     assert_form_field_error(
-        result, field_name="username", expected_message="You must provide a user name"
+        result,
+        field_name="login-username",
+        expected_message="You must provide a user name",
     )
     assert "noggin_session" not in session
     assert "noggin_username" not in session
@@ -98,8 +113,12 @@ def test_login_no_username(client):
 def test_login_incorrect_password(client, dummy_user):
     """Test a incorrect password"""
     result = client.post(
-        '/login',
-        data={"username": "dummy", "password": "an incorrect password"},
+        '/',
+        data={
+            "login-username": "dummy",
+            "login-password": "an incorrect password",
+            "login-submit": "1",
+        },
         follow_redirects=True,
     )
     assert_form_generic_error(result, "Unauthorized: bad credentials.")
@@ -114,7 +133,12 @@ def test_login_generic_error(client):
             message="something went wrong", code="4242"
         )
         result = client.post(
-            '/login', data={"username": "dummy", "password": "password"}
+            '/',
+            data={
+                "login-username": "dummy",
+                "login-password": "password",
+                "login-submit": "1",
+            },
         )
     assert_form_generic_error(result, "Could not log in to the IPA server.")
     assert "noggin_session" not in session
@@ -125,7 +149,12 @@ def test_login_cant_login(client):
     """The client library could not login"""
     with mock.patch("noggin.security.ipa.Client.login", lambda *x: None):
         result = client.post(
-            '/login', data={"username": "dummy", "password": "password"}
+            '/',
+            data={
+                "login-username": "dummy",
+                "login-password": "password",
+                "login-submit": "1",
+            },
         )
     assert_form_generic_error(result, "Could not log in to the IPA server.")
     assert "noggin_session" not in session
@@ -136,8 +165,12 @@ def test_login_cant_login(client):
 def test_login_expired_password(client, dummy_user_expired_password):
     """Test a successful Login with an expired password"""
     result = client.post(
-        '/login',
-        data={"username": "dummy", "password": "dummy_password"},
+        '/',
+        data={
+            "login-username": "dummy",
+            "login-password": "dummy_password",
+            "login-submit": "1",
+        },
         follow_redirects=False,
     )
     assert_redirects_with_flash(
@@ -149,3 +182,103 @@ def test_login_expired_password(client, dummy_user_expired_password):
     # We are not logged in
     assert "noggin_session" not in session
     assert "noggin_username" not in session
+
+
+@pytest.mark.vcr()
+def test_otp_sync_no_username(client, dummy_user):
+    """Test not giving a username"""
+    result = client.post(
+        '/otp/sync/',
+        data={
+            "password": "dummy_password",
+            "first_code": "123456",
+            "second_code": "234567",
+        },
+        follow_redirects=False,
+    )
+    assert_form_field_error(
+        result, field_name="username", expected_message="You must provide a user name"
+    )
+
+
+@pytest.mark.vcr()
+def test_otp_sync_invalid_codes(client, dummy_user_with_otp):
+    """Test synchronising OTP token with madeup codes"""
+    result = client.post(
+        '/otp/sync/',
+        data={
+            "username": "dummy",
+            "password": "dummy_password",
+            "first_code": "123456",
+            "second_code": "234567",
+        },
+        follow_redirects=False,
+    )
+    assert_form_generic_error(
+        result, "The username, password or token codes are not correct."
+    )
+
+
+@pytest.mark.vcr()
+def test_otp_sync_http_error(client, dummy_user_with_otp):
+    """Test synchronising OTP token with mocked http error"""
+    with mock.patch("noggin.controller.authentication.app.logger") as logger:
+        with mock.patch("requests.sessions.Session.post") as method:
+            method.side_effect = requests.exceptions.RequestException
+            result = client.post(
+                '/otp/sync/',
+                data={
+                    "username": "dummy",
+                    "password": "dummy_password",
+                    "first_code": "123456",
+                    "second_code": "234567",
+                },
+                follow_redirects=False,
+            )
+    logger.error.assert_called_once()
+    assert_form_generic_error(result, "Something went wrong trying to sync OTP token.")
+
+
+@pytest.mark.vcr()
+def test_otp_sync_rejected(client, dummy_user_with_otp):
+    """Test synchronising OTP token when freeipa rejects the request"""
+    with mock.patch("requests.post") as method:
+        method.return_value.status_code = 200
+        method.return_value.text = "Token sync rejected"
+        result = client.post(
+            '/otp/sync/',
+            data={
+                "username": "dummy",
+                "password": "dummy_password",
+                "first_code": "123456",
+                "second_code": "234567",
+            },
+            follow_redirects=False,
+        )
+    assert_form_generic_error(
+        result, "The username, password or token codes are not correct."
+    )
+
+
+@pytest.mark.vcr()
+def test_otp_sync_success(client, dummy_user_with_otp):
+    """Test synchronising OTP token"""
+    with mock.patch("requests.sessions.Session.post") as method:
+        method.return_value.status_code = 200
+        method.return_value.text = "All good!"
+        result = client.post(
+            '/otp/sync/',
+            data={
+                "username": "dummy",
+                "password": "dummy_password",
+                "first_code": "123456",
+                "second_code": "234567",
+            },
+            follow_redirects=False,
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Token successfully synchronized",
+        expected_category="success",
+    )

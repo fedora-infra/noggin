@@ -1,8 +1,16 @@
+import random
+from requests import RequestException
+
 from cryptography.fernet import Fernet
 import python_freeipa
 from python_freeipa.client_legacy import ClientLegacy as IPAClient
-from python_freeipa.exceptions import ValidationError, BadRequest
-import random
+from python_freeipa.exceptions import (
+    ValidationError,
+    BadRequest,
+    FreeIPAError,
+    PWChangeInvalidPassword,
+    PWChangePolicyError,
+)
 
 
 def parse_group_management_error(data):
@@ -59,7 +67,7 @@ class Client(IPAClient):
         :type ipatokenowner: string
         :param ipatokenotpalgorithm: the token algorithim
         :type ipatokenotpalgorithm: string
-        :param description: Groups to add.
+        :param description: the token's description.
         :type description: string
         """
         params = {
@@ -77,7 +85,7 @@ class Client(IPAClient):
         :param ipatokenuniqueid: the unique id of the token
         :type ipatokenuniqueid: string
         :param ipatokendisabled: whether it should be disabled
-        :type ipatokendisabled: string
+        :type ipatokendisabled: boolean
         """
         params = {
             'ipatokenuniqueid': ipatokenuniqueid,
@@ -96,6 +104,51 @@ class Client(IPAClient):
         params = {'ipatokenuniqueid': ipatokenuniqueid}
         data = self._request('otptoken_del', [], params)
         return data['result']
+
+    def otptoken_find(self, ipatokenowner=None):
+        """
+        Find otptokens for a user.
+
+        :param ipatokenowner: the username
+        :type ipatokenowner: string
+        """
+        params = {'ipatokenowner': ipatokenowner}
+        data = self._request('otptoken_find', [], params)
+        return data['result']
+
+    def otptoken_sync(self, user, password, first_code, second_code, token=None):
+        """
+        Sync an otptoken for a user.
+
+        :param user: the user to sync the token for
+        :type user: string
+        :param password: the user's password
+        :type password: string
+        :param first_code: the first OTP token
+        :type first_code: string
+        :param second_code: the second OTP token
+        :type second_code: string
+        :param token: the token description (optional)
+        :type token: string
+        """
+        data = {
+            'user': user,
+            'password': password,
+            'first_code': first_code,
+            'second_code': second_code,
+            'token': token,
+        }
+        url = "https://" + self._host + "/ipa/session/sync_token"
+        try:
+            response = self._session.post(url=url, data=data, verify=self._verify_ssl)
+            if response.ok and "Token sync rejected" not in response.text:
+                return response
+            else:
+                raise BadRequest(
+                    message="The username, password or token codes are not correct."
+                )
+        except RequestException:
+            raise BadRequest(message="Something went wrong trying to sync OTP token.")
 
     def batch(self, methods=None, raise_errors=True):
         """
@@ -142,6 +195,56 @@ class Client(IPAClient):
         params.update(kwargs)
         data = self._request('pwpolicy_add', group, params)
         return data['result']
+
+    def change_password(self, username, new_password, old_password, otp=None):
+        """
+        Override change_password to allow an OTP token to be provided.
+
+        :param username: User login (username)
+        :type username: string
+        :param new_password: New password for the user
+        :type new_password: string
+        :param old_password: Users old password
+        :type old_password: string
+        :param otp: Users OTP token
+        :type otp: string
+        """
+
+        password_url = '{0}/session/change_password'.format(self._base_url)
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'text/plain',
+        }
+        data = {
+            'user': username,
+            'new_password': new_password,
+            'old_password': old_password,
+        }
+        if otp:
+            data['otp'] = otp
+        response = self._session.post(
+            password_url, headers=headers, data=data, verify=self._verify_ssl
+        )
+
+        if not response.ok:
+            raise FreeIPAError(message=response.text, code=response.status_code)
+
+        pwchange_result = response.headers.get('X-IPA-Pwchange-Result', None)
+        if pwchange_result != 'ok':
+            if pwchange_result == 'invalid-password':
+                raise PWChangeInvalidPassword(
+                    message=response.text, code=response.status_code
+                )
+            elif pwchange_result == 'policy-error':
+                policy_error = response.headers.get('X-IPA-Pwchange-Policy-Error', None)
+                raise PWChangePolicyError(
+                    message=response.text,
+                    code=response.status_code,
+                    policy_error=policy_error,
+                )
+            else:
+                raise FreeIPAError(message=response.text, code=response.status_code)
+        return response
 
 
 # Construct an IPA client from app config, but don't attempt to log in with it

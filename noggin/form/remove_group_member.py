@@ -1,3 +1,4 @@
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
 from wtforms.validators import DataRequired
@@ -5,5 +6,6 @@ from wtforms.validators import DataRequired
 
 class RemoveGroupMemberForm(FlaskForm):
     username = HiddenField(
-        'Username', validators=[DataRequired(message='Username must not be empty')]
+        _('Username'),
+        validators=[DataRequired(message=_('Username must not be empty'))],
     )

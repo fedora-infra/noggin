@@ -1,3 +1,4 @@
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField
 from wtforms.validators import DataRequired, EqualTo
@@ -6,28 +7,33 @@ from wtforms.validators import DataRequired, EqualTo
 class NewPasswordForm(FlaskForm):
 
     password = PasswordField(
-        'New Password',
+        _('New Password'),
         validators=[
-            DataRequired(message='Password must not be empty'),
-            EqualTo('password_confirm', message='Passwords must match'),
+            DataRequired(message=_('Password must not be empty')),
+            EqualTo('password_confirm', message=_('Passwords must match')),
         ],
     )
 
-    password_confirm = PasswordField('Confirm Password')
+    password_confirm = PasswordField(_('Confirm New Password'))
+
+    otp = StringField(
+        _('OTP Token'), description=_("Enter your OTP token if you have enrolled one")
+    )
 
 
 class PasswordResetForm(NewPasswordForm):
 
     current_password = PasswordField(
-        'Current Password',
-        validators=[DataRequired(message='Current password must not be empty')],
+        _('Current Password'),
+        validators=[DataRequired(message=_('Current password must not be empty'))],
+        description=_("Just the password, don't add the OTP token if you have one"),
     )
 
 
 class ForgottenPasswordForm(FlaskForm):
 
     username = StringField(
-        'Username',
-        validators=[DataRequired(message='User name must not be empty')],
-        description="Enter your username to reset your password",
+        _('Username'),
+        validators=[DataRequired(message=_('User name must not be empty'))],
+        description=_("Enter your username to reset your password"),
     )
