@@ -21,6 +21,8 @@ class IPAAdmin(object):
         "group_del",
         "group_add_member_manager",
         "pwpolicy_add",
+        "pwpolicy_mod",
+        "pwpolicy_show",
         "otptoken_add",
         "otptoken_del",
         "otptoken_find",

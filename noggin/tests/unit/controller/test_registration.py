@@ -43,7 +43,7 @@ def post_data_step_3():
 
 
 @pytest.fixture
-def dummy_stageuser():
+def dummy_stageuser(ipa_testing_config):
     now = datetime.datetime.utcnow().replace(microsecond=0)
     user = ipa_admin.stageuser_add(
         "dummy",
@@ -63,7 +63,6 @@ def dummy_stageuser():
 @pytest.fixture
 def token_for_dummy_user(dummy_stageuser):
     token = EmailValidationToken.from_user(dummy_stageuser)
-    print(token.data)
     return token.as_string()
 
 

@@ -181,19 +181,50 @@ class Client(IPAClient):
         """
         Create the password policy
 
-        :param cn: Group name.
+        :param group: Group name.
         :param krbminpwdlife: The minimum password lifetime
         :param krbpwdminlength: The minimum password length
         """
         params = {
             'all': True,
-            'raw': True,
+            'raw': False,
             'krbminpwdlife': krbminpwdlife,
             'cospriority': cospriority,
             'krbpwdminlength': krbpwdminlength,
         }
         params.update(kwargs)
         data = self._request('pwpolicy_add', group, params)
+        return data['result']
+
+    def pwpolicy_mod(
+        self, group=None, krbminpwdlife=None, krbpwdminlength=None, **kwargs
+    ):
+        """
+        Create the password policy
+
+        :param group: group name or None for the global policy
+        :param krbminpwdlife: The minimum password lifetime
+        :param krbpwdminlength: The minimum password length
+        """
+        params = {
+            'all': True,
+            'raw': False,
+            'krbminpwdlife': krbminpwdlife,
+            'krbpwdminlength': krbpwdminlength,
+        }
+        params.update(kwargs)
+        data = self._request('pwpolicy_mod', group, params)
+        return data['result']
+
+    def pwpolicy_show(self, group=None, **kwargs):
+        """
+        Display information about a password policy.
+        :param group: group name or None for the global policy
+        :type group: string
+        """
+        params = {'all': True, 'raw': False}
+        params.update(kwargs)
+        data = self._request('pwpolicy_show', group, params)
         return data['result']
 
     def change_password(self, username, new_password, old_password, otp=None):

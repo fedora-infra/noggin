@@ -175,14 +175,8 @@ def test_change_too_old(client, token_for_dummy_user, patched_lock):
 
 @pytest.mark.vcr()
 def test_change_recent_password_change(
-    client,
-    dummy_user,
-    dummy_group,
-    token_for_dummy_user,
-    no_password_min_time,
-    patched_lock_active,
+    client, dummy_user, dummy_group, token_for_dummy_user, patched_lock_active
 ):
-    ipa_admin.group_add_member("dummy-group", users="dummy")
     ipa = untouched_ipa_client(current_app)
     ipa.change_password("dummy", "dummy_password", "dummy_password")
     result = client.get(f'/forgot-password/change?token={token_for_dummy_user}')

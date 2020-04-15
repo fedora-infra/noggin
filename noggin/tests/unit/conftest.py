@@ -4,6 +4,7 @@ import tempfile
 
 import pytest
 import python_freeipa
+from vcr import VCR
 
 from noggin import ipa_admin
 from noggin.app import app
@@ -53,8 +54,52 @@ def vcr_cassette_dir(request):
     return os.path.join(test_dir, 'cassettes', module_name)
 
 
+@pytest.fixture(scope="session")
+def vcr_session(request):
+    """Setup VCR at session-level.
+
+    Borrowed from python-vcr.
+    """
+    test_dir = os.path.abspath(os.path.dirname(__file__))
+    cassette_dir = os.path.join(test_dir, 'cassettes')
+    kwargs = dict(
+        cassette_library_dir=cassette_dir, path_transformer=VCR.ensure_suffix(".yaml")
+    )
+    record_mode = request.config.getoption('--vcr-record')
+    if record_mode:
+        kwargs['record_mode'] = record_mode
+    if request.config.getoption('--disable-vcr'):
+        # Set mode to record but discard all responses to disable both recording and playback
+        kwargs['record_mode'] = 'new_episodes'
+        kwargs['before_record_response'] = lambda *args, **kwargs: None
+    vcr = VCR(**kwargs)
+    yield vcr
+
+
+@pytest.fixture(scope="session")
+def ipa_testing_config(vcr_session):
+    """Setup IPA with a testing configuration."""
+    with vcr_session.use_cassette("ipa_testing_config"):
+        pwpolicy = ipa_admin.pwpolicy_show()
+        try:
+            ipa_admin.pwpolicy_mod(krbminpwdlife=0, krbpwdminlength=8)
+        except python_freeipa.exceptions.BadRequest as e:
+            if not e.message == "no modifications to be performed":
+                raise
+            raise
+        yield
+        try:
+            ipa_admin.pwpolicy_mod(
+                krbminpwdlife=pwpolicy["krbminpwdlife"][0],
+                krbpwdminlength=pwpolicy["krbpwdminlength"][0],
+            )
+        except python_freeipa.exceptions.BadRequest as e:
+            if not e.message == "no modifications to be performed":
+                raise
+
+
 @pytest.fixture
-def make_user():
+def make_user(ipa_testing_config):
     created_users = []
 
     def _make_user(name):
@@ -87,7 +132,7 @@ def dummy_user(make_user):
 
 
 @pytest.fixture
-def dummy_group():
+def dummy_group(ipa_testing_config):
     ipa_admin.group_add('dummy-group', description="A dummy group", fasgroup=True)
     yield
     ipa_admin.group_del('dummy-group')
@@ -102,9 +147,9 @@ def dummy_user_as_group_manager(logged_in_dummy_user, dummy_group):
 
 
 @pytest.fixture
-def no_password_min_time(dummy_group):
+def password_min_time(dummy_group):
     ipa_admin.pwpolicy_add(
-        "dummy-group", krbminpwdlife=0, cospriority=10, krbpwdminlength=8
+        "dummy-group", krbminpwdlife=1, cospriority=10, krbpwdminlength=8
     )
 
 
