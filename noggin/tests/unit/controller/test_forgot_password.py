@@ -1,6 +1,5 @@
 import datetime
 import re
-from unittest import mock
 
 import jwt
 import pytest
@@ -11,7 +10,8 @@ from flask import current_app
 from noggin import ipa_admin, mailer
 from noggin.representation.user import User
 from noggin.security.ipa import untouched_ipa_client
-from noggin.utility.password_reset import PasswordResetLock, JWTToken
+from noggin.utility.password_reset import PasswordResetLock
+from noggin.utility.token import PasswordResetToken
 from noggin.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_field_error,
@@ -23,20 +23,20 @@ from noggin.tests.unit.utilities import (
 
 @pytest.fixture
 def token_for_dummy_user(dummy_user):
-    token = JWTToken.from_user(User(ipa_admin.user_show("dummy")))
+    token = PasswordResetToken.from_user(User(ipa_admin.user_show("dummy")))
     return token.as_string()
 
 
 @pytest.fixture
-def patched_lock():
-    with mock.patch.multiple(
+def patched_lock(mocker):
+    patches = mocker.patch.multiple(
         PasswordResetLock,
-        valid_until=mock.DEFAULT,
-        delete=mock.DEFAULT,
-        store=mock.DEFAULT,
-    ) as patches:
-        patches["valid_until"].return_value = None
-        yield patches
+        valid_until=mocker.DEFAULT,
+        delete=mocker.DEFAULT,
+        store=mocker.DEFAULT,
+    )
+    patches["valid_until"].return_value = None
+    yield patches
 
 
 @pytest.fixture
@@ -92,11 +92,11 @@ def test_ask_post_non_existant_user(client):
 
 
 @pytest.mark.vcr()
-def test_ask_no_smtp(client, dummy_user, patched_lock):
-    with mock.patch("noggin.controller.password.mailer") as mailer:
-        mailer.send.side_effect = ConnectionRefusedError
-        with mock.patch("noggin.controller.password.app.logger") as logger:
-            result = client.post('/forgot-password/ask', data={"username": "dummy"})
+def test_ask_no_smtp(client, dummy_user, patched_lock, mocker):
+    mailer = mocker.patch("noggin.controller.password.mailer")
+    mailer.send.side_effect = ConnectionRefusedError
+    logger = mocker.patch("noggin.controller.password.app.logger")
+    result = client.post('/forgot-password/ask', data={"username": "dummy"})
     # Email
     mailer.send.assert_called_once()
     # Lock untouched
@@ -175,14 +175,8 @@ def test_change_too_old(client, token_for_dummy_user, patched_lock):
 
 @pytest.mark.vcr()
 def test_change_recent_password_change(
-    client,
-    dummy_user,
-    dummy_group,
-    token_for_dummy_user,
-    no_password_min_time,
-    patched_lock_active,
+    client, dummy_user, dummy_group, token_for_dummy_user, patched_lock_active
 ):
-    ipa_admin.group_add_member("dummy-group", users="dummy")
     ipa = untouched_ipa_client(current_app)
     ipa.change_password("dummy", "dummy_password", "dummy_password")
     result = client.get(f'/forgot-password/change?token={token_for_dummy_user}')
@@ -211,12 +205,14 @@ def test_change_get(client, dummy_user, token_for_dummy_user, patched_lock_activ
 
 
 @pytest.mark.vcr()
-def test_change_post(client, dummy_user, token_for_dummy_user, patched_lock_active):
-    with mock.patch("noggin.controller.password.app.logger") as logger:
-        result = client.post(
-            f'/forgot-password/change?token={token_for_dummy_user}',
-            data={"password": "newpassword", "password_confirm": "newpassword"},
-        )
+def test_change_post(
+    client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
+):
+    logger = mocker.patch("noggin.controller.password.app.logger")
+    result = client.post(
+        f'/forgot-password/change?token={token_for_dummy_user}',
+        data={"password": "newpassword", "password_confirm": "newpassword"},
+    )
     patched_lock_active["delete"].assert_called()
     assert_redirects_with_flash(
         result,
@@ -233,13 +229,26 @@ def test_change_post(client, dummy_user, token_for_dummy_user, patched_lock_acti
 
 @pytest.mark.vcr()
 def test_change_post_password_too_short(
-    client, dummy_user, token_for_dummy_user, patched_lock_active
+    client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
 ):
-    with mock.patch("noggin.controller.password.app.logger") as logger:
-        result = client.post(
-            f'/forgot-password/change?token={token_for_dummy_user}',
-            data={"password": "42", "password_confirm": "42"},
-        )
+    result = client.post(
+        f'/forgot-password/change?token={token_for_dummy_user}',
+        data={"password": "42", "password_confirm": "42"},
+    )
+    assert_form_field_error(
+        result, "password", expected_message="Field must be at least 6 characters long."
+    )
+
+
+@pytest.mark.vcr()
+def test_change_post_password_policy_rejected(
+    client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
+):
+    logger = mocker.patch("noggin.controller.password.app.logger")
+    result = client.post(
+        f'/forgot-password/change?token={token_for_dummy_user}',
+        data={"password": "1234567", "password_confirm": "1234567"},
+    )
     assert_redirects_with_flash(
         result,
         expected_url="/",
@@ -259,19 +268,19 @@ def test_change_post_password_too_short(
 
 @pytest.mark.vcr()
 def test_change_post_generic_error(
-    client, dummy_user, token_for_dummy_user, patched_lock_active
+    client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
 ):
-    with mock.patch("noggin.controller.password.app.logger") as logger:
-        with mock.patch("noggin.controller.password.ipa_admin") as ipa_admin_mock:
-            # We need user_show to work, but make user_mod raise an exception.
-            ipa_admin_mock.user_show.side_effect = ipa_admin.user_show
-            ipa_admin_mock.user_mod.side_effect = python_freeipa.exceptions.FreeIPAError(
-                message="something went wrong", code="4242"
-            )
-            result = client.post(
-                f'/forgot-password/change?token={token_for_dummy_user}',
-                data={"password": "newpassword", "password_confirm": "newpassword"},
-            )
+    logger = mocker.patch("noggin.controller.password.app.logger")
+    ipa_admin_mock = mocker.patch("noggin.controller.password.ipa_admin")
+    # We need user_show to work, but make user_mod raise an exception.
+    ipa_admin_mock.user_show.side_effect = ipa_admin.user_show
+    ipa_admin_mock.user_mod.side_effect = python_freeipa.exceptions.FreeIPAError(
+        message="something went wrong", code="4242"
+    )
+    result = client.post(
+        f'/forgot-password/change?token={token_for_dummy_user}',
+        data={"password": "newpassword", "password_confirm": "newpassword"},
+    )
     assert_form_generic_error(result, 'Could not change password, please try again.')
     patched_lock_active["delete"].assert_not_called()
     logger.error.assert_called_once()
@@ -297,13 +306,18 @@ def test_change_post_with_otp(
 
 @pytest.mark.vcr()
 def test_change_post_password_with_otp_not_given(
-    client, dummy_user, dummy_user_with_otp, token_for_dummy_user, patched_lock_active
+    client,
+    dummy_user,
+    dummy_user_with_otp,
+    token_for_dummy_user,
+    patched_lock_active,
+    mocker,
 ):
-    with mock.patch("noggin.controller.password.app.logger") as logger:
-        result = client.post(
-            f'/forgot-password/change?token={token_for_dummy_user}',
-            data={"password": "42", "password_confirm": "42"},
-        )
+    logger = mocker.patch("noggin.controller.password.app.logger")
+    result = client.post(
+        f'/forgot-password/change?token={token_for_dummy_user}',
+        data={"password": "42424242", "password_confirm": "42424242"},
+    )
     assert_form_field_error(result, "otp", "Incorrect value.")
     patched_lock_active["delete"].assert_not_called()
     logger.info.assert_called_with(
@@ -314,13 +328,18 @@ def test_change_post_password_with_otp_not_given(
 
 @pytest.mark.vcr()
 def test_change_post_password_with_otp_wrong_value(
-    client, dummy_user, dummy_user_with_otp, token_for_dummy_user, patched_lock_active
+    client,
+    dummy_user,
+    dummy_user_with_otp,
+    token_for_dummy_user,
+    patched_lock_active,
+    mocker,
 ):
-    with mock.patch("noggin.controller.password.app.logger") as logger:
-        result = client.post(
-            f'/forgot-password/change?token={token_for_dummy_user}',
-            data={"password": "42", "password_confirm": "42", "otp": "42"},
-        )
+    logger = mocker.patch("noggin.controller.password.app.logger")
+    result = client.post(
+        f'/forgot-password/change?token={token_for_dummy_user}',
+        data={"password": "42424242", "password_confirm": "42424242", "otp": "42"},
+    )
     assert_form_field_error(result, "otp", "Incorrect value.")
     patched_lock_active["delete"].assert_not_called()
     logger.info.assert_called_with(

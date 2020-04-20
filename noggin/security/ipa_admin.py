@@ -6,16 +6,28 @@ from .ipa import Client
 
 class IPAAdmin(object):
 
-    __WRAPPED_METHODS = ("user_add", "user_show", "user_mod", "group_add_member")
+    __WRAPPED_METHODS = (
+        "user_add",
+        "user_show",
+        "user_mod",
+        "group_add_member",
+        "stageuser_add",
+        "stageuser_show",
+        "stageuser_activate",
+    )
     __WRAPPED_METHODS_TESTING = (
         "user_del",
         "group_add",
         "group_del",
         "group_add_member_manager",
         "pwpolicy_add",
+        "pwpolicy_mod",
+        "pwpolicy_show",
         "otptoken_add",
         "otptoken_del",
         "otptoken_find",
+        "stageuser_del",
+        "stageuser_mod",
     )
 
     def __init__(self, app):
