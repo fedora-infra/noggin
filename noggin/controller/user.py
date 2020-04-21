@@ -171,7 +171,7 @@ def user_settings_otp(ipa, username):
     session['otp_uri'] = None
 
     tokens = [OTPToken(t) for t in ipa.otptoken_find(ipatokenowner=username)]
-    tokens.sort(key=lambda t: t.description)
+    tokens.sort(key=lambda t: t.description or "")
 
     return render_template(
         'user-settings-otp.html',
