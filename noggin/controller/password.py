@@ -18,7 +18,8 @@ from noggin.utility import (
     handle_form_errors,
     require_self,
 )
-from noggin.utility.password_reset import PasswordResetLock, JWTToken
+from noggin.utility.password_reset import PasswordResetLock
+from noggin.utility.token import PasswordResetToken
 from noggin.form.password_reset import (
     PasswordResetForm,
     ForgottenPasswordForm,
@@ -129,7 +130,7 @@ def forgot_password_ask():
                 raise FormError(
                     "username", _("User %(username)s does not exist", username=username)
                 )
-            token = JWTToken.from_user(user).as_string()
+            token = PasswordResetToken.from_user(user).as_string()
             # Send the email
             email_context = {"token": token, "username": username}
             email = Message(
@@ -144,7 +145,8 @@ def forgot_password_ask():
                 app.logger.error(f"Impossible to send a password reset email: {e}")
                 flash(_("We could not send you an email, please retry later"), "danger")
                 return redirect(url_for('root'))
-            app.logger.debug(email)
+            if app.config["DEBUG"]:  # pragma: no cover
+                app.logger.debug(email)
             lock.store()
             app.logger.info(f'{username} forgot their password and requested a token')
             flash(
@@ -165,7 +167,7 @@ def forgot_password_change():
         flash('No token provided, please request one.', 'warning')
         return redirect(url_for('forgot_password_ask'))
     try:
-        token_obj = JWTToken.from_string(token)
+        token_obj = PasswordResetToken.from_string(token)
     except jwt.exceptions.DecodeError:
         flash(_("The token is invalid, please request a new one."), "warning")
         return redirect(url_for('forgot_password_ask'))
@@ -236,7 +238,7 @@ def forgot_password_change():
             # Oh noes, the token is now invalid since the user's password was changed! Let's
             # re-generate a token so they can keep going.
             user = User(ipa_admin.user_show(username))
-            token = JWTToken.from_user(user).as_string()
+            token = PasswordResetToken.from_user(user).as_string()
             form.otp.errors.append(_("Incorrect value."))
         except python_freeipa.exceptions.FreeIPAError as e:
             # If we made it here, we hit something weird not caught above.
