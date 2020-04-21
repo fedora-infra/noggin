@@ -89,6 +89,12 @@ def user_settings_password(ipa, username):
     user = User(user_or_404(ipa, username))
     form = PasswordResetForm()
 
+    # check if an OTP token exists. If so, the user is using OTP.
+    using_otp = bool(ipa.otptoken_find(ipatokenowner=username))
+
+    if not using_otp:
+        form.current_password.description = ""
+
     if form.validate_on_submit():
         res = _validate_change_pw_form(form, username, ipa)
         if res and res.ok:
@@ -99,6 +105,7 @@ def user_settings_password(ipa, username):
         user=user,
         password_reset_form=form,
         activetab="password",
+        using_otp=using_otp,
     )
 
 
