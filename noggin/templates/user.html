@@ -37,7 +37,7 @@
                     </li>
                   {% endif %}
                   {% if user.ircnick %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("IRC Nickname")}}</strong> {{ user.ircnick }}</li>
+                    <li class="list-group-item d-flex justify-content-between"><strong>{{_("IRC Nicknames")}}</strong> <div class="text-right">{% for ircnick in user.ircnick %}<pre class="mb-0">{{ ircnick }}</pre>{% endfor %}</li>
                   {% endif %}
                   {% if user.locale %}
                     <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("Locale")}}</strong> {{ user.locale }}</li>

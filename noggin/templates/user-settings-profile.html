@@ -1,6 +1,11 @@
 {% extends "user-settings.html" %}
 
 {% import '_form_macros.html' as macros %}
+
+{% block head %}
+  {{ super() }}
+  {{ macros.selectize_css() }}
+{% endblock %}
 {% block settings_content %}
   <div class="card-body border-bottom">
     <img src="{{ gravatar(user.mail if user.mail else 'default', 100) }}" class="pb-2" alt="user avatar"/>
@@ -39,5 +44,19 @@
 {% block scripts %}
   {{ super () }}
   {{ macros.unsaved_changes() }}
+  {{ macros.selectize() }}
+  <script>
+  $('#ircnick').selectize({
+    plugins: ['remove_button'],
+    delimiter: ',',
+    persist: false,
+    create: function(input) {
+        return {
+            value: input,
+            text: input
+        }
+    }
+  });
+  </script>
 {% endblock %}
 

@@ -8,11 +8,13 @@ from wtforms import (
     HiddenField,
     PasswordField,
 )
+
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import AnyOf, DataRequired, Email, Optional, Length
 
 from noggin.utility.locales import LOCALES
 from noggin.utility.timezones import TIMEZONES
+from .base import CSVListField
 
 
 class UserSettingsProfileForm(FlaskForm):
@@ -43,7 +45,7 @@ class UserSettingsProfileForm(FlaskForm):
         ],
     )
 
-    ircnick = StringField(_('IRC Nickname'), validators=[Optional()])
+    ircnick = CSVListField(_('IRC Nicknames'), validators=[Optional()])
 
     timezone = SelectField(
         _('Timezone'),
