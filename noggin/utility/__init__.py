@@ -2,7 +2,7 @@ import hashlib
 from functools import wraps
 from contextlib import contextmanager
 
-from flask import abort, flash, g, redirect, url_for, session
+from flask import abort, flash, g, redirect, url_for, session, Markup
 from flask_babel import lazy_gettext as _
 import python_freeipa
 
@@ -155,3 +155,21 @@ def handle_form_errors(form):
         yield
     except FormError as e:
         e.populate_form(form)
+
+
+def undo_button(form_action, submit_name, submit_value, hidden_tag):
+    """return an undo button html snippet as a string, to be used in flash messages"""
+
+    undo_text = _("Undo")
+
+    template = f"""
+    <span class='ml-auto' id="flashed-undo-button">
+        <form action="{form_action}" method="post">
+            {hidden_tag}
+            <button type="submit" class="btn btn-outline-success btn-sm"
+             name="{submit_name}" value="{submit_value}">
+                {undo_text}
+            </button>
+        </form>
+    </span>"""
+    return Markup(template)

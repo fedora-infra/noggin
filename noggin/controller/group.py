@@ -8,7 +8,7 @@ from noggin.form.add_group_member import AddGroupMemberForm
 from noggin.form.remove_group_member import RemoveGroupMemberForm
 from noggin.representation.user import User
 from noggin.representation.group import Group
-from noggin.utility import group_or_404, with_ipa, messaging
+from noggin.utility import group_or_404, with_ipa, messaging, undo_button
 
 
 @app.route('/group/<groupname>/')
@@ -74,14 +74,22 @@ def group_add_member(ipa, groupname):
                 )
             return redirect(url_for('group', groupname=groupname))
 
+        flash_text = _(
+            'You got it! %(username)s has been added to %(groupname)s.',
+            username=username,
+            groupname=groupname,
+        )
         flash(
-            _(
-                'You got it! %(username)s has been added to %(groupname)s.',
-                username=username,
-                groupname=groupname,
+            flash_text
+            + undo_button(
+                url_for("group_remove_member", groupname=groupname),
+                "username",
+                username,
+                sponsor_form.hidden_tag(),
             ),
             'success',
         )
+
         messaging.publish(
             MemberSponsorV1(
                 {
@@ -117,11 +125,18 @@ def group_remove_member(ipa, groupname):
             for error in e.message['member']['user']:
                 flash('Unable to remove user %s: %s' % (error[0], error[1]), 'danger')
             return redirect(url_for('group', groupname=groupname))
+        flash_text = _(
+            'You got it! %(username)s has been removed from %(groupname)s.',
+            username=username,
+            groupname=groupname,
+        )
         flash(
-            _(
-                'You got it! %(username)s has been removed from %(groupname)s.',
-                username=username,
-                groupname=groupname,
+            flash_text
+            + undo_button(
+                url_for("group_add_member", groupname=groupname),
+                "new_member_username",
+                username,
+                form.hidden_tag(),
             ),
             'success',
         )
