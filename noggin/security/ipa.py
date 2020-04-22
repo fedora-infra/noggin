@@ -30,6 +30,12 @@ class Client(IPAClient):
     TODO: send this upstream.
     """
 
+    def ping(self):
+        """
+        Checks that the server is alive.
+        """
+        return self._request("ping")
+
     def group_add_member_manager(
         self, group, users=None, groups=None, skip_errors=False, **kwargs
     ):
@@ -332,7 +338,7 @@ def maybe_ipa_session(app, session):
         # We have reconstructed a client, let's send a ping and see if we are
         # successful.
         try:
-            ping = client._request('ping')
+            ping = client.ping()
             client.ipa_version = ping['summary']
         except python_freeipa.exceptions.Unauthorized:
             return None
