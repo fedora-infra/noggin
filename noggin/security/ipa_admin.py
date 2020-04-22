@@ -44,7 +44,7 @@ class IPAAdmin(object):
             verify_ssl=self.__app.config['FREEIPA_CACERT'],
         )
         self.__client.login(self.__username, self.__password)
-        self.__client._request('ping')
+        self.__client.ping()
         return self.__client
 
     def __wrap_method(self, method_name):
