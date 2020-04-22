@@ -42,7 +42,7 @@ class User(Representation):
 
     @property
     def ircnick(self):
-        return self._attr('fasircnick')
+        return self._attrlist('fasircnick')
 
     @property
     def gpgkeys(self):

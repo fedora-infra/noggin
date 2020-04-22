@@ -13,12 +13,20 @@ POST_CONTENTS = {
     "firstname": "Dummy",
     "lastname": "User",
     "mail": "dummy@example.com",
-    "ircnick": "dummy",
+    "ircnick": "dummy,dummy_",
     "locale": "en-US",
     "timezone": "UTC",
     "github": "@dummy",
     "gitlab": "@dummy",
     "rhbz_mail": "dummy@example.com",
+}
+
+POST_CONTENTS_MIN = {
+    "firstname": "Dummy",
+    "lastname": "User",
+    "mail": "dummy@example.com",
+    "locale": "en-US",
+    "timezone": "UTC",
 }
 
 POST_CONTENTS_KEYS = {
@@ -73,6 +81,19 @@ def test_user_edit(client, logged_in_dummy_user):
 def test_user_edit_post(client, logged_in_dummy_user):
     """Test posting to the user edit page: /user/<username>/settings/profile/"""
     result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS)
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/profile/",
+        expected_message="Profile Updated: <a href=\"/user/dummy/\">view your profile</a>",
+        expected_category="success",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_edit_post_minimal_values(client, logged_in_dummy_user):
+    """Test posting to the user edit page: /user/<username>/settings/profile/
+        with the bare minimum of values """
+    result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS_MIN)
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/profile/",
