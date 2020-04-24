@@ -29,7 +29,12 @@
             <div class="card">
                   <ul class="list-group list-group-flush">
                   {% if user.timezone %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("Timezone")}}</strong> {{ user.timezone }}</li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("Timezone")}}</strong> 
+                      <div class="text-right">
+                        <div>{{ user.timezone }}</div>
+                        <div><small id="user-time">&nbsp;</small></div>
+                      </div>
+                    </li>
                   {% endif %}
                   {% if user.ircnick %}
                     <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("IRC Nickname")}}</strong> {{ user.ircnick }}</li>
@@ -95,4 +100,17 @@
     </div>
 
   </div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+{% if user.timezone %}
+  <script>
+    setInterval("generate_local_time();",1000); 
+    function generate_local_time(){
+      var currenttime = moment().tz("{{user.timezone}}").format('dddd, h:mm:ss a')
+      $("#user-time").html(currenttime)
+    }
+  </script>
+{% endif %}
 {% endblock %}
