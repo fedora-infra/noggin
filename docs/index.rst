@@ -26,6 +26,11 @@ Here is what works so far:
 * Allowing group member managers to remove people from groups
 * Editing user profile information
 
+Migrating your application:
+
+If your application currently uses FAS, and you wish to migrate it to use Noggin, please take a
+look at FASJSON's documentation which can be found `here <https://fasjson.readthedocs.io/>`_.
+
 
 .. User Guide
 
@@ -35,14 +40,6 @@ Here is what works so far:
 
    installation
    release_notes
-
-.. API
-
-.. toctree::
-   :maxdepth: 2
-   :caption: API Documentation
-
-   api
 
 
 .. Contributors
