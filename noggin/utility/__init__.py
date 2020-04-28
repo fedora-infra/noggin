@@ -6,17 +6,20 @@ from flask import abort, flash, g, redirect, url_for, session, Markup
 from flask_babel import lazy_gettext as _
 import python_freeipa
 
+from noggin import app
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_session
 
 
 def gravatar(email, size):
     return (
-        "https://seccdn.libravatar.org/avatar/"
+        app.config["AVATAR_SERVICE_URL"]
+        + "avatar/"
         + hashlib.md5(email.lower().encode('utf8')).hexdigest()  # nosec
         + "?s="
         + str(size)
-        + "&d=robohash"
+        + "&d="
+        + app.config["AVATAR_DEFAULT_TYPE"]
     )
 
 
