@@ -4,15 +4,20 @@ import python_freeipa
 from faker import Faker
 
 from noggin.security.ipa import Client
+import noggin.utility.timezones as timezones
 
+USER_PASSWORD = "testuserpw"
 
 fake = Faker()
+fake.seed_instance(0)
 
 ipa_server = "ipa.example.com"
 ipa_user = "admin"
 ipa_pw = "adminPassw0rd!"
 ipa = Client(host=ipa_server, verify_ssl=False)
 ipa.login(ipa_user, ipa_pw)
+
+untouched_ipa = Client(host=ipa_server, verify_ssl=False)
 
 # create a developers group
 try:
@@ -33,11 +38,15 @@ for x in range(50):
             firstName + " " + lastName,
             home_directory=f"/home/fedora/{username}",
             disabled=False,
-            user_password='testuserpw',
-            fasircnick=username,
-            faslocale=None,
-            fastimezone=None,
+            user_password=USER_PASSWORD,
+            fasircnick=[username, username + "_"],
+            faslocale="en-US",
+            fastimezone=fake.random_sample(timezones.TIMEZONES, length=1)[0],
             fasgpgkeyid=[],
+        )
+        # 'change' the password as the user, so its not expired
+        untouched_ipa.change_password(
+            username, new_password=USER_PASSWORD, old_password=USER_PASSWORD,
         )
         if x % 3 == 0:
             ipa.group_add_member("developers", username, skip_errors=True)
@@ -51,6 +60,7 @@ for x in range(50):
         print(e)
 
 # add a known user for testing purposes
+
 try:
     ipa.user_add(
         "testuser",
