@@ -6,99 +6,115 @@
   {{ super() }}
   <div class="container py-4">
     <div class="row">
-      <div class="col-md-6 mx-auto">
-        <div class="row mb-3">
-          <div class="col-4">
-            <img class="w-100 border rounded" src="{{ gravatar(user.mail if user.mail else 'default', 400) }}" alt="gravatar">
+      <div class="col-md-4">
+          <div class="text-center">
+            <img class="w-100 border d-none d-md-block" src="{{ gravatar(user.mail if user.mail else 'default', 400) }}" alt="gravatar"/>
+            <img class="w-50  border d-md-none" src="{{ gravatar(user.mail if user.mail else 'default', 400) }}" alt="gravatar"/>
+            <h3 class="mt-2 mb-0" id="user_fullname">{{ user.name if user.name else user.username }}</h3>
+            <h5 class="mb-2" id="user_username">{{ user.username }}</h5>
+            {% if user.username == current_user.username %}
+            <a href="{{ url_for('user_settings_profile', username=user.username) }}" class="btn btn-outline-primary btn-block my-2">{{_("Edit Profile")}}</a>
+            {% endif %}
           </div>
-          <div class="col my-auto">
-            <h3 class="mb-0" id="user_fullname">{{ user.name if user.name else user.username }}</h3>
-            <h5 class="mb-0" id="user_username">{{ user.username }}</h5>
-          </div>
-        </div>
-        <ul class="nav nav-pills mb-3 justify-content-center" role="tablist">
-          <li class="nav-item">
-            <a class="nav-link active" data-toggle="pill" href="#profile" role="tab">{{_("Profile")}}</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="pill" href="#groups" role="tab">{{_("Groups")}} <span class="badge badge-primary badge-pill">{{groups | count }}</span></a>
-          </li>
-        </ul>
-        <div class="tab-content">
-          <div class="tab-pane fade show active" id="profile" role="tabpanel">
-            <div class="card">
-                  <ul class="list-group list-group-flush">
-                  {% if user.timezone %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("Timezone")}}</strong> 
-                      <div class="text-right">
-                        <div>{{ user.timezone }}</div>
-                        <div><small id="user-time">&nbsp;</small></div>
-                      </div>
-                    </li>
-                  {% endif %}
-                  {% if user.ircnick %}
-                    <li class="list-group-item d-flex justify-content-between"><strong>{{_("IRC Nicknames")}}</strong> <div class="text-right">{% for ircnick in user.ircnick %}<pre class="mb-0">{{ ircnick }}</pre>{% endfor %}</li>
-                  {% endif %}
-                  {% if user.locale %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("Locale")}}</strong> {{ user.locale }}</li>
-                  {% endif %}
-                  {% if user.gpgkeys %}
-                    <li class="list-group-item d-flex justify-content-between"><strong>{{_("GPG Keys")}}</strong> <div class="text-right">{% for pgpkey in user.gpgkeys %}<pre class="mb-0">{{ pgpkey }}</pre>{% endfor %}</div></li>
-                  {% endif %}
-                  {% if user.rhbz_mail %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><strong>{{_("RHBZ E-Mail")}}</strong> {{ user.rhbz_mail }}</li>
-                  {% endif %}
-                  {% if user.github %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <b>GitHub</b>
-                      <a href="https://github.com/{{ user.github }}">@{{ user.github }}</a>
-                    </li>
-                  {% endif %}
-                  {% if user.gitlab %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <b>GitLab</b>
-                      <a href="https://gitlab.com/{{ user.gitlab }}">@{{ user.gitlab }}</a>
-                    </li>
-                  {% endif %}
-                  {{ userlinks() if userlinks is defined }}
-              </ul>
-              {% if user.username == current_user.username %}
-              <div class="card-footer">
-                <a href="{{ url_for('user_settings_profile', username=user.username) }}" class="btn btn-secondary btn-block">{{_("Settings")}}</a>
-              </div>
+          <ul class="list-group list-group-flush">
+              {% if user.timezone %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong title="{{_('Timezone')}}">
+                    <i class="fa fa-fw fa-globe"></i> 
+                    {{_("Timezone")}}
+                  </strong> 
+                  <div class="text-right">
+                    <div>{{ user.timezone }}</div>
+                  </div>
+                </li>
               {% endif %}
-            </div>
-          </div>
-          <div class="tab-pane fade" id="groups" role="tabpanel">
-            <div>
-              <ul class="list-group">
-                {% for group in groups %}
-                  {% with is_sponsor = group in managed_groups %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <div class="media align-items-center">
-                        <i class="fa fa-group fa-2x text-muted mr-3"></i>
-                        <div class="media-body">
-                            <div class="my-0 font-weight-bold">
-                              <a href="{{ url_for('group', groupname=group.name) }}">
-                                <span class="title">{{ group.name }}</span>
-                              </a>
-                            </div>
-                            {% if group.description %}
-                              <div>{{ group.description }}</div>
-                            {% endif %}  
-                        </div>
+              {% if user.timezone %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong title="{{_('Current Time')}}">
+                    <i class="fa fa-fw fa-clock-o"></i> 
+                    {{_("Current Time")}}
+                  </strong> 
+                  <div class="text-right">
+                    <div id="user-time">&nbsp;</div>
+                  </div>
+                </li>
+              {% endif %}
+              {% if user.ircnick %}
+                <li class="list-group-item d-flex justify-content-between">
+                  <strong title="{{_('IRC Nicknames')}}">
+                    <i class="fa fa-fw fa-comments-o"></i> {{_("IRC Nicknames")}}
+                  </strong>
+                  <div class="text-right">
+                    {% for ircnick in user.ircnick %}
+                    <pre class="mb-0">{{ ircnick }}</pre>
+                    {% endfor %}
+                  </div>
+                </li>
+              {% endif %}
+              {% if user.gpgkeys %}
+                <li class="list-group-item d-flex justify-content-between">
+                  <strong title='{{_("GPG Keys")}}'><i class="fa fa-fw fa-key"></i> {{_("GPG Keys")}}</strong> 
+                  <div class="text-right">
+                    {% for pgpkey in user.gpgkeys %}<pre class="mb-1 bg-light border px-2 rounded"><i class="fa fa-fw fa-key text-muted"></i> {{ pgpkey }}</pre>{% endfor %}
+                  </div>
+                </li>
+              {% endif %}
+              {% if user.rhbz_mail %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong title='{{_("RHBZ")}}'><i class="fa fa-fw fa-bug"></i> {{_("RHBZ")}}</strong> 
+                  {{ user.rhbz_mail }}
+                </li>
+              {% endif %}
+              {% if user.github %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong title="GitHub"><i class="fa fa-fw fa-github"></i> GitHub</strong>
+                  <a href="https://github.com/{{ user.github }}">@{{ user.github }}</a>
+                </li>
+              {% endif %}
+              {% if user.gitlab %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong title="GitLab"><i class="fa fa-fw fa-gitlab"></i> GitLab</strong>
+                  <a href="https://gitlab.com/{{ user.gitlab }}">@{{ user.gitlab }}</a>
+                </li>
+              {% endif %}
+              {{ userlinks() if userlinks is defined }}
+          </ul>
+      </div>
+      <div class="col-md-8">
+        <ul class="list-group h-100">
+          {% for group in groups %}
+            {% if loop.index == 1 %}
+            <li class="list-group-item text-right bg-light">
+                {% set groupcount = groups | count %}
+                <strong>{{_("%(groupcount)s Group Memberships", groupcount=groupcount)}}</strong>
+            </li>
+            {% endif %}
+            {% with is_sponsor = group in managed_groups %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="media align-items-center">
+                  <i class="fa fa-group fa-2x text-muted mr-3"></i>
+                  <div class="media-body">
+                      <div class="my-0 font-weight-bold">
+                        <a href="{{ url_for('group', groupname=group.name) }}">
+                          <span class="title">{{ group.name }}</span>
+                        </a>
                       </div>
-                      <div class=" {{ 'text-warning' if is_sponsor else 'text-success' }}">{{ _('sponsor') if is_sponsor else _('member') }} </div>
-                    </li>
-                  {% endwith %}
-                {% endfor %}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div> 
+                      {% if group.description %}
+                        <div>{{ group.description }}</div>
+                      {% endif %}  
+                  </div>
+                </div>
+                <div class=" {{ 'text-warning' if is_sponsor else 'text-success' }}">{{ _('sponsor') if is_sponsor else _('member') }} </div>
+              </li>
+            {% endwith %}
+          {% else %}
+          <li class="list-group-item h4 text-muted h-100 text-center d-flex align-items-center justify-content-center bg-light">
+            {{user.username}} has no group memberships
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
-
   </div>
 {% endblock %}
 
