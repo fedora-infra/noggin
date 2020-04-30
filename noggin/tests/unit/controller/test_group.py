@@ -107,10 +107,22 @@ def test_group_add_member(client, dummy_user_as_group_manager, make_user):
         result = client.post(
             '/group/dummy-group/members/', data={"new_member_username": "testuser"}
         )
+
+    expected_message = """You got it! testuser has been added to dummy-group.
+    <span class='ml-auto' id="flashed-undo-button">
+        <form action="/group/dummy-group/members/remove" method="post">
+            
+            <button type="submit" class="btn btn-outline-success btn-sm"
+             name="username" value="testuser">
+                Undo
+            </button>
+        </form>
+    </span>"""  # noqa
+
     assert_redirects_with_flash(
         result,
         expected_url="/group/dummy-group/",
-        expected_message="You got it! testuser has been added to dummy-group.",
+        expected_message=expected_message,
         expected_category="success",
     )
 
@@ -181,10 +193,20 @@ def test_group_remove_member(client, dummy_user_as_group_manager, make_user):
     result = client.post(
         '/group/dummy-group/members/remove', data={"username": "testuser"}
     )
+    expected_message = """You got it! testuser has been removed from dummy-group.
+    <span class='ml-auto' id="flashed-undo-button">
+        <form action="/group/dummy-group/members/" method="post">
+            <input id="username" name="username" required type="hidden" value="testuser">
+            <button type="submit" class="btn btn-outline-success btn-sm"
+             name="new_member_username" value="testuser">
+                Undo
+            </button>
+        </form>
+    </span>"""
     assert_redirects_with_flash(
         result,
         expected_url="/group/dummy-group/",
-        expected_message="You got it! testuser has been removed from dummy-group.",
+        expected_message=expected_message,
         expected_category="success",
     )
 
@@ -214,10 +236,22 @@ def test_group_remove_self(client, logged_in_dummy_user, dummy_group):
     result = client.post(
         '/group/dummy-group/members/remove', data={"username": "dummy"}
     )
+
+    expected_message = """You got it! dummy has been removed from dummy-group.
+    <span class='ml-auto' id="flashed-undo-button">
+        <form action="/group/dummy-group/members/" method="post">
+            <input id="username" name="username" required type="hidden" value="dummy">
+            <button type="submit" class="btn btn-outline-success btn-sm"
+             name="new_member_username" value="dummy">
+                Undo
+            </button>
+        </form>
+    </span>"""
+
     assert_redirects_with_flash(
         result,
         expected_url="/group/dummy-group/",
-        expected_message="You got it! dummy has been removed from dummy-group.",
+        expected_message=expected_message,
         expected_category="success",
     )
 

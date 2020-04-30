@@ -1,8 +1,9 @@
+import pytest
 from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, StringField
 
-from noggin.form.base import ButtonWidget, ModestForm, SubmitButtonField
+from noggin.form.base import ButtonWidget, ModestForm, SubmitButtonField, CSVListField
 
 
 def test_buttonwidget(client):
@@ -51,3 +52,23 @@ def test_modestform_no_submit_button(client):
     ):
         form = TestForm()
         assert form.is_submitted()
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        (["one,two,three"], ["one", "two", "three"]),
+        ([" "], []),
+        ([" , , , "], []),
+        ([""], []),
+        ([], []),
+    ],
+)
+def test_csvlistfield(client, test_input, expected):
+    class DummyForm(FlaskForm):
+        csvfield = CSVListField('csv field')
+
+    form = DummyForm()
+
+    form.csvfield.process_formdata(test_input)
+    assert form.csvfield.data == expected

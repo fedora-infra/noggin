@@ -1,6 +1,8 @@
 {% extends "master.html" %}
 {% block website %}{{_("Fedora Accounts")}}{% endblock %}
 
+{% set OPENID = '.id.fedoraproject.org' %}
+
 {% block head %}
     <link href="{{ url_for('theme.static', filename='js/fedora-bootstrap/fedora-bootstrap.css') }}" rel="stylesheet" />
     <link href="{{ url_for('theme.static', filename='fonts/open-sans.css') }}" rel="stylesheet" />
@@ -36,7 +38,7 @@
         {% if flashes %}
         <div class="container flash-messages fixed-top mt-5">
             {% for category, flash in flashes %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show">
+            <div class="alert alert-{{ category }} alert-dismissible fade show d-flex align-items-center">
                 {{ flash }}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -103,8 +105,6 @@
         </div>
     {% endif %}
 {% endmacro %}
-
-{% set openid = 'https://%s.id.fedoraproject.org' %}
 
 {# an optional macro defining an element to show for account disable #}
 {# typically, it used to link to a ticket tracker for an admin to perform the disable #}

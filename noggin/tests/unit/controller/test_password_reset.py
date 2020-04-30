@@ -1,5 +1,3 @@
-from unittest import mock
-
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
@@ -59,11 +57,8 @@ def test_password_changes_wrong_user(client, logged_in_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_password_changes_user(
-    client, logged_in_dummy_user, dummy_group, no_password_min_time
-):
+def test_password_changes_user(client, logged_in_dummy_user):
     """Verify that password changes"""
-    ipa_admin.group_add_member("dummy-group", users="dummy")
     result = client.post(
         '/user/dummy/settings/password',
         data={
@@ -79,6 +74,38 @@ def test_password_changes_user(
         expected_message="Your password has been changed",
         expected_category="success",
     )
+
+
+@pytest.mark.vcr()
+def test_password_form_with_otp(client, logged_in_dummy_user, dummy_user_with_otp):
+    """Verify that the password change form shows OTP form elements
+       when a user has OTP enabled"""
+    result = client.get("/user/dummy/settings/password")
+
+    page = BeautifulSoup(result.data, "html.parser")
+
+    currentpasswordinput = page.select_one("#currentpasswordinput .form-text")
+    assert currentpasswordinput is not None
+    expected = "Just the password, don't add the OTP token if you have one"
+    assert expected in currentpasswordinput.get_text(strip=True)
+
+    otpinput = page.select("#otpinput")
+    assert len(otpinput) == 1
+
+
+@pytest.mark.vcr()
+def test_password_form_without_otp(client, logged_in_dummy_user):
+    """Verify that the password change form shows OTP form elements
+       when a user has OTP disabled"""
+    result = client.get("/user/dummy/settings/password")
+
+    page = BeautifulSoup(result.data, "html.parser")
+
+    currentpasswordinput = page.select("#currentpasswordinput .form-text")
+    assert len(currentpasswordinput) == 0
+
+    otpinput = page.select("#otpinput")
+    assert len(otpinput) == 0
 
 
 @pytest.mark.vcr()
@@ -109,7 +136,6 @@ def test_password_user(client, logged_in_dummy_user):
             "password": "LongSuperSafePassword",
             "password_confirm": "LongSuperSafePassword",
         },
-        follow_redirects=True,
     )
     assert_form_field_error(
         result,
@@ -143,7 +169,6 @@ def test_password(client, dummy_user):
             "password": "LongSuperSafePassword",
             "password_confirm": "LongSuperSafePassword",
         },
-        follow_redirects=True,
     )
     assert_form_field_error(
         result,
@@ -162,7 +187,6 @@ def test_password_no_user(client):
             "password": "LongSuperSafePassword",
             "password_confirm": "LongSuperSafePassword",
         },
-        follow_redirects=True,
     )
     assert_form_field_error(
         result,
@@ -172,8 +196,9 @@ def test_password_no_user(client):
 
 
 @pytest.mark.vcr()
-def test_time_sensitive_password_policy(client, dummy_user):
+def test_time_sensitive_password_policy(client, dummy_user, password_min_time):
     """Verify that new password policies are upheld"""
+    ipa_admin.group_add_member("dummy-group", users="dummy")
     result = client.post(
         '/password-reset?username=dummy',
         data={
@@ -181,10 +206,9 @@ def test_time_sensitive_password_policy(client, dummy_user):
             "password": "somesupersecretpassword",
             "password_confirm": "somesupersecretpassword",
         },
-        follow_redirects=True,
     )
     # the dummy user is created and has its password immediately changed,
-    # so this next attempt should failt with a constraint error.
+    # so this next attempt should fail with a constraint error.
     assert_form_field_error(
         result,
         field_name="password",
@@ -193,8 +217,8 @@ def test_time_sensitive_password_policy(client, dummy_user):
 
 
 @pytest.mark.vcr()
-def test_short_password(client, dummy_user, no_password_min_time):
-    """Verify that new password policies are upheld"""
+def test_short_password_form(client, dummy_user):
+    """Verify that form password policies are upheld"""
     result = client.post(
         '/password-reset?username=dummy',
         data={
@@ -202,7 +226,24 @@ def test_short_password(client, dummy_user, no_password_min_time):
             "password": "1",
             "password_confirm": "1",
         },
-        follow_redirects=True,
+    )
+    assert_form_field_error(
+        result,
+        field_name="password",
+        expected_message="Field must be at least 6 characters long.",
+    )
+
+
+@pytest.mark.vcr()
+def test_short_password_policy(client, dummy_user):
+    """Verify that server password policies are upheld"""
+    result = client.post(
+        '/password-reset?username=dummy',
+        data={
+            "current_password": "dummy_password",
+            "password": "1234567",
+            "password_confirm": "1234567",
+        },
     )
     assert_form_field_error(
         result,
@@ -211,29 +252,29 @@ def test_short_password(client, dummy_user, no_password_min_time):
     )
 
 
-def test_reset_generic_error(client):
+def test_reset_generic_error(client, mocker):
     """Reset password with an unhandled error"""
-    client_mock = mock.Mock()
-    with mock.patch(
+    client_mock = mocker.Mock()
+    untouched_ipa_client = mocker.patch(
         "noggin.controller.password.untouched_ipa_client"
-    ) as untouched_ipa_client:
-        untouched_ipa_client.return_value = client_mock
-        client_mock.change_password.side_effect = python_freeipa.exceptions.FreeIPAError(
-            message="something went wrong", code="4242"
-        )
-        result = client.post(
-            '/password-reset?username=dummy',
-            data={
-                "current_password": "dummy_password",
-                "password": "password",
-                "password_confirm": "password",
-            },
-        )
+    )
+    untouched_ipa_client.return_value = client_mock
+    client_mock.change_password.side_effect = python_freeipa.exceptions.FreeIPAError(
+        message="something went wrong", code="4242"
+    )
+    result = client.post(
+        '/password-reset?username=dummy',
+        data={
+            "current_password": "dummy_password",
+            "password": "password",
+            "password_confirm": "password",
+        },
+    )
     assert_form_generic_error(result, 'Could not change password.')
 
 
 @pytest.mark.vcr()
-def test_password_changes(client, dummy_user, no_password_min_time):
+def test_password_changes(client, dummy_user):
     """Verify that password changes"""
     result = client.post(
         '/password-reset?username=dummy',

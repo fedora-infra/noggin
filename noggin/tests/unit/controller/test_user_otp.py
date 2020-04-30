@@ -95,7 +95,7 @@ def test_user_settings_otp_add(client, logged_in_dummy_user, cleanup_dummy_token
 
 @pytest.mark.vcr()
 def test_user_settings_otp_add_second(
-    client, cleanup_dummy_tokens, dummy_user_with_otp, logged_in_dummy_user
+    client, dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens
 ):
     """Test posting to the create OTP endpoint"""
     current_otp = get_otp(otp_secret_from_uri(dummy_user_with_otp.uri))
@@ -107,13 +107,38 @@ def test_user_settings_otp_add_second(
     page = BeautifulSoup(result.data, "html.parser")
     tokenlist = page.select_one("div.list-group")
     assert tokenlist is not None
-    # check we are showing 1 token
+    # check we are showing 2 tokens
     tokens = tokenlist.select(".list-group-item .h6 div[data-role='token-description']")
     assert len(tokens) == 2
     # check the 2nd token is in the list
     assert tokens[1].get_text(strip=True) == "pants token"
     # check the modal is on the page
     assert len(page.select("#otp-modal")) == 1
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_check_no_description(
+    client, dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens
+):
+    """Test an OTP token without a description"""
+    current_otp = get_otp(otp_secret_from_uri(dummy_user_with_otp.uri))
+
+    result = client.post(
+        "/user/dummy/settings/otp/",
+        data={"password": f"dummy_password{current_otp}"},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(result.data, "html.parser")
+    tokenlist = page.select_one("div.list-group")
+
+    assert tokenlist is not None
+
+    tokens = tokenlist.select(".list-group-item .h6 div[data-role='token-description']")
+    assert len(tokens) == 2
+
+    assert tokens[0].get_text(strip=True) == ""
+    assert tokens[1].get_text(strip=True) == "dummy's token"
 
 
 @pytest.mark.vcr()

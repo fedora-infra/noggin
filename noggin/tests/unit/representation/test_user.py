@@ -13,7 +13,7 @@ def dummy_user_dict():
         'fasgithubusername': ['dummy'],
         'fasgitlabusername': ['dummy'],
         'fasgpgkeyid': ['key1', 'key2'],
-        'fasircnick': ['dummy'],
+        'fasircnick': ['dummy', "dummy_"],
         'faslocale': ['en-US'],
         'fasrhbzemail': ['dummy@example.com'],
         'fastimezone': ['UTC'],
@@ -73,7 +73,7 @@ def test_user(dummy_user_dict):
     ]
     assert user.timezone == "UTC"
     assert user.locale == "en-US"
-    assert user.ircnick == "dummy"
+    assert user.ircnick == ["dummy", "dummy_"]
     assert user.gpgkeys == ["key1", "key2"]
     assert user.groups == ["ipausers"]
     assert user.github == "dummy"

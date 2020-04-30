@@ -1,7 +1,24 @@
 {% extends "user-settings.html" %}
 
 {% import '_form_macros.html' as macros %}
+
+{% block head %}
+  {{ super() }}
+  {{ macros.selectize_css() }}
+{% endblock %}
 {% block settings_content %}
+  <div class="card-body border-bottom">
+    <img src="{{ gravatar(user.mail if user.mail else 'default', 100) }}" class="pb-2" alt="user avatar"/>
+    {% set buttontext = _('Change Avatar')%}
+    {%- if OPENID is defined %}
+    <form method="GET" action="https://www.libravatar.org/openid/login/">
+      <input type="hidden" name="openid_identifier" value="{{ 'https://'+user.username+OPENID }}">
+      <input name="change-avatar" type="submit" value="{{ buttontext }}" class="btn btn-sm btn-outline-primary">
+    </form>
+    {%- else %}
+    <a href="https://www.libravatar.org/accounts/login/" class="btn btn-sm btn-outline-primary">{{ buttontext }}</a>
+    {%- endif %}
+  </div>
 <form class="needs-validation" action="{{ url_for('user_settings_profile', username=user.username) }}" method="post" novalidate>
     {{ form.csrf_token }}
     <div class="card-body">
@@ -27,5 +44,19 @@
 {% block scripts %}
   {{ super () }}
   {{ macros.unsaved_changes() }}
+  {{ macros.selectize() }}
+  <script>
+  $('#ircnick').selectize({
+    plugins: ['remove_button'],
+    delimiter: ',',
+    persist: false,
+    create: function(input) {
+        return {
+            value: input,
+            text: input
+        }
+    }
+  });
+  </script>
 {% endblock %}
 

@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import SubmitField
+from wtforms import Field, SubmitField
+from wtforms.widgets import TextInput
 from wtforms.widgets.core import html_params, HTMLString
 
 
@@ -65,3 +66,19 @@ class SubmitButtonField(SubmitField):
 
 def strip(value):
     return value.strip() if value else value
+
+
+class CSVListField(Field):
+    widget = TextInput()
+
+    def _value(self):
+        if self.data:
+            return ','.join(self.data)
+        else:
+            return ''
+
+    def process_formdata(self, values):
+        if values:
+            self.data = [x.strip() for x in values[0].split(',') if x.strip()]
+        else:
+            self.data = []

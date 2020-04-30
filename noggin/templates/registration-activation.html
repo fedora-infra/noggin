@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+{% block title %}{{_("Activate your account")}}{% endblock %}
+
+{% block content %}
+  {{ super() }}
+
+
+{% import '_form_macros.html' as macros %}
+
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-6 mx-auto">
+        <div class="card">
+          <form action="{{ request.url }}" method="post">
+            {{ form.csrf_token }}
+            <div class="card-body">
+              <h4 class="card-title">{{_("Account creation, step 3/3")}}</h4>
+              <p>{{_("Hello %(name)s. To activate your account, please choose a password.", name=user.name)}}</p>
+              <div class="form-group">{{ macros.with_errors(form.password, class="validate", tabindex="1") }}</div>
+              <div class="form-group mb-0">{{ macros.with_errors(form.password_confirm, class="validate", tabindex="2") }}</div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+              <div>{{ macros.non_field_errors(form) }}</div>
+              {{ form.submit(color="primary", tabindex="3") }}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div> <!-- ./row -->
+  </div>
+
+{% endblock %}
