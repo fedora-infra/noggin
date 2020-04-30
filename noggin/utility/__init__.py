@@ -73,7 +73,7 @@ def group_or_404(ipa, groupname):
 
 def user_or_404(ipa, username):
     try:
-        return ipa.user_show(username)
+        return ipa.user_show(username)['result']
     except python_freeipa.exceptions.NotFound:
         abort(404)
 

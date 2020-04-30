@@ -76,8 +76,8 @@ def user_settings_profile(ipa, username):
             form,
             username,
             {
-                'first_name': form.firstname.data,
-                'last_name': form.lastname.data,
+                'firstname': form.firstname.data,
+                'lastname': form.lastname.data,
                 'full_name': '%s %s' % (form.firstname.data, form.lastname.data),
                 'display_name': '%s %s' % (form.firstname.data, form.lastname.data),
                 'mail': form.mail.data,
