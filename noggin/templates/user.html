@@ -89,7 +89,6 @@
                 <strong>{{_("%(groupcount)s Group Memberships", groupcount=groupcount)}}</strong>
             </li>
             {% endif %}
-            {% with is_sponsor = group in managed_groups %}
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="media align-items-center">
                   <i class="fa fa-group fa-2x text-muted mr-3"></i>
@@ -104,9 +103,9 @@
                       {% endif %}  
                   </div>
                 </div>
-                <div class=" {{ 'text-warning' if is_sponsor else 'text-success' }}">{{ _('sponsor') if is_sponsor else _('member') }} </div>
+                <div class="text-info ml-auto" style="width:5em;">{{ _('sponsor') if group in managed_groups }}</div>
+                <div class="text-success" style="width:4em;">{{ _('member') if group in member_groups }}</div>
               </li>
-            {% endwith %}
           {% else %}
           <li class="list-group-item h4 text-muted h-100 text-center d-flex align-items-center justify-content-center bg-light">
             {{user.username}} has no group memberships

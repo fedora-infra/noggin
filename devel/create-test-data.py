@@ -46,7 +46,7 @@ for x in range(50):
         )
         # 'change' the password as the user, so its not expired
         untouched_ipa.change_password(
-            username, new_password=USER_PASSWORD, old_password=USER_PASSWORD,
+            username, new_password=USER_PASSWORD, old_password=USER_PASSWORD
         )
         if x % 3 == 0:
             ipa.group_add_member("developers", username, skip_errors=True)
