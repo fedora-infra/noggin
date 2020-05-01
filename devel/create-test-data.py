@@ -33,12 +33,11 @@ for x in range(50):
     try:
         ipa.user_add(
             username,
-            firstName,
-            lastName,
-            firstName + " " + lastName,
-            home_directory=f"/home/fedora/{username}",
-            disabled=False,
-            user_password=USER_PASSWORD,
+            o_givenname,
+            o_sn,
+            o_cn=o_givenname+o_sn,
+            o_homedirectory=f"/home/fedora/{username}",
+            o_userpassword=USER_PASSWORD,
             fasircnick=[username, username + "_"],
             faslocale="en-US",
             fastimezone=fake.random_sample(timezones.TIMEZONES, length=1)[0],
@@ -52,7 +51,7 @@ for x in range(50):
             ipa.group_add_member("developers", username)
             if x < 10:
                 ipa.group_add_member_manager(
-                    "developers", users=username)
+                    "developers", o_user=username)
         if x % 2 == 0:
             ipa.group_add_member("admins", username)
     except python_freeipa.exceptions.FreeIPAError as e:

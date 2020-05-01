@@ -57,23 +57,17 @@ def group_add_member(ipa, groupname):
         try:
             ipa.user_show(username)
         except python_freeipa.exceptions.NotFound:
-<<<<<<< HEAD
             flash(
                 _('User %(username)s was not found in the system.', username=username),
                 'danger',
             )
             return redirect(url_for('group', groupname=groupname))
-=======
-            flash('User %s was not found in the system.' % username, 'danger')
-            return redirect(url_for('group', a_cn=groupname))
->>>>>>> changes to controller files
         try:
             ipa.group_add_member(group=groupname, users=username)
         except python_freeipa.exceptions.ValidationError as e:
             # e.message is a dict that we have to process ourselves for now:
             # https://github.com/opennode/python-freeipa/issues/24
             for error in e.message['member']['user']:
-<<<<<<< HEAD
                 flash(
                     _(
                         'Unable to add user %(username)s: %(errormessage)s',
@@ -83,10 +77,6 @@ def group_add_member(ipa, groupname):
                     'danger',
                 )
             return redirect(url_for('group', groupname=groupname))
-=======
-                flash('Unable to add user %s: %s' % (error[0], error[1]), 'danger')
-            return redirect(url_for('group', a_cn=groupname))
->>>>>>> changes to controller files
 
         flash_text = _(
             'You got it! %(username)s has been added to %(groupname)s.',
@@ -138,17 +128,12 @@ def group_remove_member(ipa, groupname):
             # https://github.com/opennode/python-freeipa/issues/24
             for error in e.message['member']['user']:
                 flash('Unable to remove user %s: %s' % (error[0], error[1]), 'danger')
-<<<<<<< HEAD
             return redirect(url_for('group', groupname=groupname))
         flash_text = _(
             'You got it! %(username)s has been removed from %(groupname)s.',
             username=username,
             groupname=groupname,
         )
-=======
-            return redirect(url_for('group', a_cn=groupname))
-
->>>>>>> changes to controller files
         flash(
             flash_text
             + undo_button(
