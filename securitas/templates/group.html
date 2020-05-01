@@ -72,7 +72,6 @@
         <h4 class="header fw300">Sponsors</h4>
         <ul class="collection">
           {% for sponsor in sponsors|sort(attribute='username') %}
-<<<<<<< HEAD
             <li class="collection-item avatar">
               <!-- TODO: .red if sponsor/admin -->
               {% if sponsor.mail %}
@@ -86,22 +85,6 @@
               <p>{{ sponsor.name }}</p>
               {# TODO: sponsor if sponsor #}
               <p>member</p>
-=======
-            <li class="col-lg-3 col-md-4 col-sm-6">
-              <div class="card card-body mb-4">
-              <div class="media align-items-center">
-                <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 50) }}" alt="gravatar">
-                <div class="media-body ml-2">
-                    <div class="my-0 font-weight-bold">
-                      <a href="{{ url_for('user', username=sponsor.username) }}">
-                        <span class="title">{{ sponsor.username }}</span>
-                      </a>
-                    </div>
-                    <div>{{ sponsor.name }}</div>
-                </div>
-              </div>
-              </div>
->>>>>>> sonarcloud changes and config file
             </li>
           {% endfor %}
         </ul>
@@ -120,7 +103,6 @@
           {{ sponsor_form.hidden_tag() }}
           <ul class="collection">
             {% for member in members|sort(attribute='username') %}
-<<<<<<< HEAD
               <li class="collection-item avatar">
                 <!-- TODO: .red if sponsor/admin -->
                 {% if member.mail %}
@@ -138,25 +120,6 @@
                   <div class="secondary-content">
                     <button type="submit" class="btn-flat waves-effect waves-light red-text" name="username" value="{{ member.username }}">
                       <i class="material-icons">remove_circle_outline</i>
-=======
-              <li class="col-lg-3 col-md-4 col-sm-6">
-              <div class="card card-body mb-4">
-                <div class="media align-items-center">
-                  <img src="{{ gravatar(member.mail if member.mail else 'default', 50) }}" alt="gravatar">
-                  <div class="media-body ml-2">
-                      <div class="my-0 font-weight-bold">
-                        <a href="{{ url_for('user', username=member.username) }}">
-                          <span class="title">{{ member.username }}</span>
-                        </a>
-                      </div>
-                      <div>{{ member.name }}</div>
-                  </div>
-                </div>
-                <div class="text-muted">
-                  {% if current_user_is_sponsor %}
-                    <button type="submit" class="btn btn-outline-danger border-0" name="username" value="{{ member.username }}">
-                      <i class="fa fa-trash"></i>
->>>>>>> sonarcloud changes and config file
                     </button>
                   </div>
                 {% endif %}
