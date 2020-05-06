@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 
 from flask import flash, redirect, render_template, session, url_for, Markup
 from flask_babel import _
@@ -154,7 +154,7 @@ def user_settings_otp(ipa, username):
             # the token's UUID
             principal = uri.path.split(":", 1)[0]
             new_uri = uri._replace(
-                path=f"{principal.lower()}:{addotpform.description.data}"
+                path=f"{principal.lower()}:{quote(addotpform.description.data)}"
             )
             session['otp_uri'] = new_uri.geturl()
         except python_freeipa.exceptions.InvalidSessionPassword:

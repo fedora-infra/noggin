@@ -142,6 +142,29 @@ def test_user_settings_otp_check_no_description(
 
 
 @pytest.mark.vcr()
+def test_user_settings_otp_check_description_escaping(
+    client, dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens
+):
+    """Test that we escape the token description when constructing the OTP URI"""
+    current_otp = get_otp(otp_secret_from_uri(dummy_user_with_otp.uri))
+
+    result = client.post(
+        "/user/dummy/settings/otp/",
+        data={"description": "pants token", "password": f"dummy_password{current_otp}"},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(result.data, "html.parser")
+    otp_uri = page.select_one("input#otp-uri")
+
+    assert (
+        otp_uri['value'] == "otpauth://totp/dummy@example.com:pants%20token?issuer="
+        "dummy%40EXAMPLE.COM&secret=L4PD6EXABBJDSCAKS6MZQWT4RSP3PM3QW6H57UHIKFCN7I3"
+        "FGKSHZCCO&digits=6&algorithm=SHA512&period=30"
+    )
+
+
+@pytest.mark.vcr()
 def test_user_settings_otp_add_no_permission(client, logged_in_dummy_user):
     """Verify that another user can't make an otp token. """
     result = client.post(
