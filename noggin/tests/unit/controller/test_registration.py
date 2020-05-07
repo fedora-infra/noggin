@@ -393,6 +393,18 @@ def test_invalid_email(client, post_data_step_1):
 
 
 @pytest.mark.vcr()
+def test_blocklisted_email(client, post_data_step_1):
+    """Register a user with an invalid email address"""
+    post_data_step_1["register-mail"] = "dude@fedoraproject.org"
+    result = client.post('/', data=post_data_step_1)
+    assert_form_field_error(
+        result,
+        field_name="register-mail",
+        expected_message='Email addresses from that domain are not allowed',
+    )
+
+
+@pytest.mark.vcr()
 def test_empty_email(client, post_data_step_1):
     """Register a user with an empty email address"""
     del post_data_step_1["register-mail"]
