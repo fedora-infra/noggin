@@ -2,9 +2,10 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, EqualTo, Email, Length
+from wtforms.validators import DataRequired, EqualTo, Length
 
 from noggin import app
+from noggin.form.validators import Email
 from .base import ModestForm, SubmitButtonField, strip
 
 
@@ -31,7 +32,10 @@ class RegisterUserForm(ModestForm):
         _('E-mail Address'),
         validators=[
             DataRequired(message=_('Email must not be empty')),
-            Email(message=_('Email must be valid')),
+            Email(
+                message=_('Email must be valid'),
+                blocklist=app.config["MAIL_DOMAIN_BLOCKLIST"],
+            ),
         ],
         filters=[strip],
     )
