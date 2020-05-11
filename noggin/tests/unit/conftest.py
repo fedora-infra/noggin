@@ -130,6 +130,7 @@ def dummy_user(make_user):
     make_user("dummy")
     yield
 
+
 @pytest.fixture
 def dummy_user_with_case(make_user):
     make_user("duMmy")
