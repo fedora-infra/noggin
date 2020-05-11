@@ -80,23 +80,20 @@ def _handle_registration_validation_error(username, e):
 def handle_register_form(form):
     username = form.username.data
     now = datetime.datetime.utcnow().replace(microsecond=0)
-
     # First, create the stage user.
     try:
         user = ipa_admin.stageuser_add(
-            username,
-            form.firstname.data,
-            form.lastname.data,
-            mail=form.mail.data,
-            login_shell='/bin/bash',
+            a_uid=username,
+            o_givenname=form.firstname.data,
+            o_sn=form.lastname.data,
+            o_cn=form.firstname.data + " " + form.lastname.data,
+            o_mail=form.mail.data,
+            o_loginshell='/bin/bash',
             fascreationtime=f"{now.isoformat()}Z",
             faslocale=guess_locale(),
             fastimezone=app.config["USER_DEFAULTS"]["timezone"],
             fasstatusnote=app.config["USER_DEFAULTS"]["status_note"],
-            # Beware when moving to ClientMeta, they dropped the special argument
-            # "disabled", we'll have to set nsaccountlock directly.
-            disabled=app.config["USER_DEFAULTS"]["locked"],
-        )
+        )['result']
         user = User(user)
     except python_freeipa.exceptions.DuplicateEntry:
         raise FormError(
@@ -126,7 +123,7 @@ def confirm_registration():
     if not username:
         abort(400, "No username provided")
     try:
-        user = User(ipa_admin.stageuser_show(username))
+        user = User(ipa_admin.stageuser_show(a_uid=username)['result'])
     except python_freeipa.exceptions.NotFound:
         flash(_("The registration seems to have failed, please try again."), "warning")
         return redirect(f"{url_for('root')}?tab=register")
@@ -166,7 +163,7 @@ def activate_account():
         return redirect(register_url)
 
     try:
-        user = User(ipa_admin.stageuser_show(token["sub"]))
+        user = User(ipa_admin.stageuser_show(token["sub"])["result"])
     except python_freeipa.exceptions.NotFound:
         flash(_("This user cannot be found, please register again."), "warning")
         return redirect(register_url)
@@ -309,7 +306,5 @@ def spamcheck_hook():
         lock = True
     else:
         return jsonify({"error": f"Invalid status: {status}."}), 400
-    # Beware when moving to ClientMeta, they dropped the special argument
-    # "disabled", we'll have to set nsaccountlock directly.
-    ipa_admin.user_mod(username, fasstatusnote=status, disabled=lock)
+    ipa_admin.user_mod(a_uid=username, o_nsaccountlock=lock, fasstatusnote=status)
     return jsonify({"status": "success"})

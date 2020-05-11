@@ -15,7 +15,7 @@ from noggin.utility.token import Audience, read_token
 def test_signal_basset(client, mocker, dummy_user):
     mocked_requests = mocker.patch("noggin.signals.requests")
     mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
-    user = User(ipa_admin.user_show("dummy"))
+    user = User(ipa_admin.user_show("dummy")["result"])
     with current_app.test_request_context('/'):
         request_basset_check(user)
     call_args = mocked_requests.post.call_args_list[0]

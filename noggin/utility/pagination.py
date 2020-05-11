@@ -84,7 +84,7 @@ def paginated_find(ipa, representation, *args, **kwargs):
     ]
     items = [
         representation(result['result'])
-        for result in ipa.batch(methods=batch_methods)['results']
+        for result in ipa.batch(a_methods=batch_methods)['results']
     ]
 
     return PagedResult(

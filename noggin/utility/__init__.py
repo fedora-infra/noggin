@@ -79,7 +79,7 @@ def require_self(f):
 
 
 def group_or_404(ipa, groupname):
-    group = ipa.group_find(cn=groupname, fasgroup=True)['result']
+    group = ipa.group_find(o_cn=groupname, fasgroup=True)['result']
     if not group:
         abort(404, _('Group %(groupname)s could not be found.', groupname=groupname))
     else:
@@ -88,7 +88,7 @@ def group_or_404(ipa, groupname):
 
 def user_or_404(ipa, username):
     try:
-        return ipa.user_show(username)
+        return ipa.user_show(a_uid=username)['result']
     except python_freeipa.exceptions.NotFound:
         abort(404)
 

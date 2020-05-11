@@ -46,16 +46,17 @@ def post_data_step_3():
 def dummy_stageuser(ipa_testing_config):
     now = datetime.datetime.utcnow().replace(microsecond=0)
     user = ipa_admin.stageuser_add(
-        "dummy",
-        "Dummy",
-        'User',
-        mail="dummy@example.com",
-        login_shell='/bin/bash',
+        a_uid="dummy",
+        o_givenname="Dummy",
+        o_sn="User",
+        o_cn="Dummy User",
+        o_mail="dummy@example.com",
+        o_loginshell='/bin/bash',
         fascreationtime=f"{now.isoformat()}Z",
-    )
+    )['result']
     yield User(user)
     try:
-        ipa_admin.stageuser_del("dummy")
+        ipa_admin.stageuser_del(a_uid="dummy")
     except python_freeipa.exceptions.NotFound:
         pass
 
@@ -82,16 +83,13 @@ def test_step_1(client, post_data_step_1, cleanup_dummy_user):
     assert message.subject == "Verify your email address"
     assert message.recipients == ["dummy@example.com"]
     # Check that default values are added
-    user = ipa_admin.stageuser_show("dummy")
+    user = User(ipa_admin.stageuser_show("dummy")['result'])
     # Creation time
-    assert "fascreationtime" in user
-    assert user["fascreationtime"][0]
+    assert user.creationtime is not None
     # Locale
-    assert "faslocale" in user
-    assert user["faslocale"][0] == current_app.config["USER_DEFAULTS"]["locale"]
+    assert user.locale == current_app.config["USER_DEFAULTS"]["locale"]
     # Timezone
-    assert "fastimezone" in user
-    assert user["fastimezone"][0] == current_app.config["USER_DEFAULTS"]["timezone"]
+    assert user.timezone == current_app.config["USER_DEFAULTS"]["timezone"]
 
 
 @pytest.mark.vcr()
@@ -221,7 +219,7 @@ def test_step_3_invalid_token(client, dummy_stageuser, mocker):
 @pytest.mark.vcr()
 def test_step_3_unknown_user(client, token_for_dummy_user):
     """Registration activation page with a token pointing to an unknown user"""
-    ipa_admin.stageuser_del("dummy")
+    ipa_admin.stageuser_del(a_uid="dummy")
     result = client.get(f'/register/activate?token={token_for_dummy_user}')
     assert_redirects_with_flash(
         result,
@@ -318,7 +316,7 @@ def test_strip(client, post_data_step_1, cleanup_dummy_user, field_name):
     with mailer.record_messages() as outbox:
         result = client.post('/', data=post_data_step_1)
     assert result.status_code == 302, str(result.data, "utf8")
-    user = User(ipa_admin.stageuser_show("dummy"))
+    user = User(ipa_admin.stageuser_show(a_uid="dummy")['result'])
     assert getattr(user, field_name) == "Dummy"
     assert len(outbox) == 1
 
@@ -513,7 +511,7 @@ def test_no_direct_login(
 @pytest.mark.vcr()
 def test_spamcheck(client, dummy_user, mocker, spamcheck_status):
     mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
-    user = User(ipa_admin.user_show("dummy"))
+    user = User(ipa_admin.user_show("dummy")["result"])
     assert user.status_note != spamcheck_status
     token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
     response = client.post(
@@ -522,7 +520,7 @@ def test_spamcheck(client, dummy_user, mocker, spamcheck_status):
     assert response.status_code == 200
     assert response.json == {"status": "success"}
     # Check that the status was changed
-    user = User(ipa_admin.user_show("dummy"))
+    user = User(ipa_admin.user_show("dummy")["result"])
     assert user.status_note == spamcheck_status
     assert user.locked == (spamcheck_status != "active")
 

@@ -57,11 +57,11 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     # Add members to the group
     for username in test_users:
         make_user(username)
-    ipa_admin.group_add_member("dummy-group", users=test_users)
+    ipa_admin.group_add_member(a_cn="dummy-group", o_user=test_users)
 
     # Add another user, but only as a membermanager
     make_user("testuser4")
-    ipa_admin.group_add_member_manager("dummy-group", users=["testuser4"])
+    ipa_admin.group_add_member_manager(a_cn="dummy-group", o_user=["testuser4"])
 
     result = client.get('/group/dummy-group/')
     assert result.status_code == 200
@@ -204,7 +204,7 @@ def test_group_add_member_invalid_form(client, dummy_user_as_group_manager):
 def test_group_remove_member(client, dummy_user_as_group_manager, make_user):
     """Test removing a member from a group"""
     make_user("testuser")
-    ipa_admin.group_add_member("dummy-group", users="testuser")
+    ipa_admin.group_add_member(a_cn="dummy-group", o_user="testuser")
     result = client.post(
         '/group/dummy-group/members/remove', data={"username": "testuser"}
     )
@@ -241,13 +241,6 @@ def test_group_remove_member_hidden_group(
 @pytest.mark.vcr()
 def test_group_remove_self(client, logged_in_dummy_user, dummy_group):
     """Test a non-sponsor user removing themselves from a group"""
-    ipa_admin.group_add_member("dummy-group", users="dummy")
-    result = client.get('/group/dummy-group/')
-    assert result.status_code == 200
-    page = BeautifulSoup(result.data, 'html.parser')
-    leave_btn = page.select_one("#leave-group-btn")
-    assert leave_btn.get_text(strip=True) == "Leave group"
-
     result = client.post(
         '/group/dummy-group/members/remove', data={"username": "dummy"}
     )

@@ -91,7 +91,7 @@ def user_settings_password(ipa, username):
     form = PasswordResetForm()
 
     # check if an OTP token exists. If so, the user is using OTP.
-    using_otp = bool(ipa.otptoken_find(ipatokenowner=username))
+    using_otp = bool(ipa.otptoken_find(o_ipatokenowner=username)["result"])
 
     if not using_otp:
         form.current_password.description = ""
@@ -133,7 +133,7 @@ def forgot_password_ask():
                     ),
                 )
             try:
-                user = User(ipa_admin.user_show(username))
+                user = User(ipa_admin.user_show(a_uid=username)['result'])
             except python_freeipa.exceptions.NotFound:
                 raise FormError(
                     "username", _("User %(username)s does not exist", username=username)
@@ -190,7 +190,7 @@ def forgot_password_change():
         lock.delete()
         flash(_("The token has expired, please request a new one."), "warning")
         return redirect(url_for('forgot_password_ask'))
-    user = User(ipa_admin.user_show(username))
+    user = User(ipa_admin.user_show(a_uid=username)['result'])
     if user.last_password_change != token_data["lpc"]:
         lock.delete()
         flash(
@@ -248,7 +248,7 @@ def forgot_password_change():
             )
             # Oh noes, the token is now invalid since the user's password was changed! Let's
             # re-generate a token so they can keep going.
-            user = User(ipa_admin.user_show(username))
+            user = User(ipa_admin.user_show(a_uid=username)['result'])
             token = make_token(
                 {"sub": user.username, "lpc": user.last_password_change},
                 audience=Audience.password_reset,

@@ -4,14 +4,13 @@ import pytest
 import requests
 from cryptography.fernet import Fernet
 from flask import current_app
-from python_freeipa.exceptions import BadRequest, FreeIPAError, ValidationError
+from python_freeipa.exceptions import BadRequest, FreeIPAError
 
 from noggin import ipa_admin
 from noggin.security.ipa import (
     Client,
     maybe_ipa_login,
     maybe_ipa_session,
-    parse_group_management_error,
     untouched_ipa_client,
 )
 
@@ -82,26 +81,14 @@ def test_ipa_untouched_client(client):
         assert 'noggin_username' not in sess
 
 
-def test_parse_group_management_error_member(ipa_call_error):
-    with pytest.raises(ValidationError):
-        parse_group_management_error(ipa_call_error)
-
-
-def test_parse_group_management_error_membermanager(ipa_call_error):
-    with pytest.raises(ValidationError):
-        parse_group_management_error(ipa_call_error)
-
-
-def test_parse_group_management_error_keyerror(ipa_call_error):
-    assert parse_group_management_error(ipa_call_error.pop('failed')) is None
-
-
 def test_ipa_client_with_errors(ipa_call_error):
     with patch("noggin.security.ipa.Client._request") as request:
         request.return_value = ipa_call_error
         client = Client("ipa.example.com")
-        with pytest.raises(ValidationError):
-            client.group_add_member_manager("dummy-group", users="dummy")
+        result = client.group_add_member_manager(a_cn="dummy-group", o_user="dummy")
+        assert result['failed'] == {
+            'member': {'group': [], 'user': ['this is an error']}
+        }
 
 
 def test_ipa_client_skip_errors(ipa_call_error):
@@ -109,9 +96,9 @@ def test_ipa_client_skip_errors(ipa_call_error):
         request.return_value = ipa_call_error
         client = Client("ipa.example.com")
         result = client.group_add_member_manager(
-            "dummy-group", users="dummy", skip_errors=True
+            a_cn="dummy-group", o_user="dummy", skip_errors=True
         )
-        assert result == "call-result"
+        assert result['result'] == "call-result"
 
 
 @pytest.mark.vcr
@@ -120,13 +107,13 @@ def test_ipa_client_batch(client, logged_in_dummy_user, dummy_group):
     with client.session_transaction() as sess:
         ipa = maybe_ipa_session(current_app, sess)
         result = ipa.batch(
-            methods=[
-                {"method": "user_find", "params": [[], {"uid": "dummy", 'all': True}]},
+            a_methods=[
+                {"method": "user_find", "params": [["dummy"], {}]},
                 {"method": "group_find", "params": [["dummy-group"], {}]},
             ]
         )
         assert result['count'] == 2
-        assert result['results'][0]['result'][0]['displayname'][0] == 'Dummy User'
+        assert result['results'][0]['result'][0]['uid'][0] == 'dummy'
         assert result['results'][1]['result'][0]['description'][0] == 'A dummy group'
 
 
@@ -136,15 +123,14 @@ def test_ipa_client_batch_no_raise_errors(client, logged_in_dummy_user, dummy_gr
     with client.session_transaction() as sess:
         ipa = maybe_ipa_session(current_app, sess)
         result = ipa.batch(
-            methods=[
-                {"method": "user_find", "params": [[], {"uid": "dummy", 'all': True}]},
+            a_methods=[
+                {"method": "user_find", "params": [["dummy"], {}]},
                 {"method": "this_method_wont_work", "params": [["dummy-group"], {}]},
             ],
-            raise_errors=False,
         )
         assert result['count'] == 2
-        assert result['results'][0]['result'][0]['displayname'][0] == 'Dummy User'
-        assert isinstance(result['results'][1], BadRequest)
+        assert result['results'][0]['result'][0]['uid'][0] == 'dummy'
+        assert result['results'][1]['error_name'] == 'CommandError'
 
 
 @pytest.mark.vcr

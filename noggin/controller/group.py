@@ -25,8 +25,9 @@ def group(ipa, groupname):
         {"method": "user_find", "params": [[], {"uid": sponsorname, 'all': True}]}
         for sponsorname in group.sponsors
     ]
+
     sponsors = [
-        User(u['result'][0]) for u in ipa.batch(methods=batch_methods)['results']
+        User(u['result'][0]) for u in ipa.batch(a_methods=batch_methods)['results']
     ]
 
     # We can safely assume g.current_user exists after @with_ipa
@@ -60,7 +61,7 @@ def group_add_member(ipa, groupname):
             )
             return redirect(url_for('group', groupname=groupname))
         try:
-            ipa.group_add_member(group=groupname, users=username)
+            ipa.group_add_member(a_cn=groupname, o_user=username)
         except python_freeipa.exceptions.ValidationError as e:
             # e.message is a dict that we have to process ourselves for now:
             # https://github.com/opennode/python-freeipa/issues/24
@@ -119,7 +120,7 @@ def group_remove_member(ipa, groupname):
     if form.validate_on_submit():
         username = form.username.data
         try:
-            ipa.group_remove_member(group=groupname, users=username)
+            ipa.group_remove_member(a_cn=groupname, o_user=username)
         except python_freeipa.exceptions.ValidationError as e:
             # e.message is a dict that we have to process ourselves for now:
             # https://github.com/opennode/python-freeipa/issues/24
