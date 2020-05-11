@@ -30,8 +30,6 @@ def dummy_user_expired_password():
 
 
 # Logout
-
-
 def test_logout_unauthed(client):
     """Test logout when not logged in"""
     result = client.get('/logout', follow_redirects=False)
@@ -109,6 +107,42 @@ def test_login_no_username(client):
     assert "noggin_username" not in session
 
 
+def test_login_username_case(client, dummy_user):
+    """Test giving username random uppercase letter"""
+    result = client.post(
+        '/',
+        data={
+            "login-username": "duMmy",
+            "login-password": "dummy_password",
+            "login-submit": "1",
+        },
+        follow_redirects=True,
+    )
+    page = BeautifulSoup(result.data, 'html.parser')
+    messages = page.select(".flash-messages .alert-success")
+    assert len(messages) == 1
+    assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
+    assert session.get("noggin_username") == "dummy"
+    assert session.get("noggin_session") is not None
+
+def test_login_username_created_with_case(client, dummy_user_with_case):
+    """Test giving username random uppercase letter"""
+    result = client.post(
+        '/',
+        data={
+            "login-username": "dummy",
+            "login-password": "duMmy_password",
+            "login-submit": "1",
+        },
+        follow_redirects=True,
+    )
+    page = BeautifulSoup(result.data, 'html.parser')
+    messages = page.select(".flash-messages .alert-success")
+    assert len(messages) == 1
+    assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
+    assert session.get("noggin_username") == "dummy"
+    assert session.get("noggin_session") is not None
+
 @pytest.mark.vcr()
 def test_login_incorrect_password(client, dummy_user):
     """Test a incorrect password"""
@@ -125,7 +159,7 @@ def test_login_incorrect_password(client, dummy_user):
     assert "noggin_session" not in session
     assert "noggin_username" not in session
 
-
+    
 def test_login_generic_error(client):
     """Log in a user with an unhandled error"""
     with mock.patch("noggin.controller.authentication.maybe_ipa_login") as ipa_login:

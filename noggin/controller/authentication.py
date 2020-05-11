@@ -10,7 +10,7 @@ from noggin.security.ipa import untouched_ipa_client
 
 
 def handle_login_form(form):
-    username = form.username.data
+    username = form.username.data.lower()
     password = form.password.data
 
     try:
