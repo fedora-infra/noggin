@@ -24,6 +24,7 @@ class User(Representation):
         "rhbz_mail": "fasrhbzemail",
         "website_url": "faswebsiteurl",
         "status_note": "fasstatusnote",
+        "creationtime": "fascreationtime",
     }
     attr_types = {
         "sshpubkeys": "list",

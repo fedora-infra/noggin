@@ -23,13 +23,23 @@ untouched_ipa = Client(host=ipa_server, verify_ssl=False)
 
 # create a developers fasgroup
 try:
-    ipa.group_add("developers", "A group for developers", fasgroup=True, non_posix=True)
+    ipa.group_add(
+        a_cn="developers",
+        o_description="A group for developers",
+        o_nonposix=True,
+        fasgroup=True,
+    )
 except python_freeipa.exceptions.FreeIPAError as e:
     print(e)
 
 # create a designers fasgroup
 try:
-    ipa.group_add("designers", "A group for designers", fasgroup=True, non_posix=True)
+    ipa.group_add(
+        a_cn="designers",
+        o_description="A group for designers",
+        o_nonposix=True,
+        fasgroup=True,
+    )
 except python_freeipa.exceptions.FreeIPAError as e:
     print(e)
 
@@ -57,13 +67,13 @@ for x in range(50):
     username = firstName + str(x)
     try:
         ipa.user_add(
-            username,
-            firstName,
-            lastName,
-            firstName + " " + lastName,
-            home_directory=f"/home/fedora/{username}",
-            disabled=False,
-            user_password=USER_PASSWORD,
+            a_uid=username,
+            o_givenname=firstName,
+            o_sn=lastName,
+            o_cn=firstName + " " + lastName,
+            o_homedirectory=f"/home/fedora/{username}",
+            o_nsaccountlock=False,
+            o_userpassword=USER_PASSWORD,
             fasircnick=[username, username + "_"],
             faslocale="en-US",
             fastimezone=fake.random_sample(timezones.TIMEZONES, length=1)[0],
@@ -77,22 +87,18 @@ for x in range(50):
         if x % 3 == 0:
             # User must have signed FPCA before being added to developers
             ipa.fasagreement_add_user("FPCA", user=username)
-            ipa.group_add_member("developers", username, skip_errors=True)
+            ipa.group_add_member(a_cn="developers", o_user=username)
             if x < 10:
-                ipa.group_add_member_manager(
-                    "developers", users=username, skip_errors=True
-                )
+                ipa.group_add_member_manager(a_cn="developers", o_user=username)
         if x % 5 == 0:
             # User must have signed FPCA and CentOS before being added to designers
             ipa.fasagreement_add_user("FPCA", user=username)
             ipa.fasagreement_add_user("CentOS Agreement", user=username)
 
-            ipa.group_add_member("designers", username, skip_errors=True)
+            ipa.group_add_member(a_cn="designers", o_user=username)
             if x <= 15:
-                ipa.group_add_member_manager(
-                    "designers", users=username, skip_errors=True
-                )
+                ipa.group_add_member_manager(a_cn="designers", o_user=username)
         if x % 2 == 0:
-            ipa.group_add_member("admins", username, skip_errors=True)
+            ipa.group_add_member(a_cn="admins", o_user=username)
     except python_freeipa.exceptions.FreeIPAError as e:
         print(e)

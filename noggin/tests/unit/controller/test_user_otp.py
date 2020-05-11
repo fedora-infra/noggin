@@ -20,12 +20,12 @@ from noggin.tests.unit.utilities import (
 def dummy_user_with_2_otp(client, logged_in_dummy_user, dummy_user_with_otp):
     ipa = logged_in_dummy_user
     result = ipa.otptoken_add(
-        ipatokenowner="dummy",
-        ipatokenotpalgorithm="sha512",
-        description="dummy's other token",
-    )
+        o_ipatokenowner="dummy",
+        o_ipatokenotpalgorithm="sha512",
+        o_description="dummy's other token",
+    )['result']
     token = OTPToken(result)
-    yield (dummy_user_with_otp, OTPToken(result))
+    yield dummy_user_with_otp, token
     try:
         ipa_admin.otptoken_del(token.uniqueid)
     except python_freeipa.exceptions.NotFound:

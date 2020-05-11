@@ -108,10 +108,11 @@ def test_password_form_without_otp(client, logged_in_dummy_user):
 
     page = BeautifulSoup(result.data, "html.parser")
 
-    currentpasswordinput = page.select("#currentpasswordinput .form-text")
+    currentpasswordinput = page.select("#currentpasswordinput .form-text .text-muted")
     assert len(currentpasswordinput) == 0
 
-    otpinput = page.select("#otpinput")
+    otpinput = page.select("#otpinput .form-text .text-muted")
+
     assert len(otpinput) == 0
 
 
@@ -205,7 +206,7 @@ def test_password_no_user(client):
 @pytest.mark.vcr()
 def test_time_sensitive_password_policy(client, dummy_user, password_min_time):
     """Verify that new password policies are upheld"""
-    ipa_admin.group_add_member("dummy-group", users="dummy")
+    ipa_admin.group_add_member(a_cn="dummy-group", o_user="dummy")
     result = client.post(
         '/password-reset?username=dummy',
         data={

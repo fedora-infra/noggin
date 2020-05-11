@@ -24,7 +24,7 @@ from noggin_messages import UserUpdateV1
 
 @pytest.fixture
 def token_for_dummy_user(dummy_user):
-    user = User(ipa_admin.user_show("dummy"))
+    user = User(ipa_admin.user_show("dummy")["result"])
     return make_token(
         {"sub": user.username, "lpc": user.last_password_change},
         audience=Audience.password_reset,

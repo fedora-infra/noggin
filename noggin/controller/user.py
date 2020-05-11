@@ -31,13 +31,13 @@ def user(ipa, username):
     # groups.
     member_groups = [
         Group(g)
-        for g in ipa.group_find(user=username, all=False, fasgroup=True)['result']
+        for g in ipa.group_find(o_user=username, o_all=False, fasgroup=True)['result']
     ]
     managed_groups = [
         Group(g)
-        for g in ipa.group_find(membermanager_user=username, all=False, fasgroup=True)[
-            'result'
-        ]
+        for g in ipa.group_find(
+            o_membermanager_user=username, o_all=False, fasgroup=True
+        )['result']
     ]
     groups = [g for g in managed_groups if g not in member_groups] + member_groups
 
@@ -53,7 +53,9 @@ def user(ipa, username):
 def _user_mod(ipa, form, user, details, redirect_to):
     with handle_form_errors(form):
         try:
-            updated_user = User(ipa.user_mod(user.username, **details, all=True))
+            updated_user = User(
+                ipa.user_mod(user.username, **details, all=True)['result']
+            )
         except python_freeipa.exceptions.BadRequest as e:
             if e.message == 'no modifications to be performed':
                 raise FormError("non_field_errors", e.message)
@@ -98,11 +100,11 @@ def user_settings_profile(ipa, username):
             form,
             user,
             {
-                'first_name': form.firstname.data,
-                'last_name': form.lastname.data,
-                'full_name': '%s %s' % (form.firstname.data, form.lastname.data),
-                'display_name': '%s %s' % (form.firstname.data, form.lastname.data),
-                'mail': form.mail.data,
+                'o_givenname': form.firstname.data,
+                'o_sn': form.lastname.data,
+                'o_cn': '%s %s' % (form.firstname.data, form.lastname.data),
+                'o_displayname': '%s %s' % (form.firstname.data, form.lastname.data),
+                'o_mail': form.mail.data,
                 'fasircnick': form.ircnick.data,
                 'faslocale': form.locale.data,
                 'fastimezone': form.timezone.data,
@@ -133,7 +135,7 @@ def user_settings_keys(ipa, username):
             ipa,
             form,
             user,
-            {'ipasshpubkey': form.sshpubkeys.data, 'fasgpgkeyid': form.gpgkeys.data},
+            {'o_ipasshpubkey': form.sshpubkeys.data, 'fasgpgkeyid': form.gpgkeys.data},
             "user_settings_keys",
         )
         if result:
@@ -158,16 +160,17 @@ def user_settings_keys(ipa, username):
 def user_settings_otp(ipa, username):
     addotpform = UserSettingsAddOTPForm()
     user = User(user_or_404(ipa, username))
-
     if addotpform.validate_on_submit():
         try:
             maybe_ipa_login(app, session, username, addotpform.password.data)
             result = ipa.otptoken_add(
-                ipatokenowner=username,
-                ipatokenotpalgorithm='sha512',
-                description=addotpform.description.data,
-            )
-            uri = urlparse(result["uri"])
+                o_ipatokenowner=username,
+                o_ipatokenotpalgorithm='sha512',
+                o_description=addotpform.description.data,
+            )['result']
+
+            uri = urlparse(result['uri'])
+
             # Use the provided description in the token, so it shows up in the user's app instead of
             # the token's UUID
             principal = uri.path.split(":", 1)[0]
@@ -188,7 +191,9 @@ def user_settings_otp(ipa, username):
     otp_uri = session.get('otp_uri')
     session['otp_uri'] = None
 
-    tokens = [OTPToken(t) for t in ipa.otptoken_find(ipatokenowner=username)]
+    tokens = [
+        OTPToken(t) for t in ipa.otptoken_find(o_ipatokenowner=username)["result"]
+    ]
     tokens.sort(key=lambda t: t.description or "")
 
     return render_template(
@@ -210,7 +215,7 @@ def user_settings_otp_disable(ipa, username):
     if form.validate_on_submit():
         token = form.token.data
         try:
-            ipa.otptoken_mod(ipatokenuniqueid=token, ipatokendisabled=True)
+            ipa.otptoken_mod(a_ipatokenuniqueid=token, o_ipatokendisabled=True)
         except python_freeipa.exceptions.BadRequest as e:
             if (
                 e.message
@@ -243,7 +248,7 @@ def user_settings_otp_enable(ipa, username):
     if form.validate_on_submit():
         token = form.token.data
         try:
-            ipa.otptoken_mod(ipatokenuniqueid=token, ipatokendisabled=None)
+            ipa.otptoken_mod(a_ipatokenuniqueid=token, o_ipatokendisabled=False)
         except (
             python_freeipa.exceptions.BadRequest,
             python_freeipa.exceptions.FreeIPAError,
@@ -271,7 +276,7 @@ def user_settings_otp_delete(ipa, username):
         username = session.get('noggin_username')
         token = form.token.data
         try:
-            ipa.otptoken_del(ipatokenuniqueid=token)
+            ipa.otptoken_del(a_ipatokenuniqueid=token)
         except python_freeipa.exceptions.BadRequest as e:
             if (
                 e.message

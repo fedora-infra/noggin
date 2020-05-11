@@ -20,7 +20,7 @@ def test_user_or_404(client, logged_in_dummy_user):
     """Test the user_or_404 method"""
     result = user_or_404(logged_in_dummy_user, "dummy")
     assert result is not None
-    assert result["uid"] == ["dummy"]
+    assert result['uid'] == ['dummy']
 
 
 @pytest.mark.vcr()
@@ -88,7 +88,7 @@ def test_with_ipa_anonymous(client):
 @pytest.mark.vcr()
 def test_with_ipa_spamcheck(client, dummy_user, spamcheck_status):
     """Test the with_ipa decorator"""
-    ipa_admin.user_mod("dummy", fasstatusnote=spamcheck_status, disabled=True)
+    ipa_admin.user_mod("dummy", fasstatusnote=spamcheck_status, o_nsaccountlock=True)
     view = mock.Mock()
     with current_app.test_request_context('/'):
         maybe_ipa_login(current_app, session, "dummy", "dummy_password")

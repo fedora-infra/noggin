@@ -17,21 +17,19 @@ from noggin.tests.unit.utilities import (
 @pytest.fixture
 def dummy_user_expired_password():
     ipa_admin.user_add(
-        'dummy',
-        'Dummy',
-        'User',
-        'Dummy User',
-        user_password='dummy_password',
-        login_shell='/bin/bash',
+        a_uid='dummy',
+        o_givenname='Dummy',
+        o_sn='User',
+        o_cn='Dummy User',
+        o_userpassword='dummy_password',
+        o_loginshell='/bin/bash',
     )
     # Don't change the password: it will be expired
     yield
-    ipa_admin.user_del('dummy')
+    ipa_admin.user_del(a_uid='dummy')
 
 
 # Logout
-
-
 def test_logout_unauthed(client):
     """Test logout when not logged in"""
     result = client.get('/logout', follow_redirects=False)

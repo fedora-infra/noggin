@@ -83,15 +83,15 @@ def ipa_testing_config(vcr_session):
     with vcr_session.use_cassette("ipa_testing_config"):
         pwpolicy = ipa_admin.pwpolicy_show()
         try:
-            ipa_admin.pwpolicy_mod(krbminpwdlife=0, krbpwdminlength=8)
+            ipa_admin.pwpolicy_mod(o_krbminpwdlife=0, o_krbpwdminlength=8)
         except python_freeipa.exceptions.BadRequest as e:
             if not e.message == "no modifications to be performed":
                 raise
         yield
         try:
             ipa_admin.pwpolicy_mod(
-                krbminpwdlife=pwpolicy["krbminpwdlife"][0],
-                krbpwdminlength=pwpolicy["krbpwdminlength"][0],
+                o_krbminpwdlife=pwpolicy['result']['krbminpwdlife'][0],
+                o_krbpwdminlength=pwpolicy['result']['krbpwdminlength'][0],
             )
         except python_freeipa.exceptions.BadRequest as e:
             if not e.message == "no modifications to be performed":
@@ -106,13 +106,13 @@ def make_user(ipa_testing_config):
         now = datetime.datetime.utcnow().replace(microsecond=0)
         password = f'{name}_password'
         ipa_admin.user_add(
-            name,
-            name.title(),
-            'User',
-            f'{name.title()} User',
-            mail=f"{name}@example.com",
-            user_password=password,
-            login_shell='/bin/bash',
+            a_uid=name,
+            o_givenname=name.title(),
+            o_sn='User',
+            o_cn=f'{name.title()} User',
+            o_mail=f"{name}@example.com",
+            o_userpassword=password,
+            o_loginshell='/bin/bash',
             fascreationtime=f"{now.isoformat()}Z",
         )
         ipa = untouched_ipa_client(app)
@@ -121,8 +121,8 @@ def make_user(ipa_testing_config):
 
     yield _make_user
 
-    for username in created_users:
-        ipa_admin.user_del(username)
+    for name in created_users:
+        ipa_admin.user_del(name)
 
 
 @pytest.fixture
@@ -140,36 +140,38 @@ def dummy_user_with_case(make_user):
 @pytest.fixture
 def dummy_group(ipa_testing_config):
     ipa_admin.group_add(
-        'dummy-group',
-        description="A dummy group",
+        a_cn='dummy-group',
+        o_description="A dummy group",
         fasgroup=True,
         fasurl="http://dummygroup.org",
         fasmailinglist="dummy@mailinglist.org",
         fasircchannel="irc:///freenode.net/#dummy-group",
     )
     yield
-    ipa_admin.group_del('dummy-group')
+    ipa_admin.group_del(a_cn='dummy-group')
 
 
 @pytest.fixture
 def dummy_user_as_group_manager(logged_in_dummy_user, dummy_group):
     """Make the dummy user a manager of the dummy-group group."""
-    ipa_admin.group_add_member("dummy-group", users="dummy")
-    ipa_admin.group_add_member_manager("dummy-group", users="dummy")
+    ipa_admin.group_add_member(a_cn="dummy-group", o_user="dummy")
+    ipa_admin.group_add_member_manager(a_cn="dummy-group", o_user="dummy")
     yield
 
 
 @pytest.fixture
 def password_min_time(dummy_group):
     ipa_admin.pwpolicy_add(
-        "dummy-group", krbminpwdlife=1, cospriority=10, krbpwdminlength=8
+        a_cn="dummy-group", o_krbminpwdlife=1, o_cospriority=10, o_krbpwdminlength=8
     )
 
 
 @pytest.fixture
 def logged_in_dummy_user(client, dummy_user):
     with client.session_transaction() as sess:
-        ipa = maybe_ipa_login(app, sess, "dummy", "dummy_password")
+        ipa = maybe_ipa_login(
+            app, sess, username="dummy", userpassword="dummy_password"
+        )
     yield ipa
     ipa.logout()
     with client.session_transaction() as sess:
@@ -178,18 +180,18 @@ def logged_in_dummy_user(client, dummy_user):
 
 @pytest.fixture
 def dummy_user_with_gpg_key(client, dummy_user):
-    ipa_admin.user_mod("dummy", fasgpgkeyid=["dummygpgkeyid"])
+    ipa_admin.user_mod(a_uid="dummy", fasgpgkeyid=["dummygpgkeyid"])
 
 
 @pytest.fixture
 def dummy_user_with_otp(client, logged_in_dummy_user):
     ipa = logged_in_dummy_user
     result = ipa.otptoken_add(
-        ipatokenowner="dummy",
-        ipatokenotpalgorithm='sha512',
-        description="dummy's token",
+        o_ipatokenowner="dummy",
+        o_ipatokenotpalgorithm='sha512',
+        o_description="dummy's token",
     )
-    token = OTPToken(result)
+    token = OTPToken(result['result'])
     yield token
     # Deletion needs to be done as admin to remove the last token
     try:
@@ -201,11 +203,9 @@ def dummy_user_with_otp(client, logged_in_dummy_user):
 @pytest.fixture
 def cleanup_dummy_tokens():
     yield
-    tokens = ipa_admin.otptoken_find("dummy")
-    if tokens is None:
-        return
-    for token in [OTPToken(t) for t in tokens]:
-        ipa_admin.otptoken_del(token.uniqueid)
+    tokens = ipa_admin.otptoken_find(a_criteria="dummy")
+    for token in [OTPToken(t) for t in tokens["result"]]:
+        ipa_admin.otptoken_del(a_ipatokenuniqueid=token.uniqueid)
 
 
 @pytest.fixture

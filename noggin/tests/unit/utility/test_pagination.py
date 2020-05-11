@@ -9,21 +9,23 @@ from noggin.utility.pagination import PagedResult
 def many_dummy_groups(ipa_testing_config):
     all_fas_groups = ipa_admin.group_find(fasgroup=True)["result"]
     ipa_admin.batch(
-        methods=[
+        a_methods=[
             {"method": "group_del", "params": [[entry["cn"][0]], {}]}
             for entry in all_fas_groups
         ]
     )
     group_list = [f"dummy-group-{i:02d}" for i in range(1, 11)]
     ipa_admin.batch(
-        methods=[
+        a_methods=[
             {"method": "group_add", "params": [[name], {"fasgroup": True}]}
             for name in group_list
         ]
     )
     yield
     ipa_admin.batch(
-        methods=[{"method": "group_del", "params": [[name], {}]} for name in group_list]
+        a_methods=[
+            {"method": "group_del", "params": [[name], {}]} for name in group_list
+        ]
     )
 
 
