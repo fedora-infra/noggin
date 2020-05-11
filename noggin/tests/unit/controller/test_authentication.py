@@ -126,7 +126,7 @@ def test_login_username_case(client, dummy_user):
     assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
     assert session.get("noggin_username") == "dummy"
     assert session.get("noggin_session") is not None
-    
+
 
 def test_login_username_created_with_case(client, dummy_user_with_case):
     """Test changing username to lowercase when created with uppercase"""
