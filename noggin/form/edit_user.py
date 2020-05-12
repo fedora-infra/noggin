@@ -43,7 +43,7 @@ class UserSettingsProfileForm(FlaskForm):
 
     locale = SelectField(
         _('Locale'),
-        choices=[(l, l) for l in LOCALES],
+        choices=[(locale, locale) for locale in LOCALES],
         validators=[
             DataRequired(message=_('Locale must not be empty')),
             AnyOf(LOCALES, message=_('Locale must be a valid locale short-code')),
