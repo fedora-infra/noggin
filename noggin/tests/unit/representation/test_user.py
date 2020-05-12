@@ -17,6 +17,7 @@ def dummy_user_dict():
         'faslocale': ['en-US'],
         'fasrhbzemail': ['dummy@example.com'],
         'fastimezone': ['UTC'],
+        'fasuseragreements': ['fpca', 'centos'],
         'gecos': ['Dummy User'],
         'gidnumber': ['158200186'],
         'givenname': ['Dummy'],
@@ -79,6 +80,7 @@ def test_user(dummy_user_dict):
     assert user.github == "dummy"
     assert user.gitlab == "dummy"
     assert user.rhbz_mail == "dummy@example.com"
+    assert user.agreements == ['fpca', 'centos']
 
 
 def test_user_no_displayname(dummy_user_dict):

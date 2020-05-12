@@ -233,3 +233,43 @@ def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
         )
         == '1 Group Memberships'
     )
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_undefined(client, logged_in_dummy_user):
+    """Test getting the user agreements page when none are defined in config"""
+    result = client.get('/user/dummy/settings/agreements/')
+
+    assert result.status_code == 404
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements(client, define_agreements, logged_in_dummy_user):
+    """Test getting the user agreements page"""
+    result = client.get('/user/dummy/settings/agreements/')
+    page = BeautifulSoup(result.data, 'html.parser')
+
+    results = page.findAll("a", {"data-toggle" : "modal"})
+    assert len(results) == 2
+    assert results[0]['data-target'] == "#fpca-agreement-modal"
+    assert results[0].get_text(strip=True) == "Sign"
+
+    assert results[1]['data-target'] == "#centos-agreement-modal"
+    assert results[1].get_text(strip=True) == "Sign"
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_sign(client, define_agreements, logged_in_dummy_user):
+    """Test getting the user agreements page"""
+    client.post('/user/dummy/settings/agreements/', data={"agreement":"fpca"})
+
+    result = client.get('/user/dummy/settings/agreements/')
+    page = BeautifulSoup(result.data, 'html.parser')
+
+    results = page.findAll("a", {"data-toggle" : "modal"})
+    assert len(results) == 2
+    assert results[0]['data-target'] == "#fpca-agreement-modal"
+    assert results[0].get_text(strip=True) == "View agreement"
+
+    assert results[1]['data-target'] == "#centos-agreement-modal"
+    assert results[1].get_text(strip=True) == "Sign"
+

@@ -65,5 +65,9 @@ class User(Representation):
         return self._attr('fasrhbzemail')
 
     @property
+    def agreements(self):
+        return self._attrlist('fasuseragreements')
+
+    @property
     def last_password_change(self):
         return self._attr('krblastpwdchange')

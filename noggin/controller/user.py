@@ -1,6 +1,6 @@
 from urllib.parse import urlparse, quote
 
-from flask import flash, redirect, render_template, session, url_for, Markup
+from flask import abort, flash, redirect, render_template, session, url_for, Markup
 from flask_babel import _
 import python_freeipa
 
@@ -10,6 +10,7 @@ from noggin.form.edit_user import (
     UserSettingsKeysForm,
     UserSettingsAddOTPForm,
     UserSettingsOTPStatusChange,
+    UserSettingsAgreementSign,
 )
 from noggin.representation.group import Group
 from noggin.representation.user import User
@@ -52,7 +53,7 @@ def user(ipa, username):
     )
 
 
-def _user_mod(ipa, form, username, details, redirect_to):
+def _user_mod(ipa, form, username, details, redirect_to, show_flash=True):
     with handle_form_errors(form):
         try:
             ipa.user_mod(username, **details)
@@ -64,13 +65,14 @@ def _user_mod(ipa, form, username, details, redirect_to):
                     f'An error happened while editing user {username}: {e.message}'
                 )
                 raise FormError("non_field_errors", e.message)
-        flash(
-            Markup(
-                f'Profile Updated: <a href=\"{url_for("user", username=username)}\">'
-                'view your profile</a>'
-            ),
-            'success',
-        )
+        if show_flash:
+            flash(
+                Markup(
+                    f'Profile Updated: <a href=\"{url_for("user", username=username)}\">'
+                    'view your profile</a>'
+                ),
+                'success',
+            )
         return redirect(url_for(redirect_to, username=username))
 
 
@@ -281,3 +283,40 @@ def user_settings_otp_delete(ipa, username):
         for error in field_errors:
             flash(error, 'danger')
     return redirect(url_for('user_settings_otp', username=username))
+
+
+@app.route('/user/<username>/settings/agreements/', methods=['GET', 'POST'])
+@with_ipa(app, session)
+@require_self
+def user_settings_agreements(ipa, username):
+    if not app.config["USER_AGREEMENTS"]:
+        abort(404)
+    
+    user = User(user_or_404(ipa, username))
+    form = UserSettingsAgreementSign()
+
+    if form.validate_on_submit():
+        result = _user_mod(
+            ipa,
+            form,
+            username,
+            {
+                'fasuseragreements': user.agreements + [form.agreement.data],
+            },
+            "user_settings_agreements",
+            show_flash=False,
+        )
+        if result:
+            return result
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'danger')
+            flash(form.agreement.data, 'danger')
+            flash(app.config["USER_AGREEMENTS"], 'danger')
+
+    return render_template(
+        'user-settings-agreements.html',
+        user=user,
+        activetab="agreements",
+    )

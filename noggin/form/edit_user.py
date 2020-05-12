@@ -97,3 +97,9 @@ class UserSettingsOTPStatusChange(FlaskForm):
     token = HiddenField(
         'token', validators=[DataRequired(message=_('token must not be empty'))]
     )
+
+
+class UserSettingsAgreementSign(FlaskForm):
+    agreement = HiddenField(
+        'agreement', validators=[DataRequired(message=_('agreement must not be empty')), AnyOf(app.config["USER_AGREEMENTS"], message=_('must be a valid user agreement'))]
+    )

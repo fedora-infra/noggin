@@ -20,6 +20,7 @@ def inject_global_template_vars():
         ipa=g.ipa if 'ipa' in g else None,
         current_user=g.current_user if 'current_user' in g else None,
         current_username=session.get('noggin_username'),
+        config=app.config,
     )
 
 

@@ -193,3 +193,9 @@ def cleanup_dummy_tokens():
         return
     for token in [OTPToken(t) for t in tokens]:
         ipa_admin.otptoken_del(token.uniqueid)
+
+
+@pytest.fixture
+def define_agreements():
+    app.config['USER_AGREEMENTS'] = ['fpca', 'centos']
+
