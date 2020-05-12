@@ -132,6 +132,12 @@ def dummy_user(make_user):
 
 
 @pytest.fixture
+def dummy_user_with_case(make_user):
+    make_user("duMmy")
+    yield
+
+
+@pytest.fixture
 def dummy_group(ipa_testing_config):
     ipa_admin.group_add('dummy-group', description="A dummy group", fasgroup=True)
     yield

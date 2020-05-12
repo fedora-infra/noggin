@@ -349,7 +349,7 @@ def test_field_error_step_3(
     """Activate a user with a password that the server errors on"""
     user_mod = mocker.patch("noggin.controller.registration.ipa_admin.user_mod")
     user_mod.side_effect = python_freeipa.exceptions.ValidationError(
-        message=f"invalid 'password': this is invalid", code="4242"
+        message="invalid 'password': this is invalid", code="4242"
     )
     result = client.post(
         f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
@@ -363,7 +363,7 @@ def test_field_error_unknown(client, post_data_step_1, mocker):
     """Register a user with fields that the server errors on, but it's unknown to us"""
     ipa_admin = mocker.patch("noggin.controller.registration.ipa_admin")
     ipa_admin.stageuser_add.side_effect = python_freeipa.exceptions.ValidationError(
-        message=f"invalid 'unknown': this is invalid", code="4242"
+        message="invalid 'unknown': this is invalid", code="4242"
     )
     result = client.post('/', data=post_data_step_1)
     assert_form_generic_error(
@@ -389,6 +389,18 @@ def test_invalid_email(client, post_data_step_1):
     result = client.post('/', data=post_data_step_1)
     assert_form_field_error(
         result, field_name="register-mail", expected_message='Email must be valid'
+    )
+
+
+@pytest.mark.vcr()
+def test_blocklisted_email(client, post_data_step_1):
+    """Register a user with an invalid email address"""
+    post_data_step_1["register-mail"] = "dude@fedoraproject.org"
+    result = client.post('/', data=post_data_step_1)
+    assert_form_field_error(
+        result,
+        field_name="register-mail",
+        expected_message='Email addresses from that domain are not allowed',
     )
 
 

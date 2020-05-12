@@ -215,7 +215,10 @@ def test_user_cant_see_hidden_groups(client, logged_in_dummy_user):
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
     assert page.title.string == 'Profile for dummy - noggin'
-    assert page.select_one('.nav-link .badge-pill').get_text(strip=True) == '0'
+    assert (
+        page.select_one('.list-group-item.h4').get_text(strip=True)
+        == 'dummy has no group memberships'
+    )
 
 
 @pytest.mark.vcr()
@@ -224,4 +227,9 @@ def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
     assert page.title.string == 'Profile for dummy - noggin'
-    assert page.select_one('.nav-link .badge-pill').get_text(strip=True) == '1'
+    assert (
+        page.select_one('.list-group-item.text-right.bg-light strong').get_text(
+            strip=True
+        )
+        == '1 Group Memberships'
+    )

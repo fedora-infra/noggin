@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 
 from flask import flash, redirect, render_template, session, url_for, Markup
 from flask_babel import _
@@ -36,8 +36,14 @@ def user(ipa, username):
         Group(g)
         for g in ipa.group_find(o_membermanager_user=username, o_all=False, fasgroup=True)['result']
     ]
+    groups = [g for g in managed_groups if g not in member_groups] + member_groups
+
     return render_template(
-        'user.html', user=user, groups=groups, managed_groups=managed_groups
+        'user.html',
+        user=user,
+        groups=groups,
+        managed_groups=managed_groups,
+        member_groups=member_groups,
     )
 
 
@@ -149,7 +155,7 @@ def user_settings_otp(ipa, username):
             # the token's UUID
             principal = uri.path.split(":", 1)[0]
             new_uri = uri._replace(
-                path=f"{principal.lower()}:{addotpform.description.data}"
+                path=f"{principal.lower()}:{quote(addotpform.description.data)}"
             )
             session['otp_uri'] = new_uri.geturl()
         except python_freeipa.exceptions.InvalidSessionPassword:
