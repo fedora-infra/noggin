@@ -15,5 +15,8 @@ poetry config virtualenvs.create false
 echo "---> Installing application and dependencies ..."
 poetry install --no-dev --extras deploy
 
+echo "---> Compiling translations ..."
+pybabel compile -d noggin/translations
+
 # set permissions for any installed artifacts
 fix-permissions /opt/app-root -P

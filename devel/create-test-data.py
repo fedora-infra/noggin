@@ -67,7 +67,7 @@ try:
         "Test",
         "User",
         "Test User",
-        home_directory=f"/home/fedora/testUser",
+        home_directory="/home/fedora/testUser",
         disabled=False,
         random_pass=True,
         fasircnick="testuser",
