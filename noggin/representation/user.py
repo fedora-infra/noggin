@@ -17,6 +17,7 @@ class User(Representation):
         "github": "fasgithubusername",
         "gitlab": "fasgitlabusername",
         "rhbz_mail": "fasrhbzemail",
+        "website_url": "faswebsiteurl",
         "last_password_change": "krblastpwdchange",
     }
     ATTR_LISTS = ["sshpubkeys", "ircnick", "gpgkeys", "groups"]

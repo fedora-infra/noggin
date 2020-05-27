@@ -9,8 +9,8 @@ from wtforms import (
     PasswordField,
 )
 
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import AnyOf, DataRequired, Optional, Length
+from wtforms.fields.html5 import EmailField, URLField
+from wtforms.validators import AnyOf, DataRequired, Optional, Length, URL
 
 from noggin import app
 from noggin.form.validators import Email
@@ -66,6 +66,11 @@ class UserSettingsProfileForm(FlaskForm):
     gitlab = StringField(_('GitLab Username'), validators=[Optional()])
 
     rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
+
+    website_url = URLField(
+        _('Website or Blog URL'),
+        validators=[Optional(), URL(message=_('Valid URL required'))],
+    )
 
 
 class UserSettingsKeysForm(FlaskForm):
