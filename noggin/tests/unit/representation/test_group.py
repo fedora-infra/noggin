@@ -2,28 +2,6 @@ import pytest
 
 from noggin.representation.group import Group
 
-
-@pytest.fixture
-def dummy_group_dict():
-    return {
-        'cn': ['dummy-group'],
-        'description': ['A dummy group'],
-        'dn': 'cn=dummy-group,cn=groups,cn=accounts,dc=example,dc=com',
-        'gidnumber': ['158200153'],
-        'ipauniqueid': ['ee0338e4-3cff-11ea-a002-52540019b1a3'],
-        'member_user': ['dummy', 'testuser'],
-        'membermanager_user': ['dummy'],
-        'objectclass': [
-            'top',
-            'groupofnames',
-            'nestedgroup',
-            'ipausergroup',
-            'ipaobject',
-            'posixgroup',
-        ],
-    }
-
-
 def test_group(dummy_group_dict):
     """Test the Group representation"""
     group = Group(dummy_group_dict)
