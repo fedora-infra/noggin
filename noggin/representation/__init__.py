@@ -29,6 +29,9 @@ class Representation:
     def __iter__(self):
         yield from self.ATTR_MAP.keys()
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.raw == other.raw
+
     def diff_fields(self, other):
         """
         Compares two instances of the same class, and returns the properties
