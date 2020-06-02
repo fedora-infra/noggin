@@ -1,4 +1,8 @@
-class Representation(object):
+class Representation:
+
+    ATTR_MAP = {}
+    ATTR_LISTS = []
+
     def __init__(self, raw):
         self.raw = raw
 
@@ -11,27 +15,29 @@ class Representation(object):
         if attr in self.raw:
             return self.raw[attr]
         return []
-    
-    def get_properties(self):
-        """
-        Returns a dict of all the properties defined above and their values
-        """
-        return {
-            key: getattr(self, key)
-            for key, value in self.__class__.__dict__.items()
-            if isinstance(value, property)
-        }
+
+    def __getattr__(self, key):
+        try:
+            ipa_key = self.ATTR_MAP[key]
+        except KeyError:
+            raise AttributeError(key)
+        if key in self.ATTR_LISTS:
+            return self._attrlist(ipa_key)
+        else:
+            return self._attr(ipa_key)
+
+    def __iter__(self):
+        yield from self.ATTR_MAP.keys()
 
     def diff_fields(self, other):
         """
-        Compares two instances of the User class, and returns the properties
+        Compares two instances of the same class, and returns the properties
         with values that are different
         """
         if not isinstance(other, self.__class__):
-            raise ValueError(f"Can't diff a {self.__class__.__name__} instance against a {other.__class__.__name__} instance")
+            raise ValueError(
+                f"Can't diff a {self.__class__.__name__} instance against a "
+                f"{other.__class__.__name__} instance"
+            )
 
-        return [
-            key
-            for key, value in self.get_properties().items()
-            if value != other.get_properties()[key]
-        ]
+        return [key for key in self if getattr(self, key) != getattr(other, key)]

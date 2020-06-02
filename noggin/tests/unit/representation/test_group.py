@@ -1,6 +1,5 @@
-import pytest
-
 from noggin.representation.group import Group
+
 
 def test_group(dummy_group_dict):
     """Test the Group representation"""
