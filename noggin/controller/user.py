@@ -57,7 +57,7 @@ def user(ipa, username):
 def _user_mod(ipa, form, user, details, redirect_to):
     with handle_form_errors(form):
         try:
-            ipa.user_mod(user.username, **details)
+            updated_user = User(ipa.user_mod(user.username, **details, all=True))
         except python_freeipa.exceptions.BadRequest as e:
             if e.message == 'no modifications to be performed':
                 raise FormError("non_field_errors", e.message)
@@ -73,7 +73,6 @@ def _user_mod(ipa, form, user, details, redirect_to):
             ),
             'success',
         )
-        updated_user = User(user_or_404(ipa, user.username))
 
         messaging.publish(
             UserUpdateV1(
