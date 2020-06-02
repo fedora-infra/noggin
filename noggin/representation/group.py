@@ -2,21 +2,14 @@ from noggin.representation import Representation
 
 
 class Group(Representation):
-    @property
-    def name(self):
-        return self._attr('cn')
 
-    @property
-    def description(self):
-        return self._attr('description')
-
-    @property
-    def members(self):
-        return self._attrlist('member_user')
-
-    @property
-    def sponsors(self):
-        return self._attrlist('membermanager_user')
+    ATTR_MAP = {
+        "name": "cn",
+        "description": "description",
+        "members": "member_user",
+        "sponsors": "membermanager_user",
+    }
+    ATTR_LISTS = ["members", "sponsors"]
 
     @property
     def dn(self):

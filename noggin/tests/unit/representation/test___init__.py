@@ -4,30 +4,6 @@ from noggin.representation.user import User
 from noggin.representation.group import Group
 
 
-def test_get_properties(dummy_user_dict):
-    """ Test we return the dict of the propery objects"""
-    user = User(dummy_user_dict)
-    properties = user.get_properties()
-    assert len(properties) == 15
-    assert properties['username'] == "dummy"
-    assert properties['firstname'] == "Dummy"
-    assert properties['lastname'] == "User"
-    assert properties['name'] == "Dummy User"
-    assert properties['mail'] == "dummy@example.com"
-    assert properties['sshpubkeys'] == [
-        'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtX/SK86GrOa0xUadeZVbDXCj6wseamJQTpvjzNdKLgIBuQnA2dnR+jBS54rxUzHD1In/yI9r1VXr+KVZG4ULHmSuP3Icl0SUiVs+u+qeHP77Fa9rnQaxxCFL7uZgDSGSgMx0XtiQUrcumlD/9mrahCefU0BIKfS6e9chWwJnDnPSpyWf0y0NpaGYqPaV6Ukg2Z5tBvei6ghBb0e9Tusg9dHGvpv2B23dCzps6s5WBYY2TqjTHAEuRe6xR0agtPUE1AZ/DvSBKgwEz6RXIFOtv/fnZ0tERh238+n2nohMZNo1QAtQ6I0U9Kx2gdAgHRaMN6GzmbThji/MLgKlIJPSh',  # noqa: E501
-        'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuxGxBwWH5xMLAuIUAVU3O8ZViYWW64V3tJRob+eZngeR95PzUDeH0UlZ58bPyucpMowZNgJucsHyUjqal5bctv9Q5r224Of1R3DJqIViE16W3zncGNjbgiuc66wcO2o84HEm2Zi+v4cwU8ykM0m9zeG0257aVW4/L/fDAyR55NRJ7zLIyRmGMcjkN6j02wbGK89xXJKHMtRKa5Kg4GJx3HUae79C3B7SyoRAuyzLT6GmpMZ3XRa/khZ3t4xfUtSMV6DuvR5KJ9Wg5B20ecua1tNXOLHC3dU5L+P6Pb7+HL1sxHiYbaiBPJbosMkM2wqd3VyduQDQTO4BJyly/ruIN',  # noqa: E501
-    ]
-    assert properties['timezone'] == "UTC"
-    assert properties['locale'] == "en-US"
-    assert properties['ircnick'] == ["dummy", "dummy_"]
-    assert properties['gpgkeys'] == ["key1", "key2"]
-    assert properties['groups'] == ["ipausers"]
-    assert properties['github'] == "dummy"
-    assert properties['gitlab'] == "dummy"
-    assert properties['rhbz_mail'] == "dummy@example.com"
-
-
 def test_diff_fields(dummy_user_dict):
     """ Check the method to compare the diff between two User objects works"""
     user = User(dummy_user_dict)
@@ -39,6 +15,7 @@ def test_diff_fields(dummy_user_dict):
     diff = user.diff_fields(changed_user)
     assert diff == ['github']
 
+
 def test_diff_fields_check_mismatch(dummy_user_dict, dummy_group_dict):
     """ Check we cannot diff two different objects"""
     user = User(dummy_user_dict)
@@ -46,3 +23,10 @@ def test_diff_fields_check_mismatch(dummy_user_dict, dummy_group_dict):
 
     with pytest.raises(ValueError):
         user.diff_fields(group)
+
+
+def test_wrong_attribute(dummy_user_dict):
+    user = User(dummy_user_dict)
+    with pytest.raises(AttributeError) as e:
+        user.does_not_exist
+    assert str(e.value) == "does_not_exist"
