@@ -167,7 +167,7 @@ version = "7.1.2"
 [[package]]
 category = "dev"
 description = "Cross-platform colored terminal text."
-marker = "platform_system == \"Windows\" or sys_platform == \"win32\""
+marker = "sys_platform == \"win32\" or platform_system == \"Windows\""
 name = "colorama"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
@@ -553,19 +553,14 @@ version = "4.7.5"
 
 [[package]]
 category = "main"
-description = ""
+description = "Fedora Messaging message schemas for Noggin."
 name = "noggin-messages"
 optional = false
-python-versions = "^3.6"
+python-versions = ">=3.6,<4.0"
 version = "0.0.1"
 
 [package.dependencies]
-fedora-messaging = "^2.0.1"
-
-[package.source]
-reference = "1e93855e199f5cc6be0e23495b9fd24af5140eab"
-type = "git"
-url = "https://github.com/fedora-infra/noggin-messages.git"
+fedora-messaging = ">=2.0.1,<3.0.0"
 
 [[package]]
 category = "dev"
@@ -1234,7 +1229,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 deploy = ["gunicorn"]
 
 [metadata]
-content-hash = "22dc885760cb174afb27500aeebe283ad73383475057d1bc63ae5f70ad5a8439"
+content-hash = "8da63328c6a8af871361316956975074f431e03e9e913119383ef973caa9337d"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -1538,7 +1533,10 @@ multidict = [
     {file = "multidict-4.7.5-cp38-cp38-win_amd64.whl", hash = "sha256:544fae9261232a97102e27a926019100a9db75bec7b37feedd74b3aa82f29969"},
     {file = "multidict-4.7.5.tar.gz", hash = "sha256:aee283c49601fa4c13adc64c09c978838a7e812f85377ae130a24d7198c0331e"},
 ]
-noggin-messages = []
+noggin-messages = [
+    {file = "noggin-messages-0.0.1.tar.gz", hash = "sha256:76d36ddeb168b07754a4b625e4da84a6e456d6b62c6e88a867699db473362ec1"},
+    {file = "noggin_messages-0.0.1-py3-none-any.whl", hash = "sha256:c8db3fc18b8a7302296a12992bacd276d57e79e35a806068516f8765b63bb25d"},
+]
 packaging = [
     {file = "packaging-20.3-py2.py3-none-any.whl", hash = "sha256:82f77b9bee21c1bafbf35a84905d604d5d1223801d639cf3ed140bd651c08752"},
     {file = "packaging-20.3.tar.gz", hash = "sha256:3c292b474fda1671ec57d46d739d072bfd495a4f51ad01a055121d81e952b7a3"},
