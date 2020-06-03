@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, session, jsonify
+from flask_healthz import HealthError
 
-from noggin import app
+from noggin import app, ipa_admin
 from noggin.form.register_user import RegisterUserForm
 from noggin.form.login_user import LoginUserForm
 from noggin.representation.group import Group
@@ -75,3 +76,14 @@ def search_json(ipa):
             res.append({'cn': group_.name, 'description': group_.description})
 
     return jsonify(res)
+
+
+def liveness():
+    pass
+
+
+def readiness():
+    try:
+        ipa_admin.ping()
+    except Exception:
+        raise HealthError("Can't connect to the FreeIPA Server")
