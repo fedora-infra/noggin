@@ -1,4 +1,5 @@
 import pytest
+from unittest import mock
 from bs4 import BeautifulSoup
 
 
@@ -42,3 +43,29 @@ def test_search_json_empty(client, logged_in_dummy_user):
     result = client.get('/search/json')
     assert result.status_code == 200
     assert result.json == []
+
+
+@pytest.mark.vcr()
+def test_healthz_liveness(client):
+    """Test the /healthz/live check endpoint"""
+    result = client.get('/healthz/live')
+    assert result.status_code == 200
+    assert result.data == b'OK\n'
+
+
+@pytest.mark.vcr()
+def test_healthz_readiness_ok(client):
+    """Test the /healthz/ready check endpoint"""
+    result = client.get('/healthz/ready')
+    assert result.status_code == 200
+    assert result.data == b'OK\n'
+
+
+@pytest.mark.vcr()
+def test_healthz_readiness_not_ok(client):
+    """Test the /healthz/ready check endpoint when not ready (IPA disabled)"""
+    with mock.patch("noggin.ipa_admin.ping") as ipaping:
+        ipaping.side_effect = Exception()
+        result = client.get('/healthz/ready')
+    assert result.status_code == 503
+    assert result.data == b"Can't connect to the FreeIPA Server\n"
