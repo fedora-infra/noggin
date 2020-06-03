@@ -5,6 +5,7 @@ import string
 from flask import abort, flash, render_template, redirect, request, url_for, session
 from flask_babel import _
 from flask_mail import Message
+from noggin_messages import UserUpdateV1
 import python_freeipa
 import jwt
 
@@ -17,6 +18,7 @@ from noggin.utility import (
     FormError,
     handle_form_errors,
     require_self,
+    messaging,
 )
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import PasswordResetToken
@@ -56,6 +58,11 @@ def _validate_change_pw_form(form, username, ipa=None):
     if res and res.ok:
         flash(_('Your password has been changed'), 'success')
         app.logger.info(f'Password for {username} was changed')
+        messaging.publish(
+            UserUpdateV1(
+                {"msg": {"agent": username, "user": username, "fields": ["password"]}}
+            )
+        )
     return res
 
 
@@ -262,6 +269,17 @@ def forgot_password_change():
             app.logger.info(
                 f"Password for {username} was changed after completing the forgotten "
                 f"password process."
+            )
+            messaging.publish(
+                UserUpdateV1(
+                    {
+                        "msg": {
+                            "agent": username,
+                            "user": username,
+                            "fields": ["password"],
+                        }
+                    }
+                )
             )
             return redirect(url_for('root'))
     return render_template(
