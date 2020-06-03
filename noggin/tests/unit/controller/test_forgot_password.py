@@ -6,6 +6,8 @@ import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
 from flask import current_app
+from fedora_messaging import testing as fml_testing
+from noggin_messages import UserUpdateV1
 
 from noggin import ipa_admin, mailer
 from noggin.representation.user import User
@@ -209,10 +211,15 @@ def test_change_post(
     client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
 ):
     logger = mocker.patch("noggin.controller.password.app.logger")
-    result = client.post(
-        f'/forgot-password/change?token={token_for_dummy_user}',
-        data={"password": "newpassword", "password_confirm": "newpassword"},
-    )
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {"msg": {"agent": "dummy", "user": "dummy", "fields": ["password"]}}
+        )
+    ):
+        result = client.post(
+            f'/forgot-password/change?token={token_for_dummy_user}',
+            data={"password": "newpassword", "password_confirm": "newpassword"},
+        )
     patched_lock_active["delete"].assert_called()
     assert_redirects_with_flash(
         result,
@@ -291,10 +298,19 @@ def test_change_post_with_otp(
     client, dummy_user, dummy_user_with_otp, token_for_dummy_user, patched_lock_active
 ):
     otp = get_otp(otp_secret_from_uri(dummy_user_with_otp.uri))
-    result = client.post(
-        f'/forgot-password/change?token={token_for_dummy_user}',
-        data={"password": "newpassword", "password_confirm": "newpassword", "otp": otp},
-    )
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {"msg": {"agent": "dummy", "user": "dummy", "fields": ["password"]}}
+        )
+    ):
+        result = client.post(
+            f'/forgot-password/change?token={token_for_dummy_user}',
+            data={
+                "password": "newpassword",
+                "password_confirm": "newpassword",
+                "otp": otp,
+            },
+        )
     patched_lock_active["delete"].assert_called()
     assert_redirects_with_flash(
         result,

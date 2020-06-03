@@ -2,6 +2,8 @@ import python_freeipa
 import mock
 import pytest
 from bs4 import BeautifulSoup
+from fedora_messaging import testing as fml_testing
+from noggin_messages import UserUpdateV1
 
 from noggin.tests.unit.utilities import (
     assert_redirects_with_flash,
@@ -80,7 +82,25 @@ def test_user_edit(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_edit_post(client, logged_in_dummy_user):
     """Test posting to the user edit page: /user/<username>/settings/profile/"""
-    result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS)
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {
+                "msg": {
+                    "agent": "dummy",
+                    "user": "dummy",
+                    "fields": [
+                        'timezone',
+                        'locale',
+                        'ircnick',
+                        'github',
+                        'gitlab',
+                        'rhbz_mail',
+                    ],
+                }
+            }
+        )
+    ):
+        result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS)
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/profile/",
@@ -93,7 +113,18 @@ def test_user_edit_post(client, logged_in_dummy_user):
 def test_user_edit_post_minimal_values(client, logged_in_dummy_user):
     """Test posting to the user edit page: /user/<username>/settings/profile/
         with the bare minimum of values """
-    result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS_MIN)
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {
+                "msg": {
+                    "agent": "dummy",
+                    "user": "dummy",
+                    "fields": ['timezone', 'locale'],
+                }
+            }
+        )
+    ):
+        result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS_MIN)
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/profile/",
@@ -123,11 +154,30 @@ def test_user_edit_no_permission(method, client, logged_in_dummy_user):
 def test_user_edit_post_no_change(client, logged_in_dummy_user):
     """Test posting to the user edit page and making no change"""
     # Do it once
-    result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS)
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {
+                "msg": {
+                    "agent": "dummy",
+                    "user": "dummy",
+                    "fields": [
+                        'timezone',
+                        'locale',
+                        'ircnick',
+                        'github',
+                        'gitlab',
+                        'rhbz_mail',
+                    ],
+                }
+            }
+        )
+    ):
+        result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS)
 
     assert result.status_code == 302
     # Now do it again
-    result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS)
+    with fml_testing.mock_sends():
+        result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS)
     assert_form_generic_error(result, 'no modifications to be performed')
 
 
@@ -160,7 +210,12 @@ def test_user_settings_keys(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_keys_post(client, logged_in_dummy_user):
     """Test posting to the user edit page: /user/<username>/settings/keys/"""
-    result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {"msg": {"agent": "dummy", "user": "dummy", "fields": ['sshpubkeys']}}
+        )
+    ):
+        result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/keys/",
@@ -190,11 +245,17 @@ def test_user_settings_keys_no_permission(method, client, logged_in_dummy_user):
 def test_user_settings_keys_post_no_change(client, logged_in_dummy_user):
     """Test posting to the user edit page and making no change"""
     # Do it once
-    result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {"msg": {"agent": "dummy", "user": "dummy", "fields": ['sshpubkeys']}}
+        )
+    ):
+        result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
 
     assert result.status_code == 302
     # Now do it again
-    result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
+    with fml_testing.mock_sends():
+        result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
     assert_form_generic_error(result, 'no modifications to be performed')
 
 
