@@ -1,6 +1,8 @@
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
+from fedora_messaging import testing as fml_testing
+from noggin_messages import UserUpdateV1
 
 from noggin import ipa_admin
 from noggin.tests.unit.utilities import (
@@ -59,15 +61,20 @@ def test_password_changes_wrong_user(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_password_changes_user(client, logged_in_dummy_user):
     """Verify that password changes"""
-    result = client.post(
-        '/user/dummy/settings/password',
-        data={
-            "username": "dummy",
-            "current_password": "dummy_password",
-            "password": "secretpw",
-            "password_confirm": "secretpw",
-        },
-    )
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {"msg": {"agent": "dummy", "user": "dummy", "fields": ["password"]}}
+        )
+    ):
+        result = client.post(
+            '/user/dummy/settings/password',
+            data={
+                "username": "dummy",
+                "current_password": "dummy_password",
+                "password": "secretpw",
+                "password_confirm": "secretpw",
+            },
+        )
     assert_redirects_with_flash(
         result,
         expected_url="/",
@@ -276,14 +283,19 @@ def test_reset_generic_error(client, mocker):
 @pytest.mark.vcr()
 def test_password_changes(client, dummy_user):
     """Verify that password changes"""
-    result = client.post(
-        '/password-reset?username=dummy',
-        data={
-            "current_password": "dummy_password",
-            "password": "secretpw",
-            "password_confirm": "secretpw",
-        },
-    )
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {"msg": {"agent": "dummy", "user": "dummy", "fields": ["password"]}}
+        )
+    ):
+        result = client.post(
+            '/password-reset?username=dummy',
+            data={
+                "current_password": "dummy_password",
+                "password": "secretpw",
+                "password_confirm": "secretpw",
+            },
+        )
     assert_redirects_with_flash(
         result,
         expected_url="/",
