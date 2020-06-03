@@ -22,7 +22,7 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img src="{{ gravatar(current_user.mail if current_user.mail else 'default', 30) }}" class="bg-white"/>
-                        
+
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="{{ url_for('user', username=current_user.username) }}">{{_("Profile")}}</a>
@@ -37,7 +37,7 @@
         {% if flashes %}
         <div class="container flash-messages fixed-top mt-5">
             {% for category, flash in flashes %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show d-flex align-items-center">
+            <div class="alert alert-{{ category }} alert-dismissible fade show">
                 {{ flash }}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>

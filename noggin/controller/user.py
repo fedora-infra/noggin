@@ -2,6 +2,7 @@ from urllib.parse import urlparse, quote
 
 from flask import flash, redirect, render_template, session, url_for, Markup
 from flask_babel import _
+from noggin_messages import UserUpdateV1
 import python_freeipa
 
 from noggin import app
@@ -21,6 +22,7 @@ from noggin.utility import (
     FormError,
     handle_form_errors,
     require_self,
+    messaging,
 )
 
 
@@ -52,26 +54,39 @@ def user(ipa, username):
     )
 
 
-def _user_mod(ipa, form, username, details, redirect_to):
+def _user_mod(ipa, form, user, details, redirect_to):
     with handle_form_errors(form):
         try:
-            ipa.user_mod(username, **details)
+            updated_user = User(ipa.user_mod(user.username, **details, all=True))
         except python_freeipa.exceptions.BadRequest as e:
             if e.message == 'no modifications to be performed':
                 raise FormError("non_field_errors", e.message)
             else:
                 app.logger.error(
-                    f'An error happened while editing user {username}: {e.message}'
+                    f'An error happened while editing user {user.username}: {e.message}'
                 )
                 raise FormError("non_field_errors", e.message)
         flash(
             Markup(
-                f'Profile Updated: <a href=\"{url_for("user", username=username)}\">'
+                f'Profile Updated: <a href=\"{url_for("user", username=user.username)}\">'
                 'view your profile</a>'
             ),
             'success',
         )
-        return redirect(url_for(redirect_to, username=username))
+
+        messaging.publish(
+            UserUpdateV1(
+                {
+                    "msg": {
+                        "agent": user.username,
+                        "user": user.username,
+                        "fields": user.diff_fields(updated_user),
+                    }
+                }
+            )
+        )
+
+        return redirect(url_for(redirect_to, username=user.username))
 
 
 @app.route('/user/<username>/settings/profile/', methods=['GET', 'POST'])
@@ -85,7 +100,7 @@ def user_settings_profile(ipa, username):
         result = _user_mod(
             ipa,
             form,
-            username,
+            user,
             {
                 'first_name': form.firstname.data,
                 'last_name': form.lastname.data,
@@ -120,7 +135,7 @@ def user_settings_keys(ipa, username):
         result = _user_mod(
             ipa,
             form,
-            username,
+            user,
             {'ipasshpubkey': form.sshpubkeys.data, 'fasgpgkeyid': form.gpgkeys.data},
             "user_settings_keys",
         )

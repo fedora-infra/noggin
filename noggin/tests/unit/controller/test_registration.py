@@ -351,9 +351,10 @@ def test_field_error_step_3(
     user_mod.side_effect = python_freeipa.exceptions.ValidationError(
         message="invalid 'password': this is invalid", code="4242"
     )
-    result = client.post(
-        f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
-    )
+    with fml_testing.mock_sends(UserCreateV1):
+        result = client.post(
+            f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
+        )
     assert_form_field_error(
         result, field_name="password", expected_message="this is invalid"
     )
