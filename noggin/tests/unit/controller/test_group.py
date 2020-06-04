@@ -3,6 +3,7 @@ import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
+from flask import Markup
 
 from noggin import ipa_admin
 from noggin_messages import MemberSponsorV1
@@ -108,21 +109,23 @@ def test_group_add_member(client, dummy_user_as_group_manager, make_user):
             '/group/dummy-group/members/', data={"new_member_username": "testuser"}
         )
 
-    expected_message = """You got it! testuser has been added to dummy-group.
+    expected_message = (
+        """You got it! testuser has been added to dummy-group.
     <span class='ml-auto' id="flashed-undo-button">
-        <form action="/group/dummy-group/members/remove" method="post">
-            
-            <button type="submit" class="btn btn-outline-success btn-sm"
+        <form action="/group/dummy-group/members/remove" method="post">"""
+        "\n            \n           "
+        """ <button type="submit" class="btn btn-outline-success btn-sm"
              name="username" value="testuser">
                 Undo
             </button>
         </form>
-    </span>"""  # noqa
+    </span>"""
+    )  # noqa
 
     assert_redirects_with_flash(
         result,
         expected_url="/group/dummy-group/",
-        expected_message=expected_message,
+        expected_message=Markup(expected_message),
         expected_category="success",
     )
 
