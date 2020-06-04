@@ -21,6 +21,9 @@ class User(Representation):
     }
     ATTR_LISTS = ["sshpubkeys", "ircnick", "gpgkeys", "groups"]
 
+    pkey = "username"
+    ipa_object = "user"
+
     @property
     def name(self):
         if 'displayname' in self.raw:
