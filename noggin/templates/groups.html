@@ -32,6 +32,9 @@
             </li>
           {% endfor %}
         </ul>
+        {% if groups.items|count == 0 %}
+        <p>{{ _("No groups.") }}</p>
+        {% endif %}
 
         {{ pagination_macros.pagination_bar(groups) }}
 
