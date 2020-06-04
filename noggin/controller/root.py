@@ -65,13 +65,13 @@ def search_json(ipa):
     res = []
 
     if username:
-        users_ = [User(u) for u in ipa.user_find(username)['result']]
+        users_ = [User(u) for u in ipa.user_find(username, sizelimit=10)['result']]
 
         for user_ in users_:
             res.append({'uid': user_.username, 'cn': user_.name})
 
     if groupname:
-        groups_ = [Group(g) for g in ipa.group_find(groupname)['result']]
+        groups_ = [Group(g) for g in ipa.group_find(groupname, sizelimit=10)['result']]
         for group_ in groups_:
             res.append({'cn': group_.name, 'description': group_.description})
 
