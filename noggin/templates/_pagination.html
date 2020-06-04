@@ -1,0 +1,41 @@
+{% macro pagination_bar(result) %}
+  {% if result.total_pages > 1 %}
+    <nav aria-label="Pagination">
+      <ul class="pagination justify-content-center my-4">
+        {# Previous page #}
+        <li class="page-item {% if not result.has_previous_page %}disabled{% endif %}">
+          {% if result.has_previous_page %}
+            <a class="page-link" href="{{ result.page_url(result.page_number - 1) }}">{{ _("Previous") }}</a>
+          {% else %}
+            <span class="page-link">{{ _("Previous") }}</span>
+          {% endif %}
+        </li>
+        {# Page list #}
+        {% for page_number in range(1, result.total_pages + 1) %}
+          {% if page_number == result.page_number %}
+            <li class="page-item active" aria-current="page">
+              <span class="page-link">
+                {{ page_number }}
+                <span class="sr-only">({{ _("current") }})</span>
+              </span>
+            </li>
+          {% else %}
+            <li class="page-item">
+              <a class="page-link" href="{{ result.page_url(page_number) }}">
+                {{ page_number }}
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+        {# Next page #}
+        <li class="page-item {% if not result.has_next_page %}disabled{% endif %}">
+          {% if result.has_next_page %}
+            <a class="page-link" href="{{ result.page_url(result.page_number + 1) }}">{{ _("Next") }}</a>
+          {% else %}
+            <span class="page-link">{{ _("Next") }}</span>
+          {% endif %}
+        </li>
+      </ul>
+    </nav>
+  {% endif %}
+{% endmacro %}

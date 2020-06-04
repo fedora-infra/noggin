@@ -1,5 +1,6 @@
 import pytest
 
+from noggin.representation import Representation
 from noggin.representation.user import User
 from noggin.representation.group import Group
 
@@ -30,3 +31,16 @@ def test_wrong_attribute(dummy_user_dict):
     with pytest.raises(AttributeError) as e:
         user.does_not_exist
     assert str(e.value) == "does_not_exist"
+
+
+def test_pkey_unset():
+    with pytest.raises(NotImplementedError):
+        Representation.get_ipa_pkey()
+
+
+def test_pkey_missing_map():
+    class Dummy(Representation):
+        pkey = "dummy"
+
+    with pytest.raises(NotImplementedError):
+        Dummy.get_ipa_pkey()

@@ -11,6 +11,9 @@ class Group(Representation):
     }
     ATTR_LISTS = ["members", "sponsors"]
 
+    pkey = "name"
+    ipa_object = "group"
+
     @property
     def dn(self):
         if 'dn' in self.raw:

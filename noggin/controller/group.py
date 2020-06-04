@@ -9,6 +9,7 @@ from noggin.form.remove_group_member import RemoveGroupMemberForm
 from noggin.representation.user import User
 from noggin.representation.group import Group
 from noggin.utility import group_or_404, with_ipa, messaging, undo_button
+from noggin.utility.pagination import paginated_find
 
 
 @app.route('/group/<groupname>/')
@@ -151,5 +152,5 @@ def group_remove_member(ipa, groupname):
 @app.route('/groups/')
 @with_ipa(app, session)
 def groups(ipa):
-    groups = [Group(g) for g in ipa.group_find(fasgroup=True)['result']]
+    groups = paginated_find(ipa, Group, fasgroup=True)
     return render_template('groups.html', groups=groups)
