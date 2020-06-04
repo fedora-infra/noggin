@@ -20,9 +20,9 @@
               {% if user.timezone %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <strong title="{{_('Timezone')}}">
-                    <i class="fa fa-fw fa-globe"></i> 
+                    <i class="fa fa-fw fa-globe"></i>
                     {{_("Timezone")}}
-                  </strong> 
+                  </strong>
                   <div class="text-right">
                     <div>{{ user.timezone }}</div>
                   </div>
@@ -31,9 +31,9 @@
               {% if user.timezone %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <strong title="{{_('Current Time')}}">
-                    <i class="fa fa-fw fa-clock-o"></i> 
+                    <i class="fa fa-fw fa-clock-o"></i>
                     {{_("Current Time")}}
-                  </strong> 
+                  </strong>
                   <div class="text-right">
                     <div id="user-time">&nbsp;</div>
                   </div>
@@ -46,14 +46,14 @@
                   </strong>
                   <div class="text-right">
                     {% for ircnick in user.ircnick %}
-                    <pre class="mb-0">{{ ircnick }}</pre>
+                    <pre class="mb-0 p-1">{{ ircnick }}</pre>
                     {% endfor %}
                   </div>
                 </li>
               {% endif %}
               {% if user.gpgkeys %}
                 <li class="list-group-item d-flex justify-content-between">
-                  <strong title='{{_("GPG Keys")}}'><i class="fa fa-fw fa-key"></i> {{_("GPG Keys")}}</strong> 
+                  <strong title='{{_("GPG Keys")}}'><i class="fa fa-fw fa-key"></i> {{_("GPG Keys")}}</strong>
                   <div class="text-right">
                     {% for pgpkey in user.gpgkeys %}<pre class="mb-1 bg-light border px-2 rounded"><i class="fa fa-fw fa-key text-muted"></i> {{ pgpkey }}</pre>{% endfor %}
                   </div>
@@ -61,7 +61,7 @@
               {% endif %}
               {% if user.rhbz_mail %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <strong title='{{_("RHBZ")}}'><i class="fa fa-fw fa-bug"></i> {{_("RHBZ")}}</strong> 
+                  <strong title='{{_("RHBZ")}}'><i class="fa fa-fw fa-bug"></i> {{_("RHBZ")}}</strong>
                   {{ user.rhbz_mail }}
                 </li>
               {% endif %}
@@ -100,7 +100,7 @@
                       </div>
                       {% if group.description %}
                         <div>{{ group.description }}</div>
-                      {% endif %}  
+                      {% endif %}
                   </div>
                 </div>
                 <div class="text-info ml-auto" style="width:5em;">{{ _('sponsor') if group in managed_groups }}</div>
@@ -121,7 +121,7 @@
 {{super()}}
 {% if user.timezone %}
   <script>
-    setInterval("generate_local_time();",1000); 
+    setInterval("generate_local_time();",1000);
     function generate_local_time(){
       var currenttime = moment().tz("{{user.timezone}}").format('dddd, h:mm:ss a')
       $("#user-time").html(currenttime)
