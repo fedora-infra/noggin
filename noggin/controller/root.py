@@ -1,3 +1,4 @@
+import python_freeipa
 from flask import render_template, request, redirect, url_for, session, jsonify
 from flask_healthz import HealthError
 
@@ -49,7 +50,11 @@ def logout():
     """Log the user out."""
     # Don't use the with_ipa() decorator, otherwise anonymous users visiting this endpoint will be
     # asked to login to then be logged out.
-    ipa = maybe_ipa_session(app, session)
+    try:
+        ipa = maybe_ipa_session(app, session)
+    except python_freeipa.exceptions.FreeIPAError:
+        # Not much we can do here, proceed to logout and it may help solve the issue.
+        ipa = None
     if ipa:
         ipa.logout()
     session.clear()
