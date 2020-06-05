@@ -56,3 +56,10 @@ for information on migrating applications to the new API.
    :caption: Contributor Guide
 
    contributing
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Module Documentation
+
+   _source/modules
