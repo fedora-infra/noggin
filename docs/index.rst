@@ -25,7 +25,9 @@ Noggin has the following UI Features:
 Migrating your application:
 
 If your application currently uses communicates with the Fedora Account System (FAS2) 
-using it's readonly API, this functionality will be provided by `fasjson <https://github.com/fedora-infra/fasjson/>`_
+using it's readonly API, this functionality will be provided by `fasjson <https://github.com/fedora-infra/fasjson/>`_.
+Additionally, `fasjson-client <https://github.com/fedora-infra/fasjson-client/>`_ provides a python client library for
+the fasjson api.
 
 Refer to the `fasjson documentation <https://fasjson.readthedocs.io/>`_ 
 for information on migrating applications to the new API.
@@ -38,6 +40,15 @@ for information on migrating applications to the new API.
    :caption: Release Notes
 
    release_notes
+
+
+.. User Guide
+
+.. toctree::
+   :maxdepth: 2
+   :caption: User Guide
+
+   fas2_noggin
 
 
 .. Sysadmin's Guide

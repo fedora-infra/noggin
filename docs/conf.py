@@ -103,6 +103,7 @@ extlinks = {
 
 # -- Misc -----
 
+
 def run_apidoc(_):
     from sphinx.ext import apidoc
 
@@ -112,6 +113,7 @@ def run_apidoc(_):
             "-o",
             os.path.join(topdir, "docs", "_source"),
             os.path.join(topdir, "noggin"),
+            os.path.join(topdir, "noggin", "tests"),
         ]
     )
 
