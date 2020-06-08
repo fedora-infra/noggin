@@ -27,6 +27,9 @@
             <li class="nav-item">
               <a class="nav-link {{'active' if activetab == 'password'}}" href="{{ url_for('user_settings_password', username=user.username) }}">{{_("Password")}}</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link {{'active' if activetab == 'agreements'}}" href="{{ url_for('user_settings_agreements', username=user.username) }}">{{_("Agreements")}}</a>
+            </li>
           </ul>
           {% block settings_content %}
           {% endblock %}

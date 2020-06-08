@@ -76,3 +76,28 @@ def dummy_group_dict():
             'posixgroup',
         ],
     }
+
+
+@pytest.fixture
+def dummy_agreement_dict():
+    return {
+        'objectclass': ['ipaassociation', 'fasagreement'],
+        'ipaenabledflag': ['TRUE'],
+        'ipauniqueid': ['d49ce402-aabb-11ea-88c2-525400cc96da'],
+        'description': ['Particularly \nsing purpose \nhere'],
+        'cn': ['CentOS Agreement'],
+        'memberuser_user': [
+            'andrew0',
+            'austin5',
+            'terri10',
+            'austin15',
+            'brittney20',
+            'logan25',
+            'tracy30',
+            'alexis35',
+            'james40',
+            'julie45',
+        ],
+        'member_group': ['designers'],
+        'dn': 'cn=CentOS Agreement,cn=fasagreements,dc=example,dc=com',
+    }

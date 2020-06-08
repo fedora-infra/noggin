@@ -295,3 +295,36 @@ def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
         )
         == '1 Group Memberships'
     )
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements(client, logged_in_dummy_user, dummy_agreement):
+    """Test getting the user agreements page: /user/<username>/settings/agreements/"""
+    result = client.get('/user/dummy/settings/agreements/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert page.title
+    assert (
+        len(page.select(f"#agreement-modal-{dummy_agreement['ipauniqueid'][0]}")) == 1
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_post_bad_request(
+    client, logged_in_dummy_user, dummy_agreement
+):
+    """Test handling of FreeIPA errors"""
+    with mock.patch(
+        "noggin.security.ipa.Client.fasagreement_add_user"
+    ) as fasagreement_add_user:
+        fasagreement_add_user.side_effect = python_freeipa.exceptions.BadRequest(
+            message="something went wrong", code="4242"
+        )
+        result = client.post(
+            '/user/dummy/settings/agreements/', data={"agreement": "dummy agreement"}
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/agreements/",
+        expected_message="Cannot sign the agreement, something went wrong, dummy agreement,",
+        expected_category="danger",
+    )

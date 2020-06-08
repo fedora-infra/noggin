@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 from flask import current_app
 from python_freeipa.exceptions import ValidationError, BadRequest, FreeIPAError
 
+from noggin import ipa_admin
 from noggin.security.ipa import (
     maybe_ipa_session,
     maybe_ipa_login,
@@ -186,3 +187,62 @@ def test_ipa_client_change_password_empty_response():
         request.post.return_value = response
         with pytest.raises(FreeIPAError):
             client.change_password("dummy", "password", "password")
+
+
+@pytest.mark.vcr
+def test_ipa_client_fasagreement_find(client, logged_in_dummy_user, dummy_agreement):
+    """Check the IPAClient fasagreement_find"""
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_session(current_app, sess)
+        result = ipa.fasagreement_find(all=True)
+        assert len(result) == 1
+        assert result[0]['cn'] == ['dummy agreement']
+
+
+@pytest.mark.vcr
+def test_ipa_client_fasagreement_add(client, logged_in_dummy_user, dummy_agreement):
+    """Check the IPAClient fasagreement_add"""
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_session(current_app, sess)
+
+        # add a new agreement and check it is there
+        ipa_admin.fasagreement_add("pants agreement")
+        result = ipa.fasagreement_find(all=True)
+        assert len(result) == 2
+        assert result[0]['cn'] == ['dummy agreement']
+        assert result[1]['cn'] == ['pants agreement']
+
+        # cleanup
+        ipa_admin.fasagreement_del("pants agreement")
+
+
+@pytest.mark.vcr
+def test_ipa_client_fasagreement_add_user(
+    client, logged_in_dummy_user, dummy_agreement
+):
+    """Check the IPAClient fasagreement_add_user"""
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_session(current_app, sess)
+
+        # add a user to the agreement
+        ipa.fasagreement_add_user("dummy agreement", user="dummy")
+
+        # check it worked
+        result = ipa.fasagreement_find(all=True)
+        assert "dummy" in result[0]["memberuser_user"]
+
+
+@pytest.mark.vcr
+def test_ipa_client_fasagreement_add_group(
+    client, logged_in_dummy_user, dummy_group, dummy_agreement
+):
+    """Check the IPAClient fasagreement_add_group"""
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_session(current_app, sess)
+
+        # add a user to the agreement
+        ipa_admin.fasagreement_add_group("dummy agreement", group="dummy-group")
+
+        # check it worked
+        result = ipa.fasagreement_find(all=True)
+        assert "dummy-group" in result[0]["member_group"]

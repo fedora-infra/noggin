@@ -199,3 +199,12 @@ def cleanup_dummy_tokens():
         return
     for token in [OTPToken(t) for t in tokens]:
         ipa_admin.otptoken_del(token.uniqueid)
+
+
+@pytest.fixture
+def dummy_agreement():
+    agreement = ipa_admin.fasagreement_add(
+        "dummy agreement", description="i agree to dummy"
+    )
+    yield agreement
+    ipa_admin.fasagreement_del("dummy agreement")
