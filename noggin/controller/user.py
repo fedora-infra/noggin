@@ -11,7 +11,9 @@ from noggin.form.edit_user import (
     UserSettingsKeysForm,
     UserSettingsAddOTPForm,
     UserSettingsOTPStatusChange,
+    UserSettingsAgreementSign,
 )
+from noggin.representation.agreement import Agreement
 from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.representation.otptoken import OTPToken
@@ -297,3 +299,28 @@ def user_settings_otp_delete(ipa, username):
         for error in field_errors:
             flash(error, 'danger')
     return redirect(url_for('user_settings_otp', username=username))
+
+
+@app.route('/user/<username>/settings/agreements/', methods=['GET', 'POST'])
+@with_ipa()
+@require_self
+def user_settings_agreements(ipa, username):
+
+    user = User(user_or_404(ipa, username))
+    agreements = [Agreement(a) for a in ipa.fasagreement_find(all=True)]
+    form = UserSettingsAgreementSign()
+    if form.validate_on_submit():
+        try:
+            ipa.fasagreement_add_user(form.agreement.data, user=user.username)
+        except python_freeipa.exceptions.BadRequest as e:
+            flash(f'Cannot sign the agreement, {e}, {form.agreement.data},', 'danger')
+
+        return redirect(url_for('user_settings_agreements', username=username))
+
+    return render_template(
+        'user-settings-agreements.html',
+        user=user,
+        activetab="agreements",
+        agreementslist=agreements,
+        raw=ipa.fasagreement_find(all=True),
+    )

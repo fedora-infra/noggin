@@ -31,6 +31,11 @@ class IPAAdmin(object):
         "stageuser_del",
         "stageuser_mod",
         "batch",
+        "fasagreement_add",
+        "fasagreement_add_group",
+        "fasagreement_del",
+        "fasagreement_remove_group",
+        "fasagreement_remove_user",
     )
 
     def __init__(self, app):
