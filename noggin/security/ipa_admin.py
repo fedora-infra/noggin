@@ -14,11 +14,13 @@ class IPAAdmin(object):
         "stageuser_add",
         "stageuser_show",
         "stageuser_activate",
+        "ping",
     )
     __WRAPPED_METHODS_TESTING = (
         "user_del",
         "group_add",
         "group_del",
+        "group_find",
         "group_add_member_manager",
         "pwpolicy_add",
         "pwpolicy_mod",
@@ -28,6 +30,7 @@ class IPAAdmin(object):
         "otptoken_find",
         "stageuser_del",
         "stageuser_mod",
+        "batch",
     )
 
     def __init__(self, app):

@@ -1,7 +1,8 @@
 from flask import Flask, Blueprint, request
 from flask_babel import Babel
-from flask_wtf.csrf import CSRFProtect
+from flask_healthz import healthz
 from flask_mail import Mail
+from flask_wtf.csrf import CSRFProtect
 from whitenoise import WhiteNoise
 
 from noggin.security.ipa_admin import IPAAdmin
@@ -32,6 +33,7 @@ blueprint = Blueprint(
     template_folder="themes/" + themename + "/templates/",
 )
 app.register_blueprint(blueprint)
+app.register_blueprint(healthz, url_prefix="/healthz")
 
 # Flask-Mail
 mailer = Mail(app)
