@@ -11,11 +11,10 @@
             <div>{{ agreement.name }}</div>
           </div>
           <div class="col-auto">
-            {% if user.username in agreement.users %}
-            {# we use the unique id as the modal ID here, because the name may have spaces in it#}
-            <a data-toggle="modal" data-target="#agreement-modal-{{agreement.uniqueid}}" class="btn btn-link" href="javascript:void(0)">{{ _("View agreement") }}</a>
+            {% if agreement.name in user.agreements %}
+            <a data-toggle="modal" data-target="#agreement-modal-{{agreement.slug}}" class="btn btn-link" href="javascript:void(0)">{{ _("View agreement") }}</a>
             {% else %}
-            <a data-toggle="modal" data-target="#agreement-modal-{{agreement.uniqueid}}" class="btn btn-primary" href="javascript:void(0)">{{ _("Sign") }}</a>
+            <a data-toggle="modal" data-target="#agreement-modal-{{agreement.slug}}" class="btn btn-primary" href="javascript:void(0)">{{ _("Sign") }}</a>
             {% endif %}
           </div>
         </div>
@@ -24,7 +23,7 @@
 </div>
 
 {% for agreement in agreementslist %}
-<div class="modal fade" id="agreement-modal-{{agreement.uniqueid}}" role="dialog" aria-hidden="true">
+<div class="modal fade" id="agreement-modal-{{agreement.slug}}" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -34,7 +33,7 @@
       </div>
       <div class="modal-body">
         <pre>{{ agreement.description}}</pre>
-        {% if user.username not in agreement.users %}
+        {% if agreement.name not in user.agreements %}
         <form action="{{ url_for('user_settings_agreements', username=current_user.username) }}" method="post" class="d-inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <button type='submit' class="btn btn-lg btn-block btn-primary" name="agreement" value="{{ agreement.name }}">{{ _("Sign User Agreement") }}</button>
