@@ -9,6 +9,7 @@ from vcr import VCR
 from noggin import ipa_admin
 from noggin.app import app
 from noggin.representation.otptoken import OTPToken
+from noggin.representation.agreement import Agreement
 from noggin.security.ipa import untouched_ipa_client, maybe_ipa_login
 
 
@@ -213,5 +214,5 @@ def dummy_agreement():
     agreement = ipa_admin.fasagreement_add(
         "dummy agreement", description="i agree to dummy"
     )
-    yield agreement
+    yield Agreement(agreement)
     ipa_admin.fasagreement_del("dummy agreement")

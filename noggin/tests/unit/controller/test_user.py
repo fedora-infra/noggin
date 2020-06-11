@@ -304,8 +304,7 @@ def test_user_settings_agreements(client, logged_in_dummy_user, dummy_agreement)
     result = client.get('/user/dummy/settings/agreements/')
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
-    assert (
-        len(page.select(f"#agreement-modal-{dummy_agreement['ipauniqueid'][0]}")) == 1
+    assert len(page.select("#agreement-modal-dummyagreement")) == 1
 
 
 @pytest.mark.vcr()

@@ -1,4 +1,9 @@
+import re
+
 from noggin.representation import Representation
+
+
+NOT_ASCII_RE = re.compile(r"\W")
 
 
 class Agreement(Representation):
@@ -16,3 +21,7 @@ class Agreement(Representation):
 
     pkey = "name"
     ipa_object = "fasagreement"
+
+    @property
+    def slug(self):
+        return NOT_ASCII_RE.sub("", self.name)
