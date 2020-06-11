@@ -12,6 +12,7 @@ class Agreement(Representation):
         "uniqueid": "ipauniqueid",
     }
     ATTR_LISTS = ["users", "groups"]
+    ATTR_BOOLS = ["enabled"]
 
     pkey = "name"
     ipa_object = "fasagreement"

@@ -305,16 +305,33 @@ def user_settings_otp_delete(ipa, username):
 @with_ipa()
 @require_self
 def user_settings_agreements(ipa, username):
-
     user = User(user_or_404(ipa, username))
-    agreements = [Agreement(a) for a in ipa.fasagreement_find(all=True)]
+    agreements = [
+        Agreement(a) for a in ipa.fasagreement_find(all=True) if Agreement(a).enabled
+    ]
     form = UserSettingsAgreementSign()
     if form.validate_on_submit():
+        agreement_name = form.agreement.data
+        if agreement_name not in [a.name for a in agreements]:
+            flash(_("Unknown agreement: %(name)s.", name=agreement_name), "warning")
+            return redirect(url_for('user_settings_agreements', username=username))
         try:
-            ipa.fasagreement_add_user(form.agreement.data, user=user.username)
+            ipa.fasagreement_add_user(agreement_name, user=user.username)
         except python_freeipa.exceptions.BadRequest as e:
-            flash(f'Cannot sign the agreement, {e}, {form.agreement.data},', 'danger')
-
+            app.logger.error(f"Cannot sign the agreement {agreement_name!r}: {e}")
+            flash(
+                _(
+                    'Cannot sign the agreement "%(name)s": %(error)s',
+                    name=agreement_name,
+                    error=e,
+                ),
+                'danger',
+            )
+        else:
+            flash(
+                _('You signed the "%(name)s" agreement.', name=agreement_name),
+                "success",
+            )
         return redirect(url_for('user_settings_agreements', username=username))
 
     return render_template(

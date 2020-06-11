@@ -36,6 +36,7 @@ class IPAAdmin(object):
         "fasagreement_del",
         "fasagreement_remove_group",
         "fasagreement_remove_user",
+        "fasagreement_disable",
     )
 
     def __init__(self, app):
