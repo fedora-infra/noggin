@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+
+{% block title %}IPA Error{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  <div class="container section py-4">
+    <div class="row">
+      <div class="col">
+        <div class="alert alert-danger" role="alert">
+          <h4 class="alert-heading mb-3">{{_("IPA Error")}}</h4>
+          <p class="mb-0">
+            {{ _("There was a problem with the IPA backend, please try again later.")}}
+            {% if 'noggin_session' in session %}
+            {{ _("You can also <a href=\"%(url)s\">log out</a> and log back in if the problem persists.", url=url_for("logout")) }}
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
