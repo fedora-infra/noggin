@@ -1,14 +1,16 @@
-from noggin.representation import Representation
+from .base import Representation
 
 
 class OTPToken(Representation):
 
-    ATTR_MAP = {
+    attr_names = {
         "uniqueid": "ipatokenuniqueid",
         "description": "description",
         "disabled": "ipatokendisabled",
     }
-
+    attr_types = {
+        "disabled": "bool",
+    }
     pkey = "uniqueid"
     ipa_object = "otptoken"
 

@@ -1,6 +1,6 @@
 import pytest
 
-from noggin.representation import Representation
+from noggin.representation.base import Representation
 from noggin.representation.user import User
 from noggin.representation.group import Group
 

@@ -19,3 +19,11 @@ def test_agreement(dummy_agreement_dict):
         'julie45',
     ]
     assert agreement.groups == ["designers"]
+    assert agreement.enabled is True
+
+
+def test_agreement_disabled(dummy_agreement_dict):
+    """Test the Agreement representation when disabled"""
+    dummy_agreement_dict["ipaenabledflag"] = ["FALSE"]
+    agreement = Agreement(dummy_agreement_dict)
+    assert agreement.enabled is False
