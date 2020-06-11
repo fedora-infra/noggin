@@ -1,6 +1,6 @@
 import re
 
-from noggin.representation import Representation
+from .base import Representation
 
 
 NOT_ASCII_RE = re.compile(r"\W")
@@ -8,7 +8,7 @@ NOT_ASCII_RE = re.compile(r"\W")
 
 class Agreement(Representation):
 
-    ATTR_MAP = {
+    attr_names = {
         "name": "cn",
         "enabled": "ipaenabledflag",
         "description": "description",
@@ -16,9 +16,11 @@ class Agreement(Representation):
         "groups": "member_group",
         "uniqueid": "ipauniqueid",
     }
-    ATTR_LISTS = ["users", "groups"]
-    ATTR_BOOLS = ["enabled"]
-
+    attr_types = {
+        "users": "list",
+        "groups": "list",
+        "enabled": "bool",
+    }
     pkey = "name"
     ipa_object = "fasagreement"
 
