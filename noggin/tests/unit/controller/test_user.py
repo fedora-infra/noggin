@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 from noggin_messages import UserUpdateV1
 
+from noggin import ipa_admin
 from noggin.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_generic_error,
@@ -305,6 +306,30 @@ def test_user_settings_agreements(client, logged_in_dummy_user, dummy_agreement)
     assert page.title
     assert (
         len(page.select(f"#agreement-modal-{dummy_agreement['ipauniqueid'][0]}")) == 1
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_disabled(
+    client, logged_in_dummy_user, dummy_agreement
+):
+    """Test getting the user agreements page: /user/<username>/settings/agreements/"""
+    ipa_admin.fasagreement_disable("dummy agreement")
+    result = client.get('/user/dummy/settings/agreements/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert len(page.select("#agreement-modal-dummyagreement")) == 0
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_post(client, logged_in_dummy_user, dummy_agreement):
+    """Test signing an agreement"""
+    result = client.post(
+        '/user/dummy/settings/agreements/', data={"agreement": "dummy agreement"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/agreements/",
+        expected_message="You signed the \"dummy agreement\" agreement.",
+        expected_category="success",
     )
 
 
@@ -325,6 +350,22 @@ def test_user_settings_agreements_post_bad_request(
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/agreements/",
-        expected_message="Cannot sign the agreement, something went wrong, dummy agreement,",
+        expected_message="Cannot sign the agreement \"dummy agreement\": something went wrong",
         expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_post_unknown(
+    client, logged_in_dummy_user, dummy_agreement
+):
+    """Test signing an unknown agreement"""
+    result = client.post(
+        '/user/dummy/settings/agreements/', data={"agreement": "this does not exist"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/agreements/",
+        expected_message="Unknown agreement: this does not exist.",
+        expected_category="warning",
     )

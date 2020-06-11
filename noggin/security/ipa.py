@@ -349,6 +349,12 @@ class Client(IPAClient):
         data = self._request('fasagreement_add_group', agreement, kwargs)
         return data['result']
 
+    def fasagreement_disable(self, agreement, **kwargs):
+        """
+        Disable an agreement
+        """
+        self._request('fasagreement_disable', agreement, kwargs)
+
 
 # Construct an IPA client from app config, but don't attempt to log in with it
 # or to form a session of any kind with it. This is useful for one-off cases
