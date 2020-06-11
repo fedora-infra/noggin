@@ -87,6 +87,17 @@ def test_group(client, dummy_user_as_group_manager, make_user):
         assert members[index].find("a").get_text(strip=True) == username
     # Current user is a sponsor, there must be the corresponding add form
     assert len(page.select("form[action='/group/dummy-group/members/']")) == 1
+    assert (
+        page.select_one("#group-mailinglist a").get_text(strip=True)
+        == "dummy@mailinglist.org"
+    )
+    assert (
+        page.select_one("#group-ircchannel a").get_text(strip=True)
+        == "irc:///freenode.net/#dummy-group"
+    )
+    assert (
+        page.select_one("#group-urls a").get_text(strip=True) == "http://dummygroup.org"
+    )
 
 
 @pytest.mark.vcr()

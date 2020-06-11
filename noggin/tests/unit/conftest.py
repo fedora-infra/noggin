@@ -110,7 +110,7 @@ def make_user(ipa_testing_config):
             name.title(),
             'User',
             f'{name.title()} User',
-            mail="dummy@example.com",
+            mail=f"{name}@example.com",
             user_password=password,
             login_shell='/bin/bash',
             fascreationtime=f"{now.isoformat()}Z",
@@ -139,7 +139,14 @@ def dummy_user_with_case(make_user):
 
 @pytest.fixture
 def dummy_group(ipa_testing_config):
-    ipa_admin.group_add('dummy-group', description="A dummy group", fasgroup=True)
+    ipa_admin.group_add(
+        'dummy-group',
+        description="A dummy group",
+        fasgroup=True,
+        fasurl="http://dummygroup.org",
+        fasmailinglist="dummy@mailinglist.org",
+        fasircchannel="irc:///freenode.net/#dummy-group",
+    )
     yield
     ipa_admin.group_del('dummy-group')
 
