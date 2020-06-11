@@ -8,8 +8,11 @@ class Group(Representation):
         "description": "description",
         "members": "member_user",
         "sponsors": "membermanager_user",
+        "url": "fasurl",
+        "irc_channel": "fasircchannel",
+        "mailing_list": "fasmailinglist",
     }
-    ATTR_LISTS = ["members", "sponsors"]
+    ATTR_LISTS = ["members", "sponsors", "url"]
 
     pkey = "name"
     ipa_object = "group"
