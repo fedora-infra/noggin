@@ -73,16 +73,16 @@
     {{ super() }}
 {% endblock %}
 
-{% block userlinks %}
+{% macro userlinks() %}
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Wiki</b>
-      <a href="https://fedoraproject.org/wiki/User:{{ user.username }}">User:{{ user.username }}</a>
+        <strong title='{{_("Wiki")}}'><i class="fa fa-fw fa-link" aria-hidden="true"></i> {{_("Wiki")}}</strong>
+        <a href="https://fedoraproject.org/wiki/User:{{ user.username }}">User:{{ user.username }}</a>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      <b>Fedora People</b>
-      <a href="https://{{ user.username }}.fedorapeople.org/">{{ user.username }}</a>
+        <strong title='{{_("Fedora People")}}'><i class="fa fa-fw fa-link" aria-hidden="true"></i> {{_("Fedora People")}}</strong>
+        <a href="https://{{ user.username }}.fedorapeople.org/">{{ user.username }}</a>
     </li>
-{% endblock %}
+{% endmacro %}
 
 
 {% macro front_page_blurb() %}
@@ -96,13 +96,15 @@
 {# an optional macro defining an element to show for editing group details #}
 {# typically, it used to link to a ticket tracker for an admin to edit a group #}
 {% macro edit_group_details() %}
-    {% if current_user_is_sponsor and sponsor_form %}
-        <div class="col-auto ml-auto">
-            <a class="btn btn-sm btn-outline-primary" href="https://pagure.io/fedora-infrastructure/new_issue" title="{{_('file a Fedora Infra ticket to change the details or sponsors of this group')}}">
-                {{_("Request Change of Details")}}
-            </a>
-        </div>
-    {% endif %}
+    <button tabindex="0"
+        class="btn btn-link"
+        role="button" data-toggle="popover"
+        data-trigger="focus" 
+        title="{{_('Edit Group')}}" 
+        data-content="{{_("To change group details or add sponsors, file a ticket with")}} <a href='https://pagure.io/fedora-infrastructure/new_issue' target='_blank'>fedora-infra</a>" 
+        data-html="true">
+        <i class="fa fa-fw fa-pencil" aria-hidden="true"></i>
+</button>
 {% endmacro %}
 
 {# an optional macro defining an element to show for account disable #}

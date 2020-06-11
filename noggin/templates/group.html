@@ -10,25 +10,38 @@
   <div class="container section">
     <div class="row py-4" data-section="identity">
       <div class="col">
-          <h3>{{ group.name }}</h3>
+          <h3 class="mb-0">
+            {{ group.name }}
+            {% if edit_group_details is defined %}
+              <span class="pl-1">{{ edit_group_details()}}</span>
+            {% endif %}
+          </h3>
           {% if group.description %}<div>{{ group.description }}</div>{% endif %}
+          {% if group.mailing_list %}
+            <div id="group-mailinglist"><i class="fa fa-fw fa-envelope" aria-hidden="true"></i> <a href="{{group.mailing_list}}">{{group.mailing_list}}</a></div>
+          {% endif %}
+          {% if group.irc_channel %}
+            <div id="group-ircchannel"><i class="fa fa-fw fa-comments-o" aria-hidden="true"></i> <a href="{{group.irc_channel}}">{{group.irc_channel}}</a></div>
+          {% endif %}
       </div>
-      {{ edit_group_details() if edit_group_details is defined }}
-      {% if current_user.username in group.members %}
-      <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
-        {{ sponsor_form.hidden_tag() }}
-        <button type="submit" class="btn btn-outline-danger" name="username" value="{{ current_user.username }}" id="leave-group-btn">
-          {{ _("Leave group") }}
-        </button>
-      </form>
+      {% if group.urls %}
+      <div id="group-urls" class="col-auto align-self-center">
+          {% for url in group.urls %}
+          <div><i class="fa fa-fw fa-link" aria-hidden="true"></i> <a href="{{url}}">{{url}}</a></div>
+          {% endfor %}
+      </div>
       {% endif %}
     </div>
   </div>
   </div>
-  {% if current_user.username not in group.members or not current_user_is_sponsor %}
+  {% if current_user.username not in group.members %}
   <div class="alert alert-info rounded-0">
     <div class="container text-center">
-      {{ _("To join this group, contact a group sponsor.") }}
+      {% if current_user_is_sponsor %}
+      {{ _("You are a sponsor of this group, but not a member. Add yourself if you want to be a member.") }}
+      {% else %}
+        {{ _("To join this group, contact a group sponsor.") }}
+      {% endif %}
     </div>
   </div>
   {% endif %}
@@ -77,6 +90,13 @@
                 </div>
               </div>
             </form>
+          {% elif current_user.username in group.members %}
+          <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
+            {{ sponsor_form.hidden_tag() }}
+            <button type="submit" class="btn btn-sm btn-outline-danger" name="username" value="{{ current_user.username }}" id="leave-group-btn">
+              {{ _("Leave group") }}
+            </button>
+          </form>
           {% endif %}
           </div>
         {% if members|length == 0 %}
@@ -88,7 +108,7 @@
             {% set sponsor_usernames = sponsors|map(attribute='username') %}
             {% for member in members|sort(attribute='username') %}
               <li class="col-lg-3 col-md-4 col-sm-6">
-              <div class="card card-body mb-4">
+              <div class="card card-body mb-4 px-2 py-3">
                 <div class="media align-items-center">
                   <img src="{{ gravatar(member.mail if member.mail else 'default', 50) }}" alt="gravatar">
                   <div class="media-body ml-2">
@@ -99,8 +119,6 @@
                       </div>
                       <div>{{ member.name }}</div>
                   </div>
-                </div>
-                <div class="text-muted">
                   {% if current_user_is_sponsor %}
                     <button type="submit" class="btn btn-outline-danger border-0" name="username" value="{{ member.username }}">
                       <i class="fa fa-trash"></i>
