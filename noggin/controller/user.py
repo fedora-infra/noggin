@@ -113,6 +113,7 @@ def user_settings_profile(ipa, username):
                 'fasgithubusername': form.github.data.lstrip('@'),
                 'fasgitlabusername': form.gitlab.data.lstrip('@'),
                 'fasrhbzemail': form.rhbz_mail.data,
+                'faswebsiteurl': form.website_url.data,
             },
             "user_settings_profile",
         )

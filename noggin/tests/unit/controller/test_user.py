@@ -21,6 +21,7 @@ POST_CONTENTS = {
     "github": "@dummy",
     "gitlab": "@dummy",
     "rhbz_mail": "dummy@example.com",
+    "website_url": "http://example.org/dummy",
 }
 
 POST_CONTENTS_MIN = {

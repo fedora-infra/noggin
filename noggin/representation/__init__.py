@@ -3,6 +3,8 @@ class Representation:
     ATTR_MAP = {}
     ATTR_LISTS = []
 
+    pkey = None
+
     def __init__(self, raw):
         self.raw = raw
 
@@ -31,6 +33,15 @@ class Representation:
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.raw == other.raw
+
+    @classmethod
+    def get_ipa_pkey(cls):
+        if cls.pkey is None:
+            raise NotImplementedError
+        try:
+            return cls.ATTR_MAP[cls.pkey]
+        except KeyError:
+            raise NotImplementedError
 
     def diff_fields(self, other):
         """

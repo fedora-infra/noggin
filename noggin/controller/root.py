@@ -1,3 +1,4 @@
+import python_freeipa
 from flask import render_template, request, redirect, url_for, session, jsonify
 from flask_healthz import HealthError
 
@@ -49,7 +50,11 @@ def logout():
     """Log the user out."""
     # Don't use the with_ipa() decorator, otherwise anonymous users visiting this endpoint will be
     # asked to login to then be logged out.
-    ipa = maybe_ipa_session(app, session)
+    try:
+        ipa = maybe_ipa_session(app, session)
+    except python_freeipa.exceptions.FreeIPAError:
+        # Not much we can do here, proceed to logout and it may help solve the issue.
+        ipa = None
     if ipa:
         ipa.logout()
     session.clear()
@@ -65,13 +70,13 @@ def search_json(ipa):
     res = []
 
     if username:
-        users_ = [User(u) for u in ipa.user_find(username)['result']]
+        users_ = [User(u) for u in ipa.user_find(username, sizelimit=10)['result']]
 
         for user_ in users_:
             res.append({'uid': user_.username, 'cn': user_.name})
 
     if groupname:
-        groups_ = [Group(g) for g in ipa.group_find(groupname)['result']]
+        groups_ = [Group(g) for g in ipa.group_find(groupname, sizelimit=10)['result']]
         for group_ in groups_:
             res.append({'cn': group_.name, 'description': group_.description})
 
