@@ -90,7 +90,7 @@ def password_reset():
 
 
 @app.route('/user/<username>/settings/password', methods=['GET', 'POST'])
-@with_ipa(app, session)
+@with_ipa()
 @require_self
 def user_settings_password(ipa, username):
     user = User(user_or_404(ipa, username))

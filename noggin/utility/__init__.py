@@ -2,7 +2,7 @@ import hashlib
 from functools import wraps
 from contextlib import contextmanager
 
-from flask import abort, flash, g, redirect, url_for, session, Markup
+from flask import abort, flash, g, redirect, url_for, session, Markup, current_app
 from flask_babel import lazy_gettext as _
 import python_freeipa
 
@@ -25,11 +25,11 @@ def gravatar(email, size):
 
 # A wrapper that will give us 'ipa' if it exists, or bump the user back to /
 # with a message telling them to log in.
-def with_ipa(app, session):
+def with_ipa():
     def decorator(f):
         @wraps(f)
         def fn(*args, **kwargs):
-            ipa = maybe_ipa_session(app, session)
+            ipa = maybe_ipa_session(current_app, session)
             if ipa:
                 g.ipa = ipa
                 g.current_user = User(g.ipa.user_find(whoami=True)['result'][0])
