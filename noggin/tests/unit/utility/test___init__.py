@@ -52,7 +52,7 @@ def test_with_ipa(client, dummy_user):
     view = mock.Mock()
     with current_app.test_request_context('/'):
         ipa = maybe_ipa_login(current_app, session, "dummy", "dummy_password")
-        wrapped = with_ipa(current_app, session)(view)
+        wrapped = with_ipa()(view)
         wrapped("arg")
         view.assert_called_once()
         assert "ipa" in view.call_args_list[0][1]
@@ -69,7 +69,7 @@ def test_with_ipa_anonymous(client):
     """Test the with_ipa decorator on anonymous users"""
     view = mock.Mock()
     with current_app.test_request_context('/'):
-        wrapped = with_ipa(current_app, session)(view)
+        wrapped = with_ipa()(view)
         response = wrapped("arg")
         assert response.status_code == 302
         assert response.location == "/"

@@ -62,7 +62,7 @@ def logout():
 
 
 @app.route('/search/json')
-@with_ipa(app, session)
+@with_ipa()
 def search_json(ipa):
     username = request.args.get('username')
     groupname = request.args.get('group')

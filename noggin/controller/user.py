@@ -27,7 +27,7 @@ from noggin.utility import (
 
 
 @app.route('/user/<username>/')
-@with_ipa(app, session)
+@with_ipa()
 def user(ipa, username):
     user = User(user_or_404(ipa, username))
     # As a speed optimization, we make two separate calls.
@@ -90,7 +90,7 @@ def _user_mod(ipa, form, user, details, redirect_to):
 
 
 @app.route('/user/<username>/settings/profile/', methods=['GET', 'POST'])
-@with_ipa(app, session)
+@with_ipa()
 @require_self
 def user_settings_profile(ipa, username):
     user = User(user_or_404(ipa, username))
@@ -126,7 +126,7 @@ def user_settings_profile(ipa, username):
 
 
 @app.route('/user/<username>/settings/keys/', methods=['GET', 'POST'])
-@with_ipa(app, session)
+@with_ipa()
 @require_self
 def user_settings_keys(ipa, username):
     user = User(user_or_404(ipa, username))
@@ -157,7 +157,7 @@ def user_settings_keys(ipa, username):
 
 
 @app.route('/user/<username>/settings/otp/', methods=['GET', 'POST'])
-@with_ipa(app, session)
+@with_ipa()
 @require_self
 def user_settings_otp(ipa, username):
     addotpform = UserSettingsAddOTPForm()
@@ -206,7 +206,7 @@ def user_settings_otp(ipa, username):
 
 
 @app.route('/user/<username>/settings/otp/disable/', methods=['POST'])
-@with_ipa(app, session)
+@with_ipa()
 @require_self
 def user_settings_otp_disable(ipa, username):
     form = UserSettingsOTPStatusChange()
@@ -239,7 +239,7 @@ def user_settings_otp_disable(ipa, username):
 
 
 @app.route('/user/<username>/settings/otp/enable/', methods=['POST'])
-@with_ipa(app, session)
+@with_ipa()
 @require_self
 def user_settings_otp_enable(ipa, username):
     form = UserSettingsOTPStatusChange()
@@ -266,7 +266,7 @@ def user_settings_otp_enable(ipa, username):
 
 
 @app.route('/user/<username>/settings/otp/delete/', methods=['POST'])
-@with_ipa(app, session)
+@with_ipa()
 @require_self
 def user_settings_otp_delete(ipa, username):
     form = UserSettingsOTPStatusChange()

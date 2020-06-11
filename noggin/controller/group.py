@@ -1,4 +1,4 @@
-from flask import flash, g, render_template, redirect, session, url_for
+from flask import flash, g, render_template, redirect, url_for
 from flask_babel import _
 import python_freeipa
 from noggin_messages import MemberSponsorV1
@@ -13,7 +13,7 @@ from noggin.utility.pagination import paginated_find
 
 
 @app.route('/group/<groupname>/')
-@with_ipa(app, session)
+@with_ipa()
 def group(ipa, groupname):
     group = Group(group_or_404(ipa, groupname))
     sponsor_form = AddGroupMemberForm(groupname=groupname)
@@ -44,7 +44,7 @@ def group(ipa, groupname):
 
 
 @app.route('/group/<groupname>/members/', methods=['POST'])
-@with_ipa(app, session)
+@with_ipa()
 def group_add_member(ipa, groupname):
     group_or_404(ipa, groupname)
     sponsor_form = AddGroupMemberForm()
@@ -112,7 +112,7 @@ def group_add_member(ipa, groupname):
 
 
 @app.route('/group/<groupname>/members/remove', methods=['POST'])
-@with_ipa(app, session)
+@with_ipa()
 def group_remove_member(ipa, groupname):
     group_or_404(ipa, groupname)
     form = RemoveGroupMemberForm()
@@ -150,7 +150,7 @@ def group_remove_member(ipa, groupname):
 
 
 @app.route('/groups/')
-@with_ipa(app, session)
+@with_ipa()
 def groups(ipa):
     groups = paginated_find(ipa, Group, fasgroup=True)
     return render_template('groups.html', groups=groups)
