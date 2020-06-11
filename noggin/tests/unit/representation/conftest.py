@@ -75,4 +75,7 @@ def dummy_group_dict():
             'ipaobject',
             'posixgroup',
         ],
+        'fasurl': ['http://example.com', "https://www.dummygroup.com.au"],
+        'fasircchannel': ["irc://freenode.net/#dummy-group"],
+        'fasmailinglist': ['dummygroup@lists.fedoraproject.org'],
     }
