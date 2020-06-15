@@ -53,6 +53,18 @@ def test_logout(client, logged_in_dummy_user):
     assert "noggin_ipa_server_hostname" not in session
 
 
+def test_logout_no_ipa(client, mocker):
+    """Test logout when IPA can't be reached"""
+    maybe_ipa_session = mocker.patch("noggin.controller.root.maybe_ipa_session")
+    maybe_ipa_session.side_effect = python_freeipa.exceptions.FreeIPAError
+    session = mocker.patch("noggin.controller.root.session")
+    result = client.get('/logout', follow_redirects=False)
+    assert result.status_code == 302
+    assert result.location == "http://localhost/"
+    # Make sure we did clear the session
+    session.clear.assert_called_once()
+
+
 # Login
 
 

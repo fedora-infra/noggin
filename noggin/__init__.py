@@ -6,6 +6,7 @@ from flask_wtf.csrf import CSRFProtect
 from whitenoise import WhiteNoise
 
 from noggin.security.ipa_admin import IPAAdmin
+from noggin.middleware import IPAErrorHandler
 
 app = Flask(__name__)
 app.jinja_env.add_extension('jinja2.ext.i18n')
@@ -38,13 +39,17 @@ app.register_blueprint(healthz, url_prefix="/healthz")
 # Flask-Mail
 mailer = Mail(app)
 
-
+# i18n
 babel = Babel(app)
 
 
 @babel.localeselector
 def get_locale():
     return request.accept_languages.best_match(LANGUAGES)
+
+
+# Catch IPA errors
+IPAErrorHandler(app, "ipa_error.html")
 
 
 # Whitenoise for static files
