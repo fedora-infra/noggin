@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 from noggin_messages import UserUpdateV1
 
+from noggin import ipa_admin
 from noggin.tests.unit.utilities import (
     assert_redirects_with_flash,
     assert_form_generic_error,
@@ -294,4 +295,76 @@ def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
             strip=True
         )
         == '1 Group Memberships'
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements(client, logged_in_dummy_user, dummy_agreement):
+    """Test getting the user agreements page: /user/<username>/settings/agreements/"""
+    result = client.get('/user/dummy/settings/agreements/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert page.title
+    assert len(page.select("#agreement-modal-dummyagreement")) == 1
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_disabled(
+    client, logged_in_dummy_user, dummy_agreement
+):
+    """Test getting the user agreements page: /user/<username>/settings/agreements/"""
+    ipa_admin.fasagreement_disable("dummy agreement")
+    result = client.get('/user/dummy/settings/agreements/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert len(page.select("#agreement-modal-dummyagreement")) == 0
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_post(client, logged_in_dummy_user, dummy_agreement):
+    """Test signing an agreement"""
+    result = client.post(
+        '/user/dummy/settings/agreements/', data={"agreement": "dummy agreement"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/agreements/",
+        expected_message="You signed the \"dummy agreement\" agreement.",
+        expected_category="success",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_post_bad_request(
+    client, logged_in_dummy_user, dummy_agreement
+):
+    """Test handling of FreeIPA errors"""
+    with mock.patch(
+        "noggin.security.ipa.Client.fasagreement_add_user"
+    ) as fasagreement_add_user:
+        fasagreement_add_user.side_effect = python_freeipa.exceptions.BadRequest(
+            message="something went wrong", code="4242"
+        )
+        result = client.post(
+            '/user/dummy/settings/agreements/', data={"agreement": "dummy agreement"}
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/agreements/",
+        expected_message="Cannot sign the agreement \"dummy agreement\": something went wrong",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_agreements_post_unknown(
+    client, logged_in_dummy_user, dummy_agreement
+):
+    """Test signing an unknown agreement"""
+    result = client.post(
+        '/user/dummy/settings/agreements/', data={"agreement": "this does not exist"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/agreements/",
+        expected_message="Unknown agreement: this does not exist.",
+        expected_category="warning",
     )

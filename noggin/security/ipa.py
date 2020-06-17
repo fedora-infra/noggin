@@ -307,6 +307,54 @@ class Client(IPAClient):
         data = self._request('stageuser_activate', username, params)
         return data['result']
 
+    def fasagreement_find(self, **kwargs):
+        """
+        Search agreements
+        """
+        data = self._request('fasagreement_find', params=kwargs)
+        return data['result']
+
+    def fasagreement_add(self, agreement, **kwargs):
+        """
+        Add a new agreement
+        :param agreement: Agreement name.
+        :type agreement: string
+        """
+        data = self._request('fasagreement_add', agreement, kwargs)
+        return data['result']
+
+    def fasagreement_del(self, agreement, **kwargs):
+        """
+        Delete an agreement
+        :param agreement: Agreement name.
+        :type agreement: string
+        """
+        return self._request('fasagreement_del', agreement, kwargs)
+
+    def fasagreement_add_user(self, agreement, **kwargs):
+        """
+        Add a user to an agreement
+        :param agreement: Agreement name.
+        :type agreement: string
+        """
+        data = self._request('fasagreement_add_user', agreement, kwargs)
+        return data['result']
+
+    def fasagreement_add_group(self, agreement, **kwargs):
+        """
+        Add a group to an agreement
+        :param agreement: Agreement name.
+        :type agreement: string
+        """
+        data = self._request('fasagreement_add_group', agreement, kwargs)
+        return data['result']
+
+    def fasagreement_disable(self, agreement, **kwargs):
+        """
+        Disable an agreement
+        """
+        self._request('fasagreement_disable', agreement, kwargs)
+
 
 # Construct an IPA client from app config, but don't attempt to log in with it
 # or to form a session of any kind with it. This is useful for one-off cases

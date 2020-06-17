@@ -2,6 +2,7 @@ class Representation:
 
     ATTR_MAP = {}
     ATTR_LISTS = []
+    ATTR_BOOLS = []
 
     pkey = None
 
@@ -25,6 +26,8 @@ class Representation:
             raise AttributeError(key)
         if key in self.ATTR_LISTS:
             return self._attrlist(ipa_key)
+        elif key in self.ATTR_BOOLS:
+            return self._attr(ipa_key) == "TRUE"
         else:
             return self._attr(ipa_key)
 

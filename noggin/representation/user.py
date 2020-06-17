@@ -19,8 +19,9 @@ class User(Representation):
         "rhbz_mail": "fasrhbzemail",
         "website_url": "faswebsiteurl",
         "last_password_change": "krblastpwdchange",
+        "agreements": "memberof_fasagreement",
     }
-    ATTR_LISTS = ["sshpubkeys", "ircnick", "gpgkeys", "groups"]
+    ATTR_LISTS = ["sshpubkeys", "ircnick", "gpgkeys", "groups", "agreements"]
 
     pkey = "username"
     ipa_object = "user"
