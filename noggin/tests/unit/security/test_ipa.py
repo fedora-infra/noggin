@@ -64,7 +64,7 @@ def test_ipa_login(client, dummy_user):
     assert ipa is not None
     with client.session_transaction() as sess:
         assert sess.get('noggin_session')
-        assert sess.get('noggin_ipa_server_hostname') == "ipa.example.com"
+        assert sess.get('noggin_ipa_server_hostname') == "ipa.noggin.test"
         assert sess.get('noggin_username') == "dummy"
         # Test that the session is valid Fernet
         ipa_session = Fernet(current_app.config['FERNET_SECRET']).decrypt(

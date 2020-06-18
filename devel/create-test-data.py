@@ -12,7 +12,7 @@ USER_PASSWORD = "testuserpw"
 fake = Faker()
 fake.seed_instance(0)
 
-ipa_server = "ipa.example.com"
+ipa_server = "ipa.noggin.test"
 ipa_user = "admin"
 ipa_pw = "adminPassw0rd!"
 ipa = Client(host=ipa_server, verify_ssl=False)

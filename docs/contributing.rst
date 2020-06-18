@@ -53,8 +53,8 @@ where you can run the following commands:
     $ noggin-start
     $ noggin-unit-tests
 
-The noggin web application should be running automatically. To access it, go to http://ipa.example.com:5000/ in the browser on your
-host machine to see the web application. http://ipa.example.com will give you access to the regular freeIPA
+The noggin web application should be running automatically. To access it, go to http://ipa.noggin.test:5000/ in the browser on your
+host machine to see the web application. http://ipa.noggin.test will give you access to the regular freeIPA
 webUI.
 
 Note that the ``/vagrant/`` folder contains the source of the git checkout on your host. Any changes
