@@ -161,7 +161,7 @@ def test_user_settings_otp_check_description_escaping(
     # the escaping happens before the secret, so just check that
     assert (
         otp_uri['value'][:81]
-        == "otpauth://totp/dummy@example.com:pants%20token?issuer=dummy%40EXAMPLE.COM&secret="
+        == "otpauth://totp/dummy@noggin.test:pants%20token?issuer=dummy%40NOGGIN.TEST&secret="
     )
 
 
