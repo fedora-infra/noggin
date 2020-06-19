@@ -12,14 +12,8 @@ import jwt
 from noggin import app, ipa_admin, mailer
 from noggin.security.ipa import untouched_ipa_client, maybe_ipa_session
 from noggin.representation.user import User
-from noggin.utility import (
-    with_ipa,
-    user_or_404,
-    FormError,
-    handle_form_errors,
-    require_self,
-    messaging,
-)
+from noggin.utility import with_ipa, user_or_404, require_self, messaging
+from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import PasswordResetToken
 from noggin.form.password_reset import (
@@ -53,7 +47,7 @@ def _validate_change_pw_form(form, username, ipa=None):
             f'An unhandled error {e.__class__.__name__} happened while reseting '
             f'the password for user {username}: {e.message}'
         )
-        form.errors['non_field_errors'] = [_('Could not change password.')]
+        form.non_field_errors.errors.append(_('Could not change password.'))
 
     if res and res.ok:
         flash(_('Your password has been changed'), 'success')
@@ -260,9 +254,9 @@ def forgot_password_change():
                 f'An unhandled error {e.__class__.__name__} happened while reseting '
                 f'the password for user {username}: {e.message}'
             )
-            form.errors['non_field_errors'] = [
+            form.non_field_errors.errors.append(
                 _('Could not change password, please try again.')
-            ]
+            )
         else:
             lock.delete()
             flash(_('Your password has been changed.'), 'success')

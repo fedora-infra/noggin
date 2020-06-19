@@ -18,14 +18,8 @@ from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.representation.otptoken import OTPToken
 from noggin.security.ipa import maybe_ipa_login
-from noggin.utility import (
-    with_ipa,
-    user_or_404,
-    FormError,
-    handle_form_errors,
-    require_self,
-    messaging,
-)
+from noggin.utility import with_ipa, user_or_404, require_self, messaging
+from noggin.utility.forms import FormError, handle_form_errors
 
 
 @app.route('/user/<username>/')
@@ -187,7 +181,7 @@ def user_settings_otp(ipa, username):
             app.logger.error(
                 f'An error happened while creating an OTP token for user {username}: {e.message}'
             )
-            addotpform.errors['non_field_errors'] = [_('Cannot create the token.')]
+            addotpform.non_field_errors.errors.append(_('Cannot create the token.'))
         else:
             return redirect(url_for('user_settings_otp', username=username))
 
