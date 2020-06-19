@@ -11,9 +11,10 @@ import python_freeipa
 from noggin import app, ipa_admin, mailer
 from noggin.form.register_user import ResendValidationEmailForm, PasswordSetForm
 from noggin.representation.user import User
+from noggin.utility import messaging
 from noggin.utility.locales import guess_locale
 from noggin.utility.token import EmailValidationToken
-from noggin.utility import messaging, FormError, handle_form_errors
+from noggin.utility.forms import FormError, handle_form_errors
 from noggin.security.ipa import untouched_ipa_client, maybe_ipa_login
 
 

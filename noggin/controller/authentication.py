@@ -4,7 +4,7 @@ import python_freeipa
 
 from noggin import app
 from noggin.security.ipa import maybe_ipa_login
-from noggin.utility import FormError, handle_form_errors
+from noggin.utility.forms import FormError, handle_form_errors
 from noggin.form.sync_token import SyncTokenForm
 from noggin.security.ipa import untouched_ipa_client
 

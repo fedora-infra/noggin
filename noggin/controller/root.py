@@ -9,7 +9,8 @@ from noggin.representation.group import Group
 from noggin.representation.user import User
 
 from noggin.security.ipa import maybe_ipa_session
-from noggin.utility import with_ipa, handle_form_errors
+from noggin.utility import with_ipa
+from noggin.utility.forms import handle_form_errors
 
 from .authentication import handle_login_form
 from .registration import handle_register_form

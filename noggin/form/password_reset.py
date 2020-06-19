@@ -1,12 +1,12 @@
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField
 from wtforms.validators import DataRequired, EqualTo, Length
 
 from noggin import app
+from .base import BaseForm
 
 
-class NewPasswordForm(FlaskForm):
+class NewPasswordForm(BaseForm):
 
     password = PasswordField(
         _('New Password'),
@@ -36,7 +36,7 @@ class PasswordResetForm(NewPasswordForm):
     )
 
 
-class ForgottenPasswordForm(FlaskForm):
+class ForgottenPasswordForm(BaseForm):
 
     username = StringField(
         _('Username'),
