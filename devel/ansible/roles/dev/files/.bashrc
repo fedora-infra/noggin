@@ -9,5 +9,7 @@ alias noggin-unit-tests="NOGGIN_CONFIG_PATH=/vagrant/noggin/tests/unit/noggin.cf
 alias noggin-logs="sudo journalctl -u noggin.service"
 alias noggin-restart="sudo systemctl restart noggin.service && echo 'Noggin is running on http://0.0.0.0:5000'"
 alias noggin-stop="sudo systemctl stop noggin.service && echo 'Noggin service stopped'"
+alias noggin-ipa-resetdb="sudo ipa-restore /var/lib/ipa/backup/noggin-clean -p adminPassw0rd!"
+alias noggin-ipa-populatedb="poetry run python /vagrant/devel/create-test-data.py"
 
 cd /vagrant
