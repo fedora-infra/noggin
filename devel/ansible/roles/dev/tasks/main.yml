@@ -40,6 +40,17 @@
       owner: vagrant
       group: vagrant
 
+- name: create backup of clean FreeIPA server data
+  shell: ipa-backup
+
+
+# ipa-backup creates the backup with a datetime in the dirname. here
+# we just copy it to noggin-clean so we can reference it easier in the 
+# bash alias.
+- name: copy clean backup
+  shell: mv /var/lib/ipa/backup/ipa-full* /var/lib/ipa/backup/noggin-clean
+
+
 - name: Create dummy freeipa data
   shell: poetry run python /vagrant/devel/create-test-data.py
   become: yes

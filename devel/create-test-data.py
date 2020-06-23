@@ -95,22 +95,3 @@ for x in range(50):
             ipa.group_add_member("admins", username, skip_errors=True)
     except python_freeipa.exceptions.FreeIPAError as e:
         print(e)
-
-# add a known user for testing purposes
-
-try:
-    ipa.user_add(
-        "testuser",
-        "Test",
-        "User",
-        "Test User",
-        home_directory="/home/fedora/testUser",
-        disabled=False,
-        random_pass=True,
-        fasircnick="testuser",
-        faslocale=None,
-        fastimezone=None,
-        fasgpgkeyid=[],
-    )
-except python_freeipa.exceptions.FreeIPAError as e:
-    print(e)
