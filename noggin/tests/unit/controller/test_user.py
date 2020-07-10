@@ -97,6 +97,7 @@ def test_user_edit_post(client, logged_in_dummy_user):
                         'github',
                         'gitlab',
                         'rhbz_mail',
+                        'website_url',
                     ],
                 }
             }
@@ -169,6 +170,7 @@ def test_user_edit_post_no_change(client, logged_in_dummy_user):
                         'github',
                         'gitlab',
                         'rhbz_mail',
+                        'website_url',
                     ],
                 }
             }

@@ -194,7 +194,9 @@ def test_ipa_client_fasagreement_find(client, logged_in_dummy_user, dummy_agreem
     """Check the IPAClient fasagreement_find"""
     with client.session_transaction() as sess:
         ipa = maybe_ipa_session(current_app, sess)
-        result = ipa.fasagreement_find(all=True)
+
+        result = ipa.fasagreement_find(all=True, cn="dummy agreement")
+
         assert len(result) == 1
         assert result[0]['cn'] == ['dummy agreement']
 
@@ -207,10 +209,10 @@ def test_ipa_client_fasagreement_add(client, logged_in_dummy_user, dummy_agreeme
 
         # add a new agreement and check it is there
         ipa_admin.fasagreement_add("pants agreement")
-        result = ipa.fasagreement_find(all=True)
-        assert len(result) == 2
-        assert result[0]['cn'] == ['dummy agreement']
-        assert result[1]['cn'] == ['pants agreement']
+
+        result = ipa.fasagreement_find(all=True, cn="pants agreement")
+        assert len(result) == 1
+        assert result[0]['cn'] == ['pants agreement']
 
         # cleanup
         ipa_admin.fasagreement_del("pants agreement")
@@ -228,8 +230,9 @@ def test_ipa_client_fasagreement_add_user(
         ipa.fasagreement_add_user("dummy agreement", user="dummy")
 
         # check it worked
-        result = ipa.fasagreement_find(all=True)
-        assert "dummy" in result[0]["memberuser_user"]
+        result = ipa.fasagreement_find(all=True, cn="dummy agreement")
+        assert len(result) == 1
+        assert result[0]["memberuser_user"] == ["dummy"]
 
 
 @pytest.mark.vcr
@@ -244,5 +247,9 @@ def test_ipa_client_fasagreement_add_group(
         ipa_admin.fasagreement_add_group("dummy agreement", group="dummy-group")
 
         # check it worked
-        result = ipa.fasagreement_find(all=True)
-        assert "dummy-group" in result[0]["member_group"]
+        result = ipa.fasagreement_find(all=True, cn="dummy agreement")
+        assert len(result) == 1
+        assert result[0]["member_group"] == ["dummy-group"]
+
+        # cleanup
+        ipa_admin.fasagreement_remove_group("dummy agreement", group="dummy-group")
