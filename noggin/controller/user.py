@@ -301,7 +301,7 @@ def user_settings_otp_delete(ipa, username):
 def user_settings_agreements(ipa, username):
     user = User(user_or_404(ipa, username))
     agreements = [
-        Agreement(a) for a in ipa.fasagreement_find(all=False) if Agreement(a).enabled
+        Agreement(a) for a in ipa.fasagreement_find(all=False, ipaenabledflag=True)
     ]
     form = UserSettingsAgreementSign()
     if form.validate_on_submit():

@@ -1,6 +1,7 @@
 import python_freeipa
 import mock
 import pytest
+
 from bs4 import BeautifulSoup
 
 from noggin import ipa_admin
@@ -157,10 +158,10 @@ def test_user_settings_otp_check_description_escaping(
     page = BeautifulSoup(result.data, "html.parser")
     otp_uri = page.select_one("input#otp-uri")
 
+    # the escaping happens before the secret, so just check that
     assert (
-        otp_uri['value'] == "otpauth://totp/dummy@example.com:pants%20token?issuer="
-        "dummy%40EXAMPLE.COM&secret=L4PD6EXABBJDSCAKS6MZQWT4RSP3PM3QW6H57UHIKFCN7I3"
-        "FGKSHZCCO&digits=6&algorithm=SHA512&period=30"
+        otp_uri['value'][:81]
+        == "otpauth://totp/dummy@example.com:pants%20token?issuer=dummy%40EXAMPLE.COM&secret="
     )
 
 

@@ -349,6 +349,15 @@ class Client(IPAClient):
         data = self._request('fasagreement_add_group', agreement, kwargs)
         return data['result']
 
+    def fasagreement_remove_group(self, agreement, **kwargs):
+        """
+        Remove a group from an agreement
+        :param agreement: Agreement name.
+        :type agreement: string
+        """
+        data = self._request('fasagreement_remove_group', agreement, kwargs)
+        return data['result']
+
     def fasagreement_disable(self, agreement, **kwargs):
         """
         Disable an agreement
