@@ -11,6 +11,9 @@
   args:
     chdir: /vagrant/
 
+- name: uninstall existing freeipa server
+  shell: test -f /var/log/ipaserver-install.log && ipa-server-install --uninstall --unattended
+
 - name: install freeipa server
   shell: umask 022; ipa-server-install -a adminPassw0rd! --hostname=ipa.noggin.test -r NOGGIN.TEST -p adminPassw0rd! -n noggin.test -U
 
