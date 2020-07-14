@@ -57,7 +57,12 @@ def test_logout_no_ipa(client, mocker):
     """Test logout when IPA can't be reached"""
     maybe_ipa_session = mocker.patch("noggin.controller.root.maybe_ipa_session")
     maybe_ipa_session.side_effect = python_freeipa.exceptions.FreeIPAError
-    session = mocker.patch("noggin.controller.root.session")
+
+    # Flask request, session, ... objects don't cope well with being inspected which is
+    # what unittest.mock does from Python 3.8 on. Plant something certifiably stupid and
+    # forgiving instead.
+    session = mocker.patch("noggin.controller.root.session", new=mock.MagicMock())
+
     result = client.get('/logout', follow_redirects=False)
     assert result.status_code == 302
     assert result.location == "http://localhost/"
