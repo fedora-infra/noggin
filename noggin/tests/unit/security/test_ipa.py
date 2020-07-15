@@ -4,15 +4,15 @@ import pytest
 import requests
 from cryptography.fernet import Fernet
 from flask import current_app
-from python_freeipa.exceptions import ValidationError, BadRequest, FreeIPAError
+from python_freeipa.exceptions import BadRequest, FreeIPAError, ValidationError
 
 from noggin import ipa_admin
 from noggin.security.ipa import (
-    maybe_ipa_session,
-    maybe_ipa_login,
-    untouched_ipa_client,
-    parse_group_management_error,
     Client,
+    maybe_ipa_login,
+    maybe_ipa_session,
+    parse_group_management_error,
+    untouched_ipa_client,
 )
 
 

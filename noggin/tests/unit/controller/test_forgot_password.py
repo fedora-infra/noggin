@@ -5,22 +5,22 @@ import jwt
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
-from flask import current_app
 from fedora_messaging import testing as fml_testing
-from noggin_messages import UserUpdateV1
+from flask import current_app
 
 from noggin import ipa_admin, mailer
 from noggin.representation.user import User
 from noggin.security.ipa import untouched_ipa_client
-from noggin.utility.password_reset import PasswordResetLock
-from noggin.utility.token import PasswordResetToken
 from noggin.tests.unit.utilities import (
-    assert_redirects_with_flash,
     assert_form_field_error,
     assert_form_generic_error,
+    assert_redirects_with_flash,
     get_otp,
     otp_secret_from_uri,
 )
+from noggin.utility.password_reset import PasswordResetLock
+from noggin.utility.token import PasswordResetToken
+from noggin_messages import UserUpdateV1
 
 
 @pytest.fixture

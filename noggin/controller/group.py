@@ -1,15 +1,15 @@
-from flask import flash, g, render_template, redirect, url_for
-from flask_babel import _
 import python_freeipa
-from noggin_messages import MemberSponsorV1
+from flask import flash, g, redirect, render_template, url_for
+from flask_babel import _
 
 from noggin import app
 from noggin.form.add_group_member import AddGroupMemberForm
 from noggin.form.remove_group_member import RemoveGroupMemberForm
-from noggin.representation.user import User
 from noggin.representation.group import Group
-from noggin.utility import group_or_404, with_ipa, messaging, undo_button
+from noggin.representation.user import User
+from noggin.utility import group_or_404, messaging, undo_button, with_ipa
 from noggin.utility.pagination import paginated_find
+from noggin_messages import MemberSponsorV1
 
 
 @app.route('/group/<groupname>/')

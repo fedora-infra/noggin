@@ -1,6 +1,6 @@
 from flask_babel import lazy_gettext as _
-from wtforms.validators import ValidationError
 from wtforms.validators import Email as WTFormsEmailValidator
+from wtforms.validators import ValidationError
 
 
 class Email(WTFormsEmailValidator):

@@ -1,6 +1,6 @@
+from flask_babel import lazy_gettext as _
 from wtforms import StringField
 from wtforms.validators import DataRequired
-from flask_babel import lazy_gettext as _
 
 from .base import BaseForm
 

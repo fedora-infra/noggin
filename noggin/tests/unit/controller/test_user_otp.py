@@ -1,18 +1,17 @@
 from unittest import mock
 
-import python_freeipa
 import pytest
-
+import python_freeipa
 from bs4 import BeautifulSoup
 
 from noggin import ipa_admin
 from noggin.representation.otptoken import OTPToken
 from noggin.tests.unit.utilities import (
-    assert_redirects_with_flash,
     assert_form_field_error,
     assert_form_generic_error,
-    otp_secret_from_uri,
+    assert_redirects_with_flash,
     get_otp,
+    otp_secret_from_uri,
 )
 
 

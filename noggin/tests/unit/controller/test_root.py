@@ -1,5 +1,6 @@
-import pytest
 from unittest import mock
+
+import pytest
 from bs4 import BeautifulSoup
 
 

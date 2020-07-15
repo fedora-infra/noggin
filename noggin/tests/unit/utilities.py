@@ -1,8 +1,9 @@
+import hashlib
+from urllib import parse
+
+import pyotp
 from bs4 import BeautifulSoup
 from flask import get_flashed_messages
-from urllib import parse
-import hashlib
-import pyotp
 
 
 def assert_redirects_with_flash(

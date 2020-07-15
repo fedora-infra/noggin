@@ -1,21 +1,20 @@
 from flask_babel import lazy_gettext as _
 from wtforms import (
     FieldList,
-    StringField,
-    SelectField,
-    TextAreaField,
     HiddenField,
     PasswordField,
+    SelectField,
+    StringField,
+    TextAreaField,
 )
-
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.validators import AnyOf, DataRequired, Optional, Length, URL
+from wtforms.validators import AnyOf, DataRequired, Length, Optional, URL
 
 from noggin import app
 from noggin.form.validators import Email
 from noggin.utility.locales import LOCALES
 from noggin.utility.timezones import TIMEZONES
-from .base import CSVListField, BaseForm
+from .base import BaseForm, CSVListField
 
 
 class UserSettingsProfileForm(BaseForm):

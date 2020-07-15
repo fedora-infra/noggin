@@ -2,8 +2,8 @@ from unittest import mock
 
 from fedora_messaging import exceptions as fml_exceptions
 
-from noggin_messages import MemberSponsorV1
 from noggin.utility import messaging
+from noggin_messages import MemberSponsorV1
 
 
 def test_publish():

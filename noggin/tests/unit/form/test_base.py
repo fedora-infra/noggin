@@ -1,9 +1,9 @@
 import pytest
 from flask import current_app
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, StringField
+from wtforms import StringField, SubmitField
 
-from noggin.form.base import ButtonWidget, ModestForm, SubmitButtonField, CSVListField
+from noggin.form.base import ButtonWidget, CSVListField, ModestForm, SubmitButtonField
 
 
 def test_buttonwidget(client):

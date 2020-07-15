@@ -2,25 +2,25 @@ import datetime
 import random
 import string
 
-from flask import abort, flash, render_template, redirect, request, url_for, session
+import jwt
+import python_freeipa
+from flask import abort, flash, redirect, render_template, request, session, url_for
 from flask_babel import _
 from flask_mail import Message
-from noggin_messages import UserUpdateV1
-import python_freeipa
-import jwt
 
 from noggin import app, ipa_admin, mailer
-from noggin.security.ipa import untouched_ipa_client, maybe_ipa_session
+from noggin.form.password_reset import (
+    ForgottenPasswordForm,
+    NewPasswordForm,
+    PasswordResetForm,
+)
 from noggin.representation.user import User
-from noggin.utility import with_ipa, user_or_404, require_self, messaging
+from noggin.security.ipa import maybe_ipa_session, untouched_ipa_client
+from noggin.utility import messaging, require_self, user_or_404, with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import PasswordResetToken
-from noggin.form.password_reset import (
-    PasswordResetForm,
-    ForgottenPasswordForm,
-    NewPasswordForm,
-)
+from noggin_messages import UserUpdateV1
 
 
 def _validate_change_pw_form(form, username, ipa=None):

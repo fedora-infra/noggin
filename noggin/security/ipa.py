@@ -1,10 +1,10 @@
 import random
-from requests import RequestException
 
-from cryptography.fernet import Fernet
 import python_freeipa
+from cryptography.fernet import Fernet
 from python_freeipa.client_legacy import ClientLegacy as IPAClient
-from python_freeipa.exceptions import ValidationError, BadRequest
+from python_freeipa.exceptions import BadRequest, ValidationError
+from requests import RequestException
 
 
 def parse_group_management_error(data):
