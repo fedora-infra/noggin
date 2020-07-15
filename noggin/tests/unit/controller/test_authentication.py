@@ -1,16 +1,16 @@
 from unittest import mock
 
-import requests
 import pytest
 import python_freeipa
+import requests
 from bs4 import BeautifulSoup
-from flask import session, get_flashed_messages
+from flask import get_flashed_messages, session
 
 from noggin import ipa_admin
 from noggin.tests.unit.utilities import (
-    assert_redirects_with_flash,
     assert_form_field_error,
     assert_form_generic_error,
+    assert_redirects_with_flash,
 )
 
 

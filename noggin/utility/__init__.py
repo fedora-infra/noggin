@@ -1,9 +1,9 @@
 import hashlib
 from functools import wraps
 
-from flask import abort, flash, g, redirect, url_for, session, Markup, current_app
-from flask_babel import lazy_gettext as _
 import python_freeipa
+from flask import abort, current_app, flash, g, Markup, redirect, session, url_for
+from flask_babel import lazy_gettext as _
 
 from noggin import app
 from noggin.representation.user import User

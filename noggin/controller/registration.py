@@ -1,21 +1,21 @@
 import datetime
 import re
 
-from flask import flash, redirect, url_for, abort, render_template, request, session
+import jwt
+import python_freeipa
+from flask import abort, flash, redirect, render_template, request, session, url_for
 from flask_babel import _
 from flask_mail import Message
-import jwt
-from noggin_messages import UserCreateV1
-import python_freeipa
 
 from noggin import app, ipa_admin, mailer
-from noggin.form.register_user import ResendValidationEmailForm, PasswordSetForm
+from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
 from noggin.representation.user import User
+from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
 from noggin.utility import messaging
+from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.locales import guess_locale
 from noggin.utility.token import EmailValidationToken
-from noggin.utility.forms import FormError, handle_form_errors
-from noggin.security.ipa import untouched_ipa_client, maybe_ipa_login
+from noggin_messages import UserCreateV1
 
 
 # Errors coming from FreeIPA are specified by a field name that is different from our form field

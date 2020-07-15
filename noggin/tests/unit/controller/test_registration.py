@@ -4,16 +4,16 @@ import pytest
 import python_freeipa
 from fedora_messaging import testing as fml_testing
 from flask import current_app
-from noggin_messages import UserCreateV1
 
 from noggin import ipa_admin, mailer
 from noggin.representation.user import User
-from noggin.utility.token import EmailValidationToken
 from noggin.tests.unit.utilities import (
-    assert_redirects_with_flash,
     assert_form_field_error,
     assert_form_generic_error,
+    assert_redirects_with_flash,
 )
+from noggin.utility.token import EmailValidationToken
+from noggin_messages import UserCreateV1
 
 
 @pytest.fixture

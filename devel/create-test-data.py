@@ -4,8 +4,8 @@ import textwrap
 import python_freeipa
 from faker import Faker
 
-from noggin.security.ipa import Client
 import noggin.utility.timezones as timezones
+from noggin.security.ipa import Client
 
 USER_PASSWORD = "testuserpw"
 

@@ -1,15 +1,15 @@
 from unittest import mock
 
 import pytest
-from flask import current_app, g, session, get_flashed_messages
-from werkzeug.exceptions import NotFound, InternalServerError
+from flask import current_app, g, get_flashed_messages, session
+from werkzeug.exceptions import InternalServerError, NotFound
 
 from noggin.security.ipa import maybe_ipa_login
 from noggin.utility import (
-    user_or_404,
     group_or_404,
-    with_ipa,
     require_self,
+    user_or_404,
+    with_ipa,
 )
 
 
