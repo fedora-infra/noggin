@@ -1,5 +1,6 @@
+from unittest import mock
+
 import python_freeipa
-import mock
 import pytest
 from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing

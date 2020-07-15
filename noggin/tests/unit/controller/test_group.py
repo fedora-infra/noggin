@@ -1,4 +1,5 @@
-import mock
+from unittest import mock
+
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
