@@ -1,4 +1,5 @@
 from unittest import mock
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 import python_freeipa
@@ -157,12 +158,15 @@ def test_user_settings_otp_check_description_escaping(
 
     page = BeautifulSoup(result.data, "html.parser")
     otp_uri = page.select_one("input#otp-uri")
+    parsed_otp_uri = urlparse(otp_uri["value"])
+    parsed_query = parse_qs(parsed_otp_uri.query)
 
-    # the escaping happens before the secret, so just check that
-    assert (
-        otp_uri['value'][:81]
-        == "otpauth://totp/dummy@noggin.test:pants%20token?issuer=dummy%40NOGGIN.TEST&secret="
-    )
+    # Not sure we need all of these checked
+    assert parsed_otp_uri.scheme == "otpauth"
+    assert parsed_otp_uri.netloc == "totp"
+    assert parsed_otp_uri.path == "/dummy@noggin.test:pants%20token"
+
+    assert parsed_query["issuer"] == ["dummy@NOGGIN.TEST"]
 
 
 @pytest.mark.vcr()
