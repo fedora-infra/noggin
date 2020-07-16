@@ -83,6 +83,7 @@ def handle_register_form(form):
             fascreationtime=f"{now.isoformat()}Z",
             faslocale=guess_locale(),
             fastimezone=app.config["USER_DEFAULTS"]["timezone"],
+            fasstatusnote=app.config["USER_DEFAULTS"]["status_note"],
         )
         user = User(user)
     except python_freeipa.exceptions.DuplicateEntry:
@@ -189,7 +190,7 @@ def activate_account():
                 raise FormError(
                     "non_field_errors",
                     _(
-                        "Something went wrong while activating your account, "
+                        "Something went wrong while creating your account, "
                         "please try again later."
                     ),
                 )
@@ -209,7 +210,7 @@ def activate_account():
                 # Tell the user what's going to happen.
                 flash(
                     _(
-                        'Your account has been activated, but the password you chose does not '
+                        'Your account has been created, but the password you chose does not '
                         'comply with the policy (%(policy_error)s) and has thus been set as '
                         'expired. You will be asked to change it after logging in.',
                         policy_error=e.policy_error,
@@ -229,7 +230,7 @@ def activate_account():
                 # the login page with an appropriate warning.
                 flash(
                     _(
-                        'Your account has been activated, but an error occurred while setting your '
+                        'Your account has been created, but an error occurred while setting your '
                         'password (%(message)s). You may need to change it after logging in.',
                         message=e.message,
                     ),
@@ -245,7 +246,7 @@ def activate_account():
             if ipa:
                 flash(
                     _(
-                        'Congratulations, your account is now active! Welcome, %(name)s.',
+                        'Congratulations, your account has been created! Welcome, %(name)s.',
                         name=user.name,
                     ),
                     'success',
@@ -255,7 +256,7 @@ def activate_account():
                 # expired).
                 flash(
                     _(
-                        'Congratulations, your account is now active! Go ahead and sign in '
+                        'Congratulations, your account has been created! Go ahead and sign in '
                         'to proceed.'
                     ),
                     'success',

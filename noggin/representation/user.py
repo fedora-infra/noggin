@@ -23,6 +23,7 @@ class User(Representation):
         "displayname": "displayname",
         "gecos": "gecos",
         "commonname": "cn",
+        "status_note": "fasstatusnote",
     }
     attr_types = {
         "sshpubkeys": "list",
