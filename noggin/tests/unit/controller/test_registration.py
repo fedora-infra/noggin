@@ -114,7 +114,7 @@ def test_step_3(client, post_data_step_3, token_for_dummy_user, cleanup_dummy_us
     assert_redirects_with_flash(
         result,
         "/",
-        "Congratulations, your account is now active! Welcome, Dummy User.",
+        "Congratulations, your account has been created! Welcome, Dummy User.",
         "success",
     )
 
@@ -279,7 +279,7 @@ def test_short_password_policy(
         result,
         expected_url="/",
         expected_message=(
-            'Your account has been activated, but the password you chose does not comply '
+            'Your account has been created, but the password you chose does not comply '
             'with the policy (Constraint violation: Password is too short) and has thus '
             'been set as expired. You will be asked to change it after logging in.'
         ),
@@ -446,7 +446,7 @@ def test_generic_activate_error(
         )
     assert_form_generic_error(
         result,
-        'Something went wrong while activating your account, please try again later.',
+        'Something went wrong while creating your account, please try again later.',
     )
 
 
@@ -473,7 +473,7 @@ def test_generic_pwchange_error(
         result,
         expected_url="/",
         expected_message=(
-            'Your account has been activated, but an error occurred while setting your '
+            'Your account has been created, but an error occurred while setting your '
             'password (something went wrong). You may need to change it after logging in.'
         ),
         expected_category="warning",
@@ -501,7 +501,7 @@ def test_no_direct_login(
         result,
         expected_url="/",
         expected_message=(
-            "Congratulations, your account is now active! Go ahead and sign in to proceed."
+            "Congratulations, your account has been created! Go ahead and sign in to proceed."
         ),
         expected_category="success",
     )

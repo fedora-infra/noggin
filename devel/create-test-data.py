@@ -67,6 +67,7 @@ for x in range(50):
             fasircnick=[username, username + "_"],
             faslocale="en-US",
             fastimezone=fake.random_sample(timezones.TIMEZONES, length=1)[0],
+            fasstatusnote="active",
             fasgpgkeyid=[],
         )
         # 'change' the password as the user, so its not expired
