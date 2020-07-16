@@ -6,6 +6,7 @@ import python_freeipa
 from flask import abort, flash, redirect, render_template, request, session, url_for
 from flask_babel import _
 from flask_mail import Message
+from noggin_messages import UserCreateV1
 
 from noggin import app, ipa_admin, mailer
 from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
@@ -14,8 +15,7 @@ from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
 from noggin.utility import messaging
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.locales import guess_locale
-from noggin.utility.token import EmailValidationToken
-from noggin_messages import UserCreateV1
+from noggin.utility.token import Audience, make_token, read_token
 
 
 # Errors coming from FreeIPA are specified by a field name that is different from our form field
@@ -31,7 +31,11 @@ IPA_TO_FORM_FIELDS = {
 
 
 def _send_validation_email(user):
-    token = EmailValidationToken.from_user(user).as_string()
+    token = make_token(
+        {"sub": user.username, "mail": user.mail},
+        audience=Audience.email_validation,
+        ttl=app.config["ACTIVATION_TOKEN_EXPIRATION"],
+    )
     email_context = {"token": token, "user": user}
     email = Message(
         body=render_template("email-validation.txt", **email_context),
@@ -139,22 +143,26 @@ def activate_account():
             _('No token provided, please check your email validation link.'), 'warning'
         )
         return redirect(register_url)
+
     try:
-        token = EmailValidationToken.from_string(token_string)
+        token = read_token(token_string, audience=Audience.email_validation)
     except jwt.exceptions.DecodeError:
         flash(_("The token is invalid, please register again."), "warning")
         return redirect(register_url)
-    if not token.is_valid():
+    except jwt.exceptions.ExpiredSignatureError:
         flash(_("This token is no longer valid, please register again."), "warning")
         return redirect(register_url)
+
     try:
-        user = User(ipa_admin.stageuser_show(token.username))
+        user = User(ipa_admin.stageuser_show(token["sub"]))
     except python_freeipa.exceptions.NotFound:
         flash(_("This user cannot be found, please register again."), "warning")
         return redirect(register_url)
-    if not user.mail == token.mail:
+
+    token_mail = token["mail"]
+    if not user.mail == token_mail:
         app.logger.error(
-            f'User {user.username} tried to validate a token for address {token.mail} while they '
+            f'User {user.username} tried to validate a token for address {token_mail} while they '
             f'are registered with address {user.mail}, something fishy may be going on.'
         )
         flash(
