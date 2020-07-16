@@ -6,13 +6,12 @@ import python_freeipa
 from flask import abort, flash, redirect, render_template, request, session, url_for
 from flask_babel import _
 from flask_mail import Message
-from noggin_messages import UserCreateV1
 
 from noggin import app, ipa_admin, mailer
 from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
-from noggin.utility import messaging
+from noggin.signals import user_registered
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.locales import guess_locale
 from noggin.utility.token import Audience, make_token, read_token
@@ -194,10 +193,8 @@ def activate_account():
                         "please try again later."
                     ),
                 )
-            # User activation succeeded. Send message.
-            messaging.publish(
-                UserCreateV1({"msg": {"agent": user.username, "user": user.username}})
-            )
+            # User activation succeeded. Send signal.
+            user_registered.send(user, request=request._get_current_object())
             # Now we set the password.
             try:
                 # First, set it as an admin. This will mark it as expired.
