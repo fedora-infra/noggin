@@ -3,11 +3,20 @@ import re
 
 import jwt
 import python_freeipa
-from flask import abort, flash, redirect, render_template, request, session, url_for
+from flask import (
+    abort,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_babel import _
 from flask_mail import Message
 
-from noggin import app, ipa_admin, mailer
+from noggin import app, csrf, ipa_admin, mailer
 from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
@@ -264,3 +273,39 @@ def activate_account():
             return redirect(url_for('root'))
 
     return render_template('registration-activation.html', user=user, form=form)
+
+
+@app.route('/register/spamcheck-hook', methods=["POST"])
+@csrf.exempt
+def spamcheck_hook():
+    if not app.config.get("BASSET_URL"):
+        return jsonify({"error": "Spamcheck disabled"}), 501
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Bad payload"}), 400
+
+    try:
+        token = data["token"]
+        status = data["status"]
+    except KeyError as e:
+        return jsonify({"error": f"Missing key: {e}"}), 400
+
+    try:
+        token_data = read_token(token, audience=Audience.spam_check)
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "The token has expired"}), 400
+    except jwt.InvalidTokenError as e:
+        return jsonify({"error": f"Invalid token: {e}"}), 400
+
+    username = token_data["sub"]
+
+    allowed_statuses = ("spamcheck_denied", "spamcheck_manual", "active")
+    if status not in allowed_statuses:
+        error = (
+            f"Invalid status: {status}. Must be one of {', '.join(allowed_statuses)}."
+        )
+        return jsonify({"error": error}), 400
+
+    ipa_admin.user_mod(username, fasstatusnote=status)
+    return jsonify({"status": "success"})

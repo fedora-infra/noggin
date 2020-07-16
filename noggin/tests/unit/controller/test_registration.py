@@ -505,3 +505,86 @@ def test_no_direct_login(
         ),
         expected_category="success",
     )
+
+
+@pytest.mark.parametrize(
+    "spamcheck_status", ["active", "spamcheck_denied", "spamcheck_manual"]
+)
+@pytest.mark.vcr()
+def test_spamcheck(client, dummy_user, mocker, spamcheck_status):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    user = User(ipa_admin.user_show("dummy"))
+    assert user.status_note != spamcheck_status
+    token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": token, "status": spamcheck_status},
+    )
+    assert response.status_code == 200
+    assert response.json == {"status": "success"}
+    # Check that the status was changed
+    user = User(ipa_admin.user_show("dummy"))
+    assert user.status_note == spamcheck_status
+
+
+@pytest.mark.vcr()
+def test_spamcheck_disabled(client, dummy_user):
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": "foobar", "status": "active"},
+    )
+    assert response.status_code == 501
+    assert response.json == {"error": "Spamcheck disabled"}
+
+
+@pytest.mark.vcr()
+def test_spamcheck_bad_payload(client, dummy_user, mocker):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    response = client.post("/register/spamcheck-hook")
+    assert response.status_code == 400
+    assert response.json == {"error": "Bad payload"}
+
+
+@pytest.mark.parametrize("payload", [{"token": "foobar"}, {"status": "active"}])
+@pytest.mark.vcr()
+def test_spamcheck_bad_missing_key(client, dummy_user, mocker, payload):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    response = client.post("/register/spamcheck-hook", json=payload,)
+    assert response.status_code == 400
+    assert response.json["error"].startswith("Missing key: ")
+
+
+@pytest.mark.vcr()
+def test_spamcheck_expired_token(client, dummy_user, mocker):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    token = make_token({"sub": "dummy"}, audience=Audience.spam_check, ttl=-1)
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": token, "status": "active"},
+    )
+    assert response.status_code == 400
+    assert response.json == {"error": "The token has expired"}
+
+
+@pytest.mark.vcr()
+def test_spamcheck_invalid_token(client, dummy_user, mocker):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    token = make_token({"sub": "dummy"}, audience=Audience.email_validation)
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": token, "status": "active"},
+    )
+    assert response.status_code == 400
+    assert response.json["error"] == "Invalid token: Invalid audience"
+
+
+@pytest.mark.vcr()
+def test_spamcheck_wrong_status(client, dummy_user, mocker):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": token, "status": "this-is-wrong"},
+    )
+    assert response.status_code == 400
+    assert response.json == {
+        "error": (
+            "Invalid status: this-is-wrong. Must be one of spamcheck_denied, "
+            "spamcheck_manual, active."
+        )
+    }
