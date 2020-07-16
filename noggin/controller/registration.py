@@ -79,7 +79,7 @@ def handle_register_form(form):
             login_shell='/bin/bash',
             fascreationtime=f"{now.isoformat()}Z",
             faslocale=guess_locale(),
-            fastimezone=app.config["USER_DEFAULTS"]["user_timezone"],
+            fastimezone=app.config["USER_DEFAULTS"]["timezone"],
         )
         user = User(user)
     except python_freeipa.exceptions.DuplicateEntry:

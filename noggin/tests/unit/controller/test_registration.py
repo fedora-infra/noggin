@@ -85,12 +85,10 @@ def test_step_1(client, post_data_step_1, cleanup_dummy_user):
     assert user["fascreationtime"][0]
     # Locale
     assert "faslocale" in user
-    assert user["faslocale"][0] == current_app.config["USER_DEFAULTS"]["user_locale"]
+    assert user["faslocale"][0] == current_app.config["USER_DEFAULTS"]["locale"]
     # Timezone
     assert "fastimezone" in user
-    assert (
-        user["fastimezone"][0] == current_app.config["USER_DEFAULTS"]["user_timezone"]
-    )
+    assert user["fastimezone"][0] == current_app.config["USER_DEFAULTS"]["timezone"]
 
 
 @pytest.mark.vcr()
