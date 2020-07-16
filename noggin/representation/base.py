@@ -70,3 +70,6 @@ class Representation:
             )
 
         return [key for key in self if getattr(self, key) != getattr(other, key)]
+
+    def as_dict(self):
+        return {attr: getattr(self, attr) for attr in self.attr_names}
