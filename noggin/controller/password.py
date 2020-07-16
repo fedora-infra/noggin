@@ -19,7 +19,7 @@ from noggin.security.ipa import maybe_ipa_session, untouched_ipa_client
 from noggin.utility import messaging, require_self, user_or_404, with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.password_reset import PasswordResetLock
-from noggin.utility.token import PasswordResetToken
+from noggin.utility.token import Audience, make_token, read_token
 from noggin_messages import UserUpdateV1
 
 
@@ -138,7 +138,10 @@ def forgot_password_ask():
                 raise FormError(
                     "username", _("User %(username)s does not exist", username=username)
                 )
-            token = PasswordResetToken.from_user(user).as_string()
+            token = make_token(
+                {"sub": user.username, "lpc": user.last_password_change},
+                audience=Audience.password_reset,
+            )
             # Send the email
             email_context = {"token": token, "username": username}
             email = Message(
@@ -175,11 +178,11 @@ def forgot_password_change():
         flash('No token provided, please request one.', 'warning')
         return redirect(url_for('forgot_password_ask'))
     try:
-        token_obj = PasswordResetToken.from_string(token)
+        token_data = read_token(token, audience=Audience.password_reset)
     except jwt.exceptions.DecodeError:
         flash(_("The token is invalid, please request a new one."), "warning")
         return redirect(url_for('forgot_password_ask'))
-    username = token_obj.username
+    username = token_data["sub"]
     lock = PasswordResetLock(username)
     valid_until = lock.valid_until()
     now = datetime.datetime.now()
@@ -188,7 +191,7 @@ def forgot_password_change():
         flash(_("The token has expired, please request a new one."), "warning")
         return redirect(url_for('forgot_password_ask'))
     user = User(ipa_admin.user_show(username))
-    if not token_obj.validate_last_change(user):
+    if user.last_password_change != token_data["lpc"]:
         lock.delete()
         flash(
             _(
@@ -246,7 +249,10 @@ def forgot_password_change():
             # Oh noes, the token is now invalid since the user's password was changed! Let's
             # re-generate a token so they can keep going.
             user = User(ipa_admin.user_show(username))
-            token = PasswordResetToken.from_user(user).as_string()
+            token = make_token(
+                {"sub": user.username, "lpc": user.last_password_change},
+                audience=Audience.password_reset,
+            )
             form.otp.errors.append(_("Incorrect value."))
         except python_freeipa.exceptions.FreeIPAError as e:
             # If we made it here, we hit something weird not caught above.

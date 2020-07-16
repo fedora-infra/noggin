@@ -12,7 +12,7 @@ from noggin.tests.unit.utilities import (
     assert_form_generic_error,
     assert_redirects_with_flash,
 )
-from noggin.utility.token import EmailValidationToken
+from noggin.utility.token import Audience, make_token
 from noggin_messages import UserCreateV1
 
 
@@ -62,8 +62,11 @@ def dummy_stageuser(ipa_testing_config):
 
 @pytest.fixture
 def token_for_dummy_user(dummy_stageuser):
-    token = EmailValidationToken.from_user(dummy_stageuser)
-    return token.as_string()
+    return make_token(
+        {"sub": dummy_stageuser.username, "mail": dummy_stageuser.mail},
+        audience=Audience.email_validation,
+        ttl=current_app.config["ACTIVATION_TOKEN_EXPIRATION"],
+    )
 
 
 @pytest.mark.vcr()
@@ -199,13 +202,14 @@ def test_step_3_garbled_token(client, dummy_stageuser):
 
 
 @pytest.mark.vcr()
-def test_step_3_invalid_token(client, token_for_dummy_user, mocker):
+def test_step_3_invalid_token(client, dummy_stageuser, mocker):
     """Registration activation page with an invalid token"""
-    mocker.patch(
-        "noggin.controller.registration.EmailValidationToken.is_valid",
-        return_value=False,
+    token = make_token(
+        {"sub": dummy_stageuser.username, "mail": dummy_stageuser.mail},
+        audience=Audience.email_validation,
+        ttl=-1,
     )
-    result = client.get(f'/register/activate?token={token_for_dummy_user}')
+    result = client.get(f'/register/activate?token={token}')
     assert_redirects_with_flash(
         result,
         expected_url="/?tab=register",
