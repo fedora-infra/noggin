@@ -93,6 +93,9 @@ def handle_register_form(form):
             faslocale=guess_locale(),
             fastimezone=app.config["USER_DEFAULTS"]["timezone"],
             fasstatusnote=app.config["USER_DEFAULTS"]["status_note"],
+            # Beware when moving to ClientMeta, they dropped the special argument
+            # "disabled", we'll have to set nsaccountlock directly.
+            disabled=app.config["USER_DEFAULTS"]["locked"],
         )
         user = User(user)
     except python_freeipa.exceptions.DuplicateEntry:
@@ -300,12 +303,13 @@ def spamcheck_hook():
 
     username = token_data["sub"]
 
-    allowed_statuses = ("spamcheck_denied", "spamcheck_manual", "active")
-    if status not in allowed_statuses:
-        error = (
-            f"Invalid status: {status}. Must be one of {', '.join(allowed_statuses)}."
-        )
-        return jsonify({"error": error}), 400
-
-    ipa_admin.user_mod(username, fasstatusnote=status)
+    if status == "active":
+        lock = False
+    elif status in ("spamcheck_denied", "spamcheck_manual"):
+        lock = True
+    else:
+        return jsonify({"error": f"Invalid status: {status}."}), 400
+    # Beware when moving to ClientMeta, they dropped the special argument
+    # "disabled", we'll have to set nsaccountlock directly.
+    ipa_admin.user_mod(username, fasstatusnote=status, disabled=lock)
     return jsonify({"status": "success"})
