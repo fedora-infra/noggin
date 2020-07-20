@@ -38,3 +38,8 @@ class User(Representation):
     @property
     def name(self):
         return self.displayname or self.gecos or self.commonname
+
+    @property
+    def locked(self):
+        # Unlike the others nsAccountLock is not a list.
+        return self.raw.get("nsaccountlock", False)

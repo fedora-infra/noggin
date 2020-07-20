@@ -524,6 +524,7 @@ def test_spamcheck(client, dummy_user, mocker, spamcheck_status):
     # Check that the status was changed
     user = User(ipa_admin.user_show("dummy"))
     assert user.status_note == spamcheck_status
+    assert user.locked == (spamcheck_status != "active")
 
 
 @pytest.mark.vcr()
@@ -582,9 +583,4 @@ def test_spamcheck_wrong_status(client, dummy_user, mocker):
         "/register/spamcheck-hook", json={"token": token, "status": "this-is-wrong"},
     )
     assert response.status_code == 400
-    assert response.json == {
-        "error": (
-            "Invalid status: this-is-wrong. Must be one of spamcheck_denied, "
-            "spamcheck_manual, active."
-        )
-    }
+    assert response.json == {"error": "Invalid status: this-is-wrong."}
