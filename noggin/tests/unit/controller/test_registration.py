@@ -111,9 +111,9 @@ def test_step_3(client, post_data_step_3, token_for_dummy_user, cleanup_dummy_us
         )
     assert_redirects_with_flash(
         result,
-        "/",
-        "Congratulations, your account has been created! Welcome, Dummy User.",
-        "success",
+        expected_url="/",
+        expected_message="Congratulations, your account has been created! Welcome, Dummy User.",
+        expected_category="success",
     )
 
 
