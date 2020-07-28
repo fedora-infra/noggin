@@ -241,6 +241,13 @@ def test_group_remove_member_hidden_group(
 @pytest.mark.vcr()
 def test_group_remove_self(client, logged_in_dummy_user, dummy_group):
     """Test a non-sponsor user removing themselves from a group"""
+    ipa_admin.group_add_member("dummy-group", o_user="dummy")
+    result = client.get('/group/dummy-group/')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    leave_btn = page.select_one("#leave-group-btn")
+    assert leave_btn.get_text(strip=True) == "Leave group"
+
     result = client.post(
         '/group/dummy-group/members/remove', data={"username": "dummy"}
     )
