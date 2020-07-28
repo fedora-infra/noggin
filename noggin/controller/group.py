@@ -26,9 +26,13 @@ def group(ipa, groupname):
         for sponsorname in group.sponsors
     ]
 
-    sponsors = [
-        User(u['result'][0]) for u in ipa.batch(a_methods=batch_methods)['results']
-    ]
+    # Don't call remote batch method with an empty list
+    if batch_methods:
+        sponsors = [
+            User(u['result'][0]) for u in ipa.batch(a_methods=batch_methods)['results']
+        ]
+    else:
+        sponsors = []
 
     # We can safely assume g.current_user exists after @with_ipa
     current_user_is_sponsor = g.current_user.username in group.sponsors
