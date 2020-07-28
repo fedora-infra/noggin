@@ -7,6 +7,7 @@ from faker import Faker
 import noggin.utility.timezones as timezones
 from noggin.security.ipa import Client
 
+
 USER_PASSWORD = "testuserpw"
 
 fake = Faker()

@@ -14,6 +14,7 @@ from noggin import app
 from noggin.form.validators import Email
 from noggin.utility.locales import LOCALES
 from noggin.utility.timezones import TIMEZONES
+
 from .base import BaseForm, CSVListField
 
 

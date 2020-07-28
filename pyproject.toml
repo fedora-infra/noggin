@@ -61,6 +61,7 @@ Faker = "^4.0.3"
 pyotp = "^2.3.0"
 pytest-mock = "^3.0.0"
 flake8-import-order = "^0.18.1"
+isort = "^5.1.4"
 
 [tool.poetry.extras]
 deploy = ["gunicorn"]
@@ -144,6 +145,12 @@ authorized_licenses = [
 
 [tool.liccheck.authorized_packages]
 noggin-messages = ">=0.0.1"
+
+[tool.isort]
+profile = "black"
+known_first_party = ["noggin", "noggin_messages"]
+lines_after_imports = 2
+force_alphabetical_sort_within_sections = true
 
 [build-system]
 requires = ["poetry>=1.0.0"]

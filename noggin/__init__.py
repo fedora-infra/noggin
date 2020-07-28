@@ -8,6 +8,7 @@ from whitenoise import WhiteNoise
 from noggin.middleware import IPAErrorHandler
 from noggin.security.ipa_admin import IPAAdmin
 
+
 app = Flask(__name__)
 app.jinja_env.add_extension('jinja2.ext.i18n')
 csrf = CSRFProtect(app)

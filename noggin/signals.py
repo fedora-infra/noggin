@@ -11,7 +11,6 @@ from noggin_messages import UserCreateV1
 
 noggin_signals = Namespace()
 
-
 user_registered = noggin_signals.signal('user-registered')
 
 
