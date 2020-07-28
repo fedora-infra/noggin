@@ -21,7 +21,7 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAAwAAAP//AwAAAAAAAAAAAA==
+        H4sIAAAAAAAAAwMAAAAAAAAAAAA=
     headers:
       Cache-Control:
       - no-cache, private
@@ -29,20 +29,20 @@ interactions:
       - Keep-Alive
       Content-Encoding:
       - gzip
+      Content-Length:
+      - '20'
       Content-Security-Policy:
       - frame-ancestors 'none'
       Content-Type:
       - text/plain; charset=UTF-8
       Date:
-      - Mon, 13 Jul 2020 03:05:43 GMT
+      - Mon, 03 Aug 2020 10:25:55 GMT
       Keep-Alive:
       - timeout=30, max=100
       Server:
       - Apache/2.4.43 (Fedora) OpenSSL/1.1.1d mod_wsgi/4.6.6 Python/3.7 mod_auth_gssapi/1.6.1
       Set-Cookie:
-      - ipa_session=MagBearerToken=yQM4RoY0KDe8JHW%2f0xEseoSnBTLHTO9L6k4SRu9fqDP7LEHrMgma90uVihXMl8a6g2Pg1SsMqTBqnQaoIUVQVp6o8d6kgv7cwrIdXHck%2bp8d2SUtK9ksrwpcgWPlXeYMeEQ0bVeOgcAQ%2fvHq9QuFklaMxVYOxNr8ItxGcx%2fX1MZPPh%2f4pXL828a22EtwMQuR;path=/ipa;httponly;secure;
-      Transfer-Encoding:
-      - chunked
+      - ipa_session=MagBearerToken=EQSQOC4FUeHtO3Fc8xA1e4X0wDT%2bLhYz%2bxMFZSyVXoP8VxnQbNSW3LFPzf8dN7%2bGZf5%2fU447yCUGoqc6Q0rBkLnXren9%2flDnfmcMnf9aQz17%2bbrFJQbmn1wZJXl7W5sIemAaLqdIwuNE5me7YjUQSqMhbpBTtCWjj9vhPGDixS6CzUVrxOL5TF1cNvf447o7;path=/ipa;httponly;secure;
       Vary:
       - Accept-Encoding
       X-Frame-Options:
@@ -51,7 +51,7 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "ping", "params": [[], {}]}'
+    body: '{"method": "ping", "params": [[], {"version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -60,11 +60,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '38'
+      - '56'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=yQM4RoY0KDe8JHW%2f0xEseoSnBTLHTO9L6k4SRu9fqDP7LEHrMgma90uVihXMl8a6g2Pg1SsMqTBqnQaoIUVQVp6o8d6kgv7cwrIdXHck%2bp8d2SUtK9ksrwpcgWPlXeYMeEQ0bVeOgcAQ%2fvHq9QuFklaMxVYOxNr8ItxGcx%2fX1MZPPh%2f4pXL828a22EtwMQuR
+      - ipa_session=MagBearerToken=EQSQOC4FUeHtO3Fc8xA1e4X0wDT%2bLhYz%2bxMFZSyVXoP8VxnQbNSW3LFPzf8dN7%2bGZf5%2fU447yCUGoqc6Q0rBkLnXren9%2flDnfmcMnf9aQz17%2bbrFJQbmn1wZJXl7W5sIemAaLqdIwuNE5me7YjUQSqMhbpBTtCWjj9vhPGDixS6CzUVrxOL5TF1cNvf447o7
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -74,11 +74,9 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA0yQTWvDMAyG/4rxZZdg+kUZO62HUnJYW1jZZYyhxl4wxHaQnJUQ8t8nJ2btwSBL
-        el690iDRUNdE+SIGSZ1zgD3HsjzvBBn8NSj4kQ1ebNSz2iqxO5f/qZVarbeyENIZIqgNMfo5yNi3
-        JoncAL31dWrw4KbUx0y+WaJcyWgqJuncIHznrjz8BiR8iOzFx0L8BGRNLargWoj2ahsb+6led4Dg
-        ozGaHRIvwup5gSd69FzcTVdBp7HL9WKx5K+GCPMZJuw7A8nYjIzj18h9BjEgZ33XNPy1+h63aH1l
-        W2gSBJpNvB5Ph0N5VJf9+yXNfBCd7inHPwAAAP//AwAZeihGggEAAA==
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqFYqLs3NTSyqBLKVPAMcFYpTi8pSixSAuDgzP0/BRM9Cz0xP
+        wTHAEy5kpGdkbKZUq6OglFpUlF8E1JhXmpMD5GamINgFRZl5yZkFiTkgcxNTcjPzHPz83d09/fRC
+        XINDlIAqoMaB5MGWKNUCAAAA//8DAMPMtr2XAAAA
     headers:
       Cache-Control:
       - no-cache, private
@@ -91,7 +89,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:44 GMT
+      - Mon, 03 Aug 2020 10:25:56 GMT
       Keep-Alive:
       - timeout=30, max=99
       Server:
@@ -106,9 +104,11 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "user_add", "params": [["dummy"], {"all": true, "givenname":
-      "Dummy", "sn": "User", "cn": "Dummy User", "mail": "dummy@example.com", "loginshell":
-      "/bin/bash", "userpassword": "dummy_password", "fascreationtime": "2020-07-13T03:05:43Z"}]}'
+    body: '{"method": "user_add", "params": [["dummy"], {"givenname": "Dummy", "sn":
+      "User", "cn": "Dummy User", "loginshell": "/bin/bash", "mail": "dummy@example.com",
+      "userpassword": "dummy_password", "random": false, "noprivate": false, "all":
+      true, "raw": false, "no_members": false, "fascreationtime": "2020-08-03T10:25:55Z",
+      "version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -117,11 +117,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '249'
+      - '341'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=yQM4RoY0KDe8JHW%2f0xEseoSnBTLHTO9L6k4SRu9fqDP7LEHrMgma90uVihXMl8a6g2Pg1SsMqTBqnQaoIUVQVp6o8d6kgv7cwrIdXHck%2bp8d2SUtK9ksrwpcgWPlXeYMeEQ0bVeOgcAQ%2fvHq9QuFklaMxVYOxNr8ItxGcx%2fX1MZPPh%2f4pXL828a22EtwMQuR
+      - ipa_session=MagBearerToken=EQSQOC4FUeHtO3Fc8xA1e4X0wDT%2bLhYz%2bxMFZSyVXoP8VxnQbNSW3LFPzf8dN7%2bGZf5%2fU447yCUGoqc6Q0rBkLnXren9%2flDnfmcMnf9aQz17%2bbrFJQbmn1wZJXl7W5sIemAaLqdIwuNE5me7YjUQSqMhbpBTtCWjj9vhPGDixS6CzUVrxOL5TF1cNvf447o7
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -131,20 +131,18 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA4RUXW/aMBT9K1Fe9gI0kNDCpEpjW0WraqVSKQ9dK3RjX4JHYmf+AFLU/z7bCdBK
-        XfuU63vul889zi6UqEyuw6/B7rVJuP38Dn+aoqiCe4UyfGoFIWWqzKHiUOB7MONMM8hVjd17X4ZE
-        qPeCRfoHiSY5qBrWogytu0SpBHeWkBlw9gyaCQ750c84aou9dRhX1qULxbZAiDBcu/NKpqVknLAS
-        cjDbxqUZWaEuRc5I1XhtQD1Rc1Bqua+5ALU3LXCnlmMpTDlZ3Jr0Givl/AWWE8kyxi+4llVNRgmG
-        s78GGfX3SylilMTYJknab3e7CO00TXrtfq+fRNGQxPGg5xPdyLb9RkiK25JJT4Av0Yt6UXTWjaM4
-        6ifxwz7aUqjLDSVL4Bl+FIhbLYGCBhe0C+fzFBSeJvO5PYej0fXl80YvSDFc0x/D5cO4W6ar75Np
-        RC/v7hMzu5hNZ6PRefjyVF+4AA4ZUvQ3dl0JP6duxy1rZI4i5axmGapFyTkXmeXIWRqV3o9FgAvO
-        COQHXfky324m4/HVTWd6cTf1oQWw/BWMWyjKHDtEFB62ayISPVuaFf8nImOUmyK1C3UR3bN4cBpF
-        0WDYgGvkb/Xt/UtRIGXS6kM0tz1xrhN6iHittE8uoup1Hp5CLiwraol5fb2TlPETu5qlB81H45pG
-        XMcxSvuIUa7R+Rf2LaIbHtR8Lynr1tLsvSusNKRHX4Guk1jM/f58aadjW1HVPwA3uet63LQHP1n0
-        i01dQ24cKc2svplSVkGqVqOuSg9vQHLGMxfQ0BjObAe71V9MqQZpUr1ub6+CJiCoiQo2oAIudKCs
-        NlvBQkhbkwZWJ6VVR8pypiuPZwYkcI1IO8FIKVPY6oFnT35RgSu8rgu3gl6nF5+6zkRQ19ZKKuo6
-        QurXtAvrtHmT4AarU178c7G1C/DCCUeUIg0ca8FjzcVj6AlCKYVbMjd57v4f9GgfhOUKALVzvtGU
-        Y/fYN+kMOrbvPwAAAP//AwBqEqoq2gUAAA==
+        H4sIAAAAAAAAA5RU227aQBD9FeTnAIbgQCpFKm0jGlUKlULykKZC492xvWUv7l4oJMq/d3dtQyNF
+        jfLE+MxlZ86c4SnRaBy3yYfe078mkf7nR/LFCbHv3RrUyc+TXkKZqTnsJQh8zc0kswy4aXy3ESuR
+        KPNasMp/IbGEg2ncVtWJh2vURslgKV2CZI9gmZLAjziTaL3vJeBC2ZCuDNsBIcpJG743Oq81k4TV
+        wMHtWsgyskFbK87IvkV9QNNR+2FM1dUswHSmd9yYaqGVq5fFd5d/w70JuMB6qVnJ5KW0et+QUYOT
+        7LdDRuN8+XQKOKazPs2mp/3RCKE/o3nRz8bZJE2nOc7OipgYWvbP/1Ga4q5mOhIQSjwl6zUFi5YJ
+        XK89kozTcZrO0tNROs6y7D55bvM9qbb+Q0kFssT3peLOavCh0KXlYPBs0iTN51ePGaMFEedb+vm8
+        ul+M6nzzablK6deb24m7u7xb3c3nF001T4oACSVSjKwEFoi8oEEHJ94oA40mWO3CzAklF1KVnsdg
+        WTQ2MmIaMR6kI4DxiMRSH3EHouY4IEp0BBKQSjIC/CDVJvR6uVhcXQ9WlzerA9edPN4IdYxKJ3Lf
+        QogZzdKpX9soGzcqZ1uUL8+ixf+TxJUf1FTIm2GGOZNDz3YVnV50RGPcfVjaO5ZYKYGUaS9l1ZI+
+        DNCQHrpyrSSPSO1PH/UWA174C8ZQB8y6E6KHrXYdusG9hfyICQwjqmIdNxpLB/X7iqb52wj7C68e
+        dx+db6z+2adugbswfNtrEIM3IA6WzClF2guleg9NwEMSs1BrFSiXjvNwivRoH9YdCgAVTL7YdHjS
+        d9ZcXDIZzAZnyfNfAAAA//8DACH9hFYlBQAA
     headers:
       Cache-Control:
       - no-cache, private
@@ -157,7 +155,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:44 GMT
+      - Mon, 03 Aug 2020 10:25:56 GMT
       Keep-Alive:
       - timeout=30, max=98
       Server:
@@ -172,7 +170,7 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "session_logout", "params": [[], {}]}'
+    body: '{"method": "session_logout", "params": [[], {"version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -181,11 +179,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '48'
+      - '66'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=yQM4RoY0KDe8JHW%2f0xEseoSnBTLHTO9L6k4SRu9fqDP7LEHrMgma90uVihXMl8a6g2Pg1SsMqTBqnQaoIUVQVp6o8d6kgv7cwrIdXHck%2bp8d2SUtK9ksrwpcgWPlXeYMeEQ0bVeOgcAQ%2fvHq9QuFklaMxVYOxNr8ItxGcx%2fX1MZPPh%2f4pXL828a22EtwMQuR
+      - ipa_session=MagBearerToken=EQSQOC4FUeHtO3Fc8xA1e4X0wDT%2bLhYz%2bxMFZSyVXoP8VxnQbNSW3LFPzf8dN7%2bGZf5%2fU447yCUGoqc6Q0rBkLnXren9%2flDnfmcMnf9aQz17%2bbrFJQbmn1wZJXl7W5sIemAaLqdIwuNE5me7YjUQSqMhbpBTtCWjj9vhPGDixS6CzUVrxOL5TF1cNvf447o7
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -195,11 +193,8 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA0yPTUvDQBCG/8qwFy8h9ENEPNmDlB6sgsWLiEyzY1jI7oaZTUsJ+e/OJoF4m4/3
-        fd6Z3jBJ1yTzBP1Shq5pCjCeRLAm0clXb9KtJa3MFTm4UBsVBPTj6JNYXAyvTmTezNa83L0fYBYo
-        2J+J4YoCISYQCqmA38jKtFBF32JyZ9e4dBv3dYeMIRHZEnYinVe6mvhCfCeQwZcJXMCm3GwfcnIV
-        bY5db1ertbYWE47PTbaf2ZAPmyzD8D2ojpgjL687u9Qtu1C5FptsQqtHPB/f9vvDsTy9fJxy5j/o
-        fflYKvQPAAD//wMAt/mjK1gBAAA=
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqEYw80pzcmp1FJRSi4ryi6B8IDczBcEuKMrMS84sSMwBCikl
+        puRm5jn4+bu7e/rphbgGhygBVZSlFhVn5ueB5E30LPTMlGoBAAAA//8DAO6xzS5tAAAA
     headers:
       Cache-Control:
       - no-cache, private
@@ -212,7 +207,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:44 GMT
+      - Mon, 03 Aug 2020 10:25:56 GMT
       Keep-Alive:
       - timeout=30, max=97
       Server:
@@ -263,7 +258,7 @@ interactions:
       Content-Type:
       - text/html; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:44 GMT
+      - Mon, 03 Aug 2020 10:25:56 GMT
       Keep-Alive:
       - timeout=30, max=100
       Server:
@@ -301,7 +296,7 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAAwMAAAAAAAAAAAA=
+        H4sIAAAAAAAAAwAAAP//AwAAAAAAAAAAAA==
     headers:
       Cache-Control:
       - no-cache, private
@@ -309,20 +304,20 @@ interactions:
       - Keep-Alive
       Content-Encoding:
       - gzip
-      Content-Length:
-      - '20'
       Content-Security-Policy:
       - frame-ancestors 'none'
       Content-Type:
       - text/plain; charset=UTF-8
       Date:
-      - Mon, 13 Jul 2020 03:05:44 GMT
+      - Mon, 03 Aug 2020 10:25:56 GMT
       Keep-Alive:
       - timeout=30, max=100
       Server:
       - Apache/2.4.43 (Fedora) OpenSSL/1.1.1d mod_wsgi/4.6.6 Python/3.7 mod_auth_gssapi/1.6.1
       Set-Cookie:
-      - ipa_session=MagBearerToken=uRGoJBFujrxuWIz22L9gkc6IQyrg2LjCAKzugRtzIpMgcoJJbZh%2fAaN3XAOboC9EPG0cNh0ridGQzYucPXaERPDKjmGaYZs08EzulDsuUTb3PvRbl%2ftPJ0b%2ftDxW6cYKWmcQA56qzTMwXFjm%2bb%2bYO4YtDXJUHs%2fX%2bzRVLBhX8RjLD0L0VPN4Tqw32S939mqr;path=/ipa;httponly;secure;
+      - ipa_session=MagBearerToken=T80wLU0onZaBN7HM3SjbBrs9lcVHex8DAXRjRAque%2bHqpUD8bqMz6s54Kf%2b%2fJDrljURvKhtIPZb1C0KEvGb1tCVd7d2iqS4CYn6qBU1eE8TZxsA72vLkHPm6RuGcVa663gFTzSO33E%2fTZz0oGCCbq2W3wRT2Xm3%2fADI9G2k7se5sB82APV01gJCnHilkzIts;path=/ipa;httponly;secure;
+      Transfer-Encoding:
+      - chunked
       Vary:
       - Accept-Encoding
       X-Frame-Options:
@@ -331,7 +326,7 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "ping", "params": [[], {}]}'
+    body: '{"method": "ping", "params": [[], {"version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -340,11 +335,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '38'
+      - '56'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=uRGoJBFujrxuWIz22L9gkc6IQyrg2LjCAKzugRtzIpMgcoJJbZh%2fAaN3XAOboC9EPG0cNh0ridGQzYucPXaERPDKjmGaYZs08EzulDsuUTb3PvRbl%2ftPJ0b%2ftDxW6cYKWmcQA56qzTMwXFjm%2bb%2bYO4YtDXJUHs%2fX%2bzRVLBhX8RjLD0L0VPN4Tqw32S939mqr
+      - ipa_session=MagBearerToken=T80wLU0onZaBN7HM3SjbBrs9lcVHex8DAXRjRAque%2bHqpUD8bqMz6s54Kf%2b%2fJDrljURvKhtIPZb1C0KEvGb1tCVd7d2iqS4CYn6qBU1eE8TZxsA72vLkHPm6RuGcVa663gFTzSO33E%2fTZz0oGCCbq2W3wRT2Xm3%2fADI9G2k7se5sB82APV01gJCnHilkzIts
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -354,11 +349,9 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA0yQTWvDMAyG/4rxZZdg+kUZO62HUnJYW1jZZYyhxl4wxHaQnJUQ8t8nJ2btwSBL
-        el690iDRUNdE+SIGSZ1zgD3HsjzvBBn8NSj4kQ1ebNSz2iqxO5f/qZVarbeyENIZIqgNMfo5yNi3
-        JoncAL31dWrw4KbUx0y+WaJcyWgqJuncIHznrjz8BiR8iOzFx0L8BGRNLargWoj2ahsb+6led4Dg
-        ozGaHRIvwup5gSd69FzcTVdBp7HL9WKx5K+GCPMZJuw7A8nYjIzj18h9BjEgZ33XNPy1+h63aH1l
-        W2gSpPma/evxdDiUR3XZv1/SzAfR6Z5y/AMAAP//AwC9Ji2lggEAAA==
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqFYqLs3NTSyqBLKVPAMcFYpTi8pSixSAuDgzP0/BRM9Cz0xP
+        wTHAEy5kpGdkbKZUq6OglFpUlF8E1JhXmpMD5GamINgFRZl5yZkFiTkgc1OAVlQ6+Pm7u3v66YW4
+        BocoAVVAjQPJgy1RqgUAAAD//wMAZ5CzXpcAAAA=
     headers:
       Cache-Control:
       - no-cache, private
@@ -371,7 +364,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:44 GMT
+      - Mon, 03 Aug 2020 10:25:57 GMT
       Keep-Alive:
       - timeout=30, max=100
       Server:
@@ -386,8 +379,8 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "user_find", "params": [[], {"all": true, "no_members": false,
-      "sizelimit": 0, "whoami": true}]}'
+    body: '{"method": "user_find", "params": [[null], {"whoami": true, "all": true,
+      "raw": false, "no_members": true, "pkey_only": false, "version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -396,11 +389,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '107'
+      - '148'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=uRGoJBFujrxuWIz22L9gkc6IQyrg2LjCAKzugRtzIpMgcoJJbZh%2fAaN3XAOboC9EPG0cNh0ridGQzYucPXaERPDKjmGaYZs08EzulDsuUTb3PvRbl%2ftPJ0b%2ftDxW6cYKWmcQA56qzTMwXFjm%2bb%2bYO4YtDXJUHs%2fX%2bzRVLBhX8RjLD0L0VPN4Tqw32S939mqr
+      - ipa_session=MagBearerToken=T80wLU0onZaBN7HM3SjbBrs9lcVHex8DAXRjRAque%2bHqpUD8bqMz6s54Kf%2b%2fJDrljURvKhtIPZb1C0KEvGb1tCVd7d2iqS4CYn6qBU1eE8TZxsA72vLkHPm6RuGcVa663gFTzSO33E%2fTZz0oGCCbq2W3wRT2Xm3%2fADI9G2k7se5sB82APV01gJCnHilkzIts
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -410,19 +403,17 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA4RUXU/bMBT9K1Ze9tKWpGmhICENaQihaYAE7IFpQo59m3o4dubr0HYV/32+dtrC
-        hran3pz7fe5xN5kD7LTPTthmb37bZMLQb/apa5o1u0dw2fcBy6TCVvO14Q2851ZGecU1Jt99xGoQ
-        Ft8LnnMUDrhX1njV1xvn4zw/Ksq8zKeT8iHG2eoHCC80x1TG2zYLcAsOrSHLupob9StW4nqPKwM+
-        +N4CHbWndItqxYWwnfH0/eSq1ikjVMs171Y95JV4At9arcS6R0NAmqj/QFxsa4aNtmZw3OLiwtmu
-        vZ7fdNVnWCPhDbTXTtXKnBvv1om0lndG/exAybhfJQHySQlDMammw6IAPqyqyXg4HU8neX4synI2
-        jok0cmi/tE7CqlUuErCjsciLItI4edhGBwp9u5RiwU39Dt99IKYauztpG8bFBWgd8YNKmYOK4yI6
-        G64SLOm4H2HFm1bDSNhmN+KW1Z1oUujV9cXF5dXo7vz2LulEPYN5K6yIdz0t8jViuqYK4xFeHJWz
-        wzzPZ8d9mX84wziCG2uU+O84C9uAVC7c2YY7xcUJOtiPYbCXj7biKUTMg/CBlBWeEbhnkK+wBmgk
-        O3+sSRGxHJ09xGF6V8Q5LXYa6w+EOY1OMvouOJDi1Ng6HIMsD+izF8pNEj5hRbC964zg/o/eiLwG
-        TO/ar1taO1tyZ5SpSZM9E9nX0DAo6ItC7D19KjnPbi5ZH8ASwWzJkRnrGYLxAza3LtSULJy+DUqs
-        lFZ+Hf11xx03HkCO2Bli14TqLFLkPiCjws+p8ICNR+PyMItLSWoblJnTXpJ7Hv+iUtpjn0CDpZSX
-        SEWo3fB4rqxgRCBruBeLQMdL8IJzlmRhOq3p3cm9vRMppf4tiBDxquNkNBuFjr8BAAD//wMA7vNb
-        7zsFAAA=
+        H4sIAAAAAAAAA4xT22obMRD9FaNnX3Y32dgEDH1oCKWQFJK8tASjlcZeNVppq4tj1/jfO6NdX0LT
+        Cyzs6MxFM2eOdsyBjzqw68HuZH7bMWHozz7GptkOnjw49jwcMKl8q/nW8AbecyujguLad76nhK1A
+        WP9e8JJ74YAHZU1QXb0dWywkD0DnxQIRVmRFls2yizwryrL8yvaUaavvIILQ3HeFg20Zwi04bw1Z
+        1q24UT9Tba5PuDIQ0PcWiNQQpVuvNlwIG02g84urWqeMUC3XPG56KCjxAqG1Woltj2JA11F/8L4+
+        1MQZDyY6Hnx962xs75dfYvUZtp7wBtp7p1bK3Jjgth2NLY9G/YigZJqvmk45FHI2kuX0YpTnwEcz
+        WS1HZVFeZtm0gtnVMiVSy3j9q3USNq1yiYA/E5vn9CGxVz2xmI+khvZVipqb1f/s5Cz1yNZRHpI2
+        /uHu/vb209348ebhMXUZlTSxqZAWisln2RSnyMvi4DylJkRbJMfXoHVyTCplJhX3dacutQbzVo4J
+        b7jSZy3AhjethrGwTZ/2lxZwFMGNNUr8cxTfvZKjpmvbgFQOtWBxl6ldgianaYzvJaateMGIJT4X
+        IPXh4wO3BnmGNUAt2uViRapJ5UgaGOe710i3E2PzVH8ozDw5yehv8UMp5saukEKyAvjQ7auT+fUg
+        Rzu4aASu+PxujxV5moHlA6o6aHgQNcbs0QvOWeLORK1JsPJkH1VAqb+zhhFrbLHTJbscz8ZXbP8L
+        AAD//wMABj05N4YEAAA=
     headers:
       Cache-Control:
       - no-cache, private
@@ -435,7 +426,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:44 GMT
+      - Mon, 03 Aug 2020 10:25:57 GMT
       Keep-Alive:
       - timeout=30, max=99
       Server:
@@ -450,7 +441,8 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "user_show", "params": [["dummy"], {"all": true, "raw": false}]}'
+    body: '{"method": "user_show", "params": [["dummy"], {"rights": false, "all":
+      true, "raw": false, "no_members": false, "version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -459,11 +451,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '75'
+      - '133'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=uRGoJBFujrxuWIz22L9gkc6IQyrg2LjCAKzugRtzIpMgcoJJbZh%2fAaN3XAOboC9EPG0cNh0ridGQzYucPXaERPDKjmGaYZs08EzulDsuUTb3PvRbl%2ftPJ0b%2ftDxW6cYKWmcQA56qzTMwXFjm%2bb%2bYO4YtDXJUHs%2fX%2bzRVLBhX8RjLD0L0VPN4Tqw32S939mqr
+      - ipa_session=MagBearerToken=T80wLU0onZaBN7HM3SjbBrs9lcVHex8DAXRjRAque%2bHqpUD8bqMz6s54Kf%2b%2fJDrljURvKhtIPZb1C0KEvGb1tCVd7d2iqS4CYn6qBU1eE8TZxsA72vLkHPm6RuGcVa663gFTzSO33E%2fTZz0oGCCbq2W3wRT2Xm3%2fADI9G2k7se5sB82APV01gJCnHilkzIts
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -473,19 +465,17 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA4RUXU/bMBT9K1Fe9tKWpGmhTEIa0hBC0wAJ2MOmCd3Yt6lXx8587bYZ4r/PdtK0
-        SEg89eac+2Gfc92X1CA5adPPyctxyJT/+ZV+dXXdJk+EJv09SlIuqJHQKqjxPVooYQVI6riniFXI
-        NL2XrMs/yCyTQB1tdZN6uEFDWoVImwqU+AdWaAXygAuF1nNvARfahnJNYgeMaads+F6bsjFCMdGA
-        BLfrISvYGm2jpWBtj/qE7kT9B9Fq33MJtA898UCra6Ndc7e8d+U3bCngNTZ3RlRCXSlr2k6MBpwS
-        fx0KHu9XcsRsVuCYzcr5OM8RxmU5m47n0/ksy85ZUSymsTAc2Y/fasNx1wgTBYgtptk0y7M8z4ps
-        Ppv93Gd7CW2z5WwFqsIhMTvLi+NE6noM+ldig+qtkz3OlatLnxXw/KxYnGZZtjjfT2OgtBIM5FDL
-        Q+2X27vr65vbyePVw2NMdR/0GWz5oE8NQh7RuIO6kThhuo601F51WqHskk5KoU5KoFUkvXPMYBTQ
-        ivodbYpOm5WukQvj3dfevdgnQCd8UMX1Lh4QRf2aSc3Wnlv6xcfQC+h575+HrXF7dI2thfKANf69
-        odkgP6quMUiml89V2LE4MiySz6PuBQYXw2ku4klGTF1EMgT9eWjE2YXSldclRBbJpq++dAPSBQn6
-        O8RhRFBhfH8vqW2bSG/BKKGqkNBbk/7wE7yG3wVRz/Slgby8v0n6hKRzPNkCJUrbhFDZUbLUxvfk
-        ibes8V6UQgrbRr5yYEBZRD5JLolc7bsnURPziZLQeNM1HiXTybQ4DZOZ5mGsNzDLgyBgIf5jdWXP
-        fUE4WFfy+hq3398ZorfKSRnkQGO06b/Dc+WHeFjNQa03Wxm0PEyZTRYTP+U/AAAA//8DAN1ssp1J
-        BQAA
+        H4sIAAAAAAAAA4xT24rbMBD9lUXPudjZdRIKgT50CaWwKezuS8sSZGniqJElVZds3JB/r0Z2nA1s
+        L2Dw6MxF58yMjsSCC9KTDzfHtyZT8fedfAp13dw8O7DkZXBDuHBG0kbRGt5zCyW8oNK1vueEVcC0
+        ey9Ylz+AeSapa91eGxJhA9ZphZa2FVXiF/VCKyovuFDgo+8aCFgW07UTB8qYDsrjeWdLY4ViwlBJ
+        w6GDvGA78EZLwZoOjQEto+7g3PZcc0Pd2YyOR7ddWh3MavM1lF+gcYjXYFZWVELdK2+bthmGBiV+
+        BhA86StnMwoTPh/yYnY7zHOgwzkvN8NiUtxl2ayE+XSTEpFyvP5VWw4HI2xqAJY4kvWaUw9e1LBe
+        R4RMskmW5/hNimL6jZy6/NhUb14521JVwZ9Ts3l2e5VaUyETWY6z+ggHWhsJI6brxEzqqNBtQbZB
+        41KocUndtqd97nS/IG2dh9Vy+flh9HT/+JRCY0OZhaQLCf0HwaIjWAmuQl3GYWD1fJ7NYu/yYpLK
+        hr85K7EHdb24Cd/qGriwcfA6Di7JQmjM+4jQDfCCRKmMKq0E+6dU176jfuuV65ZTaraLrk18LoA0
+        qFufpx5hb8MZ3UHjaXnBTHylYPfA32TXgLL1Zl3hZqYbcf1inGvfLbJAIYvEcsDUIjnR6Pi4AWcL
+        pas4YbQ8OE9OMXVPZUCBnXyUFA2aeqWClBgD1mrbnXHz+cXuV6IvcdUivCDyaBec3I3moyk5/QYA
+        AP//AwD7SFK7lAQAAA==
     headers:
       Cache-Control:
       - no-cache, private
@@ -498,7 +488,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:44 GMT
+      - Mon, 03 Aug 2020 10:25:57 GMT
       Keep-Alive:
       - timeout=30, max=98
       Server:
@@ -513,7 +503,7 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "session_logout", "params": [[], {}]}'
+    body: '{"method": "session_logout", "params": [[], {"version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -522,11 +512,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '48'
+      - '66'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=uRGoJBFujrxuWIz22L9gkc6IQyrg2LjCAKzugRtzIpMgcoJJbZh%2fAaN3XAOboC9EPG0cNh0ridGQzYucPXaERPDKjmGaYZs08EzulDsuUTb3PvRbl%2ftPJ0b%2ftDxW6cYKWmcQA56qzTMwXFjm%2bb%2bYO4YtDXJUHs%2fX%2bzRVLBhX8RjLD0L0VPN4Tqw32S939mqr
+      - ipa_session=MagBearerToken=T80wLU0onZaBN7HM3SjbBrs9lcVHex8DAXRjRAque%2bHqpUD8bqMz6s54Kf%2b%2fJDrljURvKhtIPZb1C0KEvGb1tCVd7d2iqS4CYn6qBU1eE8TZxsA72vLkHPm6RuGcVa663gFTzSO33E%2fTZz0oGCCbq2W3wRT2Xm3%2fADI9G2k7se5sB82APV01gJCnHilkzIts
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -536,11 +526,8 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA0yPS2vDMBCE/8qiSy9G5EUpPTWHEnJoGmjopZSiWFsj0MPsSgnG+L9Xsg3ubbQz
-        8622F4ScbBTP0C/SJ2srEA6ZVYOcJ1+9iF2LWYm7Im98I3LAKzeOPpHYBP9mmGdnrhZzfz7CHMhg
-        d0WCu2LwIQKjjxX8BspMDXVwrYrmaqyJ3eg3SZHyEVFL2DMnl+m5RDekB4YCvk3gCjZys30sm+ug
-        y9r1drVa56dWUY3HTbWfuVA+NlWG4XvIOSQKtJxu9KJbMr42rbKlpJNz3cvp/XA4nuTl9eNSdv6D
-        7uSTzNA/AAAA//8DABOlpshYAQAA
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqEYw80pzcmp1FJRSi4ryi6B8IDczBcEuKMrMS84sSMwBCiml
+        lObmVjr4+bu7e/rphbgGhygBVZSlFhVn5ueB5E30LPTMlGoBAAAA//8DAErtyM1tAAAA
     headers:
       Cache-Control:
       - no-cache, private
@@ -553,7 +540,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:45 GMT
+      - Mon, 03 Aug 2020 10:25:57 GMT
       Keep-Alive:
       - timeout=30, max=99
       Server:
@@ -604,13 +591,13 @@ interactions:
       Content-Type:
       - text/plain; charset=UTF-8
       Date:
-      - Mon, 13 Jul 2020 03:05:45 GMT
+      - Mon, 03 Aug 2020 10:25:57 GMT
       Keep-Alive:
       - timeout=30, max=100
       Server:
       - Apache/2.4.43 (Fedora) OpenSSL/1.1.1d mod_wsgi/4.6.6 Python/3.7 mod_auth_gssapi/1.6.1
       Set-Cookie:
-      - ipa_session=MagBearerToken=JGMaAoYOUmfpBmRxRuchFgfkmaqJ4wdumIEnQA2CCrt5si57xFKzlgvJOXyCLnMll2uIaQMAyNzMTTpe%2fPsNjzpBWlPMxSXLzqDSmAGktc%2bbyAh%2bzljakv6uH7%2fAmdVaPDz25Xw3YpD4C8Hi%2bEe%2baem7Ls8V%2bGbIq8%2f9PTIBKSitnauodrG4WLXAMWpCuW%2f8;path=/ipa;httponly;secure;
+      - ipa_session=MagBearerToken=5fzVtpq6sRSl7VBj3%2f%2bpO70cCJpv7GYo71%2bHG%2fz%2bY8hcfI88OkjdMijlAWUZhnV4FwF62NG2B9rNEv2Fq%2bntNCmOEKGXNnQRKxi2tqg22fCc6Vu2YyUsdU86ZoW7Sw4p%2fwhpbMA9%2fxL31zIhtXC83tplIoYEdyn5kd7qFJQsBjRgyyjpV8s6yzLwUd%2fmVzlu;path=/ipa;httponly;secure;
       Transfer-Encoding:
       - chunked
       Vary:
@@ -621,7 +608,7 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "ping", "params": [[], {}]}'
+    body: '{"method": "ping", "params": [[], {"version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -630,11 +617,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '38'
+      - '56'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=JGMaAoYOUmfpBmRxRuchFgfkmaqJ4wdumIEnQA2CCrt5si57xFKzlgvJOXyCLnMll2uIaQMAyNzMTTpe%2fPsNjzpBWlPMxSXLzqDSmAGktc%2bbyAh%2bzljakv6uH7%2fAmdVaPDz25Xw3YpD4C8Hi%2bEe%2baem7Ls8V%2bGbIq8%2f9PTIBKSitnauodrG4WLXAMWpCuW%2f8
+      - ipa_session=MagBearerToken=5fzVtpq6sRSl7VBj3%2f%2bpO70cCJpv7GYo71%2bHG%2fz%2bY8hcfI88OkjdMijlAWUZhnV4FwF62NG2B9rNEv2Fq%2bntNCmOEKGXNnQRKxi2tqg22fCc6Vu2YyUsdU86ZoW7Sw4p%2fwhpbMA9%2fxL31zIhtXC83tplIoYEdyn5kd7qFJQsBjRgyyjpV8s6yzLwUd%2fmVzlu
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -644,11 +631,9 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA0yQTWvDMAyG/4rxZZdg+kUZO62HUnJYW1jZZYyhxl4wxHaQnJUQ8t8nJ2btwSBL
-        el690iDRUNdE+SIGSZ1zgD3HsjzvBBn8NSj4kQ1ebNSz2iqxO5f/qZVarbeyENIZIqgNMfo5yNi3
-        JoncAL31dWrw4KbUx0y+WaJcyWgqJuncIHznrjz8BiR8iOzFx0L8BGRNLargWoj2ahsb+6led4Dg
-        ozGaHRIvwup5gSd69FzcTVdBp7HL9WKx5K+GCPMZJuw7A8nYjIzj18h9BjEgZ33XNPy1+h63aH1l
-        W2gSBJpNvB5Ph0N5VJf9+yXNfBCd7inHPwAAAP//AwAZeihGggEAAA==
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqFYqLs3NTSyqBLKVPAMcFYpTi8pSixSAuDgzP0/BRM9Cz0xP
+        wTHAEy5kpGdkbKZUq6OglFpUlF8E1JhXmpMD5GamINgFRZl5yZkFiTkgcxNTcjPzHPz83d09/fRC
+        XINDlIAqoMaB5MGWKNUCAAAA//8DAMPMtr2XAAAA
     headers:
       Cache-Control:
       - no-cache, private
@@ -661,7 +646,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:45 GMT
+      - Mon, 03 Aug 2020 10:25:58 GMT
       Keep-Alive:
       - timeout=30, max=99
       Server:
@@ -676,8 +661,8 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "user_del", "params": [["dummy"], {"continue": false, "preserve":
-      false}]}'
+    body: '{"method": "user_del", "params": [["dummy"], {"continue": false, "version":
+      "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -686,11 +671,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '85'
+      - '86'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=JGMaAoYOUmfpBmRxRuchFgfkmaqJ4wdumIEnQA2CCrt5si57xFKzlgvJOXyCLnMll2uIaQMAyNzMTTpe%2fPsNjzpBWlPMxSXLzqDSmAGktc%2bbyAh%2bzljakv6uH7%2fAmdVaPDz25Xw3YpD4C8Hi%2bEe%2baem7Ls8V%2bGbIq8%2f9PTIBKSitnauodrG4WLXAMWpCuW%2f8
+      - ipa_session=MagBearerToken=5fzVtpq6sRSl7VBj3%2f%2bpO70cCJpv7GYo71%2bHG%2fz%2bY8hcfI88OkjdMijlAWUZhnV4FwF62NG2B9rNEv2Fq%2bntNCmOEKGXNnQRKxi2tqg22fCc6Vu2YyUsdU86ZoW7Sw4p%2fwhpbMA9%2fxL31zIhtXC83tplIoYEdyn5kd7qFJQsBjRgyyjpV8s6yzLwUd%2fmVzlu
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -700,12 +685,9 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA0xQS2sCQQz+K2EuvSyLj1JKTxUs4qG2UOmlSolOlIGZ2SUzoyzif2/iLtRb8uV7
-        JLkYplR8Ni9wuS8P6DxZKX+21wrMCX0h7YwtIXRmK1iglPBISeGLyV2rBHNGji4ejRAihhv0TZxc
-        E99dSsNkkOpw9rmEgQCxhB0xnDFBbDIkirmCQ8PiaWHfhBaz2znvcnebHwsyxkxka5ilVIK4i4hP
-        xA8J1PjUG1cwqSfTJ03eN1Zjx9PRaCytxYy3e3vZ7yDQxXrJ9aqnindA7hSek6dMFoooYNO/Y2OM
-        PomYGxZOLN5L6+x/3bKLe9eiVwu0sunr6mOxWK7q9dvXWhe7S36sn2tJ/gMAAP//AwBJDJkymwEA
-        AA==
+        H4sIAAAAAAAAA0yNsQrDMAxEf8VoLp5KKZ06tIQu6ZBsTQZTqyCQnSDHhRDy75HJ0G7vTnenBQRT
+        5gkuZvnHjyNGr/jq14OBr+OMRYHPIczQq5eUnMzqwg0ZJ/QmJxTT7ZkOoDRRZBDNxMyskvyPR6H4
+        ptFxmXA+ULzWz6p61La9Ny2UtyiJhljuR3u2J1g3AAAA//8DAETYZbiwAAAA
     headers:
       Cache-Control:
       - no-cache, private
@@ -718,7 +700,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:45 GMT
+      - Mon, 03 Aug 2020 10:25:58 GMT
       Keep-Alive:
       - timeout=30, max=98
       Server:
@@ -733,7 +715,7 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "session_logout", "params": [[], {}]}'
+    body: '{"method": "session_logout", "params": [[], {"version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -742,11 +724,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '48'
+      - '66'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=JGMaAoYOUmfpBmRxRuchFgfkmaqJ4wdumIEnQA2CCrt5si57xFKzlgvJOXyCLnMll2uIaQMAyNzMTTpe%2fPsNjzpBWlPMxSXLzqDSmAGktc%2bbyAh%2bzljakv6uH7%2fAmdVaPDz25Xw3YpD4C8Hi%2bEe%2baem7Ls8V%2bGbIq8%2f9PTIBKSitnauodrG4WLXAMWpCuW%2f8
+      - ipa_session=MagBearerToken=5fzVtpq6sRSl7VBj3%2f%2bpO70cCJpv7GYo71%2bHG%2fz%2bY8hcfI88OkjdMijlAWUZhnV4FwF62NG2B9rNEv2Fq%2bntNCmOEKGXNnQRKxi2tqg22fCc6Vu2YyUsdU86ZoW7Sw4p%2fwhpbMA9%2fxL31zIhtXC83tplIoYEdyn5kd7qFJQsBjRgyyjpV8s6yzLwUd%2fmVzlu
       Referer:
       - https://ipa.noggin.test/ipa
       User-Agent:
@@ -756,11 +738,8 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA0yPTUvDQBCG/8qwFy8h9ENEPNmDlB6sgsWLiEyzY1jI7oaZTUsJ+e/OJoF4m4/3
-        fd6Z3jBJ1yTzBP1Shq5pCjCeRLAm0clXb9KtJa3MFTm4UBsVBPTj6JNYXAyvTmTezNa83L0fYBYo
-        2J+J4YoCISYQCqmA38jKtFBF32JyZ9e4dBv3dYeMIRHZEnYinVe6mvhCfCeQwZcJXMCm3GwfcnIV
-        bY5db1ertbYWE47PTbaf2ZAPmyzD8D2ojpgjL687u9Qtu1C5FptsQqtHPB/f9vvDsTy9fJxy5j/o
-        fflYKvQPAAD//wMAt/mjK1gBAAA=
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqEYw80pzcmp1FJRSi4ryi6B8IDczBcEuKMrMS84sSMwBCikl
+        puRm5jn4+bu7e/rphbgGhygBVZSlFhVn5ueB5E30LPTMlGoBAAAA//8DAO6xzS5tAAAA
     headers:
       Cache-Control:
       - no-cache, private
@@ -773,7 +752,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 13 Jul 2020 03:05:45 GMT
+      - Mon, 03 Aug 2020 10:25:58 GMT
       Keep-Alive:
       - timeout=30, max=97
       Server:
