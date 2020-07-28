@@ -7,12 +7,7 @@ from werkzeug.exceptions import InternalServerError, NotFound
 from noggin import ipa_admin
 from noggin.security.ipa import maybe_ipa_login
 from noggin.tests.unit.utilities import captured_templates
-from noggin.utility import (
-    group_or_404,
-    require_self,
-    user_or_404,
-    with_ipa,
-)
+from noggin.utility import group_or_404, require_self, user_or_404, with_ipa
 
 
 @pytest.mark.vcr()

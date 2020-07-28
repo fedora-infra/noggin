@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired, EqualTo, Length
 
 from noggin import app
 from noggin.form.validators import Email
+
 from .base import BaseForm, ModestForm, strip, SubmitButtonField
 
 

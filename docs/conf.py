@@ -13,6 +13,7 @@
 import os
 import sys
 
+
 topdir = os.path.abspath("../")
 sys.path.insert(0, topdir)
 if "NOGGIN_CONFIG_PATH" not in os.environ:

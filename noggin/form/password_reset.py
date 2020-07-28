@@ -3,6 +3,7 @@ from wtforms import PasswordField, StringField
 from wtforms.validators import DataRequired, EqualTo, Length
 
 from noggin import app
+
 from .base import BaseForm
 
 

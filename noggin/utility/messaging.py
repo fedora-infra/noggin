@@ -2,7 +2,8 @@ import sys
 import traceback
 
 import backoff
-from fedora_messaging import api, exceptions as fml_exceptions
+from fedora_messaging import api
+from fedora_messaging import exceptions as fml_exceptions
 
 from noggin import app
 
