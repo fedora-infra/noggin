@@ -47,7 +47,7 @@ def with_ipa():
                     "spamcheck_denied",
                     "spamcheck_manual",
                 ):
-                    return render_template("spamcheck.html")
+                    return render_template("spamcheck.html")  # pragma: no cover
                 return f(*args, **kwargs, ipa=ipa)
             flash('Please log in to continue.', 'warning')
             return redirect(url_for('root'))
