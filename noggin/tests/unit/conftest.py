@@ -87,7 +87,6 @@ def ipa_testing_config(vcr_session):
         except python_freeipa.exceptions.BadRequest as e:
             if not e.message == "no modifications to be performed":
                 raise
-            raise
         yield
         try:
             ipa_admin.pwpolicy_mod(
