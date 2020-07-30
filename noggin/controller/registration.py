@@ -20,7 +20,7 @@ from noggin import app, csrf, ipa_admin, mailer
 from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
-from noggin.signals import user_registered
+from noggin.signals import stageuser_created, user_registered
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.locales import guess_locale
 from noggin.utility.token import Audience, make_token, read_token
@@ -112,9 +112,31 @@ def handle_register_form(form):
             _('An error occurred while creating the account, please try again.'),
         )
 
-    # Send the address validation email
-    _send_validation_email(user)
-    return redirect(f"{url_for('confirm_registration')}?username={username}")
+    stageuser_created.send(user, request=request._get_current_object())
+    if app.config["BASSET_URL"]:
+        return redirect(f"{url_for('spamcheck_wait')}?username={username}")
+    else:
+        # Send the address validation email
+        _send_validation_email(user)
+        return redirect(f"{url_for('confirm_registration')}?username={username}")
+
+
+@app.route('/register/spamcheck-wait')
+def spamcheck_wait():
+    username = request.args.get('username')
+    if not username:
+        abort(400, "No username provided")
+
+    try:
+        user = User(ipa_admin.stageuser_show(a_uid=username)["result"])
+    except python_freeipa.exceptions.NotFound:
+        flash(_("The registration seems to have failed, please try again."), "warning")
+        return redirect(f"{url_for('root')}?tab=register")
+
+    if user.status_note == "active":
+        return redirect(f"{url_for('confirm_registration')}?username={username}")
+
+    return render_template('registration-spamcheck-wait.html', user=user)
 
 
 @app.route('/register/confirm', methods=["GET", "POST"])
@@ -127,6 +149,9 @@ def confirm_registration():
     except python_freeipa.exceptions.NotFound:
         flash(_("The registration seems to have failed, please try again."), "warning")
         return redirect(f"{url_for('root')}?tab=register")
+
+    if app.config["BASSET_URL"] and user.status_note != "active":
+        abort(401, "You should not be here")
 
     form = ResendValidationEmailForm()
     if form.validate_on_submit():
@@ -300,11 +325,13 @@ def spamcheck_hook():
 
     username = token_data["sub"]
 
-    if status == "active":
-        lock = False
-    elif status in ("spamcheck_denied", "spamcheck_manual"):
-        lock = True
-    else:
+    if status not in ("active", "spamcheck_denied", "spamcheck_manual"):
         return jsonify({"error": f"Invalid status: {status}."}), 400
-    ipa_admin.user_mod(a_uid=username, o_nsaccountlock=lock, fasstatusnote=status)
+    result = ipa_admin.stageuser_mod(a_uid=username, fasstatusnote=status)
+    user = User(result["result"])
+
+    if status == "active":
+        # Send the address validation email
+        _send_validation_email(user)
+
     return jsonify({"status": "success"})

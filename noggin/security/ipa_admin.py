@@ -14,6 +14,7 @@ class IPAAdmin(object):
         "stageuser_add",
         "stageuser_show",
         "stageuser_activate",
+        "stageuser_mod",
         "ping",
     )
     __WRAPPED_METHODS_TESTING = (

@@ -7,6 +7,7 @@ from flask import current_app
 
 from noggin import ipa_admin, mailer
 from noggin.representation.user import User
+from noggin.signals import stageuser_created
 from noggin.tests.unit.utilities import (
     assert_form_field_error,
     assert_form_generic_error,
@@ -70,13 +71,23 @@ def token_for_dummy_user(dummy_stageuser):
     )
 
 
+@pytest.fixture
+def spamcheck_on(mocker):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+
+
 @pytest.mark.vcr()
-def test_step_1(client, post_data_step_1, cleanup_dummy_user):
+def test_step_1(client, post_data_step_1, cleanup_dummy_user, mocker):
     """Register a user, step 1"""
-    with mailer.record_messages() as outbox:
+    record_signal = mocker.Mock()
+    with mailer.record_messages() as outbox, stageuser_created.connected_to(
+        record_signal
+    ):
         result = client.post('/', data=post_data_step_1)
     assert result.status_code == 302
     assert result.location == "http://localhost/register/confirm?username=dummy"
+    # Emitted signal
+    record_signal.assert_called_once()
     # Sent email
     assert len(outbox) == 1
     message = outbox[0]
@@ -90,6 +101,46 @@ def test_step_1(client, post_data_step_1, cleanup_dummy_user):
     assert user.locale == current_app.config["USER_DEFAULTS"]["locale"]
     # Timezone
     assert user.timezone == current_app.config["USER_DEFAULTS"]["timezone"]
+
+
+@pytest.mark.vcr()
+def test_step_1_spamcheck(
+    client, post_data_step_1, cleanup_dummy_user, spamcheck_on, mocker
+):
+    """Register a user, step 1, with spamcheck on"""
+    mocked_requests = mocker.patch("noggin.signals.requests")
+    record_signal = mocker.Mock()
+    with mailer.record_messages() as outbox, stageuser_created.connected_to(
+        record_signal
+    ):
+        result = client.post('/', data=post_data_step_1)
+    assert result.status_code == 302
+    assert result.location == "http://localhost/register/spamcheck-wait?username=dummy"
+    # Emitted signal
+    record_signal.assert_called_once()
+    # Basset called
+    mocked_requests.post.assert_called_once()
+    assert mocked_requests.post.call_args_list[0][0][0] == "http://basset.test"
+    call_data = mocked_requests.post.call_args_list[0][1]["json"]
+    assert call_data["action"] == "fedora.noggin.registration"
+    assert call_data["data"]["user"]["username"] == "dummy"
+    assert call_data["data"]["request_headers"]["Host"] == "localhost"
+    assert call_data["data"]["request_ip"] == "127.0.0.1"
+    assert "token" in call_data["data"]
+    assert call_data["data"]["callback"] == "http://localhost/register/spamcheck-hook"
+    # No sent email
+    assert len(outbox) == 0
+
+
+@pytest.mark.parametrize(
+    "spamcheck_status", ["spamcheck_awaiting", "spamcheck_denied", "spamcheck_manual"]
+)
+@pytest.mark.vcr()
+def test_spamcheck_wait(client, dummy_stageuser, spamcheck_status):
+    """Test the spamcheck_wait endpoint"""
+    ipa_admin.stageuser_mod(a_uid="dummy", fasstatusnote=spamcheck_status)
+    result = client.get('/register/spamcheck-wait?username=dummy')
+    assert result.status_code == 200
 
 
 @pytest.mark.vcr()
@@ -135,6 +186,34 @@ def test_step_1_no_smtp(client, post_data_step_1, cleanup_dummy_user, mocker):
 
 
 @pytest.mark.vcr()
+def test_spamcheck_wait_no_username(client, dummy_stageuser):
+    """Test the spamcheck_wait endpoint without a username"""
+    result = client.get('/register/spamcheck-wait')
+    assert result.status_code == 400
+
+
+@pytest.mark.vcr()
+def test_spamcheck_wait_bad_username(client, dummy_stageuser):
+    """Test the spamcheck_wait endpoint with a bad username"""
+    result = client.get('/register/spamcheck-wait?username=does-not-exist')
+    assert_redirects_with_flash(
+        result,
+        expected_url="/?tab=register",
+        expected_message="The registration seems to have failed, please try again.",
+        expected_category="warning",
+    )
+
+
+@pytest.mark.vcr()
+def test_spamcheck_wait_active(client, dummy_stageuser):
+    """Test the spamcheck_wait endpoint when the user is active"""
+    ipa_admin.stageuser_mod(a_uid="dummy", fasstatusnote="active")
+    result = client.get('/register/spamcheck-wait?username=dummy')
+    assert result.status_code == 302
+    assert result.location == "http://localhost/register/confirm?username=dummy"
+
+
+@pytest.mark.vcr()
 def test_step_2_no_user(client):
     """Register a user, step 2, but no provided username"""
     result = client.get('/register/confirm')
@@ -152,6 +231,14 @@ def test_step_2_unknown_user(client):
         expected_message="The registration seems to have failed, please try again.",
         expected_category="warning",
     )
+
+
+@pytest.mark.vcr()
+def test_step_2_spamchecking_user(client, dummy_stageuser, spamcheck_on):
+    """Register a user, step 2, but the user hasn't been checked for spam"""
+    ipa_admin.stageuser_mod(a_uid="dummy", fasstatusnote="spamcheck_awaiting")
+    result = client.get('/register/confirm?username=dummy')
+    assert result.status_code == 401
 
 
 @pytest.mark.vcr()
@@ -233,7 +320,7 @@ def test_step_3_unknown_user(client, token_for_dummy_user):
 def test_step_3_wrong_address(client, token_for_dummy_user, mocker):
     """Registration activation page with a token containing the wrong email address"""
     logger = mocker.patch("noggin.controller.registration.app.logger")
-    ipa_admin.stageuser_mod("dummy", mail="dummy-new@example.com")
+    ipa_admin.stageuser_mod(a_uid="dummy", mail="dummy-new@example.com")
     result = client.get(f'/register/activate?token={token_for_dummy_user}')
     assert_redirects_with_flash(
         result,
@@ -509,20 +596,29 @@ def test_no_direct_login(
     "spamcheck_status", ["active", "spamcheck_denied", "spamcheck_manual"]
 )
 @pytest.mark.vcr()
-def test_spamcheck(client, dummy_user, mocker, spamcheck_status):
-    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+def test_spamcheck(client, dummy_user, mocker, spamcheck_status, spamcheck_on):
     user = User(ipa_admin.user_show("dummy")["result"])
     assert user.status_note != spamcheck_status
     token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
-    response = client.post(
-        "/register/spamcheck-hook", json={"token": token, "status": spamcheck_status},
-    )
+    with mailer.record_messages() as outbox:
+        response = client.post(
+            "/register/spamcheck-hook",
+            json={"token": token, "status": spamcheck_status},
+        )
     assert response.status_code == 200
     assert response.json == {"status": "success"}
     # Check that the status was changed
     user = User(ipa_admin.user_show("dummy")["result"])
     assert user.status_note == spamcheck_status
     assert user.locked == (spamcheck_status != "active")
+    # Sent email
+    if spamcheck_status == "active":
+        assert len(outbox) == 1
+        message = outbox[0]
+        assert message.subject == "Verify your email address"
+        assert message.recipients == ["dummy@example.com"]
+    else:
+        assert len(outbox) == 0
 
 
 @pytest.mark.vcr()
@@ -535,8 +631,7 @@ def test_spamcheck_disabled(client, dummy_user):
 
 
 @pytest.mark.vcr()
-def test_spamcheck_bad_payload(client, dummy_user, mocker):
-    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+def test_spamcheck_bad_payload(client, dummy_user, mocker, spamcheck_on):
     response = client.post("/register/spamcheck-hook")
     assert response.status_code == 400
     assert response.json == {"error": "Bad payload"}
@@ -544,16 +639,14 @@ def test_spamcheck_bad_payload(client, dummy_user, mocker):
 
 @pytest.mark.parametrize("payload", [{"token": "foobar"}, {"status": "active"}])
 @pytest.mark.vcr()
-def test_spamcheck_bad_missing_key(client, dummy_user, mocker, payload):
-    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+def test_spamcheck_bad_missing_key(client, dummy_user, mocker, payload, spamcheck_on):
     response = client.post("/register/spamcheck-hook", json=payload,)
     assert response.status_code == 400
     assert response.json["error"].startswith("Missing key: ")
 
 
 @pytest.mark.vcr()
-def test_spamcheck_expired_token(client, dummy_user, mocker):
-    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+def test_spamcheck_expired_token(client, dummy_user, mocker, spamcheck_on):
     token = make_token({"sub": "dummy"}, audience=Audience.spam_check, ttl=-1)
     response = client.post(
         "/register/spamcheck-hook", json={"token": token, "status": "active"},
@@ -563,8 +656,7 @@ def test_spamcheck_expired_token(client, dummy_user, mocker):
 
 
 @pytest.mark.vcr()
-def test_spamcheck_invalid_token(client, dummy_user, mocker):
-    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+def test_spamcheck_invalid_token(client, dummy_user, mocker, spamcheck_on):
     token = make_token({"sub": "dummy"}, audience=Audience.email_validation)
     response = client.post(
         "/register/spamcheck-hook", json={"token": token, "status": "active"},
@@ -574,8 +666,7 @@ def test_spamcheck_invalid_token(client, dummy_user, mocker):
 
 
 @pytest.mark.vcr()
-def test_spamcheck_wrong_status(client, dummy_user, mocker):
-    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+def test_spamcheck_wrong_status(client, dummy_user, mocker, spamcheck_on):
     token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
     response = client.post(
         "/register/spamcheck-hook", json={"token": token, "status": "this-is-wrong"},
