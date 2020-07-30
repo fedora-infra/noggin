@@ -7,7 +7,7 @@ from flask import current_app
 
 from noggin import ipa_admin, mailer
 from noggin.representation.user import User
-from noggin.signals import stageuser_created
+from noggin.signals import stageuser_created, user_registered
 from noggin.tests.unit.utilities import (
     assert_form_field_error,
     assert_form_generic_error,
@@ -152,11 +152,14 @@ def test_step_2(client, dummy_stageuser):
 
 
 @pytest.mark.vcr()
-def test_step_3(client, post_data_step_3, token_for_dummy_user, cleanup_dummy_user):
+def test_step_3(
+    client, post_data_step_3, token_for_dummy_user, cleanup_dummy_user, mocker
+):
     """Register a user, step 3"""
+    record_signal = mocker.Mock()
     with fml_testing.mock_sends(
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
-    ):
+    ), user_registered.connected_to(record_signal):
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
         )
@@ -166,6 +169,7 @@ def test_step_3(client, post_data_step_3, token_for_dummy_user, cleanup_dummy_us
         expected_message="Congratulations, your account has been created! Welcome, Dummy User.",
         expected_category="success",
     )
+    record_signal.assert_called_once()
 
 
 @pytest.mark.vcr()
@@ -350,12 +354,13 @@ def test_short_password_form(
 
 @pytest.mark.vcr()
 def test_short_password_policy(
-    client, post_data_step_3, token_for_dummy_user, cleanup_dummy_user
+    client, post_data_step_3, token_for_dummy_user, cleanup_dummy_user, mocker
 ):
     """Register a user with a password rejected by the server policy"""
+    record_signal = mocker.Mock()
     with fml_testing.mock_sends(
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
-    ):
+    ), user_registered.connected_to(record_signal):
         post_data_step_3["password"] = post_data_step_3["password_confirm"] = "1234567"
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
@@ -370,6 +375,7 @@ def test_short_password_policy(
         ),
         expected_category="warning",
     )
+    record_signal.assert_called_once()
 
 
 @pytest.mark.vcr()
@@ -438,13 +444,17 @@ def test_field_error_step_3(
     user_mod.side_effect = python_freeipa.exceptions.ValidationError(
         message="invalid 'password': this is invalid", code="4242"
     )
-    with fml_testing.mock_sends(UserCreateV1):
+    record_signal = mocker.Mock()
+    with fml_testing.mock_sends(UserCreateV1), user_registered.connected_to(
+        record_signal
+    ):
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
         )
     assert_form_field_error(
         result, field_name="password", expected_message="this is invalid"
     )
+    record_signal.assert_called_once()
 
 
 def test_field_error_unknown(client, post_data_step_1, mocker):
@@ -548,9 +558,10 @@ def test_generic_pwchange_error(
         "noggin.controller.registration.untouched_ipa_client"
     )
     untouched_ipa_client.return_value = ipa_client
+    record_signal = mocker.Mock()
     with fml_testing.mock_sends(
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
-    ):
+    ), user_registered.connected_to(record_signal):
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
         )
@@ -563,6 +574,7 @@ def test_generic_pwchange_error(
         ),
         expected_category="warning",
     )
+    record_signal.assert_called_once()
 
 
 @pytest.mark.vcr()
@@ -576,9 +588,10 @@ def test_no_direct_login(
             message="something went wrong", code="4242"
         ),
     )
+    record_signal = mocker.Mock()
     with fml_testing.mock_sends(
         UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
-    ):
+    ), user_registered.connected_to(record_signal):
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
         )
@@ -590,6 +603,7 @@ def test_no_direct_login(
         ),
         expected_category="success",
     )
+    record_signal.assert_called_once()
 
 
 @pytest.mark.parametrize(
