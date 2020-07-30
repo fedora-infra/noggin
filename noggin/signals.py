@@ -11,6 +11,7 @@ from noggin_messages import UserCreateV1
 
 noggin_signals = Namespace()
 
+stageuser_created = noggin_signals.signal('stageuser-created')
 user_registered = noggin_signals.signal('user-registered')
 
 
@@ -22,7 +23,7 @@ def send_registered_message(sender, **kwargs):
     )
 
 
-@user_registered.connect_via(ANY)
+@stageuser_created.connect_via(ANY)
 def request_basset_check(sender, **kwargs):
     user = sender
     basset_url = current_app.config.get("BASSET_URL")

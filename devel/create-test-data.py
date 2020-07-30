@@ -73,7 +73,6 @@ for x in range(50):
             o_sn=lastName,
             o_cn=firstName + " " + lastName,
             o_homedirectory=f"/home/fedora/{username}",
-            o_nsaccountlock=False,
             o_userpassword=USER_PASSWORD,
             fasircnick=[username, username + "_"],
             faslocale="en-US",

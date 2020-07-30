@@ -4,9 +4,7 @@ import pytest
 from flask import current_app, g, get_flashed_messages, session
 from werkzeug.exceptions import InternalServerError, NotFound
 
-from noggin import ipa_admin
 from noggin.security.ipa import maybe_ipa_login
-from noggin.tests.unit.utilities import captured_templates
 from noggin.utility import group_or_404, require_self, user_or_404, with_ipa
 
 
@@ -75,29 +73,6 @@ def test_with_ipa_anonymous(client):
         category, message = messages[0]
         assert message == "Please log in to continue."
         assert category == "warning"
-
-
-@pytest.mark.xfail()
-@pytest.mark.parametrize(
-    "spamcheck_status", ["spamcheck_awaiting", "spamcheck_denied", "spamcheck_manual"]
-)
-@pytest.mark.vcr()
-def test_with_ipa_spamcheck(client, dummy_user, spamcheck_status):
-    """Test the with_ipa decorator"""
-    ipa_admin.user_mod("dummy", fasstatusnote=spamcheck_status, o_nsaccountlock=True)
-    view = mock.Mock()
-    with current_app.test_request_context('/'):
-        # This will fail currently because the user is disabled, see above.
-        maybe_ipa_login(current_app, session, "dummy", "dummy_password")
-        wrapped = with_ipa()(view)
-        with captured_templates(current_app) as templates:
-            wrapped("arg")
-            assert len(templates) == 1
-            template, context = templates[0]
-        assert template.name == 'spamcheck.html'
-        view.assert_not_called()
-        assert context["g"].current_user.username == "dummy"
-        assert context["g"].current_user.status_note == spamcheck_status
 
 
 def test_require_self_wrong_route(client):

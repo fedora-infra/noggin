@@ -138,9 +138,9 @@
 
 {% macro spamcheck_contact() %}
 {% set email_link %}
-<a href="mailto:spamcheck@fedoraproject.org?Subject=Not%20Spam:%20{{ g.current_user.username }}">spamcheck@fedoraproject.org</a>
+<a href="mailto:spamcheck@fedoraproject.org?Subject=Not%20Spam:%20{{ user.username }}">spamcheck@fedoraproject.org</a>
 {% endset %}
 <p>
-    {{ _("If it is not correct, please send an email to %(email_link)s and explain the situation.", email_link=email_link) }}
+    {{ _("To let admins know that you're not a spammer, please send an email to %(email_link)s and explain the situation.", email_link=email_link) }}
 </p>
 {% endmacro %}
