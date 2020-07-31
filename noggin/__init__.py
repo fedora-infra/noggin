@@ -1,12 +1,12 @@
-from flask import Flask, Blueprint, request
+from flask import Blueprint, Flask, request
 from flask_babel import Babel
 from flask_healthz import healthz
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from whitenoise import WhiteNoise
 
-from noggin.security.ipa_admin import IPAAdmin
 from noggin.middleware import IPAErrorHandler
+from noggin.security.ipa_admin import IPAAdmin
 
 app = Flask(__name__)
 app.jinja_env.add_extension('jinja2.ext.i18n')

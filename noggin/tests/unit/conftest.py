@@ -8,9 +8,9 @@ from vcr import VCR
 
 from noggin import ipa_admin
 from noggin.app import app
-from noggin.representation.otptoken import OTPToken
 from noggin.representation.agreement import Agreement
-from noggin.security.ipa import untouched_ipa_client, maybe_ipa_login
+from noggin.representation.otptoken import OTPToken
+from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
 
 
 @pytest.fixture(scope="session")

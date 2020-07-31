@@ -1,16 +1,18 @@
-import python_freeipa
-import mock
+from unittest import mock
+from urllib.parse import parse_qs, urlparse
+
 import pytest
+import python_freeipa
 from bs4 import BeautifulSoup
 
 from noggin import ipa_admin
 from noggin.representation.otptoken import OTPToken
 from noggin.tests.unit.utilities import (
-    assert_redirects_with_flash,
     assert_form_field_error,
     assert_form_generic_error,
-    otp_secret_from_uri,
+    assert_redirects_with_flash,
     get_otp,
+    otp_secret_from_uri,
 )
 
 
@@ -156,12 +158,15 @@ def test_user_settings_otp_check_description_escaping(
 
     page = BeautifulSoup(result.data, "html.parser")
     otp_uri = page.select_one("input#otp-uri")
+    parsed_otp_uri = urlparse(otp_uri["value"])
+    parsed_query = parse_qs(parsed_otp_uri.query)
 
-    assert (
-        otp_uri['value'] == "otpauth://totp/dummy@example.com:pants%20token?issuer="
-        "dummy%40EXAMPLE.COM&secret=L4PD6EXABBJDSCAKS6MZQWT4RSP3PM3QW6H57UHIKFCN7I3"
-        "FGKSHZCCO&digits=6&algorithm=SHA512&period=30"
-    )
+    # Not sure we need all of these checked
+    assert parsed_otp_uri.scheme == "otpauth"
+    assert parsed_otp_uri.netloc == "totp"
+    assert parsed_otp_uri.path == "/dummy@noggin.test:pants%20token"
+
+    assert parsed_query["issuer"] == ["dummy@NOGGIN.TEST"]
 
 
 @pytest.mark.vcr()

@@ -1,32 +1,34 @@
 import datetime
 import re
 
-import jwt
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
-from flask import current_app
 from fedora_messaging import testing as fml_testing
-from noggin_messages import UserUpdateV1
+from flask import current_app
 
 from noggin import ipa_admin, mailer
 from noggin.representation.user import User
 from noggin.security.ipa import untouched_ipa_client
-from noggin.utility.password_reset import PasswordResetLock
-from noggin.utility.token import PasswordResetToken
 from noggin.tests.unit.utilities import (
-    assert_redirects_with_flash,
     assert_form_field_error,
     assert_form_generic_error,
+    assert_redirects_with_flash,
     get_otp,
     otp_secret_from_uri,
 )
+from noggin.utility.password_reset import PasswordResetLock
+from noggin.utility.token import Audience, make_token, read_token
+from noggin_messages import UserUpdateV1
 
 
 @pytest.fixture
 def token_for_dummy_user(dummy_user):
-    token = PasswordResetToken.from_user(User(ipa_admin.user_show("dummy")))
-    return token.as_string()
+    user = User(ipa_admin.user_show("dummy"))
+    return make_token(
+        {"sub": user.username, "lpc": user.last_password_change},
+        audience=Audience.password_reset,
+    )
 
 
 @pytest.fixture
@@ -76,11 +78,9 @@ def test_ask_post(client, dummy_user, patched_lock):
     token_match = re.search(r"\?token=([^\s\"']+)", message.body)
     assert token_match is not None
     token = token_match.group(1)
-    token_data = jwt.decode(
-        token, current_app.config["SECRET_KEY"], algorithms=["HS256"]
-    )
-    assert token_data.get("username") == "dummy"
-    assert "last_change" in token_data
+    token_data = read_token(token, audience=Audience.password_reset)
+    assert token_data.get("sub") == "dummy"
+    assert "lpc" in token_data
     # Lock activated
     patched_lock["store"].assert_called_once()
 

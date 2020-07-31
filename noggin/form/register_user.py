@@ -1,11 +1,11 @@
 from flask_babel import lazy_gettext as _
-from wtforms import StringField, PasswordField
+from wtforms import PasswordField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo, Length
 
 from noggin import app
 from noggin.form.validators import Email
-from .base import ModestForm, SubmitButtonField, strip, BaseForm
+from .base import BaseForm, ModestForm, strip, SubmitButtonField
 
 
 class RegisterUserForm(ModestForm):
