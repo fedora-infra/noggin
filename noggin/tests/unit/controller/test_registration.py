@@ -4,16 +4,16 @@ import pytest
 import python_freeipa
 from fedora_messaging import testing as fml_testing
 from flask import current_app
-from noggin_messages import UserCreateV1
 
 from noggin import ipa_admin, mailer
 from noggin.representation.user import User
-from noggin.utility.token import EmailValidationToken
 from noggin.tests.unit.utilities import (
-    assert_redirects_with_flash,
     assert_form_field_error,
     assert_form_generic_error,
+    assert_redirects_with_flash,
 )
+from noggin.utility.token import Audience, make_token
+from noggin_messages import UserCreateV1
 
 
 @pytest.fixture
@@ -62,8 +62,11 @@ def dummy_stageuser(ipa_testing_config):
 
 @pytest.fixture
 def token_for_dummy_user(dummy_stageuser):
-    token = EmailValidationToken.from_user(dummy_stageuser)
-    return token.as_string()
+    return make_token(
+        {"sub": dummy_stageuser.username, "mail": dummy_stageuser.mail},
+        audience=Audience.email_validation,
+        ttl=current_app.config["ACTIVATION_TOKEN_EXPIRATION"],
+    )
 
 
 @pytest.mark.vcr()
@@ -85,12 +88,10 @@ def test_step_1(client, post_data_step_1, cleanup_dummy_user):
     assert user["fascreationtime"][0]
     # Locale
     assert "faslocale" in user
-    assert user["faslocale"][0] == current_app.config["USER_DEFAULTS"]["user_locale"]
+    assert user["faslocale"][0] == current_app.config["USER_DEFAULTS"]["locale"]
     # Timezone
     assert "fastimezone" in user
-    assert (
-        user["fastimezone"][0] == current_app.config["USER_DEFAULTS"]["user_timezone"]
-    )
+    assert user["fastimezone"][0] == current_app.config["USER_DEFAULTS"]["timezone"]
 
 
 @pytest.mark.vcr()
@@ -113,7 +114,7 @@ def test_step_3(client, post_data_step_3, token_for_dummy_user, cleanup_dummy_us
     assert_redirects_with_flash(
         result,
         "/",
-        "Congratulations, your account is now active! Welcome, Dummy User.",
+        "Congratulations, your account has been created! Welcome, Dummy User.",
         "success",
     )
 
@@ -201,13 +202,14 @@ def test_step_3_garbled_token(client, dummy_stageuser):
 
 
 @pytest.mark.vcr()
-def test_step_3_invalid_token(client, token_for_dummy_user, mocker):
+def test_step_3_invalid_token(client, dummy_stageuser, mocker):
     """Registration activation page with an invalid token"""
-    mocker.patch(
-        "noggin.controller.registration.EmailValidationToken.is_valid",
-        return_value=False,
+    token = make_token(
+        {"sub": dummy_stageuser.username, "mail": dummy_stageuser.mail},
+        audience=Audience.email_validation,
+        ttl=-1,
     )
-    result = client.get(f'/register/activate?token={token_for_dummy_user}')
+    result = client.get(f'/register/activate?token={token}')
     assert_redirects_with_flash(
         result,
         expected_url="/?tab=register",
@@ -277,7 +279,7 @@ def test_short_password_policy(
         result,
         expected_url="/",
         expected_message=(
-            'Your account has been activated, but the password you chose does not comply '
+            'Your account has been created, but the password you chose does not comply '
             'with the policy (Constraint violation: Password is too short) and has thus '
             'been set as expired. You will be asked to change it after logging in.'
         ),
@@ -444,7 +446,7 @@ def test_generic_activate_error(
         )
     assert_form_generic_error(
         result,
-        'Something went wrong while activating your account, please try again later.',
+        'Something went wrong while creating your account, please try again later.',
     )
 
 
@@ -471,7 +473,7 @@ def test_generic_pwchange_error(
         result,
         expected_url="/",
         expected_message=(
-            'Your account has been activated, but an error occurred while setting your '
+            'Your account has been created, but an error occurred while setting your '
             'password (something went wrong). You may need to change it after logging in.'
         ),
         expected_category="warning",
@@ -499,7 +501,86 @@ def test_no_direct_login(
         result,
         expected_url="/",
         expected_message=(
-            "Congratulations, your account is now active! Go ahead and sign in to proceed."
+            "Congratulations, your account has been created! Go ahead and sign in to proceed."
         ),
         expected_category="success",
     )
+
+
+@pytest.mark.parametrize(
+    "spamcheck_status", ["active", "spamcheck_denied", "spamcheck_manual"]
+)
+@pytest.mark.vcr()
+def test_spamcheck(client, dummy_user, mocker, spamcheck_status):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    user = User(ipa_admin.user_show("dummy"))
+    assert user.status_note != spamcheck_status
+    token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": token, "status": spamcheck_status},
+    )
+    assert response.status_code == 200
+    assert response.json == {"status": "success"}
+    # Check that the status was changed
+    user = User(ipa_admin.user_show("dummy"))
+    assert user.status_note == spamcheck_status
+    assert user.locked == (spamcheck_status != "active")
+
+
+@pytest.mark.vcr()
+def test_spamcheck_disabled(client, dummy_user):
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": "foobar", "status": "active"},
+    )
+    assert response.status_code == 501
+    assert response.json == {"error": "Spamcheck disabled"}
+
+
+@pytest.mark.vcr()
+def test_spamcheck_bad_payload(client, dummy_user, mocker):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    response = client.post("/register/spamcheck-hook")
+    assert response.status_code == 400
+    assert response.json == {"error": "Bad payload"}
+
+
+@pytest.mark.parametrize("payload", [{"token": "foobar"}, {"status": "active"}])
+@pytest.mark.vcr()
+def test_spamcheck_bad_missing_key(client, dummy_user, mocker, payload):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    response = client.post("/register/spamcheck-hook", json=payload,)
+    assert response.status_code == 400
+    assert response.json["error"].startswith("Missing key: ")
+
+
+@pytest.mark.vcr()
+def test_spamcheck_expired_token(client, dummy_user, mocker):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    token = make_token({"sub": "dummy"}, audience=Audience.spam_check, ttl=-1)
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": token, "status": "active"},
+    )
+    assert response.status_code == 400
+    assert response.json == {"error": "The token has expired"}
+
+
+@pytest.mark.vcr()
+def test_spamcheck_invalid_token(client, dummy_user, mocker):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    token = make_token({"sub": "dummy"}, audience=Audience.email_validation)
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": token, "status": "active"},
+    )
+    assert response.status_code == 400
+    assert response.json["error"] == "Invalid token: Invalid audience"
+
+
+@pytest.mark.vcr()
+def test_spamcheck_wrong_status(client, dummy_user, mocker):
+    mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
+    token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
+    response = client.post(
+        "/register/spamcheck-hook", json={"token": token, "status": "this-is-wrong"},
+    )
+    assert response.status_code == 400
+    assert response.json == {"error": "Invalid status: this-is-wrong."}

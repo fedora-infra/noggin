@@ -1,4 +1,5 @@
-import mock
+from unittest import mock
+
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
@@ -6,8 +7,8 @@ from fedora_messaging import testing as fml_testing
 from flask import Markup
 
 from noggin import ipa_admin
-from noggin_messages import MemberSponsorV1
 from noggin.tests.unit.utilities import assert_redirects_with_flash
+from noggin_messages import MemberSponsorV1
 
 
 @pytest.mark.vcr()

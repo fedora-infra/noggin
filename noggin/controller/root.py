@@ -1,17 +1,15 @@
 import python_freeipa
-from flask import render_template, request, redirect, url_for, session, jsonify
+from flask import jsonify, redirect, render_template, request, session, url_for
 from flask_healthz import HealthError
 
 from noggin import app, ipa_admin
-from noggin.form.register_user import RegisterUserForm
 from noggin.form.login_user import LoginUserForm
+from noggin.form.register_user import RegisterUserForm
 from noggin.representation.group import Group
 from noggin.representation.user import User
-
 from noggin.security.ipa import maybe_ipa_session
 from noggin.utility import with_ipa
 from noggin.utility.forms import handle_form_errors
-
 from .authentication import handle_login_form
 from .registration import handle_register_form
 

@@ -2,8 +2,8 @@ from unittest import mock
 
 from flask import current_app
 
-from noggin.utility.forms import FormError, handle_form_errors
 from noggin.form.login_user import LoginUserForm
+from noggin.utility.forms import FormError, handle_form_errors
 
 
 def test_formerror(client):

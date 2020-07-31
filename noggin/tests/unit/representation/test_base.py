@@ -1,8 +1,8 @@
 import pytest
 
 from noggin.representation.base import Representation
-from noggin.representation.user import User
 from noggin.representation.group import Group
+from noggin.representation.user import User
 
 
 def test_diff_fields(dummy_user_dict):

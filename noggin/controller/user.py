@@ -1,25 +1,25 @@
-from urllib.parse import urlparse, quote
+from urllib.parse import quote, urlparse
 
-from flask import flash, redirect, render_template, session, url_for, Markup
-from flask_babel import _
-from noggin_messages import UserUpdateV1
 import python_freeipa
+from flask import flash, Markup, redirect, render_template, session, url_for
+from flask_babel import _
 
 from noggin import app
 from noggin.form.edit_user import (
-    UserSettingsProfileForm,
-    UserSettingsKeysForm,
     UserSettingsAddOTPForm,
-    UserSettingsOTPStatusChange,
     UserSettingsAgreementSign,
+    UserSettingsKeysForm,
+    UserSettingsOTPStatusChange,
+    UserSettingsProfileForm,
 )
 from noggin.representation.agreement import Agreement
 from noggin.representation.group import Group
-from noggin.representation.user import User
 from noggin.representation.otptoken import OTPToken
+from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login
-from noggin.utility import with_ipa, user_or_404, require_self, messaging
+from noggin.utility import messaging, require_self, user_or_404, with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
+from noggin_messages import UserUpdateV1
 
 
 @app.route('/user/<username>/')
@@ -301,7 +301,7 @@ def user_settings_otp_delete(ipa, username):
 def user_settings_agreements(ipa, username):
     user = User(user_or_404(ipa, username))
     agreements = [
-        Agreement(a) for a in ipa.fasagreement_find(all=False) if Agreement(a).enabled
+        Agreement(a) for a in ipa.fasagreement_find(all=False, ipaenabledflag=True)
     ]
     form = UserSettingsAgreementSign()
     if form.validate_on_submit():

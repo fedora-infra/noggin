@@ -1,8 +1,8 @@
 import os
 
 import pytest
-from bs4 import BeautifulSoup
 from babel.messages.frontend import compile_catalog
+from bs4 import BeautifulSoup
 
 import noggin
 from noggin.tests.unit.utilities import assert_redirects_with_flash

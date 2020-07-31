@@ -6,7 +6,7 @@ def guess_locale():
     if locale is not None:
         return locale
     # Unspecified or unsupported locale, fallback.
-    return current_app.config["USER_DEFAULTS"]["user_locale"]
+    return current_app.config["USER_DEFAULTS"]["locale"]
 
 
 LOCALES = [

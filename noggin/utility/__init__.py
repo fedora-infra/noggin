@@ -1,9 +1,19 @@
 import hashlib
 from functools import wraps
 
-from flask import abort, flash, g, redirect, url_for, session, Markup, current_app
-from flask_babel import lazy_gettext as _
 import python_freeipa
+from flask import (
+    abort,
+    current_app,
+    flash,
+    g,
+    Markup,
+    redirect,
+    render_template,
+    session,
+    url_for,
+)
+from flask_babel import lazy_gettext as _
 
 from noggin import app
 from noggin.representation.user import User
@@ -32,6 +42,12 @@ def with_ipa():
             if ipa:
                 g.ipa = ipa
                 g.current_user = User(g.ipa.user_find(whoami=True)['result'][0])
+                if g.current_user.status_note in (
+                    "spamcheck_awaiting",
+                    "spamcheck_denied",
+                    "spamcheck_manual",
+                ):
+                    return render_template("spamcheck.html")
                 return f(*args, **kwargs, ipa=ipa)
             flash('Please log in to continue.', 'warning')
             return redirect(url_for('root'))
