@@ -1,9 +1,9 @@
-from noggin.representation import Representation
+from .base import Representation
 
 
 class User(Representation):
 
-    ATTR_MAP = {
+    attr_names = {
         "username": "uid",
         "firstname": "givenname",
         "lastname": "sn",
@@ -20,18 +20,26 @@ class User(Representation):
         "website_url": "faswebsiteurl",
         "last_password_change": "krblastpwdchange",
         "agreements": "memberof_fasagreement",
+        "displayname": "displayname",
+        "gecos": "gecos",
+        "commonname": "cn",
+        "status_note": "fasstatusnote",
     }
-    ATTR_LISTS = ["sshpubkeys", "ircnick", "gpgkeys", "groups", "agreements"]
-
+    attr_types = {
+        "sshpubkeys": "list",
+        "ircnick": "list",
+        "gpgkeys": "list",
+        "groups": "list",
+        "agreements": "list",
+    }
     pkey = "username"
     ipa_object = "user"
 
     @property
     def name(self):
-        if 'displayname' in self.raw:
-            return self._attr('displayname')
-        if 'gecos' in self.raw:
-            return self._attr('gecos')
-        if 'cn' in self.raw:
-            return self._attr('cn')
-        return None
+        return self.displayname or self.gecos or self.commonname
+
+    @property
+    def locked(self):
+        # Unlike the others nsAccountLock is not a list.
+        return self.raw.get("nsaccountlock", False)

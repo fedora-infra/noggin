@@ -4,7 +4,13 @@ from wtforms.widgets import TextInput
 from wtforms.widgets.core import html_params, HTMLString
 
 
-class ModestForm(FlaskForm):
+class BaseForm(FlaskForm):
+    """Add an invisible field to hold form-wide errors."""
+
+    non_field_errors = Field()
+
+
+class ModestForm(BaseForm):
     """A form that can handle not being the only form on the page."""
 
     def _get_submit_field(self):

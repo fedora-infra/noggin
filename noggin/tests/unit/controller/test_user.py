@@ -1,15 +1,16 @@
-import python_freeipa
-import mock
+from unittest import mock
+
 import pytest
+import python_freeipa
 from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
-from noggin_messages import UserUpdateV1
 
 from noggin import ipa_admin
 from noggin.tests.unit.utilities import (
-    assert_redirects_with_flash,
     assert_form_generic_error,
+    assert_redirects_with_flash,
 )
+from noggin_messages import UserUpdateV1
 
 
 POST_CONTENTS = {
@@ -97,6 +98,7 @@ def test_user_edit_post(client, logged_in_dummy_user):
                         'github',
                         'gitlab',
                         'rhbz_mail',
+                        'website_url',
                     ],
                 }
             }
@@ -169,6 +171,7 @@ def test_user_edit_post_no_change(client, logged_in_dummy_user):
                         'github',
                         'gitlab',
                         'rhbz_mail',
+                        'website_url',
                     ],
                 }
             }

@@ -1,12 +1,11 @@
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import PasswordField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo, Length
 
 from noggin import app
 from noggin.form.validators import Email
-from .base import ModestForm, SubmitButtonField, strip
+from .base import BaseForm, ModestForm, strip, SubmitButtonField
 
 
 class RegisterUserForm(ModestForm):
@@ -43,11 +42,11 @@ class RegisterUserForm(ModestForm):
     submit = SubmitButtonField(_("Register"))
 
 
-class ResendValidationEmailForm(FlaskForm):
+class ResendValidationEmailForm(BaseForm):
     submit = SubmitButtonField(_("Resend email"))
 
 
-class PasswordSetForm(FlaskForm):
+class PasswordSetForm(BaseForm):
 
     password = PasswordField(
         _('Password'),

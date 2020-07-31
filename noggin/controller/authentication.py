@@ -1,12 +1,11 @@
-from flask import flash, redirect, session, url_for, render_template
-from flask_babel import _
 import python_freeipa
+from flask import flash, redirect, render_template, session, url_for
+from flask_babel import _
 
 from noggin import app
-from noggin.security.ipa import maybe_ipa_login
-from noggin.utility import FormError, handle_form_errors
 from noggin.form.sync_token import SyncTokenForm
-from noggin.security.ipa import untouched_ipa_client
+from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
+from noggin.utility.forms import FormError, handle_form_errors
 
 
 def handle_login_form(form):

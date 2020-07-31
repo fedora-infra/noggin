@@ -1,8 +1,10 @@
-from bs4 import BeautifulSoup
-from flask import get_flashed_messages
-from urllib import parse
 import hashlib
+from contextlib import contextmanager
+from urllib import parse
+
 import pyotp
+from bs4 import BeautifulSoup
+from flask import get_flashed_messages, template_rendered
 
 
 def assert_redirects_with_flash(
@@ -60,3 +62,18 @@ def get_otp(secret):
     """
     totp = pyotp.TOTP(secret, 6, hashlib.sha512)
     return totp.now()
+
+
+# https://flask.palletsprojects.com/en/1.1.x/signals/#subscribing-to-signals
+@contextmanager
+def captured_templates(app):
+    recorded = []
+
+    def record(sender, template, context, **extra):
+        recorded.append((template, context))
+
+    template_rendered.connect(record)
+    try:
+        yield recorded
+    finally:
+        template_rendered.disconnect(record, app)

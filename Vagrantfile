@@ -5,7 +5,7 @@ Vagrant.configure(2) do |config|
   config.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/31/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-31-1.9.x86_64.vagrant-libvirt.box"
   config.vm.box = "f31-cloud-libvirt"
   #config.vm.network "forwarded_port", guest: 80, host: 8080
-  config.vm.hostname = "ipa.example.com"
+  config.vm.hostname = "ipa.noggin.test"
   config.vm.synced_folder ".", "/vagrant", type: "sshfs"
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
@@ -14,7 +14,7 @@ Vagrant.configure(2) do |config|
     libvirt.memory = 2048 
   end
 
-  # Vagrant adds '127.0.0.1 ipa.example.com ipa' as the first line in /etc/hosts
+  # Vagrant adds '127.0.0.1 ipa.noggin.test ipa' as the first line in /etc/hosts
   # and freeipa doesnt like that, so we remove it
   config.vm.provision "shell", inline: "sudo sed -i '1d' /etc/hosts"
 

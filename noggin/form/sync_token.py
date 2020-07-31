@@ -1,10 +1,11 @@
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import PasswordField, StringField
 from wtforms.validators import DataRequired, Optional
 
+from .base import BaseForm
 
-class SyncTokenForm(FlaskForm):
+
+class SyncTokenForm(BaseForm):
     username = StringField(
         _('Username'),
         validators=[DataRequired(message=_('You must provide a user name'))],

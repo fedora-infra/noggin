@@ -1,10 +1,10 @@
 import random
-from requests import RequestException
 
-from cryptography.fernet import Fernet
 import python_freeipa
+from cryptography.fernet import Fernet
 from python_freeipa.client_legacy import ClientLegacy as IPAClient
-from python_freeipa.exceptions import ValidationError, BadRequest
+from python_freeipa.exceptions import BadRequest, ValidationError
+from requests import RequestException
 
 
 def parse_group_management_error(data):
@@ -347,6 +347,15 @@ class Client(IPAClient):
         :type agreement: string
         """
         data = self._request('fasagreement_add_group', agreement, kwargs)
+        return data['result']
+
+    def fasagreement_remove_group(self, agreement, **kwargs):
+        """
+        Remove a group from an agreement
+        :param agreement: Agreement name.
+        :type agreement: string
+        """
+        data = self._request('fasagreement_remove_group', agreement, kwargs)
         return data['result']
 
     def fasagreement_disable(self, agreement, **kwargs):

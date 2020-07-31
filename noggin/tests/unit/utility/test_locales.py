@@ -13,7 +13,7 @@ from noggin.utility.locales import guess_locale
         ("en", "en-US"),
         ("en-GB,en;q=0.8", "en-GB"),
         ("it", "it-IT"),
-        ("xx", app.config["USER_DEFAULTS"]["user_locale"]),
+        ("xx", app.config["USER_DEFAULTS"]["locale"]),
     ],
 )
 def test_guess_locale(client, accepted, expected):

@@ -1,19 +1,18 @@
 from unittest import mock
 
 import pytest
-from flask import current_app, g, session, get_flashed_messages
-from werkzeug.exceptions import NotFound, InternalServerError
+from flask import current_app, g, get_flashed_messages, session
+from werkzeug.exceptions import InternalServerError, NotFound
 
+from noggin import ipa_admin
 from noggin.security.ipa import maybe_ipa_login
+from noggin.tests.unit.utilities import captured_templates
 from noggin.utility import (
-    user_or_404,
     group_or_404,
-    with_ipa,
-    FormError,
-    handle_form_errors,
     require_self,
+    user_or_404,
+    with_ipa,
 )
-from noggin.form.login_user import LoginUserForm
 
 
 @pytest.mark.vcr()
@@ -83,53 +82,25 @@ def test_with_ipa_anonymous(client):
         assert category == "warning"
 
 
-def test_formerror(client):
+@pytest.mark.parametrize(
+    "spamcheck_status", ["spamcheck_awaiting", "spamcheck_denied", "spamcheck_manual"]
+)
+@pytest.mark.vcr()
+def test_with_ipa_spamcheck(client, dummy_user, spamcheck_status):
+    """Test the with_ipa decorator"""
+    ipa_admin.user_mod("dummy", fasstatusnote=spamcheck_status, disabled=True)
+    view = mock.Mock()
     with current_app.test_request_context('/'):
-        form = LoginUserForm(data={"username": "dummy", "password": "passwd"})
-        form.validate()
-        error = FormError("username", "error message")
-        error.populate_form(form)
-    assert form.errors == {"username": ["error message"]}
-
-
-def test_formerror_unknown_field(client):
-    with current_app.test_request_context('/'):
-        form = LoginUserForm(data={"username": "dummy", "password": "passwd"})
-        form.validate()
-        error = FormError("non_form_errors", "error message")
-        error.populate_form(form)
-    assert form.errors == {"non_form_errors": ["error message"]}
-
-
-def test_formerror_existing_field(client):
-    with current_app.test_request_context('/'):
-        form = LoginUserForm()
-        form.validate()
-        error = FormError("username", "error message")
-        error.populate_form(form)
-        assert form.errors["username"] == [
-            "You must provide a user name",
-            "error message",
-        ]
-
-
-def test_formerror_unknown_field_append(client):
-    with current_app.test_request_context('/'):
-        form = LoginUserForm()
-        form.validate()
-        FormError("non_form_errors", "error message 1").populate_form(form)
-        FormError("non_form_errors", "error message 2").populate_form(form)
-    assert form.errors["non_form_errors"] == ["error message 1", "error message 2"]
-
-
-def test_handle_form_errors(client):
-    with current_app.test_request_context('/'):
-        form = LoginUserForm()
-        error = FormError("username", "error_message")
-        with mock.patch.object(error, "populate_form") as populate_form:
-            with handle_form_errors(form):
-                raise error
-    populate_form.assert_called_once_with(form)
+        maybe_ipa_login(current_app, session, "dummy", "dummy_password")
+        wrapped = with_ipa()(view)
+        with captured_templates(current_app) as templates:
+            wrapped("arg")
+            assert len(templates) == 1
+            template, context = templates[0]
+        assert template.name == 'spamcheck.html'
+        view.assert_not_called()
+        assert context["g"].current_user.username == "dummy"
+        assert context["g"].current_user.status_note == spamcheck_status
 
 
 def test_require_self_wrong_route(client):

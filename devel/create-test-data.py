@@ -4,15 +4,15 @@ import textwrap
 import python_freeipa
 from faker import Faker
 
-from noggin.security.ipa import Client
 import noggin.utility.timezones as timezones
+from noggin.security.ipa import Client
 
 USER_PASSWORD = "testuserpw"
 
 fake = Faker()
 fake.seed_instance(0)
 
-ipa_server = "ipa.example.com"
+ipa_server = "ipa.noggin.test"
 ipa_user = "admin"
 ipa_pw = "adminPassw0rd!"
 ipa = Client(host=ipa_server, verify_ssl=False)
@@ -67,6 +67,7 @@ for x in range(50):
             fasircnick=[username, username + "_"],
             faslocale="en-US",
             fastimezone=fake.random_sample(timezones.TIMEZONES, length=1)[0],
+            fasstatusnote="active",
             fasgpgkeyid=[],
         )
         # 'change' the password as the user, so its not expired
@@ -95,22 +96,3 @@ for x in range(50):
             ipa.group_add_member("admins", username, skip_errors=True)
     except python_freeipa.exceptions.FreeIPAError as e:
         print(e)
-
-# add a known user for testing purposes
-
-try:
-    ipa.user_add(
-        "testuser",
-        "Test",
-        "User",
-        "Test User",
-        home_directory="/home/fedora/testUser",
-        disabled=False,
-        random_pass=True,
-        fasircnick="testuser",
-        faslocale=None,
-        fastimezone=None,
-        fasgpgkeyid=[],
-    )
-except python_freeipa.exceptions.FreeIPAError as e:
-    print(e)

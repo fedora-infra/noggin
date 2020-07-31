@@ -1,9 +1,9 @@
-from noggin.representation import Representation
+from .base import Representation
 
 
 class Group(Representation):
 
-    ATTR_MAP = {
+    attr_names = {
         "name": "cn",
         "description": "description",
         "members": "member_user",
@@ -12,13 +12,10 @@ class Group(Representation):
         "irc_channel": "fasircchannel",
         "mailing_list": "fasmailinglist",
     }
-    ATTR_LISTS = ["members", "sponsors", "urls"]
-
+    attr_types = {
+        "members": "list",
+        "sponsors": "list",
+        "urls": "list",
+    }
     pkey = "name"
     ipa_object = "group"
-
-    @property
-    def dn(self):
-        if 'dn' in self.raw:
-            return self.raw['dn']
-        return None

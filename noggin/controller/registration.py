@@ -1,20 +1,29 @@
 import datetime
 import re
 
-from flask import flash, redirect, url_for, abort, render_template, request, session
+import jwt
+import python_freeipa
+from flask import (
+    abort,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_babel import _
 from flask_mail import Message
-import jwt
-from noggin_messages import UserCreateV1
-import python_freeipa
 
-from noggin import app, ipa_admin, mailer
-from noggin.form.register_user import ResendValidationEmailForm, PasswordSetForm
+from noggin import app, csrf, ipa_admin, mailer
+from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
 from noggin.representation.user import User
+from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
+from noggin.signals import user_registered
+from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.locales import guess_locale
-from noggin.utility.token import EmailValidationToken
-from noggin.utility import messaging, FormError, handle_form_errors
-from noggin.security.ipa import untouched_ipa_client, maybe_ipa_login
+from noggin.utility.token import Audience, make_token, read_token
 
 
 # Errors coming from FreeIPA are specified by a field name that is different from our form field
@@ -30,7 +39,11 @@ IPA_TO_FORM_FIELDS = {
 
 
 def _send_validation_email(user):
-    token = EmailValidationToken.from_user(user).as_string()
+    token = make_token(
+        {"sub": user.username, "mail": user.mail},
+        audience=Audience.email_validation,
+        ttl=app.config["ACTIVATION_TOKEN_EXPIRATION"],
+    )
     email_context = {"token": token, "user": user}
     email = Message(
         body=render_template("email-validation.txt", **email_context),
@@ -78,7 +91,11 @@ def handle_register_form(form):
             login_shell='/bin/bash',
             fascreationtime=f"{now.isoformat()}Z",
             faslocale=guess_locale(),
-            fastimezone=app.config["USER_DEFAULTS"]["user_timezone"],
+            fastimezone=app.config["USER_DEFAULTS"]["timezone"],
+            fasstatusnote=app.config["USER_DEFAULTS"]["status_note"],
+            # Beware when moving to ClientMeta, they dropped the special argument
+            # "disabled", we'll have to set nsaccountlock directly.
+            disabled=app.config["USER_DEFAULTS"]["locked"],
         )
         user = User(user)
     except python_freeipa.exceptions.DuplicateEntry:
@@ -138,22 +155,26 @@ def activate_account():
             _('No token provided, please check your email validation link.'), 'warning'
         )
         return redirect(register_url)
+
     try:
-        token = EmailValidationToken.from_string(token_string)
+        token = read_token(token_string, audience=Audience.email_validation)
     except jwt.exceptions.DecodeError:
         flash(_("The token is invalid, please register again."), "warning")
         return redirect(register_url)
-    if not token.is_valid():
+    except jwt.exceptions.ExpiredSignatureError:
         flash(_("This token is no longer valid, please register again."), "warning")
         return redirect(register_url)
+
     try:
-        user = User(ipa_admin.stageuser_show(token.username))
+        user = User(ipa_admin.stageuser_show(token["sub"]))
     except python_freeipa.exceptions.NotFound:
         flash(_("This user cannot be found, please register again."), "warning")
         return redirect(register_url)
-    if not user.mail == token.mail:
+
+    token_mail = token["mail"]
+    if not user.mail == token_mail:
         app.logger.error(
-            f'User {user.username} tried to validate a token for address {token.mail} while they '
+            f'User {user.username} tried to validate a token for address {token_mail} while they '
             f'are registered with address {user.mail}, something fishy may be going on.'
         )
         flash(
@@ -181,14 +202,12 @@ def activate_account():
                 raise FormError(
                     "non_field_errors",
                     _(
-                        "Something went wrong while activating your account, "
+                        "Something went wrong while creating your account, "
                         "please try again later."
                     ),
                 )
-            # User activation succeeded. Send message.
-            messaging.publish(
-                UserCreateV1({"msg": {"agent": user.username, "user": user.username}})
-            )
+            # User activation succeeded. Send signal.
+            user_registered.send(user, request=request._get_current_object())
             # Now we set the password.
             try:
                 # First, set it as an admin. This will mark it as expired.
@@ -203,7 +222,7 @@ def activate_account():
                 # Tell the user what's going to happen.
                 flash(
                     _(
-                        'Your account has been activated, but the password you chose does not '
+                        'Your account has been created, but the password you chose does not '
                         'comply with the policy (%(policy_error)s) and has thus been set as '
                         'expired. You will be asked to change it after logging in.',
                         policy_error=e.policy_error,
@@ -223,7 +242,7 @@ def activate_account():
                 # the login page with an appropriate warning.
                 flash(
                     _(
-                        'Your account has been activated, but an error occurred while setting your '
+                        'Your account has been created, but an error occurred while setting your '
                         'password (%(message)s). You may need to change it after logging in.',
                         message=e.message,
                     ),
@@ -239,7 +258,7 @@ def activate_account():
             if ipa:
                 flash(
                     _(
-                        'Congratulations, your account is now active! Welcome, %(name)s.',
+                        'Congratulations, your account has been created! Welcome, %(name)s.',
                         name=user.name,
                     ),
                     'success',
@@ -249,7 +268,7 @@ def activate_account():
                 # expired).
                 flash(
                     _(
-                        'Congratulations, your account is now active! Go ahead and sign in '
+                        'Congratulations, your account has been created! Go ahead and sign in '
                         'to proceed.'
                     ),
                     'success',
@@ -257,3 +276,40 @@ def activate_account():
             return redirect(url_for('root'))
 
     return render_template('registration-activation.html', user=user, form=form)
+
+
+@app.route('/register/spamcheck-hook', methods=["POST"])
+@csrf.exempt
+def spamcheck_hook():
+    if not app.config.get("BASSET_URL"):
+        return jsonify({"error": "Spamcheck disabled"}), 501
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Bad payload"}), 400
+
+    try:
+        token = data["token"]
+        status = data["status"]
+    except KeyError as e:
+        return jsonify({"error": f"Missing key: {e}"}), 400
+
+    try:
+        token_data = read_token(token, audience=Audience.spam_check)
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "The token has expired"}), 400
+    except jwt.InvalidTokenError as e:
+        return jsonify({"error": f"Invalid token: {e}"}), 400
+
+    username = token_data["sub"]
+
+    if status == "active":
+        lock = False
+    elif status in ("spamcheck_denied", "spamcheck_manual"):
+        lock = True
+    else:
+        return jsonify({"error": f"Invalid status: {status}."}), 400
+    # Beware when moving to ClientMeta, they dropped the special argument
+    # "disabled", we'll have to set nsaccountlock directly.
+    ipa_admin.user_mod(username, fasstatusnote=status, disabled=lock)
+    return jsonify({"status": "success"})

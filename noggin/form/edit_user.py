@@ -1,25 +1,23 @@
-from flask_wtf import FlaskForm
 from flask_babel import lazy_gettext as _
 from wtforms import (
     FieldList,
-    StringField,
-    SelectField,
-    TextAreaField,
     HiddenField,
     PasswordField,
+    SelectField,
+    StringField,
+    TextAreaField,
 )
-
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.validators import AnyOf, DataRequired, Optional, Length, URL
+from wtforms.validators import AnyOf, DataRequired, Length, Optional, URL
 
 from noggin import app
 from noggin.form.validators import Email
 from noggin.utility.locales import LOCALES
 from noggin.utility.timezones import TIMEZONES
-from .base import CSVListField
+from .base import BaseForm, CSVListField
 
 
-class UserSettingsProfileForm(FlaskForm):
+class UserSettingsProfileForm(BaseForm):
     firstname = StringField(
         _('First Name'),
         validators=[DataRequired(message=_('First name must not be empty'))],
@@ -73,7 +71,7 @@ class UserSettingsProfileForm(FlaskForm):
     )
 
 
-class UserSettingsKeysForm(FlaskForm):
+class UserSettingsKeysForm(BaseForm):
     sshpubkeys = FieldList(
         TextAreaField(validators=[Optional()], render_kw={"rows": 4}),
         label=_('SSH Keys'),
@@ -84,7 +82,7 @@ class UserSettingsKeysForm(FlaskForm):
     )
 
 
-class UserSettingsAddOTPForm(FlaskForm):
+class UserSettingsAddOTPForm(BaseForm):
     description = StringField(
         _('Token name'),
         validators=[Optional()],
@@ -98,13 +96,13 @@ class UserSettingsAddOTPForm(FlaskForm):
     )
 
 
-class UserSettingsOTPStatusChange(FlaskForm):
+class UserSettingsOTPStatusChange(BaseForm):
     token = HiddenField(
         'token', validators=[DataRequired(message=_('token must not be empty'))]
     )
 
 
-class UserSettingsAgreementSign(FlaskForm):
+class UserSettingsAgreementSign(BaseForm):
     agreement = HiddenField(
         'agreement', validators=[DataRequired(message=_('agreement must not be empty'))]
     )

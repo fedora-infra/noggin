@@ -99,9 +99,9 @@
     <button tabindex="0"
         class="btn btn-link"
         role="button" data-toggle="popover"
-        data-trigger="focus" 
-        title="{{_('Edit Group')}}" 
-        data-content="{{_("To change group details or add sponsors, file a ticket with")}} <a href='https://pagure.io/fedora-infrastructure/new_issue' target='_blank'>fedora-infra</a>" 
+        data-trigger="focus"
+        title="{{_('Edit Group')}}"
+        data-content="{{_("To change group details or add sponsors, file a ticket with")}} <a href='https://pagure.io/fedora-infrastructure/new_issue' target='_blank'>fedora-infra</a>"
         data-html="true">
         <i class="fa fa-fw fa-pencil" aria-hidden="true"></i>
 </button>
@@ -133,4 +133,14 @@
       </div>
     </div>
   </div>
+{% endmacro %}
+
+
+{% macro spamcheck_contact() %}
+{% set email_link %}
+<a href="mailto:spamcheck@fedoraproject.org?Subject=Not%20Spam:%20{{ g.current_user.username }}">spamcheck@fedoraproject.org</a>
+{% endset %}
+<p>
+    {{ _("If it is not correct, please send an email to %(email_link)s and explain the situation.", email_link=email_link) }}
+</p>
 {% endmacro %}
