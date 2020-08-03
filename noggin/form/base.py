@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
+from markupsafe import escape, Markup
 from wtforms import Field, SubmitField
 from wtforms.widgets import TextInput
-from wtforms.widgets.core import html_params, HTMLString
+from wtforms.widgets.core import html_params
 
 
 class BaseForm(FlaskForm):
@@ -32,7 +33,6 @@ class ButtonWidget:
     data on the field.
     """
 
-    html_params = staticmethod(html_params)
     button_type = "button"
 
     def __call__(self, field, **kwargs):
@@ -47,11 +47,7 @@ class ButtonWidget:
         classes.append(kwargs.get("class"))
         kwargs["class"] = " ".join(c for c in classes if c)
         # Rendering
-        return HTMLString(
-            '<button {params}>{label}</button>'.format(
-                params=self.html_params(**kwargs), label=label
-            )
-        )
+        return Markup(f"<button {html_params(**kwargs)}>{escape(label)}</button>")
 
 
 class ButtonSubmitWidget(ButtonWidget):
