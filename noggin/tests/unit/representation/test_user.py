@@ -21,6 +21,7 @@ def test_user(dummy_user_dict):
     assert user.github == "dummy"
     assert user.gitlab == "dummy"
     assert user.rhbz_mail == "dummy@example.com"
+    assert user.locked is False
 
 
 def test_user_no_displayname(dummy_user_dict):
