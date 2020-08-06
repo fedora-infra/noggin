@@ -610,8 +610,8 @@ def test_no_direct_login(
     "spamcheck_status", ["active", "spamcheck_denied", "spamcheck_manual"]
 )
 @pytest.mark.vcr()
-def test_spamcheck(client, dummy_user, mocker, spamcheck_status, spamcheck_on):
-    user = User(ipa_admin.user_show("dummy")["result"])
+def test_spamcheck(client, dummy_stageuser, mocker, spamcheck_status, spamcheck_on):
+    user = User(ipa_admin.stageuser_show("dummy")["result"])
     assert user.status_note != spamcheck_status
     token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
     with mailer.record_messages() as outbox:
@@ -622,9 +622,8 @@ def test_spamcheck(client, dummy_user, mocker, spamcheck_status, spamcheck_on):
     assert response.status_code == 200
     assert response.json == {"status": "success"}
     # Check that the status was changed
-    user = User(ipa_admin.user_show("dummy")["result"])
+    user = User(ipa_admin.stageuser_show("dummy")["result"])
     assert user.status_note == spamcheck_status
-    assert user.locked == (spamcheck_status != "active")
     # Sent email
     if spamcheck_status == "active":
         assert len(outbox) == 1
