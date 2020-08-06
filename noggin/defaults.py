@@ -9,9 +9,7 @@ USER_DEFAULTS = {
     "status_note": "active",
 }
 THEME = "default"
-PASSWORD_POLICY = {
-    "min": 8, "max": -1
-}
+PASSWORD_POLICY = {"min": 8, "max": -1}
 PASSWORD_RESET_EXPIRATION = 10  # in minutes
 PASSWORD_RESET_LOCK_DIR = "/tmp/noggin-pw-reset"
 ACTIVATION_TOKEN_EXPIRATION = 30  # in minutes

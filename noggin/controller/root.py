@@ -1,26 +1,35 @@
 import python_freeipa
-from flask import jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    current_app,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_healthz import HealthError
 
-from noggin import app, ipa_admin
+from noggin.app import ipa_admin
 from noggin.form.login_user import LoginUserForm
 from noggin.form.register_user import RegisterUserForm
 from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_session
-from noggin.utility import with_ipa
+from noggin.utility.controllers import with_ipa
 from noggin.utility.forms import handle_form_errors
 
+from . import blueprint as bp
 from .authentication import handle_login_form
 from .registration import handle_register_form
 
 
-@app.route('/', methods=['GET', 'POST'])
+@bp.route('/', methods=['GET', 'POST'])
 def root():
-    ipa = maybe_ipa_session(app, session)
+    ipa = maybe_ipa_session(current_app, session)
     username = session.get('noggin_username')
     if ipa and username:
-        return redirect(url_for('user', username=username))
+        return redirect(url_for('.user', username=username))
 
     # Kick any non-authed user back to the login form.
 
@@ -45,23 +54,23 @@ def root():
     )
 
 
-@app.route('/logout')
+@bp.route('/logout')
 def logout():
     """Log the user out."""
     # Don't use the with_ipa() decorator, otherwise anonymous users visiting this endpoint will be
     # asked to login to then be logged out.
     try:
-        ipa = maybe_ipa_session(app, session)
+        ipa = maybe_ipa_session(current_app, session)
     except python_freeipa.exceptions.FreeIPAError:
         # Not much we can do here, proceed to logout and it may help solve the issue.
         ipa = None
     if ipa:
         ipa.logout()
     session.clear()
-    return redirect(url_for('root'))
+    return redirect(url_for('.root'))
 
 
-@app.route('/search/json')
+@bp.route('/search/json')
 @with_ipa()
 def search_json(ipa):
     username = request.args.get('username')

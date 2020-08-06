@@ -1,10 +1,12 @@
 import random
 from functools import wraps
 
+from flask import current_app
+
 from .ipa import Client
 
 
-class IPAAdmin(object):
+class IPAAdmin:
 
     __WRAPPED_METHODS = (
         "user_add",
@@ -40,22 +42,29 @@ class IPAAdmin(object):
         "fasagreement_disable",
     )
 
-    def __init__(self, app):
-        self.__username = app.config['FREEIPA_ADMIN_USER']
-        self.__password = app.config['FREEIPA_ADMIN_PASSWORD']
+    def __init__(self, app=None):
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
+        app.extensions["ipa-admin"] = {
+            "username": app.config['FREEIPA_ADMIN_USER'],
+            "password": app.config['FREEIPA_ADMIN_PASSWORD'],
+        }
         app.config['FREEIPA_ADMIN_USER'] = '***'
         app.config['FREEIPA_ADMIN_PASSWORD'] = '***'  # nosec
-        self.__app = app
 
     # Attempt to obtain an administrative IPA session
     def __maybe_ipa_admin_session(self):
-        self.__client = Client(
-            random.choice(self.__app.config['FREEIPA_SERVERS']),
-            verify_ssl=self.__app.config['FREEIPA_CACERT'],
+        username = current_app.extensions["ipa-admin"]["username"]
+        password = current_app.extensions["ipa-admin"]["password"]
+        client = Client(
+            random.choice(current_app.config['FREEIPA_SERVERS']),
+            verify_ssl=current_app.config['FREEIPA_CACERT'],
         )
-        self.__client.login(self.__username, self.__password)
-        self.__client.ping()
-        return self.__client
+        client.login(username, password)
+        client.ping()
+        return client
 
     def __wrap_method(self, method_name):
         @wraps(getattr(Client, method_name))
@@ -70,7 +79,7 @@ class IPAAdmin(object):
 
     def __getattr__(self, name):
         wrapped_methods = list(self.__WRAPPED_METHODS)
-        if self.__app.config['TESTING']:  # pragma: no cover
+        if current_app.config.get('TESTING', False):  # pragma: no cover
             wrapped_methods.extend(self.__WRAPPED_METHODS_TESTING)
         if name in wrapped_methods:
             return self.__wrap_method(name)

@@ -1,7 +1,7 @@
 import pytest
 from bs4 import BeautifulSoup
 
-from noggin import ipa_admin
+from noggin.app import ipa_admin
 from noggin.utility.pagination import PagedResult
 
 
@@ -81,7 +81,7 @@ def test_groups_page(client, logged_in_dummy_user, many_dummy_groups):
 @pytest.mark.vcr()
 def test_groups_page_nopaging(client, logged_in_dummy_user, mocker):
     ipa = mocker.Mock(name="ipa")
-    mocker.patch("noggin.utility.maybe_ipa_session", return_value=ipa)
+    mocker.patch("noggin.utility.controllers.maybe_ipa_session", return_value=ipa)
     ipa.user_find.return_value = {"result": [{"uid": "dummy"}]}
     ipa.group_find.return_value = {"result": [{"cn": "dummy-1"}, {"cn": "dummy-2"}]}
     result = client.get("/groups/?page_size=0")

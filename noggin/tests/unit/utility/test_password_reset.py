@@ -3,12 +3,11 @@ from unittest import mock
 
 import pytest
 
-from noggin.app import app
 from noggin.utility.password_reset import PasswordResetLock
 
 
 @pytest.fixture
-def tmp_lock_dir(tmp_path):
+def tmp_lock_dir(app, tmp_path):
     with app.test_request_context('/'):
         with mock.patch.dict(app.config, {"PASSWORD_RESET_LOCK_DIR": tmp_path}):
             yield tmp_path

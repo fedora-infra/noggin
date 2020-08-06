@@ -1,28 +1,76 @@
-from flask import g, render_template, session
+import os
+from logging.config import dictConfig
 
-from noggin import app
-from noggin.controller.authentication import otp_sync  # noqa: F401
-from noggin.controller.group import group, groups  # noqa: F401
-from noggin.controller.password import password_reset  # noqa: F401
-from noggin.controller.registration import (  # noqa: F401
-    activate_account,
-    confirm_registration,
-)
-from noggin.controller.root import root, search_json  # noqa: F401
-from noggin.controller.user import user  # noqa: F401
-from noggin.utility import gravatar
+from flask import Flask
+from flask_healthz import healthz
+from flask_mail import Mail
+from flask_wtf.csrf import CSRFProtect
+from whitenoise import WhiteNoise
+
+from noggin.controller import blueprint
+from noggin.l10n import babel
+from noggin.middleware import IPAErrorHandler
+from noggin.security.ipa_admin import IPAAdmin
+from noggin.themes import Theme
+from noggin.utility import import_all
 
 
-@app.context_processor
-def inject_global_template_vars():
-    return dict(
-        gravatar=gravatar,
-        ipa=g.ipa if 'ipa' in g else None,
-        current_user=g.current_user if 'current_user' in g else None,
-        current_username=session.get('noggin_username'),
+# Forms
+csrf = CSRFProtect()
+
+# IPA admin account
+ipa_admin = IPAAdmin()
+
+# Theme manager
+theme = Theme()
+
+# Flask-Mail
+mailer = Mail()
+
+# Catch IPA errors
+ipa_error_handler = IPAErrorHandler()
+
+
+def create_app(config=None):
+    """See https://flask.palletsprojects.com/en/1.1.x/patterns/appfactories/"""
+
+    app = Flask(__name__)
+
+    # Load default configuration
+    app.config.from_object("noggin.defaults")
+
+    # Load the optional configuration file
+    if "NOGGIN_CONFIG_PATH" in os.environ:
+        app.config.from_envvar("NOGGIN_CONFIG_PATH")
+
+    # Load the config passed as argument
+    app.config.update(config or {})
+
+    # Templates reloading
+    if app.config.get("TEMPLATES_AUTO_RELOAD"):
+        app.jinja_env.auto_reload = True
+
+    # Logging
+    if app.config.get("LOGGING"):
+        dictConfig(app.config["LOGGING"])
+
+    # Static files
+    whitenoise = app.wsgi_app = WhiteNoise(
+        app.wsgi_app, root=f"{app.root_path}/static/", prefix="static/"
     )
 
+    # Extensions
+    babel.init_app(app)
+    app.jinja_env.add_extension("jinja2.ext.i18n")
+    csrf.init_app(app)
+    ipa_admin.init_app(app)
+    mailer.init_app(app)
+    ipa_error_handler.init_app(app)
+    theme.init_app(app, whitenoise=whitenoise)
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
+    # Register views
+    import_all("noggin.controller")
+    app.register_blueprint(blueprint)
+    app.register_blueprint(healthz, url_prefix="/healthz")
+
+    return app

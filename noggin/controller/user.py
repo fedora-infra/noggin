@@ -1,10 +1,17 @@
 from urllib.parse import quote, urlparse
 
 import python_freeipa
-from flask import flash, Markup, redirect, render_template, session, url_for
+from flask import (
+    current_app,
+    flash,
+    Markup,
+    redirect,
+    render_template,
+    session,
+    url_for,
+)
 from flask_babel import _
 
-from noggin import app
 from noggin.form.edit_user import (
     UserSettingsAddOTPForm,
     UserSettingsAgreementSign,
@@ -17,12 +24,15 @@ from noggin.representation.group import Group
 from noggin.representation.otptoken import OTPToken
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login
-from noggin.utility import messaging, require_self, user_or_404, with_ipa
+from noggin.utility import messaging
+from noggin.utility.controllers import require_self, user_or_404, with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin_messages import UserUpdateV1
 
+from . import blueprint as bp
 
-@app.route('/user/<username>/')
+
+@bp.route('/user/<username>/')
 @with_ipa()
 def user(ipa, username):
     user = User(user_or_404(ipa, username))
@@ -60,13 +70,13 @@ def _user_mod(ipa, form, user, details, redirect_to):
             if e.message == 'no modifications to be performed':
                 raise FormError("non_field_errors", e.message)
             else:
-                app.logger.error(
+                current_app.logger.error(
                     f'An error happened while editing user {user.username}: {e.message}'
                 )
                 raise FormError("non_field_errors", e.message)
         flash(
             Markup(
-                f'Profile Updated: <a href=\"{url_for("user", username=user.username)}\">'
+                f'Profile Updated: <a href=\"{url_for(".user", username=user.username)}\">'
                 'view your profile</a>'
             ),
             'success',
@@ -87,7 +97,7 @@ def _user_mod(ipa, form, user, details, redirect_to):
         return redirect(url_for(redirect_to, username=user.username))
 
 
-@app.route('/user/<username>/settings/profile/', methods=['GET', 'POST'])
+@bp.route('/user/<username>/settings/profile/', methods=['GET', 'POST'])
 @with_ipa()
 @require_self
 def user_settings_profile(ipa, username):
@@ -113,7 +123,7 @@ def user_settings_profile(ipa, username):
                 'fasrhbzemail': form.rhbz_mail.data,
                 'faswebsiteurl': form.website_url.data,
             },
-            "user_settings_profile",
+            ".user_settings_profile",
         )
         if result:
             return result
@@ -123,7 +133,7 @@ def user_settings_profile(ipa, username):
     )
 
 
-@app.route('/user/<username>/settings/keys/', methods=['GET', 'POST'])
+@bp.route('/user/<username>/settings/keys/', methods=['GET', 'POST'])
 @with_ipa()
 @require_self
 def user_settings_keys(ipa, username):
@@ -136,7 +146,7 @@ def user_settings_keys(ipa, username):
             form,
             user,
             {'o_ipasshpubkey': form.sshpubkeys.data, 'fasgpgkeyid': form.gpgkeys.data},
-            "user_settings_keys",
+            ".user_settings_keys",
         )
         if result:
             return result
@@ -154,7 +164,7 @@ def user_settings_keys(ipa, username):
     )
 
 
-@app.route('/user/<username>/settings/otp/', methods=['GET', 'POST'])
+@bp.route('/user/<username>/settings/otp/', methods=['GET', 'POST'])
 @with_ipa()
 @require_self
 def user_settings_otp(ipa, username):
@@ -162,7 +172,7 @@ def user_settings_otp(ipa, username):
     user = User(user_or_404(ipa, username))
     if addotpform.validate_on_submit():
         try:
-            maybe_ipa_login(app, session, username, addotpform.password.data)
+            maybe_ipa_login(current_app, session, username, addotpform.password.data)
             result = ipa.otptoken_add(
                 o_ipatokenowner=username,
                 o_ipatokenotpalgorithm='sha512',
@@ -181,12 +191,12 @@ def user_settings_otp(ipa, username):
         except python_freeipa.exceptions.InvalidSessionPassword:
             addotpform.password.errors.append(_("Incorrect password"))
         except python_freeipa.exceptions.FreeIPAError as e:
-            app.logger.error(
+            current_app.logger.error(
                 f'An error happened while creating an OTP token for user {username}: {e.message}'
             )
             addotpform.non_field_errors.errors.append(_('Cannot create the token.'))
         else:
-            return redirect(url_for('user_settings_otp', username=username))
+            return redirect(url_for('.user_settings_otp', username=username))
 
     otp_uri = session.get('otp_uri')
     session['otp_uri'] = None
@@ -206,7 +216,7 @@ def user_settings_otp(ipa, username):
     )
 
 
-@app.route('/user/<username>/settings/otp/disable/', methods=['POST'])
+@bp.route('/user/<username>/settings/otp/disable/', methods=['POST'])
 @with_ipa()
 @require_self
 def user_settings_otp_disable(ipa, username):
@@ -224,22 +234,22 @@ def user_settings_otp_disable(ipa, username):
                 flash(_('Sorry, You cannot disable your last active token.'), 'warning')
             else:
                 flash('Cannot disable the token.', 'danger')
-                app.logger.error(
+                current_app.logger.error(
                     f'Something went wrong disabling an OTP token for user {username}: {e}'
                 )
         except python_freeipa.exceptions.FreeIPAError as e:
             flash(_('Cannot disable the token.'), 'danger')
-            app.logger.error(
+            current_app.logger.error(
                 f'Something went wrong disabling an OTP token for user {username}: {e}'
             )
 
     for field_errors in form.errors.values():
         for error in field_errors:
             flash(error, 'danger')
-    return redirect(url_for('user_settings_otp', username=username))
+    return redirect(url_for('.user_settings_otp', username=username))
 
 
-@app.route('/user/<username>/settings/otp/enable/', methods=['POST'])
+@bp.route('/user/<username>/settings/otp/enable/', methods=['POST'])
 @with_ipa()
 @require_self
 def user_settings_otp_enable(ipa, username):
@@ -256,17 +266,17 @@ def user_settings_otp_enable(ipa, username):
             flash(
                 _('Cannot enable the token. %(errormessage)s', errormessage=e), 'danger'
             )
-            app.logger.error(
+            current_app.logger.error(
                 f'Something went wrong enabling an OTP token for user {username}: {e}'
             )
 
     for field_errors in form.errors.values():
         for error in field_errors:
             flash(error, 'danger')
-    return redirect(url_for('user_settings_otp', username=username))
+    return redirect(url_for('.user_settings_otp', username=username))
 
 
-@app.route('/user/<username>/settings/otp/delete/', methods=['POST'])
+@bp.route('/user/<username>/settings/otp/delete/', methods=['POST'])
 @with_ipa()
 @require_self
 def user_settings_otp_delete(ipa, username):
@@ -285,22 +295,22 @@ def user_settings_otp_delete(ipa, username):
                 flash(_('Sorry, You cannot delete your last active token.'), 'warning')
             else:
                 flash(_('Cannot delete the token.'), 'danger')
-                app.logger.error(
+                current_app.logger.error(
                     f'Something went wrong deleting OTP token for user {username}: {e}'
                 )
         except python_freeipa.exceptions.FreeIPAError as e:
             flash(_('Cannot delete the token.'), 'danger')
-            app.logger.error(
+            current_app.logger.error(
                 f'Something went wrong deleting OTP token for user {username}: {e}'
             )
 
     for field_errors in form.errors.values():
         for error in field_errors:
             flash(error, 'danger')
-    return redirect(url_for('user_settings_otp', username=username))
+    return redirect(url_for('.user_settings_otp', username=username))
 
 
-@app.route('/user/<username>/settings/agreements/', methods=['GET', 'POST'])
+@bp.route('/user/<username>/settings/agreements/', methods=['GET', 'POST'])
 @with_ipa()
 @require_self
 def user_settings_agreements(ipa, username):
@@ -313,11 +323,13 @@ def user_settings_agreements(ipa, username):
         agreement_name = form.agreement.data
         if agreement_name not in [a.name for a in agreements]:
             flash(_("Unknown agreement: %(name)s.", name=agreement_name), "warning")
-            return redirect(url_for('user_settings_agreements', username=username))
+            return redirect(url_for('.user_settings_agreements', username=username))
         try:
             ipa.fasagreement_add_user(agreement_name, user=user.username)
         except python_freeipa.exceptions.BadRequest as e:
-            app.logger.error(f"Cannot sign the agreement {agreement_name!r}: {e}")
+            current_app.logger.error(
+                f"Cannot sign the agreement {agreement_name!r}: {e}"
+            )
             flash(
                 _(
                     'Cannot sign the agreement "%(name)s": %(error)s',
@@ -331,7 +343,7 @@ def user_settings_agreements(ipa, username):
                 _('You signed the "%(name)s" agreement.', name=agreement_name),
                 "success",
             )
-        return redirect(url_for('user_settings_agreements', username=username))
+        return redirect(url_for('.user_settings_agreements', username=username))
 
     return render_template(
         'user-settings-agreements.html',

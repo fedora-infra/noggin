@@ -4,11 +4,20 @@ import string
 
 import jwt
 import python_freeipa
-from flask import abort, flash, redirect, render_template, request, session, url_for
+from flask import (
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_babel import _
 from flask_mail import Message
 
-from noggin import app, ipa_admin, mailer
+from noggin.app import ipa_admin, mailer
 from noggin.form.password_reset import (
     ForgottenPasswordForm,
     NewPasswordForm,
@@ -16,16 +25,19 @@ from noggin.form.password_reset import (
 )
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_session, untouched_ipa_client
-from noggin.utility import messaging, require_self, user_or_404, with_ipa
+from noggin.utility import messaging
+from noggin.utility.controllers import require_self, user_or_404, with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import Audience, make_token, read_token
 from noggin_messages import UserUpdateV1
 
+from . import blueprint as bp
+
 
 def _validate_change_pw_form(form, username, ipa=None):
     if ipa is None:
-        ipa = untouched_ipa_client(app)
+        ipa = untouched_ipa_client(current_app)
 
     current_password = form.current_password.data
     password = form.password.data
@@ -43,7 +55,7 @@ def _validate_change_pw_form(form, username, ipa=None):
     except python_freeipa.exceptions.FreeIPAError as e:
         # If we made it here, we hit something weird not caught above. We didn't
         # bomb out, but we don't have IPA creds, either.
-        app.logger.error(
+        current_app.logger.error(
             f'An unhandled error {e.__class__.__name__} happened while reseting '
             f'the password for user {username}: {e.message}'
         )
@@ -51,7 +63,7 @@ def _validate_change_pw_form(form, username, ipa=None):
 
     if res and res.ok:
         flash(_('Your password has been changed'), 'success')
-        app.logger.info(f'Password for {username} was changed')
+        current_app.logger.info(f'Password for {username} was changed')
         messaging.publish(
             UserUpdateV1(
                 {"msg": {"agent": username, "user": username, "fields": ["password"]}}
@@ -60,13 +72,13 @@ def _validate_change_pw_form(form, username, ipa=None):
     return res
 
 
-@app.route('/password-reset', methods=['GET', 'POST'])
+@bp.route('/password-reset', methods=['GET', 'POST'])
 def password_reset():
     # If already logged in, redirect to the logged in reset form
-    ipa = maybe_ipa_session(app, session)
+    ipa = maybe_ipa_session(current_app, session)
     username = session.get('noggin_username')
     if ipa and username:
-        return redirect(url_for('user_settings_password', username=username))
+        return redirect(url_for('.user_settings_password', username=username))
 
     username = request.args.get('username')
     if not username:
@@ -76,14 +88,14 @@ def password_reset():
     if form.validate_on_submit():
         res = _validate_change_pw_form(form, username)
         if res and res.ok:
-            return redirect(url_for('root'))
+            return redirect(url_for('.root'))
 
     return render_template(
         'password-reset.html', password_reset_form=form, username=username
     )
 
 
-@app.route('/user/<username>/settings/password', methods=['GET', 'POST'])
+@bp.route('/user/<username>/settings/password', methods=['GET', 'POST'])
 @with_ipa()
 @require_self
 def user_settings_password(ipa, username):
@@ -99,7 +111,7 @@ def user_settings_password(ipa, username):
     if form.validate_on_submit():
         res = _validate_change_pw_form(form, username, ipa)
         if res and res.ok:
-            return redirect(url_for('root'))
+            return redirect(url_for('.root'))
 
     return render_template(
         'user-settings-password.html',
@@ -110,7 +122,7 @@ def user_settings_password(ipa, username):
     )
 
 
-@app.route('/forgot-password/ask', methods=['GET', 'POST'])
+@bp.route('/forgot-password/ask', methods=['GET', 'POST'])
 def forgot_password_ask():
     form = ForgottenPasswordForm()
     if form.validate_on_submit():
@@ -153,13 +165,17 @@ def forgot_password_ask():
             try:
                 mailer.send(email)
             except ConnectionRefusedError as e:
-                app.logger.error(f"Impossible to send a password reset email: {e}")
+                current_app.logger.error(
+                    f"Impossible to send a password reset email: {e}"
+                )
                 flash(_("We could not send you an email, please retry later"), "danger")
-                return redirect(url_for('root'))
-            if app.config["DEBUG"]:  # pragma: no cover
-                app.logger.debug(email)
+                return redirect(url_for('.root'))
+            if current_app.config["DEBUG"]:  # pragma: no cover
+                current_app.logger.debug(email)
             lock.store()
-            app.logger.info(f'{username} forgot their password and requested a token')
+            current_app.logger.info(
+                f'{username} forgot their password and requested a token'
+            )
             flash(
                 _(
                     'An email has been sent to your address with instructions on how to reset '
@@ -167,21 +183,21 @@ def forgot_password_ask():
                 ),
                 "success",
             )
-            return redirect(url_for('root'))
+            return redirect(url_for('.root'))
     return render_template('forgot-password-ask.html', form=form)
 
 
-@app.route('/forgot-password/change', methods=['GET', 'POST'])
+@bp.route('/forgot-password/change', methods=['GET', 'POST'])
 def forgot_password_change():
     token = request.args.get('token')
     if not token:
         flash('No token provided, please request one.', 'warning')
-        return redirect(url_for('forgot_password_ask'))
+        return redirect(url_for('.forgot_password_ask'))
     try:
         token_data = read_token(token, audience=Audience.password_reset)
     except jwt.exceptions.DecodeError:
         flash(_("The token is invalid, please request a new one."), "warning")
-        return redirect(url_for('forgot_password_ask'))
+        return redirect(url_for('.forgot_password_ask'))
     username = token_data["sub"]
     lock = PasswordResetLock(username)
     valid_until = lock.valid_until()
@@ -189,7 +205,7 @@ def forgot_password_change():
     if valid_until is None or now > valid_until:
         lock.delete()
         flash(_("The token has expired, please request a new one."), "warning")
-        return redirect(url_for('forgot_password_ask'))
+        return redirect(url_for('.forgot_password_ask'))
     user = User(ipa_admin.user_show(a_uid=username)['result'])
     if user.last_password_change != token_data["lpc"]:
         lock.delete()
@@ -200,7 +216,7 @@ def forgot_password_change():
             ),
             "warning",
         )
-        return redirect(url_for('forgot_password_ask'))
+        return redirect(url_for('.forgot_password_ask'))
 
     form = NewPasswordForm()
     if form.validate_on_submit():
@@ -215,7 +231,7 @@ def forgot_password_change():
             # example)
             ipa_admin.user_mod(username, userpassword=temp_password)
             # Change the password as the user, so it's not expired.
-            ipa = untouched_ipa_client(app)
+            ipa = untouched_ipa_client(current_app)
             ipa.change_password(
                 username,
                 new_password=password,
@@ -233,16 +249,16 @@ def forgot_password_change():
                 ),
                 'warning',
             )
-            app.logger.info(
+            current_app.logger.info(
                 f"Password for {username} was changed to a non-compliant password after "
                 f"completing the forgotten password process."
             )
             # Send them to the login page, they will have to change their password
             # after login.
-            return redirect(url_for('root'))
+            return redirect(url_for('.root'))
         except python_freeipa.exceptions.PWChangeInvalidPassword:
             # The provided OTP was wrong
-            app.logger.info(
+            current_app.logger.info(
                 f"Password for {username} was changed to a random string because "
                 f"the OTP token they provided was wrong."
             )
@@ -256,7 +272,7 @@ def forgot_password_change():
             form.otp.errors.append(_("Incorrect value."))
         except python_freeipa.exceptions.FreeIPAError as e:
             # If we made it here, we hit something weird not caught above.
-            app.logger.error(
+            current_app.logger.error(
                 f'An unhandled error {e.__class__.__name__} happened while reseting '
                 f'the password for user {username}: {e.message}'
             )
@@ -266,7 +282,7 @@ def forgot_password_change():
         else:
             lock.delete()
             flash(_('Your password has been changed.'), 'success')
-            app.logger.info(
+            current_app.logger.info(
                 f"Password for {username} was changed after completing the forgotten "
                 f"password process."
             )
@@ -281,7 +297,7 @@ def forgot_password_change():
                     }
                 )
             )
-            return redirect(url_for('root'))
+            return redirect(url_for('.root'))
     return render_template(
         'forgot-password-change.html', username=username, form=form, token=token
     )

@@ -5,7 +5,7 @@ import python_freeipa
 from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 
-from noggin import ipa_admin
+from noggin.app import ipa_admin
 from noggin.tests.unit.utilities import (
     assert_form_generic_error,
     assert_redirects_with_flash,

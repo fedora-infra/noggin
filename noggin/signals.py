@@ -49,7 +49,7 @@ def request_basset_check(sender, **kwargs):
                 "request_headers": dict(request.headers),
                 "request_ip": request.remote_addr,
                 "token": token,
-                "callback": url_for('spamcheck_hook', _external=True),
+                "callback": url_for('.spamcheck_hook', _external=True),
             },
         },
     )

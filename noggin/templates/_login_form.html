@@ -1,5 +1,5 @@
 {% import '_form_macros.html' as macros %}
-<form action="{{ url_for('root') }}" method="post" novalidate>
+<form action="{{ url_for('.root') }}" method="post" novalidate>
   {{ login_form.csrf_token }}
   <div class="card-body">
     <div class="form-group">
@@ -8,12 +8,12 @@
     <div class="form-group mb-0">
       {{ macros.with_errors(login_form.password, class="validate", placeholder="Password or Password + One-Time-Password", tabindex="2", label=False) }}
       {% if lost_otp_token is not defined %}
-      <small><a href="{{ url_for('forgot_password_ask') }}">{{ _("Forgot password?") }}</a></small>
+      <small><a href="{{ url_for('.forgot_password_ask') }}">{{ _("Forgot password?") }}</a></small>
       {% else %}
-      <small><a href="{{ url_for('forgot_password_ask') }}">{{ _("Forgotten password or lost OTP token?") }}</a></small>
+      <small><a href="{{ url_for('.forgot_password_ask') }}">{{ _("Forgotten password or lost OTP token?") }}</a></small>
       {% endif %}
       <div class="form-group mb-0">
-        <small><a href="{{ url_for('otp_sync') }}">{{ _("Sync Token") }}</a></small>
+        <small><a href="{{ url_for('.otp_sync') }}">{{ _("Sync Token") }}</a></small>
       </div>
     </div>
   </div>

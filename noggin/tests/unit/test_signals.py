@@ -4,8 +4,7 @@ import pytest
 import requests
 from flask import current_app
 
-from noggin import ipa_admin
-from noggin.app import app
+from noggin.app import ipa_admin
 from noggin.representation.user import User
 from noggin.signals import request_basset_check
 from noggin.utility.token import Audience, read_token
@@ -51,7 +50,7 @@ def test_signal_basset_failed(client, mocker, dummy_user):
     failure.raw = BytesIO(b"nope.")
     mocked_requests.post.return_value = failure
     mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
-    logger = mocker.patch.object(app, "logger")
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
     user = User(ipa_admin.user_show("dummy"))
     with current_app.test_request_context('/'):
         request_basset_check(user)

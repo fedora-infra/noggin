@@ -6,11 +6,40 @@ import pytest
 import python_freeipa
 from vcr import VCR
 
-from noggin import ipa_admin
-from noggin.app import app
+from noggin.app import create_app, ipa_admin
 from noggin.representation.agreement import Agreement
 from noggin.representation.otptoken import OTPToken
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
+
+
+@pytest.fixture(scope="session")
+def app_config(ipa_cert):
+    return dict(
+        TESTING=True,
+        DEBUG=True,
+        WTF_CSRF_ENABLED=False,
+        # IPA settings
+        FREEIPA_SERVERS=['ipa.noggin.test'],
+        FREEIPA_CACERT=ipa_cert,
+        # Any user with admin privileges
+        FREEIPA_ADMIN_USER='admin',
+        FREEIPA_ADMIN_PASSWORD='adminPassw0rd!',
+        # Fernet secret
+        FERNET_SECRET=b'G8ObvrpEEwbjWUO9rU1qAkDQRafAFd39heVKYf6TZi8=',
+        # Session secret
+        SECRET_KEY=b'monkiesmonkiesmonkiesmonkiesmonkies!!!1111monkies',
+        # We don't do https for testing
+        SESSION_COOKIE_SECURE=False,
+        # Email sender
+        MAIL_DEFAULT_SENDER="Noggin <noggin@example.com>",
+        # Set a different password policy betweed the form and the server so we can test both
+        PASSWORD_POLICY={"min": 6},
+    )
+
+
+@pytest.fixture(scope="session")
+def app(app_config):
+    return create_app(app_config)
 
 
 @pytest.fixture(scope="session")
@@ -33,15 +62,12 @@ def ipa_cert():
             # because VCR will mock the requests anyway.
             pass
         cert.close()
-        app.config['FREEIPA_CACERT'] = cert.name
-        yield
+        yield cert.name
 
 
 @pytest.fixture
-def client(ipa_cert):
-    app.config['TESTING'] = True
-    app.config['DEBUG'] = True
-    app.config['WTF_CSRF_ENABLED'] = False
+def client(app, ipa_cert):
+    # app.config['FREEIPA_CACERT'] = ipa_cert
     with app.test_client() as client:
         with app.app_context():
             yield client
@@ -78,9 +104,9 @@ def vcr_session(request):
 
 
 @pytest.fixture(scope="session")
-def ipa_testing_config(vcr_session):
+def ipa_testing_config(vcr_session, app):
     """Setup IPA with a testing configuration."""
-    with vcr_session.use_cassette("ipa_testing_config"):
+    with vcr_session.use_cassette("ipa_testing_config"), app.test_request_context('/'):
         pwpolicy = ipa_admin.pwpolicy_show()
         try:
             ipa_admin.pwpolicy_mod(o_krbminpwdlife=0, o_krbpwdminlength=8)
@@ -99,7 +125,7 @@ def ipa_testing_config(vcr_session):
 
 
 @pytest.fixture
-def make_user(ipa_testing_config):
+def make_user(ipa_testing_config, app):
     created_users = []
 
     def _make_user(name):
@@ -167,7 +193,7 @@ def password_min_time(dummy_group):
 
 
 @pytest.fixture
-def logged_in_dummy_user(client, dummy_user):
+def logged_in_dummy_user(client, dummy_user, app):
     with client.session_transaction() as sess:
         ipa = maybe_ipa_login(
             app, sess, username="dummy", userpassword="dummy_password"

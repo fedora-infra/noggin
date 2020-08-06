@@ -34,7 +34,7 @@
       <div class="modal-body">
         <pre>{{ agreement.description}}</pre>
         {% if agreement.name not in user.agreements %}
-        <form action="{{ url_for('user_settings_agreements', username=current_user.username) }}" method="post" class="d-inline">
+        <form action="{{ url_for('.user_settings_agreements', username=current_user.username) }}" method="post" class="d-inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <button type='submit' class="btn btn-lg btn-block btn-primary" name="agreement" value="{{ agreement.name }}">{{ _("Sign User Agreement") }}</button>
         </form>
