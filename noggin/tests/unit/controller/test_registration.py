@@ -5,7 +5,7 @@ import python_freeipa
 from fedora_messaging import testing as fml_testing
 from flask import current_app
 
-from noggin import ipa_admin, mailer
+from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
 from noggin.signals import stageuser_created, user_registered
 from noggin.tests.unit.utilities import (
@@ -176,7 +176,7 @@ def test_step_3(
 def test_step_1_no_smtp(client, post_data_step_1, cleanup_dummy_user, mocker):
     mailer = mocker.patch("noggin.controller.registration.mailer")
     mailer.send.side_effect = ConnectionRefusedError
-    logger = mocker.patch("noggin.controller.registration.app.logger")
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
     result = client.post('/', data=post_data_step_1)
     # Error message
     assert_redirects_with_flash(
@@ -323,7 +323,7 @@ def test_step_3_unknown_user(client, token_for_dummy_user):
 @pytest.mark.vcr()
 def test_step_3_wrong_address(client, token_for_dummy_user, mocker):
     """Registration activation page with a token containing the wrong email address"""
-    logger = mocker.patch("noggin.controller.registration.app.logger")
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
     ipa_admin.stageuser_mod(a_uid="dummy", mail="dummy-new@example.com")
     result = client.get(f'/register/activate?token={token_for_dummy_user}')
     assert_redirects_with_flash(

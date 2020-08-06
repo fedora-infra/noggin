@@ -1,11 +1,12 @@
 import python_freeipa
-from flask import flash, redirect, render_template, session, url_for
+from flask import current_app, flash, redirect, render_template, session, url_for
 from flask_babel import _
 
-from noggin import app
 from noggin.form.sync_token import SyncTokenForm
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
 from noggin.utility.forms import FormError, handle_form_errors
+
+from . import blueprint as bp
 
 
 def handle_login_form(form):
@@ -14,39 +15,39 @@ def handle_login_form(form):
 
     try:
         # This call will set the cookie itself, we don't have to.
-        ipa = maybe_ipa_login(app, session, username, password)
+        ipa = maybe_ipa_login(current_app, session, username, password)
     except python_freeipa.exceptions.PasswordExpired:
         flash(_('Password expired. Please reset it.'), 'danger')
-        return redirect(url_for('password_reset', username=username))
+        return redirect(url_for('.password_reset', username=username))
     except python_freeipa.exceptions.Unauthorized as e:
         raise FormError("non_field_errors", e.message)
     except python_freeipa.exceptions.FreeIPAError as e:
         # If we made it here, we hit something weird not caught above. We didn't
         # bomb out, but we don't have IPA creds, either.
-        app.logger.error(
+        current_app.logger.error(
             f'An unhandled error {e.__class__.__name__} happened while logging in user '
             f'{username}: {e.message}'
         )
         raise FormError("non_field_errors", _('Could not log in to the IPA server.'))
 
     if not ipa:
-        app.logger.error(
+        current_app.logger.error(
             f'An unhandled situation happened while logging in user {username}: '
             f'could not connect to the IPA server'
         )
         raise FormError("non_field_errors", _('Could not log in to the IPA server.'))
 
     flash(_('Welcome, %(username)s!', username=username), 'success')
-    return redirect(url_for('user', username=username))
+    return redirect(url_for('.user', username=username))
 
 
-@app.route('/otp/sync/', methods=['GET', 'POST'])
+@bp.route('/otp/sync/', methods=['GET', 'POST'])
 def otp_sync():
     form = SyncTokenForm()
     if form.validate_on_submit():
         with handle_form_errors(form):
             try:
-                ipa = untouched_ipa_client(app)
+                ipa = untouched_ipa_client(current_app)
                 ipa.otptoken_sync(
                     user=form.username.data,
                     password=form.password.data,
@@ -56,10 +57,10 @@ def otp_sync():
                 )
 
                 flash(_('Token successfully synchronized'), category='success')
-                return redirect(url_for('root'))
+                return redirect(url_for('.root'))
 
             except python_freeipa.exceptions.BadRequest as e:
-                app.logger.error(
+                current_app.logger.error(
                     f'An error {e.__class__.__name__} happened while syncing a token for user '
                     f'{form.username}: {e}'
                 )

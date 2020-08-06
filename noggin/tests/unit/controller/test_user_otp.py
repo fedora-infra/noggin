@@ -5,7 +5,7 @@ import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
 
-from noggin import ipa_admin
+from noggin.app import ipa_admin
 from noggin.representation.otptoken import OTPToken
 from noggin.tests.unit.utilities import (
     assert_form_field_error,

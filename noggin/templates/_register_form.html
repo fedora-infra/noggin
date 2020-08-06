@@ -1,6 +1,6 @@
 {% import '_form_macros.html' as macros %}
 
-<form action="{{ url_for('root') }}?tab=register" method="post" novalidate>
+<form action="{{ url_for('.root') }}?tab=register" method="post" novalidate>
   {{ register_form.csrf_token }}
   <div class="card-body">
     <div class="form-group">{{ macros.with_errors(register_form.username, tabindex="4") }}</div>

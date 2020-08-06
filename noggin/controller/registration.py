@@ -5,6 +5,7 @@ import jwt
 import python_freeipa
 from flask import (
     abort,
+    current_app,
     flash,
     jsonify,
     redirect,
@@ -16,14 +17,16 @@ from flask import (
 from flask_babel import _
 from flask_mail import Message
 
-from noggin import app, csrf, ipa_admin, mailer
+from noggin.app import csrf, ipa_admin, mailer
 from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
+from noggin.l10n import guess_locale
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
 from noggin.signals import stageuser_created, user_registered
 from noggin.utility.forms import FormError, handle_form_errors
-from noggin.utility.locales import guess_locale
 from noggin.utility.token import Audience, make_token, read_token
+
+from . import blueprint as bp
 
 
 # Errors coming from FreeIPA are specified by a field name that is different from our form field
@@ -42,7 +45,7 @@ def _send_validation_email(user):
     token = make_token(
         {"sub": user.username, "mail": user.mail},
         audience=Audience.email_validation,
-        ttl=app.config["ACTIVATION_TOKEN_EXPIRATION"],
+        ttl=current_app.config["ACTIVATION_TOKEN_EXPIRATION"],
     )
     email_context = {"token": token, "user": user}
     email = Message(
@@ -51,12 +54,12 @@ def _send_validation_email(user):
         recipients=[user.mail],
         subject=_("Verify your email address"),
     )
-    if app.config["DEBUG"]:  # pragma: no cover
-        app.logger.debug(email)
+    if current_app.config["DEBUG"]:  # pragma: no cover
+        current_app.logger.debug(email)
     try:
         mailer.send(email)
     except ConnectionRefusedError as e:
-        app.logger.error(f"Impossible to send an address validation email: {e}")
+        current_app.logger.error(f"Impossible to send an address validation email: {e}")
         flash(
             _("We could not send you the address validation email, please retry later"),
             "danger",
@@ -70,7 +73,7 @@ def _handle_registration_validation_error(username, e):
         if ipa_field_name in IPA_TO_FORM_FIELDS:
             raise FormError(IPA_TO_FORM_FIELDS[ipa_field_name], mo.group(2))
     # Raise a generic error if we can't do better
-    app.logger.error(
+    current_app.logger.error(
         f'An unhandled invalid value happened while registering user '
         f'{username}: {e.message}'
     )
@@ -91,8 +94,8 @@ def handle_register_form(form):
             o_loginshell='/bin/bash',
             fascreationtime=f"{now.isoformat()}Z",
             faslocale=guess_locale(),
-            fastimezone=app.config["USER_DEFAULTS"]["timezone"],
-            fasstatusnote=app.config["USER_DEFAULTS"]["status_note"],
+            fastimezone=current_app.config["USER_DEFAULTS"]["timezone"],
+            fasstatusnote=current_app.config["USER_DEFAULTS"]["status_note"],
         )['result']
         user = User(user)
     except python_freeipa.exceptions.DuplicateEntry:
@@ -103,7 +106,7 @@ def handle_register_form(form):
         # for example: invalid username. We don't know which field to link it to
         _handle_registration_validation_error(username, e)
     except python_freeipa.exceptions.FreeIPAError as e:
-        app.logger.error(
+        current_app.logger.error(
             f'An unhandled error {e.__class__.__name__} happened while registering user '
             f'{username}: {e.message}'
         )
@@ -113,15 +116,15 @@ def handle_register_form(form):
         )
 
     stageuser_created.send(user, request=request._get_current_object())
-    if app.config["BASSET_URL"]:
-        return redirect(f"{url_for('spamcheck_wait')}?username={username}")
+    if current_app.config["BASSET_URL"]:
+        return redirect(f"{url_for('.spamcheck_wait')}?username={username}")
     else:
         # Send the address validation email
         _send_validation_email(user)
-        return redirect(f"{url_for('confirm_registration')}?username={username}")
+        return redirect(f"{url_for('.confirm_registration')}?username={username}")
 
 
-@app.route('/register/spamcheck-wait')
+@bp.route('/register/spamcheck-wait')
 def spamcheck_wait():
     username = request.args.get('username')
     if not username:
@@ -131,15 +134,15 @@ def spamcheck_wait():
         user = User(ipa_admin.stageuser_show(a_uid=username)["result"])
     except python_freeipa.exceptions.NotFound:
         flash(_("The registration seems to have failed, please try again."), "warning")
-        return redirect(f"{url_for('root')}?tab=register")
+        return redirect(f"{url_for('.root')}?tab=register")
 
     if user.status_note == "active":
-        return redirect(f"{url_for('confirm_registration')}?username={username}")
+        return redirect(f"{url_for('.confirm_registration')}?username={username}")
 
     return render_template('registration-spamcheck-wait.html', user=user)
 
 
-@app.route('/register/confirm', methods=["GET", "POST"])
+@bp.route('/register/confirm', methods=["GET", "POST"])
 def confirm_registration():
     username = request.args.get('username')
     if not username:
@@ -148,9 +151,9 @@ def confirm_registration():
         user = User(ipa_admin.stageuser_show(a_uid=username)['result'])
     except python_freeipa.exceptions.NotFound:
         flash(_("The registration seems to have failed, please try again."), "warning")
-        return redirect(f"{url_for('root')}?tab=register")
+        return redirect(f"{url_for('.root')}?tab=register")
 
-    if app.config["BASSET_URL"] and user.status_note != "active":
+    if current_app.config["BASSET_URL"] and user.status_note != "active":
         abort(401, "You should not be here")
 
     form = ResendValidationEmailForm()
@@ -168,9 +171,9 @@ def confirm_registration():
     return render_template('registration-confirmation.html', user=user, form=form)
 
 
-@app.route('/register/activate', methods=["GET", "POST"])
+@bp.route('/register/activate', methods=["GET", "POST"])
 def activate_account():
-    register_url = f"{url_for('root')}?tab=register"
+    register_url = f"{url_for('.root')}?tab=register"
     token_string = request.args.get('token')
     if not token_string:
         flash(
@@ -195,7 +198,7 @@ def activate_account():
 
     token_mail = token["mail"]
     if not user.mail == token_mail:
-        app.logger.error(
+        current_app.logger.error(
             f'User {user.username} tried to validate a token for address {token_mail} while they '
             f'are registered with address {user.mail}, something fishy may be going on.'
         )
@@ -217,7 +220,7 @@ def activate_account():
             try:
                 ipa_admin.stageuser_activate(user.username)
             except python_freeipa.exceptions.FreeIPAError as e:
-                app.logger.error(
+                current_app.logger.error(
                     f'An unhandled error {e.__class__.__name__} happened while activating '
                     f'stage user {user.username}: {e.message}'
                 )
@@ -235,7 +238,7 @@ def activate_account():
                 # First, set it as an admin. This will mark it as expired.
                 ipa_admin.user_mod(user.username, userpassword=password)
                 # And now we set it again as the user, so it is not expired any more.
-                ipa = untouched_ipa_client(app)
+                ipa = untouched_ipa_client(current_app)
                 ipa.change_password(
                     user.username, new_password=password, old_password=password
                 )
@@ -251,12 +254,12 @@ def activate_account():
                     ),
                     'warning',
                 )
-                return redirect(url_for("root"))
+                return redirect(url_for(".root"))
             except python_freeipa.exceptions.ValidationError as e:
                 # for example: invalid username. We don't know which field to link it to
                 _handle_registration_validation_error(user.username, e)
             except python_freeipa.exceptions.FreeIPAError as e:
-                app.logger.error(
+                current_app.logger.error(
                     f'An unhandled error {e.__class__.__name__} happened while changing initial '
                     f'password for user {user.username}: {e.message}'
                 )
@@ -270,11 +273,11 @@ def activate_account():
                     ),
                     'warning',
                 )
-                return redirect(url_for("root"))
+                return redirect(url_for(".root"))
 
             # Try to log them in directly, so they don't have to type their password again.
             try:
-                ipa = maybe_ipa_login(app, session, user.username, password)
+                ipa = maybe_ipa_login(current_app, session, user.username, password)
             except python_freeipa.exceptions.FreeIPAError:
                 ipa = None
             if ipa:
@@ -295,15 +298,15 @@ def activate_account():
                     ),
                     'success',
                 )
-            return redirect(url_for('root'))
+            return redirect(url_for('.root'))
 
     return render_template('registration-activation.html', user=user, form=form)
 
 
-@app.route('/register/spamcheck-hook', methods=["POST"])
+@bp.route('/register/spamcheck-hook', methods=["POST"])
 @csrf.exempt
 def spamcheck_hook():
-    if not app.config.get("BASSET_URL"):
+    if not current_app.config.get("BASSET_URL"):
         return jsonify({"error": "Spamcheck disabled"}), 501
 
     data = request.get_json()

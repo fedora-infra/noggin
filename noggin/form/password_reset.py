@@ -1,10 +1,9 @@
 from flask_babel import lazy_gettext as _
 from wtforms import PasswordField, StringField
-from wtforms.validators import DataRequired, EqualTo, Length
-
-from noggin import app
+from wtforms.validators import DataRequired, EqualTo
 
 from .base import BaseForm
+from .validators import PasswordLength
 
 
 class NewPasswordForm(BaseForm):
@@ -13,10 +12,7 @@ class NewPasswordForm(BaseForm):
         _('New Password'),
         validators=[
             DataRequired(message=_('Password must not be empty')),
-            Length(
-                min=app.config["PASSWORD_POLICY"].get("min", -1),
-                max=app.config["PASSWORD_POLICY"].get("max", -1),
-            ),
+            PasswordLength(),
             EqualTo('password_confirm', message=_('Passwords must match')),
         ],
     )

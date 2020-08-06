@@ -4,9 +4,9 @@ import pytest
 import python_freeipa
 import requests
 from bs4 import BeautifulSoup
-from flask import get_flashed_messages, session
+from flask import current_app, get_flashed_messages, session
 
-from noggin import ipa_admin
+from noggin.app import ipa_admin
 from noggin.tests.unit.utilities import (
     assert_form_field_error,
     assert_form_generic_error,
@@ -273,21 +273,23 @@ def test_otp_sync_invalid_codes(client, dummy_user_with_otp):
 
 
 @pytest.mark.vcr()
-def test_otp_sync_http_error(client, dummy_user_with_otp):
+def test_otp_sync_http_error(client, dummy_user_with_otp, mocker):
     """Test synchronising OTP token with mocked http error"""
-    with mock.patch("noggin.controller.authentication.app.logger") as logger:
-        with mock.patch("requests.sessions.Session.post") as method:
-            method.side_effect = requests.exceptions.RequestException
-            result = client.post(
-                '/otp/sync/',
-                data={
-                    "username": "dummy",
-                    "password": "dummy_password",
-                    "first_code": "123456",
-                    "second_code": "234567",
-                },
-                follow_redirects=False,
-            )
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
+    method = mocker.patch("requests.sessions.Session.post")
+    method.side_effect = requests.exceptions.RequestException
+
+    result = client.post(
+        '/otp/sync/',
+        data={
+            "username": "dummy",
+            "password": "dummy_password",
+            "first_code": "123456",
+            "second_code": "234567",
+        },
+        follow_redirects=False,
+    )
+
     logger.error.assert_called_once()
     assert_form_generic_error(result, "Something went wrong trying to sync OTP token.")
 

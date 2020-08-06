@@ -64,7 +64,7 @@
                 <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 50) }}" alt="gravatar">
                 <div class="media-body ml-2">
                     <div class="my-0 font-weight-bold">
-                      <a href="{{ url_for('user', username=sponsor.username) }}">
+                      <a href="{{ url_for('.user', username=sponsor.username) }}">
                         <span class="title">{{ sponsor.username }}</span>
                       </a>
                     </div>
@@ -81,7 +81,7 @@
           <div class="h4">{{ _("Members") }} <span class="badge badge-secondary">{{members|length}}</span></div>
           {% if current_user_is_sponsor and sponsor_form %}
           {# TODO: not require a double enter here maybe #}
-             <form action="{{ url_for('group_add_member', groupname=group.name) }}" method="post">
+             <form action="{{ url_for('.group_add_member', groupname=group.name) }}" method="post">
               <div class="row">
                 <div class="col">
                   {{ sponsor_form.hidden_tag() }}
@@ -91,7 +91,7 @@
               </div>
             </form>
           {% elif current_user.username in group.members %}
-          <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
+          <form action="{{ url_for('.group_remove_member', groupname=group.name) }}" method="post">
             {{ sponsor_form.hidden_tag() }}
             <button type="submit" class="btn btn-sm btn-outline-danger" name="username" value="{{ current_user.username }}" id="leave-group-btn">
               {{ _("Leave group") }}
@@ -102,7 +102,7 @@
         {% if members|length == 0 %}
         <p>{{ _("No members yet.") }}</p>
         {% else %}
-        <form action="{{ url_for('group_remove_member', groupname=group.name) }}" method="post">
+        <form action="{{ url_for('.group_remove_member', groupname=group.name) }}" method="post">
           {{ sponsor_form.hidden_tag() }}
           <ul class="list-unstyled row">
             {% set sponsor_usernames = sponsors|map(attribute='username') %}
@@ -113,7 +113,7 @@
                   <img src="{{ gravatar(member.mail if member.mail else 'default', 50) }}" alt="gravatar">
                   <div class="media-body ml-2">
                       <div class="my-0 font-weight-bold">
-                        <a href="{{ url_for('user', username=member.username) }}">
+                        <a href="{{ url_for('.user', username=member.username) }}">
                           <span class="title">{{ member.username }}</span>
                         </a>
                       </div>

@@ -1,20 +1,18 @@
 import python_freeipa
-from flask import make_response, render_template
+from flask import current_app, make_response, render_template
 
 
 class IPAErrorHandler:
-    def __init__(self, app, error_template):
-        self.app = app
+    def __init__(self, app=None, error_template="ipa_error.html"):
         self.template = error_template
-        self.init_app()
+        if app is not None:
+            self.init_app(app)
 
-    def init_app(self):
-        self.app.wsgi_app = IPAWSGIMiddleware(
-            self.app.wsgi_app, self.get_error_response
-        )
+    def init_app(self, app):
+        app.wsgi_app = IPAWSGIMiddleware(app.wsgi_app, self.get_error_response)
 
     def get_error_response(self, error):
-        self.app.logger.error(f"Uncaught IPA exception: {error}")
+        current_app.logger.error(f"Uncaught IPA exception: {error}")
         return make_response(render_template(self.template, error=error), 500)
 
 

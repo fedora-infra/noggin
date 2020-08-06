@@ -1,10 +1,9 @@
 from flask_babel import lazy_gettext as _
 from wtforms import PasswordField, StringField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, EqualTo, Length
+from wtforms.validators import DataRequired, EqualTo
 
-from noggin import app
-from noggin.form.validators import Email
+from noggin.form.validators import Email, PasswordLength
 
 from .base import BaseForm, ModestForm, strip, SubmitButtonField
 
@@ -32,10 +31,7 @@ class RegisterUserForm(ModestForm):
         _('E-mail Address'),
         validators=[
             DataRequired(message=_('Email must not be empty')),
-            Email(
-                message=_('Email must be valid'),
-                blocklist=app.config["MAIL_DOMAIN_BLOCKLIST"],
-            ),
+            Email(message=_('Email must be valid')),
         ],
         filters=[strip],
     )
@@ -53,10 +49,7 @@ class PasswordSetForm(BaseForm):
         _('Password'),
         validators=[
             DataRequired(message=_('Password must not be empty')),
-            Length(
-                min=app.config["PASSWORD_POLICY"].get("min", -1),
-                max=app.config["PASSWORD_POLICY"].get("max", -1),
-            ),
+            PasswordLength(),
             EqualTo('password_confirm', message=_('Passwords must match')),
         ],
         filters=[strip],

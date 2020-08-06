@@ -16,10 +16,6 @@ import sys
 
 topdir = os.path.abspath("../")
 sys.path.insert(0, topdir)
-if "NOGGIN_CONFIG_PATH" not in os.environ:
-    os.environ["NOGGIN_CONFIG_PATH"] = os.path.join(
-        topdir, "noggin", "tests", "unit", "noggin.cfg"
-    )
 
 import noggin  # NOQA
 

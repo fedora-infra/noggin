@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 from flask import current_app
 
-from noggin import ipa_admin, mailer
+from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
 from noggin.security.ipa import untouched_ipa_client
 from noggin.tests.unit.utilities import (
@@ -97,7 +97,7 @@ def test_ask_post_non_existant_user(client):
 def test_ask_no_smtp(client, dummy_user, patched_lock, mocker):
     mailer = mocker.patch("noggin.controller.password.mailer")
     mailer.send.side_effect = ConnectionRefusedError
-    logger = mocker.patch("noggin.controller.password.app.logger")
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
     result = client.post('/forgot-password/ask', data={"username": "dummy"})
     # Email
     mailer.send.assert_called_once()
@@ -210,7 +210,7 @@ def test_change_get(client, dummy_user, token_for_dummy_user, patched_lock_activ
 def test_change_post(
     client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
 ):
-    logger = mocker.patch("noggin.controller.password.app.logger")
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
     with fml_testing.mock_sends(
         UserUpdateV1(
             {"msg": {"agent": "dummy", "user": "dummy", "fields": ["password"]}}
@@ -251,7 +251,7 @@ def test_change_post_password_too_short(
 def test_change_post_password_policy_rejected(
     client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
 ):
-    logger = mocker.patch("noggin.controller.password.app.logger")
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
     result = client.post(
         f'/forgot-password/change?token={token_for_dummy_user}',
         data={"password": "1234567", "password_confirm": "1234567"},
@@ -277,7 +277,7 @@ def test_change_post_password_policy_rejected(
 def test_change_post_generic_error(
     client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
 ):
-    logger = mocker.patch("noggin.controller.password.app.logger")
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
     ipa_admin_mock = mocker.patch("noggin.controller.password.ipa_admin")
     # We need user_show to work, but make user_mod raise an exception.
     ipa_admin_mock.user_show.side_effect = ipa_admin.user_show
@@ -329,7 +329,7 @@ def test_change_post_password_with_otp_not_given(
     patched_lock_active,
     mocker,
 ):
-    logger = mocker.patch("noggin.controller.password.app.logger")
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
     result = client.post(
         f'/forgot-password/change?token={token_for_dummy_user}',
         data={"password": "42424242", "password_confirm": "42424242"},
@@ -351,7 +351,7 @@ def test_change_post_password_with_otp_wrong_value(
     patched_lock_active,
     mocker,
 ):
-    logger = mocker.patch("noggin.controller.password.app.logger")
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
     result = client.post(
         f'/forgot-password/change?token={token_for_dummy_user}',
         data={"password": "42424242", "password_confirm": "42424242", "otp": "42"},

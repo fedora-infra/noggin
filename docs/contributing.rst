@@ -28,7 +28,7 @@ below.
 Development Environment
 =======================
 Vagrant allows contributors to get quickly up and running with a Noggin development environment by
-automatically configuring a virtual machine. To get started, first install the Vagrant and Virtualization 
+automatically configuring a virtual machine. To get started, first install the Vagrant and Virtualization
 packages needed, and start the libvirt service::
 
     $ sudo dnf install ansible libvirt vagrant-libvirt vagrant-sshfs vagrant-hostmanager
@@ -136,7 +136,7 @@ you want to be credited as. There is a script to generate a list of authors that
 before releasing, but creating the file manually allows you to set a custom name.
 
 A preview of the release notes can be generated with
-``NOGGIN_CONFIG_PATH=`pwd`/noggin.cfg.default towncrier --draft``.
+``towncrier --draft``.
 
 
 Licensing
@@ -196,7 +196,7 @@ When cutting a new release, follow these steps:
 #. Add missing authors to the release notes fragments by changing to the ``news`` directory and
    running the ``get-authors.py`` script, but check for duplicates and errors
 #. Generate the release notes by running
-   ``NOGGIN_CONFIG_PATH=`pwd`/noggin.cfg.default towncrier``
+   ``towncrier``
 #. Commit the changes
 #. Tag the commit with ``-s`` to generate a signed tag
 #. Push those changes to the upstream Github repository (via a PR or not)
@@ -224,5 +224,3 @@ To update all created languages with the newest strings in messages.pot, use::
 To compile the translations in updated .mo files into what noggin can use, use the command::
 
   poetry run pybabel compile -d noggin/translations
-
-

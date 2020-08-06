@@ -5,7 +5,7 @@ from flask import current_app, g, get_flashed_messages, session
 from werkzeug.exceptions import InternalServerError, NotFound
 
 from noggin.security.ipa import maybe_ipa_login
-from noggin.utility import group_or_404, require_self, user_or_404, with_ipa
+from noggin.utility.controllers import group_or_404, require_self, user_or_404, with_ipa
 
 
 @pytest.mark.vcr()

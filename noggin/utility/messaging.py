@@ -4,12 +4,11 @@ import traceback
 import backoff
 from fedora_messaging import api
 from fedora_messaging import exceptions as fml_exceptions
-
-from noggin import app
+from flask import current_app
 
 
 def backoff_hdlr(details):
-    app.logger.warning(
+    current_app.logger.warning(
         f"Publishing message failed. Retrying. {traceback.format_tb(sys.exc_info()[2])}"
     )
 
@@ -28,7 +27,7 @@ def publish(message):
     try:
         _publish(message)
     except (fml_exceptions.BaseException):
-        app.logger.error(
+        current_app.logger.error(
             f"Publishing message failed. Giving up. {traceback.format_tb(sys.exc_info()[2])}"
         )
         return

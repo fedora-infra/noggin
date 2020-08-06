@@ -6,7 +6,7 @@ from cryptography.fernet import Fernet
 from flask import current_app
 from python_freeipa.exceptions import BadRequest, FreeIPAError
 
-from noggin import ipa_admin
+from noggin.app import ipa_admin
 from noggin.security.ipa import (
     Client,
     maybe_ipa_login,

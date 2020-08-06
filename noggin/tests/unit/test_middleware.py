@@ -1,6 +1,8 @@
 import python_freeipa
 from bs4 import BeautifulSoup
 
+from noggin.middleware import IPAErrorHandler
+
 
 def test_ipa_error(client, mocker):
     """Test the error page for IPA exceptions"""
@@ -12,3 +14,10 @@ def test_ipa_error(client, mocker):
     page = BeautifulSoup(result.data, 'html.parser')
     assert page.title
     assert page.title.string == 'IPA Error - noggin'
+
+
+def test_flask_ext(mocker):
+    init_app = mocker.patch.object(IPAErrorHandler, "init_app")
+    dummy_app = object()
+    IPAErrorHandler(dummy_app)
+    init_app.assert_called_once_with(dummy_app)

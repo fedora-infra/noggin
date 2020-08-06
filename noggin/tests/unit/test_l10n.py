@@ -1,7 +1,7 @@
 import pytest
 
-from noggin.app import app
-from noggin.utility.locales import guess_locale
+from noggin.defaults import USER_DEFAULTS
+from noggin.l10n import guess_locale
 
 
 @pytest.mark.parametrize(
@@ -13,10 +13,10 @@ from noggin.utility.locales import guess_locale
         ("en", "en-US"),
         ("en-GB,en;q=0.8", "en-GB"),
         ("it", "it-IT"),
-        ("xx", app.config["USER_DEFAULTS"]["locale"]),
+        ("xx", USER_DEFAULTS["locale"]),
     ],
 )
-def test_guess_locale(client, accepted, expected):
+def test_guess_locale(app, client, accepted, expected):
     headers = {"Accept-Language": accepted}
     with app.test_request_context('/', headers=headers):
         assert guess_locale() == expected

@@ -2,17 +2,20 @@ import python_freeipa
 from flask import flash, g, redirect, render_template, url_for
 from flask_babel import _
 
-from noggin import app
 from noggin.form.add_group_member import AddGroupMemberForm
 from noggin.form.remove_group_member import RemoveGroupMemberForm
 from noggin.representation.group import Group
 from noggin.representation.user import User
-from noggin.utility import group_or_404, messaging, undo_button, with_ipa
+from noggin.utility import messaging
+from noggin.utility.controllers import group_or_404, with_ipa
 from noggin.utility.pagination import paginated_find
+from noggin.utility.templates import undo_button
 from noggin_messages import MemberSponsorV1
 
+from . import blueprint as bp
 
-@app.route('/group/<groupname>/')
+
+@bp.route('/group/<groupname>/')
 @with_ipa()
 def group(ipa, groupname):
     group = Group(group_or_404(ipa, groupname))
@@ -48,7 +51,7 @@ def group(ipa, groupname):
     )
 
 
-@app.route('/group/<groupname>/members/', methods=['POST'])
+@bp.route('/group/<groupname>/members/', methods=['POST'])
 @with_ipa()
 def group_add_member(ipa, groupname):
     group_or_404(ipa, groupname)
@@ -63,7 +66,7 @@ def group_add_member(ipa, groupname):
                 _('User %(username)s was not found in the system.', username=username),
                 'danger',
             )
-            return redirect(url_for('group', groupname=groupname))
+            return redirect(url_for('.group', groupname=groupname))
         try:
             ipa.group_add_member(a_cn=groupname, o_user=username)
         except python_freeipa.exceptions.ValidationError as e:
@@ -78,7 +81,7 @@ def group_add_member(ipa, groupname):
                     ),
                     'danger',
                 )
-            return redirect(url_for('group', groupname=groupname))
+            return redirect(url_for('.group', groupname=groupname))
 
         flash_text = _(
             'You got it! %(username)s has been added to %(groupname)s.',
@@ -88,7 +91,7 @@ def group_add_member(ipa, groupname):
         flash(
             flash_text
             + undo_button(
-                url_for("group_remove_member", groupname=groupname),
+                url_for(".group_remove_member", groupname=groupname),
                 "username",
                 username,
                 sponsor_form.hidden_tag(),
@@ -108,15 +111,15 @@ def group_add_member(ipa, groupname):
             )
         )
 
-        return redirect(url_for('group', groupname=groupname))
+        return redirect(url_for('.group', groupname=groupname))
 
     for field_errors in sponsor_form.errors.values():
         for error in field_errors:
             flash(error, 'danger')
-    return redirect(url_for('group', groupname=groupname))
+    return redirect(url_for('.group', groupname=groupname))
 
 
-@app.route('/group/<groupname>/members/remove', methods=['POST'])
+@bp.route('/group/<groupname>/members/remove', methods=['POST'])
 @with_ipa()
 def group_remove_member(ipa, groupname):
     group_or_404(ipa, groupname)
@@ -130,7 +133,7 @@ def group_remove_member(ipa, groupname):
             # https://github.com/opennode/python-freeipa/issues/24
             for error in e.message['member']['user']:
                 flash('Unable to remove user %s: %s' % (error[0], error[1]), 'danger')
-            return redirect(url_for('group', groupname=groupname))
+            return redirect(url_for('.group', groupname=groupname))
         flash_text = _(
             'You got it! %(username)s has been removed from %(groupname)s.',
             username=username,
@@ -139,22 +142,22 @@ def group_remove_member(ipa, groupname):
         flash(
             flash_text
             + undo_button(
-                url_for("group_add_member", groupname=groupname),
+                url_for(".group_add_member", groupname=groupname),
                 "new_member_username",
                 username,
                 form.hidden_tag(),
             ),
             'success',
         )
-        return redirect(url_for('group', groupname=groupname))
+        return redirect(url_for('.group', groupname=groupname))
 
     for field_errors in form.errors.values():
         for error in field_errors:
             flash(error, 'danger')
-    return redirect(url_for('group', groupname=groupname))
+    return redirect(url_for('.group', groupname=groupname))
 
 
-@app.route('/groups/')
+@bp.route('/groups/')
 @with_ipa()
 def groups(ipa):
     groups = paginated_find(ipa, Group, fasgroup=True)

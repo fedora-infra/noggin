@@ -13,7 +13,7 @@
             <h3 class="mt-2 mb-0" id="user_fullname">{{ user.name if user.name else user.username }}</h3>
             <h5 class="mb-2" id="user_username">{{ user.username }}</h5>
             {% if user.username == current_user.username %}
-            <a href="{{ url_for('user_settings_profile', username=user.username) }}" class="btn btn-outline-primary btn-block my-2">{{_("Edit Profile")}}</a>
+            <a href="{{ url_for('.user_settings_profile', username=user.username) }}" class="btn btn-outline-primary btn-block my-2">{{_("Edit Profile")}}</a>
             {% endif %}
           </div>
           <ul class="list-group list-group-flush">
@@ -61,7 +61,7 @@
               {% endif %}
               {% if user.website_url %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <strong title='{{_("Website")}}'><i class="fa fa-fw fa-link" aria-hidden="true"></i> {{_("Website")}}</strong> 
+                  <strong title='{{_("Website")}}'><i class="fa fa-fw fa-link" aria-hidden="true"></i> {{_("Website")}}</strong>
                   <a href="{{ user.website_url }}" target="_blank">{{ user.website_url }}</a>
                 </li>
               {% endif %}
@@ -100,7 +100,7 @@
                   <i class="fa fa-group fa-2x text-muted mr-3"></i>
                   <div class="media-body">
                       <div class="my-0 font-weight-bold">
-                        <a href="{{ url_for('group', groupname=group.name) }}">
+                        <a href="{{ url_for('.group', groupname=group.name) }}">
                           <span class="title">{{ group.name }}</span>
                         </a>
                       </div>

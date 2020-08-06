@@ -10,9 +10,8 @@ from wtforms import (
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import AnyOf, DataRequired, Length, Optional, URL
 
-from noggin import app
 from noggin.form.validators import Email
-from noggin.utility.locales import LOCALES
+from noggin.l10n import LOCALES
 from noggin.utility.timezones import TIMEZONES
 
 from .base import BaseForm, CSVListField
@@ -33,10 +32,7 @@ class UserSettingsProfileForm(BaseForm):
         _('E-mail Address'),
         validators=[
             DataRequired(message=_('Email must not be empty')),
-            Email(
-                message=_('Email must be valid'),
-                blocklist=app.config["MAIL_DOMAIN_BLOCKLIST"],
-            ),
+            Email(message=_('Email must be valid')),
         ],
     )
 

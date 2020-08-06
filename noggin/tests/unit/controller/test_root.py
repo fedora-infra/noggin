@@ -65,7 +65,7 @@ def test_healthz_readiness_ok(client):
 @pytest.mark.vcr()
 def test_healthz_readiness_not_ok(client):
     """Test the /healthz/ready check endpoint when not ready (IPA disabled)"""
-    with mock.patch("noggin.ipa_admin.ping") as ipaping:
+    with mock.patch("noggin.app.ipa_admin.ping") as ipaping:
         ipaping.side_effect = Exception()
         result = client.get('/healthz/ready')
     assert result.status_code == 503
