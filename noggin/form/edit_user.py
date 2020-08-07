@@ -21,12 +21,12 @@ from .base import BaseForm, CSVListField
 class UserSettingsProfileForm(BaseForm):
     firstname = StringField(
         _('First Name'),
-        validators=[DataRequired(message=_('First name must not be empty'))],
+        validators=[Optional()],
     )
 
     lastname = StringField(
         _('Last Name'),
-        validators=[DataRequired(message=_('Last name must not be empty'))],
+        validators=[Optional()],
     )
 
     mail = EmailField(

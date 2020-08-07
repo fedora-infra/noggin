@@ -4,7 +4,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo, Length
 
 from noggin import app
-from noggin.form.validators import Email
+from noggin.form.validators import Email, Optional
 
 from .base import BaseForm, ModestForm, strip, SubmitButtonField
 
@@ -12,13 +12,13 @@ from .base import BaseForm, ModestForm, strip, SubmitButtonField
 class RegisterUserForm(ModestForm):
     firstname = StringField(
         _('First Name'),
-        validators=[DataRequired(message=_('First name must not be empty'))],
+        validators=[Optional()],
         filters=[strip],
     )
 
     lastname = StringField(
         _('Last Name'),
-        validators=[DataRequired(message=_('Last name must not be empty'))],
+        validators=[Optional()],
         filters=[strip],
     )
 
