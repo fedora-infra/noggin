@@ -16,11 +16,11 @@ from noggin.utility.timezones import TIMEZONES
 
 class UserSettingsProfileForm(FlaskForm):
     firstname = StringField(
-        'First Name', validators=[DataRequired(message='First name must not be empty')]
+        'First Name', validators=[Optional()]
     )
 
     lastname = StringField(
-        'Last Name', validators=[DataRequired(message='Last name must not be empty')]
+        'Last Name', validators=[Optional()]
     )
 
     mail = EmailField(
