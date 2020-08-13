@@ -26,7 +26,7 @@ from noggin.signals import stageuser_created, user_registered
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.token import Audience, make_token, read_token
 
-from . import blueprint as bp
+from . import root
 
 
 # Errors coming from FreeIPA are specified by a field name that is different from our form field
@@ -124,7 +124,7 @@ def handle_register_form(form):
         return redirect(f"{url_for('.confirm_registration')}?username={username}")
 
 
-@bp.route('/register/spamcheck-wait')
+@root.route('/register/spamcheck-wait')
 def spamcheck_wait():
     username = request.args.get('username')
     if not username:
@@ -142,7 +142,7 @@ def spamcheck_wait():
     return render_template('registration-spamcheck-wait.html', user=user)
 
 
-@bp.route('/register/confirm', methods=["GET", "POST"])
+@root.route('/register/confirm', methods=["GET", "POST"])
 def confirm_registration():
     username = request.args.get('username')
     if not username:
@@ -171,7 +171,7 @@ def confirm_registration():
     return render_template('registration-confirmation.html', user=user, form=form)
 
 
-@bp.route('/register/activate', methods=["GET", "POST"])
+@root.route('/register/activate', methods=["GET", "POST"])
 def activate_account():
     register_url = f"{url_for('.root')}?tab=register"
     token_string = request.args.get('token')
@@ -303,7 +303,7 @@ def activate_account():
     return render_template('registration-activation.html', user=user, form=form)
 
 
-@bp.route('/register/spamcheck-hook', methods=["POST"])
+@root.route('/register/spamcheck-hook', methods=["POST"])
 @csrf.exempt
 def spamcheck_hook():
     if not current_app.config.get("BASSET_URL"):

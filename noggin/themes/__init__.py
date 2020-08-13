@@ -8,14 +8,14 @@ class Theme:
 
     def init_app(self, app, whitenoise=None):
         name = app.config.get('THEME')
-        blueprint = Blueprint(
+        theme = Blueprint(
             'theme',
             __name__,
             static_url_path='/theme/static',
             static_folder=f"{name}/static/",
             template_folder=f"{name}/templates/",
         )
-        app.register_blueprint(blueprint)
+        app.register_blueprint(theme)
 
         # Use Whitenoise to serve the static files
         if whitenoise:

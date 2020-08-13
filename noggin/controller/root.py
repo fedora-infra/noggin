@@ -21,12 +21,12 @@ from noggin.security.ipa import maybe_ipa_session
 from noggin.utility.controllers import with_ipa
 from noggin.utility.forms import handle_form_errors
 
-from . import blueprint as bp
+from . import root
 from .authentication import handle_login_form
 from .registration import handle_register_form
 
 
-@bp.route('/', methods=['GET', 'POST'])
+@root.route('/', methods=['GET', 'POST'])
 def root():
     ipa = maybe_ipa_session(current_app, session)
     username = session.get('noggin_username')
@@ -59,7 +59,7 @@ def root():
     )
 
 
-@bp.route('/logout')
+@root.route('/logout')
 def logout():
     """Log the user out."""
     # Don't use the with_ipa() decorator, otherwise anonymous users visiting this endpoint will be
@@ -75,7 +75,7 @@ def logout():
     return redirect(url_for('.root'))
 
 
-@bp.route('/search/json')
+@root.route('/search/json')
 @with_ipa()
 def search_json(ipa):
     username = request.args.get('username')

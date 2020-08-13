@@ -7,7 +7,7 @@ from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from whitenoise import WhiteNoise
 
-from noggin.controller import blueprint
+from noggin.controller import root
 from noggin.l10n import babel
 from noggin.middleware import IPAErrorHandler
 from noggin.security.ipa_admin import IPAAdmin
@@ -70,7 +70,7 @@ def create_app(config=None):
 
     # Register views
     import_all("noggin.controller")
-    app.register_blueprint(blueprint)
+    app.register_blueprint(root)
     app.register_blueprint(healthz, url_prefix="/healthz")
 
     return app

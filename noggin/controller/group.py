@@ -12,10 +12,10 @@ from noggin.utility.pagination import paginated_find
 from noggin.utility.templates import undo_button
 from noggin_messages import MemberSponsorV1
 
-from . import blueprint as bp
+from . import root
 
 
-@bp.route('/group/<groupname>/')
+@root.route('/group/<groupname>/')
 @with_ipa()
 def group(ipa, groupname):
     group = Group(group_or_404(ipa, groupname))
@@ -51,7 +51,7 @@ def group(ipa, groupname):
     )
 
 
-@bp.route('/group/<groupname>/members/', methods=['POST'])
+@root.route('/group/<groupname>/members/', methods=['POST'])
 @with_ipa()
 def group_add_member(ipa, groupname):
     group_or_404(ipa, groupname)
@@ -119,7 +119,7 @@ def group_add_member(ipa, groupname):
     return redirect(url_for('.group', groupname=groupname))
 
 
-@bp.route('/group/<groupname>/members/remove', methods=['POST'])
+@root.route('/group/<groupname>/members/remove', methods=['POST'])
 @with_ipa()
 def group_remove_member(ipa, groupname):
     group_or_404(ipa, groupname)
@@ -157,7 +157,7 @@ def group_remove_member(ipa, groupname):
     return redirect(url_for('.group', groupname=groupname))
 
 
-@bp.route('/groups/')
+@root.route('/groups/')
 @with_ipa()
 def groups(ipa):
     groups = paginated_find(ipa, Group, fasgroup=True)

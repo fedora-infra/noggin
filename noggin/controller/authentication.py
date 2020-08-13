@@ -6,7 +6,7 @@ from noggin.form.sync_token import SyncTokenForm
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
 from noggin.utility.forms import FormError, handle_form_errors
 
-from . import blueprint as bp
+from . import root
 
 
 def handle_login_form(form):
@@ -41,7 +41,7 @@ def handle_login_form(form):
     return redirect(url_for('.user', username=username))
 
 
-@bp.route('/otp/sync/', methods=['GET', 'POST'])
+@root.route('/otp/sync/', methods=['GET', 'POST'])
 def otp_sync():
     form = SyncTokenForm()
     if form.validate_on_submit():

@@ -3,15 +3,15 @@ from flask import Blueprint, g, render_template, session
 from noggin.utility.templates import gravatar
 
 
-blueprint = Blueprint("root", __name__)
+root = Blueprint("root", __name__)
 
 
-@blueprint.app_errorhandler(404)
+@root.app_errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
 
 
-@blueprint.app_context_processor
+@root.app_context_processor
 def inject_global_template_vars():
     return dict(
         gravatar=gravatar,

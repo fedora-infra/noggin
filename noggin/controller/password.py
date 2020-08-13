@@ -32,7 +32,7 @@ from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import Audience, make_token, read_token
 from noggin_messages import UserUpdateV1
 
-from . import blueprint as bp
+from . import root
 
 
 def _validate_change_pw_form(form, username, ipa=None):
@@ -72,7 +72,7 @@ def _validate_change_pw_form(form, username, ipa=None):
     return res
 
 
-@bp.route('/password-reset', methods=['GET', 'POST'])
+@root.route('/password-reset', methods=['GET', 'POST'])
 def password_reset():
     # If already logged in, redirect to the logged in reset form
     ipa = maybe_ipa_session(current_app, session)
@@ -95,7 +95,7 @@ def password_reset():
     )
 
 
-@bp.route('/user/<username>/settings/password', methods=['GET', 'POST'])
+@root.route('/user/<username>/settings/password', methods=['GET', 'POST'])
 @with_ipa()
 @require_self
 def user_settings_password(ipa, username):
@@ -122,7 +122,7 @@ def user_settings_password(ipa, username):
     )
 
 
-@bp.route('/forgot-password/ask', methods=['GET', 'POST'])
+@root.route('/forgot-password/ask', methods=['GET', 'POST'])
 def forgot_password_ask():
     form = ForgottenPasswordForm()
     if form.validate_on_submit():
@@ -187,7 +187,7 @@ def forgot_password_ask():
     return render_template('forgot-password-ask.html', form=form)
 
 
-@bp.route('/forgot-password/change', methods=['GET', 'POST'])
+@root.route('/forgot-password/change', methods=['GET', 'POST'])
 def forgot_password_change():
     token = request.args.get('token')
     if not token:
