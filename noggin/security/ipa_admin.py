@@ -79,7 +79,7 @@ class IPAAdmin:
 
     def __getattr__(self, name):
         wrapped_methods = list(self.__WRAPPED_METHODS)
-        if current_app.config.get('TESTING', False):  # pragma: no cover
+        if current_app.config.get('TESTING'):  # pragma: no cover
             wrapped_methods.extend(self.__WRAPPED_METHODS_TESTING)
         if name in wrapped_methods:
             return self.__wrap_method(name)
