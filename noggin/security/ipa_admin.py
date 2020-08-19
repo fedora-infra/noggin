@@ -9,10 +9,8 @@ from .ipa import Client
 class IPAAdmin:
 
     __WRAPPED_METHODS = (
-        "user_add",
         "user_show",
         "user_mod",
-        "group_add_member",
         "stageuser_add",
         "stageuser_show",
         "stageuser_activate",
@@ -20,10 +18,12 @@ class IPAAdmin:
         "ping",
     )
     __WRAPPED_METHODS_TESTING = (
+        "user_add",
         "user_del",
         "group_add",
         "group_del",
         "group_find",
+        "group_add_member",
         "group_add_member_manager",
         "pwpolicy_add",
         "pwpolicy_mod",
