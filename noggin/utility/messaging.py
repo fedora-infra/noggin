@@ -24,6 +24,11 @@ def _publish(message):
 
 
 def publish(message):
+    if not current_app.config["FEDORA_MESSAGING_ENABLED"]:
+        current_app.logger.info(
+            f"Fedora Messaging is disabled, not publishing the message on {message.topic}"
+        )
+        return
     try:
         _publish(message)
     except (fml_exceptions.BaseException):
