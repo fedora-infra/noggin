@@ -2,7 +2,7 @@ var bloodhound_users = new Bloodhound({
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-        url: '/search/json?username=%QUERY',
+        url: URL_SEARCH + '?username=%QUERY',
         wildcard: '%QUERY'
     }
 });
@@ -11,7 +11,7 @@ var bloodhound_groups = new Bloodhound({
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-        url: '/search/json?group=%QUERY',
+        url: URL_SEARCH + '?group=%QUERY',
         wildcard: '%QUERY'
     }
 });

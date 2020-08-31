@@ -17,6 +17,9 @@
       {% if current_user %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/bloodhound.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/typeahead.jquery.min.js"></script>
+        <script>
+          var URL_SEARCH = {{ url_for('root.search_json')|tojson }};
+        </script>
         <script src="{{ url_for('static', filename='js/search.js') }}"></script>
         <script src="{{ url_for('static', filename='js/vendor/moment-2.24.0/moment.js') }}"></script>
         <script src="{{ url_for('static', filename='js/vendor/moment-timezone-0.5.28-2019c/moment-timezone-with-data-10-year-range.js') }}"></script>
