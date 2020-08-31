@@ -74,18 +74,21 @@ def paginated_find(ipa, representation, *args, **kwargs):
     first = (page_number - 1) * page_size
     last = first + page_size
     pkeys_page = [item[pkey_name][0] for item in pkeys[first:last]]
-    # Batch-request the itemps in the page
-    batch_methods = [
-        {
-            "method": f"{object_name}_show",
-            "params": [args, {pkey_name: pkey, 'all': True}],
-        }
-        for pkey in pkeys_page
-    ]
-    items = [
-        representation(result['result'])
-        for result in ipa.batch(a_methods=batch_methods)['results']
-    ]
+    if pkeys_page:
+        # Batch-request the items in the page
+        batch_methods = [
+            {
+                "method": f"{object_name}_show",
+                "params": [args, {pkey_name: pkey, 'all': True}],
+            }
+            for pkey in pkeys_page
+        ]
+        items = [
+            representation(result['result'])
+            for result in ipa.batch(a_methods=batch_methods)['results']
+        ]
+    else:
+        items = []
 
     return PagedResult(
         items=items, page_size=page_size, page_number=page_number, total=total,
