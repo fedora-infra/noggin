@@ -29,3 +29,6 @@ PAGE_SIZE = 30
 
 BASSET_URL = None
 SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
+
+# Cheat code to disable Fedora Messaging
+FEDORA_MESSAGING_ENABLED = True
