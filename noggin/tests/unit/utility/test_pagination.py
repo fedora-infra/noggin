@@ -2,7 +2,8 @@ import pytest
 from bs4 import BeautifulSoup
 
 from noggin.app import ipa_admin
-from noggin.utility.pagination import PagedResult
+from noggin.representation.group import Group
+from noggin.utility.pagination import PagedResult, paginated_find
 
 
 @pytest.fixture
@@ -106,3 +107,15 @@ def test_pagination_result():
     assert result == PagedResult(items=["dummy"], page_size=2, page_number=1)
     with pytest.raises(ValueError):
         result == object()
+
+
+@pytest.mark.vcr()
+def test_empty_result(mocker, app):
+    """Don't call ipa.batch when there are no results"""
+    ipa = mocker.Mock()
+    ipa.group_find.return_value = {"result": []}
+    with app.test_request_context("/?page_size=10"):
+        result = paginated_find(ipa, Group)
+    ipa.group_find.assert_called_once_with(pkey_only=True)
+    ipa.batch.assert_not_called()
+    assert len(result.items) == 0
