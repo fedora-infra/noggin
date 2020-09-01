@@ -3,6 +3,15 @@ from unittest import mock
 import pytest
 from bs4 import BeautifulSoup
 
+from noggin.app import ipa_admin
+
+
+@pytest.fixture
+def nonfas_group(ipa_testing_config, app):
+    ipa_admin.group_add(a_cn="nonfas-group")
+    yield
+    ipa_admin.group_del("nonfas-group")
+
 
 def test_root(client):
     """Test the root page"""
@@ -42,6 +51,14 @@ def test_search_json(client, logged_in_dummy_user, dummy_group):
 def test_search_json_empty(client, logged_in_dummy_user):
     """Test the /search/json endpoint with an empty search"""
     result = client.get('/search/json')
+    assert result.status_code == 200
+    assert result.json == []
+
+
+@pytest.mark.vcr()
+def test_search_json_group_nonfas(client, logged_in_dummy_user, nonfas_group):
+    """The /search/json endpoint should only return FAS groups"""
+    result = client.get('/search/json?group=nonfas')
     assert result.status_code == 200
     assert result.json == []
 
