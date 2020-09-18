@@ -82,7 +82,13 @@ def search_json(ipa):
         users_ = [User(u) for u in ipa.user_find(username, sizelimit=10)['result']]
 
         for user_ in users_:
-            res.append({'uid': user_.username, 'cn': user_.name})
+            res.append(
+                {
+                    'uid': user_.username,
+                    'cn': user_.name,
+                    'url': url_for(".user", username=user_.username),
+                }
+            )
 
     if groupname:
         groups_ = [
@@ -90,7 +96,13 @@ def search_json(ipa):
             for g in ipa.group_find(groupname, fasgroup=True, sizelimit=10)['result']
         ]
         for group_ in groups_:
-            res.append({'cn': group_.name, 'description': group_.description})
+            res.append(
+                {
+                    'cn': group_.name,
+                    'description': group_.description,
+                    'url': url_for(".group", groupname=group_.name),
+                }
+            )
 
     return jsonify(res)
 

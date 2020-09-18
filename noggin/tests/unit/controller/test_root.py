@@ -42,8 +42,12 @@ def test_search_json(client, logged_in_dummy_user, dummy_group):
     result = client.get('/search/json?username=dummy&group=dummy-group')
     assert result.status_code == 200
     assert result.json == [
-        {'cn': 'Dummy User', 'uid': 'dummy'},
-        {'cn': 'dummy-group', 'description': 'A dummy group'},
+        {'cn': 'Dummy User', 'uid': 'dummy', 'url': '/user/dummy/'},
+        {
+            'cn': 'dummy-group',
+            'description': 'A dummy group',
+            'url': '/group/dummy-group/',
+        },
     ]
 
 
