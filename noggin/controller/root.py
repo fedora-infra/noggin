@@ -79,7 +79,10 @@ def search_json(ipa):
     res = []
 
     if username:
-        users_ = [User(u) for u in ipa.user_find(username, sizelimit=10)['result']]
+        users_ = [
+            User(u)
+            for u in ipa.user_find(username, fasuser=True, sizelimit=10)['result']
+        ]
 
         for user_ in users_:
             res.append(

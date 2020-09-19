@@ -13,6 +13,20 @@ def nonfas_group(ipa_testing_config, app):
     ipa_admin.group_del("nonfas-group")
 
 
+@pytest.fixture
+def nonfas_user(ipa_testing_config, app):
+    ipa_admin.user_add(
+        a_uid="nonfas-user",
+        o_givenname="NonFAS",
+        o_sn="User",
+        o_cn="NonFAS User",
+        o_mail="nonfas-user@example.com",
+        o_userpassword="nonfas-user_password",
+    )
+    yield
+    ipa_admin.user_del("nonfas-user")
+
+
 def test_root(client):
     """Test the root page"""
     result = client.get('/')
@@ -55,6 +69,14 @@ def test_search_json(client, logged_in_dummy_user, dummy_group):
 def test_search_json_empty(client, logged_in_dummy_user):
     """Test the /search/json endpoint with an empty search"""
     result = client.get('/search/json')
+    assert result.status_code == 200
+    assert result.json == []
+
+
+@pytest.mark.vcr()
+def test_search_json_user_nonfas(client, logged_in_dummy_user, nonfas_user):
+    """The /search/json endpoint should only return FAS users"""
+    result = client.get('/search/json?user=nonfas')
     assert result.status_code == 200
     assert result.json == []
 
