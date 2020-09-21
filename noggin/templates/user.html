@@ -16,7 +16,7 @@
             <a href="{{ url_for('.user_settings_profile', username=user.username) }}" class="btn btn-outline-primary btn-block my-2">{{_("Edit Profile")}}</a>
             {% endif %}
           </div>
-          <ul class="list-group list-group-flush">
+          <ul class="list-group list-group-flush" id="user_attributes">
               {% if user.timezone %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <strong title="{{_('Timezone')}}">
@@ -27,8 +27,6 @@
                     <div>{{ user.timezone }}</div>
                   </div>
                 </li>
-              {% endif %}
-              {% if user.timezone %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <strong title="{{_('Current Time')}}">
                     <i class="fa fa-fw fa-clock-o"></i>

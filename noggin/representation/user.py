@@ -24,7 +24,8 @@ class User(Representation):
         "rhbz_mail": "fasrhbzemail",
         "website_url": "faswebsiteurl",
         "status_note": "fasstatusnote",
-        "creationtime": "fascreationtime",
+        "creation_time": "fascreationtime",
+        "is_private": "fasisprivate",
     }
     attr_types = {
         "sshpubkeys": "list",
@@ -32,6 +33,7 @@ class User(Representation):
         "gpgkeys": "list",
         "groups": "list",
         "agreements": "list",
+        "is_private": "bool",
     }
     pkey = "username"
     ipa_object = "user"
@@ -44,3 +46,19 @@ class User(Representation):
     def locked(self):
         # Unlike the others nsAccountLock is not a list.
         return self.raw.get("nsaccountlock", False)
+
+    def anonymize(self):
+        not_hidden = [
+            "username",
+            "mail",
+            "last_password_change",
+            "agreements",
+            "groups",
+            "status_note",
+            "creation_time",
+            "is_private",
+        ]
+        for attr_name in self.attr_names:
+            if attr_name in not_hidden:
+                continue
+            setattr(self, attr_name, None)

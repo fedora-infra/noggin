@@ -1,12 +1,22 @@
 {% macro form_field(field) %}
-  {% set css_class = 'form-control ' + kwargs.pop('class', '') %}
+  {% set css_class = kwargs.pop('class', '') %}
+  {% if field.type == 'BooleanField' %}
+    {% set css_class = css_class + ' form-check-input' %}
+  {% else %}
+    {% set css_class = css_class + ' form-control' %}
+  {% endif %}
   {% if field.errors %}
     {% set css_class = css_class + ' is-invalid ' %}
   {% endif %}
-  {% if kwargs.pop('label', True) %}
-    <strong>{{ field.label }}</strong>
+  {% if kwargs.pop('label', True) and field.type != "BooleanField" %}
+    <strong>
+      {{ field.label }}
+    </strong>
   {% endif %}
   {{ field(class=css_class, **kwargs) }}
+  {% if field.type == 'BooleanField' %}
+      <label class="form-check-label ml-1"><strong>{{ field.label.text }}</strong></label>
+  {% endif %}
   {% if field.description %}
     <small class="form-text text-muted">{{ field.description }}</small>
   {% endif %}

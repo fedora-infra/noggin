@@ -371,3 +371,20 @@ def test_user_settings_agreements_post_unknown(
         expected_message="Unknown agreement: this does not exist.",
         expected_category="warning",
     )
+
+
+@pytest.mark.vcr()
+def test_user_private(client, logged_in_dummy_user, make_user):
+    """A user with fasIsPrivate should be anonymized as much as possible."""
+    make_user("testuser")
+    ipa_admin.user_mod("testuser", fasisprivate=True)
+    result = client.get('/user/testuser/')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    # print(page.prettify())
+    user_fullname = page.select_one("#user_fullname")
+    assert user_fullname is not None
+    assert user_fullname.get_text(strip=True) == "testuser"
+    user_attributes = page.select_one("ul#user_attributes")
+    assert user_attributes is not None
+    assert len(user_attributes.find_all("li")) == 0

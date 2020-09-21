@@ -1,5 +1,6 @@
 from flask_babel import lazy_gettext as _
 from wtforms import (
+    BooleanField,
     FieldList,
     HiddenField,
     PasswordField,
@@ -65,6 +66,14 @@ class UserSettingsProfileForm(BaseForm):
     website_url = URLField(
         _('Website or Blog URL'),
         validators=[Optional(), URL(message=_('Valid URL required'))],
+    )
+
+    is_private = BooleanField(
+        _('Private'),
+        description=_(
+            "Hide information from other users, see the Privacy Policy for details."
+        ),
+        validators=[Optional()],
     )
 
 

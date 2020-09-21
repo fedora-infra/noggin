@@ -4,6 +4,7 @@ import python_freeipa
 from flask import (
     current_app,
     flash,
+    g,
     Markup,
     redirect,
     render_template,
@@ -40,16 +41,23 @@ def user(ipa, username):
     # Just doing a group_find (with all=True) is super slow here, with a lot of
     # groups.
     member_groups = [
-        Group(g)
-        for g in ipa.group_find(o_user=username, o_all=False, fasgroup=True)['result']
+        Group(group)
+        for group in ipa.group_find(o_user=username, o_all=False, fasgroup=True)[
+            'result'
+        ]
     ]
     managed_groups = [
-        Group(g)
-        for g in ipa.group_find(
+        Group(group)
+        for group in ipa.group_find(
             o_membermanager_user=username, o_all=False, fasgroup=True
         )['result']
     ]
-    groups = [g for g in managed_groups if g not in member_groups] + member_groups
+    groups = [
+        group for group in managed_groups if group not in member_groups
+    ] + member_groups
+    # Privacy setting
+    if user != g.current_user and user.is_private:
+        user.anonymize()
 
     return render_template(
         'user.html',
@@ -122,6 +130,7 @@ def user_settings_profile(ipa, username):
                 'fasgitlabusername': form.gitlab.data.lstrip('@'),
                 'fasrhbzemail': form.rhbz_mail.data,
                 'faswebsiteurl': form.website_url.data,
+                'fasisprivate': form.is_private.data,
             },
             ".user_settings_profile",
         )
