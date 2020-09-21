@@ -7,6 +7,7 @@ Vagrant.configure(2) do |config|
   #config.vm.network "forwarded_port", guest: 80, host: 8080
   config.vm.hostname = "ipa.noggin.test"
   config.vm.synced_folder ".", "/vagrant", type: "sshfs"
+  config.vm.synced_folder "../freeipa-fas", "/home/vagrant/freeipa-fas", type: "sshfs"
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.vm.provider :libvirt do |libvirt|

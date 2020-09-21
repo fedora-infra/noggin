@@ -96,7 +96,7 @@ def test_step_1(client, post_data_step_1, cleanup_dummy_user, mocker):
     # Check that default values are added
     user = User(ipa_admin.stageuser_show("dummy")['result'])
     # Creation time
-    assert user.creationtime is not None
+    assert user.creation_time is not None
     # Locale
     assert user.locale == current_app.config["USER_DEFAULTS"]["locale"]
     # Timezone
