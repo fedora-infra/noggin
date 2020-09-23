@@ -19,6 +19,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/typeahead.jquery.min.js"></script>
         <script>
           var URL_SEARCH = {{ url_for('root.search_json')|tojson }};
+          var BASE_URL = {{ request.url_root.rstrip('/') }};
         </script>
         <script src="{{ url_for('static', filename='js/search.js') }}"></script>
         <script src="{{ url_for('static', filename='js/vendor/moment-2.24.0/moment.js') }}"></script>

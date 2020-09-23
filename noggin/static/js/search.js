@@ -33,5 +33,5 @@ $('#search').typeahead(
 ).on('typeahead:selected', function(evt, itm, name) {
 var path = name == "users" ? "user" : "group";
 var n = path == "group" ? itm.cn : itm.uid;
-window.location.href = '/' + path + '/' + n + '/';
+window.location.href = BASE_URL + '/' + path + '/' + n + '/';
 });
