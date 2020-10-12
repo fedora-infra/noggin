@@ -8,7 +8,7 @@ USER_DEFAULTS = {
     "timezone": "UTC",
     "status_note": "active",
 }
-THEME = "default"
+THEME = "centos"
 PASSWORD_POLICY = {"min": 8, "max": -1}
 PASSWORD_RESET_EXPIRATION = 10  # in minutes
 PASSWORD_RESET_LOCK_DIR = "/tmp/noggin-pw-reset"
