@@ -1,0 +1,11 @@
+== Noggin ==
+
+{{_("Hello %(name)s,", name=user.name)}}
+
+{{_("To activate your account with username %(username)s, click on the link below:", username=user.username)}}
+
+  {{ url_for('.activate_account', _external=True) }}?token={{ token }}
+
+{{_("If you did not create an account for username %(username)s, you can ignore this email.", username=user.username)}}
+
+-- {{_("The Noggin team")}}
