@@ -89,7 +89,7 @@ def search_json(ipa):
                 {
                     'uid': user_.username,
                     'cn': user_.name,
-                    'url': url_for(".user", username=user_.username),
+                    'url': url_for(".user", username=user_.username, _external=True),
                 }
             )
 
@@ -103,7 +103,7 @@ def search_json(ipa):
                 {
                     'cn': group_.name,
                     'description': group_.description,
-                    'url': url_for(".group", groupname=group_.name),
+                    'url': url_for(".group", groupname=group_.name, _external=True),
                 }
             )
 

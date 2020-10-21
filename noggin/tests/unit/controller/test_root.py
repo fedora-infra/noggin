@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 
 from noggin.app import ipa_admin
 
+from .. import tweak_app_config
+
 
 @pytest.fixture
 def nonfas_group(ipa_testing_config, app):
@@ -51,18 +53,31 @@ def test_page_not_found(client):
 
 
 @pytest.mark.vcr()
-def test_search_json(client, logged_in_dummy_user, dummy_group):
+@pytest.mark.parametrize("app_root", (None, "/accounts/"))
+def test_search_json(app, client, logged_in_dummy_user, dummy_group, app_root):
     """Test the /search/json endpoint"""
-    result = client.get('/search/json?username=dummy&group=dummy-group')
-    assert result.status_code == 200
-    assert result.json == [
-        {'cn': 'Dummy User', 'uid': 'dummy', 'url': '/user/dummy/'},
-        {
-            'cn': 'dummy-group',
-            'description': 'A dummy group',
-            'url': '/group/dummy-group/',
-        },
-    ]
+
+    if app_root:
+        addl_config = {"APPLICATION_ROOT": app_root}
+    else:
+        addl_config = {}
+        app_root = "/"
+
+    with tweak_app_config(app, addl_config):
+        result = client.get('/search/json?username=dummy&group=dummy-group')
+        assert result.status_code == 200
+        assert result.json == [
+            {
+                'cn': 'Dummy User',
+                'uid': 'dummy',
+                'url': f'http://localhost{app_root}user/dummy/',
+            },
+            {
+                'cn': 'dummy-group',
+                'description': 'A dummy group',
+                'url': f'http://localhost{app_root}group/dummy-group/',
+            },
+        ]
 
 
 @pytest.mark.vcr()
