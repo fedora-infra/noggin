@@ -1,6 +1,7 @@
 import python_freeipa
 from flask import (
     current_app,
+    flash,
     jsonify,
     redirect,
     render_template,
@@ -8,6 +9,7 @@ from flask import (
     session,
     url_for,
 )
+from flask_babel import _
 from flask_healthz import HealthError
 
 from noggin.app import ipa_admin
@@ -43,6 +45,9 @@ def root():
             return handle_login_form(login_form)
 
     if register_form.validate_on_submit():
+        if not current_app.config["REGISTRATION_OPEN"]:
+            flash(_("Registration is closed at the moment."), "warning")
+            return redirect(url_for('.root'))
         with handle_form_errors(register_form):
             return handle_register_form(register_form)
 

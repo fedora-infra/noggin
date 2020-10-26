@@ -104,6 +104,27 @@ def test_step_1(client, post_data_step_1, cleanup_dummy_user, mocker):
 
 
 @pytest.mark.vcr()
+def test_step_1_registration_closed(
+    client, post_data_step_1, cleanup_dummy_user, mocker
+):
+    """Try to register a user when registration is closed"""
+    mocker.patch.dict(current_app.config, {"REGISTRATION_OPEN": False})
+    record_signal = mocker.Mock()
+    with mailer.record_messages() as outbox, stageuser_created.connected_to(
+        record_signal
+    ):
+        result = client.post('/', data=post_data_step_1)
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Registration is closed at the moment.",
+        expected_category="warning",
+    )
+    record_signal.assert_not_called()
+    assert len(outbox) == 0
+
+
+@pytest.mark.vcr()
 def test_step_1_spamcheck(
     client, post_data_step_1, cleanup_dummy_user, spamcheck_on, mocker
 ):

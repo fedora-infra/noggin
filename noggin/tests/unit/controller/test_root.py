@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 from bs4 import BeautifulSoup
+from flask import current_app
 
 from noggin.app import ipa_admin
 
@@ -42,6 +43,18 @@ def test_root_authenticated(client, logged_in_dummy_user):
     result = client.get('/')
     assert result.status_code == 302
     assert result.location == "http://localhost/user/dummy/"
+
+
+def test_root_registration_closed(client, mocker):
+    """Test the root page when registration is closed"""
+    mocker.patch.dict(current_app.config, {"REGISTRATION_OPEN": False})
+    result = client.get('/')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    register_tab = page.select_one("#register")
+    alert = register_tab.select_one("div.alert-info")
+    assert alert is not None
+    assert alert.string.strip() == "Registration is closed at the moment."
 
 
 def test_page_not_found(client):

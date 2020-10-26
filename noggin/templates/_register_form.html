@@ -1,5 +1,6 @@
 {% import '_form_macros.html' as macros %}
 
+{% if config["REGISTRATION_OPEN"] %}
 <form action="{{ url_for('.root') }}?tab=register" method="post" novalidate>
   {{ register_form.csrf_token }}
   <div class="card-body">
@@ -17,3 +18,10 @@
     {{ register_form.submit(color="primary", tabindex="8") }}
   </div>
 </form>
+{% else %}
+<div class="card-body">
+  <div class="alert alert-info">
+    {{ _("Registration is closed at the moment.") }}
+  </div>
+</div>
+{% endif %}
