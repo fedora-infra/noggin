@@ -1,3 +1,5 @@
+# This is useful for development, disable it in prod
+# https://flask.palletsprojects.com/en/1.1.x/config/#TEMPLATES_AUTO_RELOAD
 TEMPLATES_AUTO_RELOAD = True
 
 # IPA settings
@@ -17,18 +19,21 @@ FREEIPA_ADMIN_PASSWORD = 'adminPassw0rd!'
 FERNET_SECRET = b'G8ObvrpEEwbjWUO9rU1qAkDQRafAFd39heVKYf6TZi8='
 
 # Session secret
+# https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY
 SECRET_KEY = b'monkiesmonkiesmonkiesmonkiesmonkies!!!1111monkies'
 
+# https://flask.palletsprojects.com/en/1.1.x/config/#SESSION_COOKIE_HTTPONLY
 SESSION_COOKIE_HTTPONLY = True
 
-# Set to True for prod...
+# Set to True for prod
+# https://flask.palletsprojects.com/en/1.1.x/config/#SESSION_COOKIE_SECURE
 SESSION_COOKIE_SECURE = False
 
 # Default values for new users
 # USER_DEFAULTS = {
 #     "locale": "en-US",
 #     "timezone": "UTC",
-#     "status_note": "spamcheck_awaiting",
+#     "status_note": "active",
 # }
 
 # Set this to False to disable registration
@@ -49,9 +54,11 @@ PASSWORD_RESET_EXPIRATION = 10
 # PASSWORD_RESET_LOCK_DIR = "/tmp/noggin-pw-reset"
 
 # Email sender
+# https://pythonhosted.org/Flask-Mail/#configuring-flask-mail
 MAIL_DEFAULT_SENDER = "Noggin <noggin@example.com>"
 
 # Set to False for prod
+# https://pythonhosted.org/Flask-Mail/#configuring-flask-mail
 MAIL_SUPPRESS_SEND = True
 
 # email domains that a user cannot use to register or change to
@@ -67,5 +74,8 @@ MAIL_SUPPRESS_SEND = True
 # AVATAR_DEFAULT_TYPE = "robohash"
 
 # Spam checking
-BASSET_URL = None
-SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
+# BASSET_URL = None
+# SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
+
+# Set to False to disable Fedora Messaging integration
+# FEDORA_MESSAGING_ENABLED = True
