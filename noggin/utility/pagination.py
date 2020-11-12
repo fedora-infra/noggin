@@ -30,7 +30,7 @@ class PagedResult:
         qs = dict(request.args)
         qs.update({"page_size": self.page_size, "page_number": page_number})
         qs = "&".join(f"{k}={v}" for k, v in qs.items())
-        return f"{request.path}?{qs}"
+        return f"{request.script_root}{request.path}?{qs}"
 
     def __repr__(self):
         return f"<PagedResult items=[{len(self.items)} items] page={self.page_number}>"
