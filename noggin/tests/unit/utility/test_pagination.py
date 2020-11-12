@@ -119,3 +119,18 @@ def test_empty_result(mocker, app):
     ipa.group_find.assert_called_once_with(pkey_only=True)
     ipa.batch.assert_not_called()
     assert len(result.items) == 0
+
+
+@pytest.mark.vcr()
+def test_mounted_subdir(client, logged_in_dummy_user, many_dummy_groups):
+    """Test the pagination when the app is mounted on a subdirectory"""
+    result = client.get(
+        "/groups/?page_number=2&page_size=3", base_url="http://localhost/subdir"
+    )
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    # Check all links
+    links = page.select("ul.pagination a.page-link")
+    assert len(links) == 5
+    for link in links:
+        assert link["href"].startswith("/subdir/groups/?page_number=")
