@@ -15,7 +15,7 @@ from noggin.form.validators import Email
 from noggin.l10n import LOCALES
 from noggin.utility.timezones import TIMEZONES
 
-from .base import BaseForm, CSVListField
+from .base import BaseForm, CSVListField, strip
 
 
 class UserSettingsProfileForm(BaseForm):
@@ -79,7 +79,7 @@ class UserSettingsProfileForm(BaseForm):
 
 class UserSettingsKeysForm(BaseForm):
     sshpubkeys = FieldList(
-        TextAreaField(validators=[Optional()], render_kw={"rows": 4}),
+        TextAreaField(validators=[Optional()], render_kw={"rows": 4}, filters=[strip]),
         label=_('SSH Keys'),
     )
 
