@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 
 from noggin.app import ipa_admin
+from noggin.representation.user import User
 from noggin.tests.unit.utilities import (
     assert_form_generic_error,
     assert_redirects_with_flash,
@@ -273,6 +274,27 @@ def test_user_settings_keys_post_bad_request(client, logged_in_dummy_user):
         )
         result = client.post('/user/dummy/settings/keys/', data=POST_CONTENTS_KEYS)
     assert_form_generic_error(result, 'something went wrong')
+
+
+@pytest.mark.vcr()
+def test_user_settings_keys_post_whitespace(client, logged_in_dummy_user):
+    """Test adding an SSH key with whitespace"""
+    post_contents = POST_CONTENTS_KEYS.copy()
+    post_contents["sshpubkeys-0"] = f" {post_contents['sshpubkeys-0']} \n "
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {"msg": {"agent": "dummy", "user": "dummy", "fields": ['sshpubkeys']}}
+        )
+    ):
+        result = client.post('/user/dummy/settings/keys/', data=post_contents)
+        assert_redirects_with_flash(
+            result,
+            expected_url="/user/dummy/settings/keys/",
+            expected_message="Profile Updated: <a href=\"/user/dummy/\">view your profile</a>",
+            expected_category="success",
+        )
+    user = User(ipa_admin.user_show("dummy")["result"])
+    assert user.sshpubkeys == [POST_CONTENTS_KEYS["sshpubkeys-0"]]
 
 
 @pytest.mark.vcr()
