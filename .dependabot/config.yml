@@ -4,3 +4,11 @@ update_configs:
     directory: "/"
     update_schedule: "daily"
     version_requirement_updates: "off"
+    allowed_updates:
+      - match:
+          update_type: "all"
+          dependency_type: "all"
+    automerged_updates:
+      - match:
+          dependency_type: "all"
+          update_type: "in_range"
