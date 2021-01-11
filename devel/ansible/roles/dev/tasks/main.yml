@@ -1,8 +1,21 @@
 ---
 - name: Install RPM packages
+  vars:
+    base_packages:
+    - git
+    - fedora-messaging
+    - freeipa-server
+    - poetry
+    - python3-cryptography
+    - python3-flask
+    - python3-pip
+    - vim
+    python_dev_packages:
+    - gcc
+    - python3-devel
   dnf:
-      name: ['git', 'vim', 'poetry', 'python3-flask', 'python3-pip', 'python3-cryptography', 'freeipa-server', 'fedora-messaging']
-      state: present
+    name: "{{ base_packages + (needs_python_dev_env | ternary(python_dev_packages, [])) | list }}"
+    state: present
 
 - name: install python deps with poetry
   shell: poetry install
