@@ -1,7 +1,18 @@
 ---
 - name: Install RPM packages
   dnf:
-      name: ['git', 'vim', 'poetry', 'python3-flask', 'python3-pip', 'python3-cryptography', 'freeipa-server', 'fedora-messaging']
+      name:
+        - fedora-messaging
+        - freeipa-server
+        - gcc
+        - git
+        - libffi-devel
+        - poetry
+        - python3-cryptography
+        - python3-devel
+        - python3-flask
+        - python3-pip
+        - vim
       state: present
 
 - name: install python deps with poetry
