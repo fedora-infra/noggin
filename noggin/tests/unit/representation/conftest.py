@@ -16,6 +16,7 @@ def dummy_user_dict():
         'fasrhbzemail': ['dummy@example.com'],
         'fastimezone': ['UTC'],
         'gecos': ['Dummy User'],
+        'faspronoun': ['they / them / theirs'],
         'gidnumber': ['158200186'],
         'givenname': ['Dummy'],
         'has_keytab': True,

@@ -76,6 +76,8 @@ class UserSettingsProfileForm(BaseForm):
         validators=[Optional()],
     )
 
+    pronouns = StringField(_('Pronouns'), validators=[Optional()],)
+
 
 class UserSettingsKeysForm(BaseForm):
     sshpubkeys = FieldList(

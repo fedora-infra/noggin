@@ -131,6 +131,7 @@ def user_settings_profile(ipa, username):
                 'fasrhbzemail': form.rhbz_mail.data,
                 'faswebsiteurl': form.website_url.data,
                 'fasisprivate': form.is_private.data,
+                'faspronoun': form.pronouns.data,
             },
             ".user_settings_profile",
         )

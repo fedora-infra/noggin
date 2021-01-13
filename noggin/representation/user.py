@@ -26,6 +26,7 @@ class User(Representation):
         "status_note": "fasstatusnote",
         "creation_time": "fascreationtime",
         "is_private": "fasisprivate",
+        "pronouns": "faspronoun",
     }
     attr_types = {
         "sshpubkeys": "list",
