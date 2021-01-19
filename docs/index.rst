@@ -3,7 +3,7 @@ Noggin's documentation
 ========================
 
 *noggin* is a self-service portal for FreeIPA. Noggin also requires the use of
-the `freeipa-fas <https://github.com/fedora-infra/freeipa-fas/>`_ extensions for 
+the `freeipa-fas <https://github.com/fedora-infra/freeipa-fas/>`_ extensions for
 FreeIPA to provide additional fields and functionality.
 
 The primary purpose of the portal is to allow users to sign up and manage their
@@ -24,12 +24,12 @@ Noggin has the following UI Features:
 
 Migrating your application:
 
-If your application currently uses communicates with the Fedora Account System (FAS2) 
+If your application currently uses communicates with the Fedora Account System (FAS2)
 using it's readonly API, this functionality will be provided by `fasjson <https://github.com/fedora-infra/fasjson/>`_.
 Additionally, `fasjson-client <https://github.com/fedora-infra/fasjson-client/>`_ provides a python client library for
 the fasjson api.
 
-Refer to the `fasjson documentation <https://fasjson.readthedocs.io/>`_ 
+Refer to the `fasjson documentation <https://fasjson.readthedocs.io/>`_
 for information on migrating applications to the new API.
 
 
@@ -45,10 +45,10 @@ for information on migrating applications to the new API.
 .. User Guide
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: User Guide
 
-   fas2_noggin
+   userguide
 
 
 .. Sysadmin's Guide

@@ -1,0 +1,127 @@
+About Noggin
+============
+**Noggin** is a self-service portal for creating and managing user accounts and groups.
+
+User accounts
+=============
+
+How do I create a new account?
+******************************
+
+To create a new account, go to the Noggin home page, choose the register tab, and fill out your basic details:
+
+.. image:: _static/screenshots/newaccount1.png
+
+An email will be sent to your provided email address that includes a validation link, follow this link back to
+Noggin to validate your email, then set your password:
+
+.. image:: _static/screenshots/newaccount2.png
+
+After setting your password you will be logged into your new account automatically:
+
+.. image:: _static/screenshots/newaccount3.png
+
+
+Group Members
+=============
+
+How do I become a member of a group?
+************************************
+
+Group Sponsors have the ability to add new members to the group. A group should provide the information required to request
+access to the group, otherwise contact a group sponsor directly.
+
+Previously, In FAS2, a user could request access to a group, which a group admininstrator could either approve or deny.
+In Noggin, users are simply just added to the group by a sponsor after requesting access through other channels for that
+group, such as email or IRC.
+
+
+How do I stop being a member of a group?
+****************************************
+
+As a group member, you can choose to leave a group at anytime. Press the leave group button on the group detail page:
+
+.. image:: _static/screenshots/leave-group.png
+
+If you are the sponsor of a group, you can simply remove yourself from the group, as you would remove any other user.
+
+
+Group Sponsors
+==============
+
+What is a group sponsor?
+************************
+Groups in Noggin have users with a special *sponsor* privilege. If a user is a sponsor of a group,
+they are able to add and remove group members. The sponsors of a group are listed above the group members.
+
+.. image:: _static/screenshots/groupscreen-sponsorview.png
+
+Previously in  FAS2, groups had special *admininstrator* users that had the ability to add both new members and new admininstrators to a group.
+In Noggin, groups have *Sponsors* which have the ability to add new members to a group.
+
+
+How do I become a sponsor of a group?
+*************************************
+To become a sponsor of a group, you will need to talk to whomever administrates your Noggin system.
+
+.. note::
+    In the Fedora Noggin deployment, this is achieved by filing a ticket at https://pagure.io/fedora-infrastructure/new_issue
+
+
+How do I stop being a sponsor of a group?
+*****************************************
+To stop being a sponsor of a group, you will need to talk to whomever administrates your Noggin system
+
+.. note::
+    In the Fedora Noggin deployment, this is achieved by filing a ticket at https://pagure.io/fedora-infrastructure/new_issue
+
+
+As a group sponsor, how do I add members to the group?
+******************************************************
+Add new members to a group in the group detail page. If you are the sponsor of a group, a search bar is
+visible at the top of the user listing on the group detail page:
+
+.. image:: _static/screenshots/adduser1.png
+
+Simply search for the user that you want to add, and press enter to add them to the group:
+
+.. image:: _static/screenshots/adduser2.png
+
+
+As a group sponsor, how do I remove members from a group?
+*********************************************************
+Remove members from a group in the group detail page. If you are the sponsor of a group, each of the users
+in the user listing have a trash icon button. Simply click this to remove this user from the group.
+
+.. image:: _static/screenshots/deleteuser.png
+
+Two Factor authentication
+=========================
+
+How do I add and use two-factor authentication?
+***********************************************
+Noggin features the ability to configure and user two-factor authentication through the user of OTP tokens.
+by default, Noggin generates Time-based One-time Password (TOTP) tokens, which can be used with popular authentication
+apps such as `Google Authenticator <https://en.wikipedia.org/wiki/Google_Authenticator>`_ and
+`FreeOTP <https://freeotp.github.io/>`_.
+
+To create an OTP token in Noggin, go to the OTP tab in the user settings, and click the **Add OTP Token** button:
+
+.. image:: _static/screenshots/otp1.png
+
+Next, add a name for the token and provide your password again. Something descriptive like the name of the app you are adding the token to
+might prove useful it you decide to add more tokens later:
+
+.. image:: _static/screenshots/otp2.png
+
+Your token is now created. Using your chosen authenticator application, scan the QR code and add it to your app.
+
+.. image:: _static/screenshots/otp3.png
+
+Next time you log in to Noggin, you will need to enter in your password followed by the 6 digit OTP code generated by your
+chosen authenticator app.
+
+
+
+
+
