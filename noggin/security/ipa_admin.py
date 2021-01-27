@@ -47,6 +47,8 @@ class IPAAdmin:
             self.init_app(app)
 
     def init_app(self, app):
+        # Move FreeIPA admin user and password values from the main configuration into the one for
+        # the `ipa-admin` extension. Overwrite the values in the main configuration.
         app.extensions["ipa-admin"] = {
             "username": app.config['FREEIPA_ADMIN_USER'],
             "password": app.config['FREEIPA_ADMIN_PASSWORD'],
