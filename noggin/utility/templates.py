@@ -8,6 +8,8 @@ def gravatar(email, size):
     return (
         current_app.config["AVATAR_SERVICE_URL"]
         + "avatar/"
+        # We use MD5 to hash email addresses because gravatar.com uses that as a key. We could use
+        # SHA256 instead if we limited ourselves to using libravatar.org.
         + hashlib.md5(email.lower().encode('utf8')).hexdigest()  # nosec
         + "?s="
         + str(size)
