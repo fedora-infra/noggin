@@ -4,11 +4,11 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-Environment=FLASK_APP=/vagrant/noggin/app.py
+Environment=FLASK_APP=/home/vagrant/noggin/noggin/app.py
 Environment=NOGGIN_CONFIG_PATH=/home/vagrant/noggin.cfg
 Environment=FLASK_DEBUG=1
 User=vagrant
-WorkingDirectory=/vagrant
+WorkingDirectory=/home/vagrant/noggin
 ExecStart=poetry run flask run -h 0.0.0.0
 
 [Install]
