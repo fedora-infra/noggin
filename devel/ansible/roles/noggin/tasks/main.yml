@@ -1,0 +1,72 @@
+---
+- name: Install RPM packages
+  dnf:
+      name:
+      - freeipa-server
+      - fedora-messaging
+      - gcc
+      - git
+      - ipa-client
+      - libffi-devel
+      - poetry
+      - python3-cryptography
+      - python3-devel
+      - python3-flask
+      - python3-pip
+      - vim
+      state: present
+
+- name: Enroll system as IPA client
+  shell: |
+    ipa-client-install --uninstall --unattended
+    ipa-client-install \
+      --hostname noggin.noggin.test \
+      --domain noggin.test \
+      --realm {{ krb_realm }} \
+      --server ipa.noggin.test \
+      -p {{ ipa_admin_user }} \
+      -w {{ ipa_admin_password }} \
+      --unattended \
+      --no-ntp \
+      --force-join
+
+- name: install python deps with poetry
+  become_user: vagrant
+  command:
+    cmd: poetry install
+    chdir: noggin
+
+- name: Install the .bashrc
+  copy:
+    src: .bashrc
+    dest: /home/vagrant/.bashrc
+    mode: 0644
+    owner: vagrant
+    group: vagrant
+
+- name: Install noggin.cfg
+  become_user: vagrant
+  template:
+    src: noggin.cfg
+    dest: noggin.cfg
+
+- name: compile the translations
+  become_user: vagrant
+  command:
+    cmd: poetry run pybabel compile -d /home/vagrant/noggin/noggin/translations
+    chdir: noggin
+
+- name: Install the systemd unit files for noggin services
+  copy:
+    src: noggin.service
+    dest: /etc/systemd/system/noggin.service
+    mode: 0644
+
+- name: Start noggin service using systemd
+  systemd:
+    state: started
+    name: noggin
+    daemon_reload: yes
+    enabled: yes
+
+- import_tasks: rabbitmq.yml
