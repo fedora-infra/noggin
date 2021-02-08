@@ -138,7 +138,7 @@
 
 {% block scripts %}
   {{ super () }}
-  <script>
+  <script nonce="{{ csp_nonce() }}">
     {% if current_user_is_sponsor and sponsor_form %}
       var typeahead = $('#new_member_username').typeahead(
         { highlight: true},

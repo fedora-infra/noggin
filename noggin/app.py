@@ -1,6 +1,7 @@
 import os
 from logging.config import dictConfig
 
+import flask_talisman
 from flask import Flask
 from flask_healthz import healthz
 from flask_mail import Mail
@@ -29,6 +30,9 @@ mailer = Mail()
 
 # Catch IPA errors
 ipa_error_handler = IPAErrorHandler()
+
+# Security headers
+talisman = flask_talisman.Talisman()
 
 
 def create_app(config=None):
@@ -67,6 +71,21 @@ def create_app(config=None):
     mailer.init_app(app)
     ipa_error_handler.init_app(app)
     theme.init_app(app, whitenoise=whitenoise)
+    talisman.init_app(
+        app,
+        force_https=app.config.get("SESSION_COOKIE_SECURE", True),
+        frame_options=flask_talisman.DENY,
+        referrer_policy="same-origin",
+        content_security_policy={
+            "default-src": "'self'",
+            "script-src": [
+                # https://csp.withgoogle.com/docs/strict-csp.html#example
+                "'strict-dynamic'",
+            ],
+            "img-src": ["'self'", "seccdn.libravatar.org"],
+        },
+        content_security_policy_nonce_in=['script-src'],
+    )
 
     # Register views
     import_all("noggin.controller")

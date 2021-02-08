@@ -224,3 +224,17 @@ To update all created languages with the newest strings in messages.pot, use::
 To compile the translations in updated .mo files into what noggin can use, use the command::
 
   poetry run pybabel compile -d noggin/translations
+
+
+UI and themes
+-------------
+
+Noggin has support for themes, have a look at the existing themes for inspiration.
+
+Some notes regarding our Content Security Policy:
+
+- inline ``<script>`` tags must have a ``nonce`` attribute, look at the other templates for the proper Jinja snippet.
+- CSS files can't use the ``data:`` scheme for images. Bootstrap makes use of that, for example.
+  You can convert a CSS file that uses the ``data:`` scheme for SVGs with the ``data-uri-to-svg.py`` script, it will
+  extract the files and replace the ``url()`` instructions. You can then just use the new file it created in the
+  HTML template.

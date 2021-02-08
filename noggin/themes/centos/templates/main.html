@@ -2,7 +2,7 @@
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('theme.static', filename='vendor/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ url_for('theme.static', filename='vendor/bootstrap-4.3.1/bootstrap.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('theme.static', filename='vendor/bootstrap-4.3.1/bootstrap.min.nodata.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('theme.static', filename='fonts/Montserrat.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('theme.static', filename='css/default.css') }}" type="text/css">
 {% endblock %}
@@ -67,9 +67,9 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('theme.static', filename='vendor/jquery/jquery-3.3.1.min.js') }}"></script>
-    <script src="{{ url_for('theme.static', filename='vendor/popper-1.14.7/popper.min.js') }}"></script>
-    <script src="{{ url_for('theme.static', filename='vendor/bootstrap-4.3.1/bootstrap.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/jquery/jquery-3.3.1.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/popper-1.14.7/popper.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/bootstrap-4.3.1/bootstrap.min.js') }}"></script>
     {{ super() }}
 {% endblock %}
 

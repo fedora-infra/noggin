@@ -106,8 +106,8 @@
 {% block scripts %}
   {{ super() }}
   {% if otp_uri %}
-  <script src="{{ url_for('static', filename='js/vendor/jquery-qrcode-1.0/jquery.qrcode.min.js') }}"></script>
-  <script>
+  <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/jquery-qrcode-1.0/jquery.qrcode.min.js') }}"></script>
+  <script nonce="{{ csp_nonce() }}">
     $(document).ready(function() {
         $('#otp-modal').modal('show');
         $('#otp-qrcode').qrcode("{{ otp_uri|safe }}");
@@ -118,6 +118,8 @@
   </script>
   {% endif %}
   {% if addotpform.errors %}
-    <script>$(document).ready(function() {$('#add-token-modal').modal('show');});</script>
+    <script nonce="{{ csp_nonce() }}">
+      $(document).ready(function() {$('#add-token-modal').modal('show');});
+    </script>
   {% endif %}
 {% endblock %}

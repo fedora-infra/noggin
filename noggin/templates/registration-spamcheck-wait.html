@@ -47,7 +47,7 @@
   </div>
 
   {% if user.status_note == "spamcheck_awaiting" %}
-    <script>
+    <script nonce="{{ csp_nonce() }}">
       // refresh page every five seconds
       setTimeout(function(){ location.reload(); }, 5000);
     </script>

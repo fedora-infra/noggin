@@ -118,8 +118,8 @@
                       {% endif %}
                   </div>
                 </div>
-                <div class="text-info ml-auto" style="width:5em;">{{ _('sponsor') if group in managed_groups }}</div>
-                <div class="text-success" style="width:4em;">{{ _('member') if group in member_groups }}</div>
+                <div class="text-info ml-auto px-2 {{ 'invisible' if group not in managed_groups }}">{{ _('sponsor') }}</div>
+                <div class="text-success px-2 {{ 'invisible' if group not in member_groups }}">{{ _('member') }}</div>
               </li>
           {% else %}
           <li class="list-group-item h4 text-muted h-100 text-center d-flex align-items-center justify-content-center bg-light">
@@ -135,12 +135,12 @@
 {% block scripts %}
 {{super()}}
 {% if user.timezone %}
-  <script>
-    setInterval("generate_local_time();",1000);
+  <script nonce="{{ csp_nonce() }}">
     function generate_local_time(){
       var currenttime = moment().tz("{{user.timezone}}").format('dddd, h:mm:ss a')
       $("#user-time").html(currenttime)
     }
+    setInterval(generate_local_time, 1000);
   </script>
 {% endif %}
 {% endblock %}

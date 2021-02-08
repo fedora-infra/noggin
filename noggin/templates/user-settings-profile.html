@@ -48,7 +48,7 @@
   {{ super () }}
   {{ macros.unsaved_changes() }}
   {{ macros.selectize() }}
-  <script>
+  <script nonce="{{ csp_nonce() }}">
   $('#ircnick').selectize({
     plugins: ['remove_button'],
     delimiter: ',',

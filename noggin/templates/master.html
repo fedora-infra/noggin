@@ -15,20 +15,20 @@
     {% block footer %}{% endblock %}
     {% block scripts %}
       {% if current_user %}
-        <script src="{{ url_for('static', filename='js/vendor/corejs-typeahead-1.2.1/bloodhound.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/vendor/corejs-typeahead-1.2.1/typeahead.jquery.min.js') }}"></script>
-        <script>
+        <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/corejs-typeahead-1.2.1/bloodhound.min.js') }}"></script>
+        <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/corejs-typeahead-1.2.1/typeahead.jquery.min.js') }}"></script>
+        <script nonce="{{ csp_nonce() }}">
           var URL_SEARCH = {{ url_for('root.search_json')|tojson }};
-          
+
           /* Translated strings for use in search.js. These are the labels that are shown
              in the searchbox dropdown */
           var GROUPS_SEARCH_LABEL = '{{ _("Groups") }}'
           var USERS_SEARCH_LABEL = '{{ _("Users") }}'
         </script>
-        <script src="{{ url_for('static', filename='js/search.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/vendor/moment-2.24.0/moment.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/vendor/moment-timezone-0.5.28-2019c/moment-timezone-with-data-10-year-range.js') }}"></script>
-        <script>
+        <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/search.js') }}"></script>
+        <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/moment-2.24.0/moment.js') }}"></script>
+        <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/moment-timezone-0.5.28-2019c/moment-timezone-with-data-10-year-range.js') }}"></script>
+        <script nonce="{{ csp_nonce() }}">
         $(function () {
           $('[data-toggle="popover"]').popover()
         })
