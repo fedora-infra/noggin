@@ -4,7 +4,7 @@
 {% set OPENID = '.sso.opensuse.org' %}
 
 {% block head %}
-    <link href="{{ url_for('theme.static', filename='css/chameleon.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ url_for('theme.static', filename='css/chameleon.nodata.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ url_for('theme.static', filename='css/accounts.css') }}" rel="stylesheet" type="text/css" />
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('theme.static', filename='images/favicons/favicon.ico') }}">
     <link color="#73ba25" href="{{ url_for('theme.static', filename='images/favicons/mask-icon.svg') }}" rel="mask-icon">
@@ -79,8 +79,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('theme.static', filename='js/jquery/jquery-1.10.2.min.js') }}"></script>
-    <script defer src="{{ url_for('theme.static', filename='js/chameleon.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='js/jquery/jquery-3.3.1.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" defer src="{{ url_for('theme.static', filename='js/chameleon.js') }}"></script>
     {{ super() }}
 {% endblock %}
 

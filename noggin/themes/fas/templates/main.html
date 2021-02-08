@@ -4,7 +4,7 @@
 {% set OPENID = '.id.fedoraproject.org' %}
 
 {% block head %}
-    <link href="{{ url_for('theme.static', filename='js/fedora-bootstrap/fedora-bootstrap.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('theme.static', filename='js/fedora-bootstrap/fedora-bootstrap.min.nodata.css') }}" rel="stylesheet" />
     <link href="{{ url_for('theme.static', filename='fonts/open-sans.css') }}" rel="stylesheet" />
     <link href="{{ url_for('theme.static', filename='fonts/hack.css') }}" rel="stylesheet" />
     <link href="{{ url_for('theme.static', filename='css/fas.css') }}" rel="stylesheet" type="text/css" />
@@ -70,8 +70,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('theme.static', filename='js/jquery/jquery-1.10.2.min.js') }}"></script>
-    <script src="{{ url_for('theme.static', filename='js/fedora-bootstrap/fedora-bootstrap.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='js/jquery/jquery-3.3.1.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='js/fedora-bootstrap/fedora-bootstrap.min.js') }}"></script>
     {{ super() }}
 {% endblock %}
 
