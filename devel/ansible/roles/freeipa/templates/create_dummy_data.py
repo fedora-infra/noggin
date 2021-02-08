@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+import python_freeipa
 from faker import Faker
 
-import python_freeipa
 
 USER_PASSWORD = "password"
 
@@ -26,9 +26,7 @@ groups = {
     "ambassadors": 30,
 }
 
-ipa = python_freeipa.ClientLegacy(
-    host="ipa.noggin.test", verify_ssl="/etc/ipa/ca.crt"
-)
+ipa = python_freeipa.ClientLegacy(host="ipa.noggin.test", verify_ssl="/etc/ipa/ca.crt")
 ipa.login("{{ ipa_admin_user }}", "{{ ipa_admin_password }}")
 
 untouched_ipa = python_freeipa.ClientLegacy(
@@ -42,7 +40,7 @@ for group in groups.keys():
     ipa.group_add(group, f"A group for {group}", fasgroup=True)
     ipa._request("fasagreement_add_group", "FPCA", {"group": group})
 
-ipa.group_add("general", f"A group for general stuff", fasgroup=True)
+ipa.group_add("general", "A group for general stuff", fasgroup=True)
 
 
 for x in range(100):
