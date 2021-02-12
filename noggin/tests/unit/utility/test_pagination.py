@@ -90,7 +90,7 @@ def test_groups_page_nopaging(client, logged_in_dummy_user, mocker):
     page = BeautifulSoup(result.data, 'html.parser')
     groups = page.select("ul.list-group li")
     assert len(groups) == 2
-    ipa.group_find.assert_called_with(fasgroup=True, all=True)
+    ipa.group_find.assert_called_with(fasgroup=True, all=True, sizelimit=0)
     ipa.batch.assert_not_called()
 
 
@@ -116,7 +116,7 @@ def test_empty_result(mocker, app):
     ipa.group_find.return_value = {"result": []}
     with app.test_request_context("/?page_size=10"):
         result = paginated_find(ipa, Group)
-    ipa.group_find.assert_called_once_with(pkey_only=True)
+    ipa.group_find.assert_called_once_with(pkey_only=True, sizelimit=0)
     ipa.batch.assert_not_called()
     assert len(result.items) == 0
 
