@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
 # Jan Kuparinen <copper_fin@hotmail.com>, 2021.
+# Ricky Tigg <ricky.tigg@gmail.com>, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2020-04-08 15:35+0000\n"
-"PO-Revision-Date: 2021-01-24 08:38+0000\n"
-"Last-Translator: Jan Kuparinen <copper_fin@hotmail.com>\n"
+"PO-Revision-Date: 2021-02-13 11:40+0000\n"
+"Last-Translator: Ricky Tigg <ricky.tigg@gmail.com>\n"
 "Language-Team: Finnish <https://translate.fedoraproject.org/projects/"
 "fedora-infra/noggin/fi/>\n"
 "Language: fi\n"
@@ -27,7 +28,7 @@ msgstr "Salasana vanhentunut. Nollaa se."
 #: noggin/controller/authentication.py:31
 #: noggin/controller/authentication.py:38
 msgid "Could not log in to the IPA server."
-msgstr ""
+msgstr "IPA-palvelimeen ei voitu kirjautua."
 
 #: noggin/controller/authentication.py:40
 #, python-format
@@ -36,31 +37,31 @@ msgstr "Tervetuloa, %(username)s!"
 
 #: noggin/controller/authentication.py:59
 msgid "Token successfully synchronized"
-msgstr ""
+msgstr "Tunnuksen synkronointi onnistui"
 
 #: noggin/controller/group.py:57
 #, python-format
 msgid "User %(username)s was not found in the system."
-msgstr ""
+msgstr "Käyttäjää %(username)s ei löydetty järjestelmästä."
 
 #: noggin/controller/group.py:68
 #, python-format
 msgid "Unable to add user %(username)s: %(errormessage)s"
-msgstr ""
+msgstr "Käyttäjää %(username)s: %(errormessage)s ei voi lisätä"
 
 #: noggin/controller/group.py:78
 #, python-format
 msgid "You got it! %(username)s has been added to %(groupname)s."
-msgstr ""
+msgstr "%(username)s lisättiin %(groupname)s:een."
 
 #: noggin/controller/group.py:121
 #, python-format
 msgid "You got it! %(username)s has been removed from %(groupname)s."
-msgstr ""
+msgstr "%(username)s poistettiin %(groupname)s:sta."
 
 #: noggin/controller/password.py:42
 msgid "The old password or username is not correct"
-msgstr ""
+msgstr "Vanha salasana tai käyttäjänimi ei ole oikein"
 
 #: noggin/controller/password.py:53
 msgid "Could not change password."
@@ -77,35 +78,38 @@ msgid ""
 "%(wait_min)s minute(s) and %(wait_sec)s seconds before you can request "
 "another."
 msgstr ""
+"Olet jo pyytänyt salasanan vaihtamista. Sinun on odotettava %(wait_min)s "
+"minuutti(a) ja s %(wait_sec)s ekuntia, ennen kuin voit pyytää uutta."
 
 #: noggin/controller/password.py:130
 #, python-format
 msgid "User %(username)s does not exist"
-msgstr ""
+msgstr "Käyttäjää %(username)s ei ole olemassa"
 
 #: noggin/controller/password.py:145
 msgid "We could not send you an email, please retry later"
-msgstr ""
+msgstr "Emme voineet lähettää sinulle sähköpostia. Yritä myöhemmin uudelleen"
 
 #: noggin/controller/password.py:151
 msgid ""
 "An email has been sent to your address with instructions on how to reset "
 "your password"
 msgstr ""
+"Osoitteeseesi on lähetetty sähköposti, jossa on ohjeet salasanan vaihtamiseen"
 
 #: noggin/controller/password.py:170
 msgid "The token is invalid, please request a new one."
-msgstr ""
+msgstr "Tunnus on virheellinen. Pyydä uutta."
 
 #: noggin/controller/password.py:178
 msgid "The token has expired, please request a new one."
-msgstr ""
+msgstr "Tunnus on vanhentunut. Pyydä uutta."
 
 #: noggin/controller/password.py:184
 msgid ""
 "Your password has been changed since you requested this token, please "
 "request a new one."
-msgstr ""
+msgstr "Salasanasi on vaihdettu, koska pyysit tätä tunnusta. Pyydä uusi."
 
 #: noggin/controller/password.py:215
 #, python-format
@@ -114,22 +118,25 @@ msgid ""
 "(%(policy_error)s) and has thus been set as expired. You will be asked to"
 " change it after logging in."
 msgstr ""
+"Salasanasi on vaihdettu, mutta se ei ole käytännön (%(policy_error)s) "
+"mukainen ja on siten asetettu vanhentuneeksi. Sinua pyydetään vaihtamaan se "
+"sisäänkirjautumisen jälkeen."
 
 #: noggin/controller/password.py:240
 msgid "Incorrect value."
-msgstr ""
+msgstr "Virheellinen arvo."
 
 #: noggin/controller/password.py:248
 msgid "Could not change password, please try again."
-msgstr ""
+msgstr "Salasanan vaihtaminen epäonnistui. Yritä uudelleen."
 
 #: noggin/controller/password.py:252
 msgid "Your password has been changed."
-msgstr ""
+msgstr "Salasanasi on vaihdettu."
 
 #: noggin/controller/registration.py:73
 msgid "An error occurred while creating the account, please try again."
-msgstr ""
+msgstr "Tilin luomisessa tapahtui virhe. Yritä uudelleen."
 
 #: noggin/controller/registration.py:88
 #, python-format
@@ -138,6 +145,9 @@ msgid ""
 " with the policy (%(policy_error)s) and has thus been set as expired. You"
 " will be asked to change it after logging in."
 msgstr ""
+"Tilisi on luotu, mutta valitsemasi salasana ei ole käytännön "
+"(%(policy_error)s) mukainen ja on siten asetettu vanhentuneeksi. Sinua "
+"pyydetään vaihtamaan se kirjautumisen jälkeen."
 
 #: noggin/controller/registration.py:107
 #, python-format
@@ -145,473 +155,483 @@ msgid ""
 "Your account has been created, but an error occurred while setting your "
 "password (%(message)s). You may need to change it after logging in."
 msgstr ""
+"Tilisi on luotu, mutta salasanaa (%(message)s) asetettaessa tapahtui virhe. "
+"Saatat joutua muuttamaan sitä sisäänkirjautumisen jälkeen."
 
 #: noggin/controller/registration.py:117
 msgid "Congratulations, you now have an account! Go ahead and sign in to proceed."
 msgstr ""
+"Onnittelut, sinulla on nyt tili! Mene eteenpäin ja kirjaudu sisään "
+"jatkaaksesi."
 
 #: noggin/controller/user.py:157
 msgid "Incorrect password"
-msgstr ""
+msgstr "Väärä salasana"
 
 #: noggin/controller/user.py:162
 msgid "Cannot create the token."
-msgstr ""
+msgstr "Tunnusta ei voi luoda."
 
 #: noggin/controller/user.py:197
 msgid "Sorry, You cannot disable your last active token."
-msgstr ""
+msgstr "Valitettavasti et voi poistaa viimeistä aktiivista tunnusta."
 
 #: noggin/controller/user.py:204
 msgid "Cannot disable the token."
-msgstr ""
+msgstr "Tunnusta ei voi poistaa käytöstä."
 
 #: noggin/controller/user.py:231
 msgid "Sorry, You cannot delete your last active token."
-msgstr ""
+msgstr "Valitettavasti et voi poistaa viimestä aktiivista tunnusta."
 
 #: noggin/controller/user.py:233 noggin/controller/user.py:238
 msgid "Cannot delete the token."
-msgstr ""
+msgstr "Tunnusta ei voi poistaa."
 
 #: noggin/form/add_group_member.py:10
 msgid "New member username must not be empty"
-msgstr ""
+msgstr "Uuden jäsenen käyttäjätunnus ei saa olla tyhjä"
 
 #: noggin/form/edit_user.py:20 noggin/form/register_user.py:11
 msgid "First Name"
-msgstr ""
+msgstr "Etunimi"
 
 #: noggin/form/edit_user.py:21 noggin/form/register_user.py:12
 msgid "First name must not be empty"
-msgstr ""
+msgstr "Etunimi ei saa olla tyhjä"
 
 #: noggin/form/edit_user.py:25 noggin/form/register_user.py:17
 msgid "Last Name"
-msgstr ""
+msgstr "Sukunimi"
 
 #: noggin/form/edit_user.py:26 noggin/form/register_user.py:18
 msgid "Last name must not be empty"
-msgstr ""
+msgstr "Sukunimi ei saa olla tyhjä"
 
 #: noggin/form/edit_user.py:30 noggin/form/register_user.py:41
 msgid "E-mail Address"
-msgstr ""
+msgstr "Sähköpostiosoite"
 
 #: noggin/form/edit_user.py:32 noggin/form/register_user.py:43
 msgid "Email must not be empty"
-msgstr ""
+msgstr "Sähköposti ei saa olla tyhjä"
 
 #: noggin/form/edit_user.py:33 noggin/form/register_user.py:44
 msgid "Email must be valid"
-msgstr ""
+msgstr "Sähköpostin on oltava kelvollinen"
 
 #: noggin/form/edit_user.py:38 noggin/templates/user.html:38
 msgid "Locale"
-msgstr ""
+msgstr "Maa-asetusto"
 
 #: noggin/form/edit_user.py:41
 msgid "Locale must not be empty"
-msgstr ""
+msgstr "Kielialue ei saa olla tyhjä"
 
 #: noggin/form/edit_user.py:42
 msgid "Locale must be a valid locale short-code"
-msgstr ""
+msgstr "Kielialueen on oltava kelvollinen kielialueen lyhyt koodi"
 
 #: noggin/form/edit_user.py:46 noggin/templates/user.html:35
 msgid "IRC Nickname"
-msgstr ""
+msgstr "IRC:n nimimerkki"
 
 #: noggin/form/edit_user.py:49 noggin/templates/user.html:32
 msgid "Timezone"
-msgstr ""
+msgstr "Aikavyöhyke"
 
 #: noggin/form/edit_user.py:52
 msgid "Timezone must not be empty"
-msgstr ""
+msgstr "Aikavyöhyke ei saa olla tyhjä"
 
 #: noggin/form/edit_user.py:53
 msgid "Timezone must be a valid timezone"
-msgstr ""
+msgstr "Aikavyöhykkeen on oltava kelvollinen aikavyöhyke"
 
 #: noggin/form/edit_user.py:57
 msgid "GitHub Username"
-msgstr ""
+msgstr "GitHub-käyttäjänimi"
 
 #: noggin/form/edit_user.py:59
 msgid "GitLab Username"
-msgstr ""
+msgstr "GitLab-käyttäjänimi"
 
 #: noggin/form/edit_user.py:61
 msgid "Red Hat Bugzilla Email"
-msgstr ""
+msgstr "Red Hat Bugzilla -sähköposti"
 
 #: noggin/form/edit_user.py:67
 msgid "SSH Keys"
-msgstr ""
+msgstr "SSH-avaimet"
 
 #: noggin/form/edit_user.py:71 noggin/templates/user.html:41
 msgid "GPG Keys"
-msgstr ""
+msgstr "GPG-avaimet"
 
 #: noggin/form/edit_user.py:77
 msgid "Token description"
-msgstr ""
+msgstr "Tunnuksen kuvaus"
 
 #: noggin/form/edit_user.py:78
 msgid "Description must not be empty"
-msgstr ""
+msgstr "Kuvaus ei saa olla tyhjä"
 
 #: noggin/form/edit_user.py:82
 msgid "Enter your current password"
-msgstr ""
+msgstr "Syötä nykyinen salasanasi"
 
 #: noggin/form/edit_user.py:83 noggin/form/login_user.py:16
 #: noggin/form/sync_token.py:15
 msgid "You must provide a password"
-msgstr ""
+msgstr "Sinun on annettava salasana"
 
 #: noggin/form/edit_user.py:89 noggin/form/edit_user.py:95
 msgid "token must not be empty"
-msgstr ""
+msgstr "tunnus ei saa olla tyhjä"
 
 #: noggin/form/login_user.py:10 noggin/form/password_reset.py:36
 #: noggin/form/register_user.py:23 noggin/form/remove_group_member.py:9
 #: noggin/form/sync_token.py:9 noggin/templates/sync-token.html:16
 msgid "Username"
-msgstr ""
+msgstr "Käyttäjänimi"
 
 #: noggin/form/login_user.py:11 noggin/form/sync_token.py:10
 msgid "You must provide a user name"
-msgstr ""
+msgstr "Sinun on annettava käyttäjänimi"
 
 #: noggin/form/login_user.py:15 noggin/form/register_user.py:29
 #: noggin/form/sync_token.py:14 noggin/templates/sync-token.html:19
 #: noggin/templates/user-settings.html:28
 msgid "Password"
-msgstr ""
+msgstr "Salasana"
 
 #: noggin/form/login_user.py:19
 msgid "Log In"
-msgstr ""
+msgstr "Kirjaudu sisään"
 
 #: noggin/form/password_reset.py:10
 msgid "New Password"
-msgstr ""
+msgstr "Uusi salasana"
 
 #: noggin/form/password_reset.py:12 noggin/form/register_user.py:31
 msgid "Password must not be empty"
-msgstr ""
+msgstr "Salasana ei saa olla tyhjä"
 
 #: noggin/form/password_reset.py:13 noggin/form/register_user.py:32
 msgid "Passwords must match"
-msgstr ""
+msgstr "Salasanojen täytyy täsmätä"
 
 #: noggin/form/password_reset.py:17
 msgid "Confirm New Password"
-msgstr ""
+msgstr "Vahvista uusi salasana"
 
 #: noggin/form/password_reset.py:20
 msgid "OTP Token"
-msgstr ""
+msgstr "OTP-tunnus"
 
 #: noggin/form/password_reset.py:20
 msgid "Enter your OTP token if you have enrolled one"
-msgstr ""
+msgstr "Anna OTP-tunnuksesi, jos olet rekisteröinyt sellaisen"
 
 #: noggin/form/password_reset.py:27
 msgid "Current Password"
-msgstr ""
+msgstr "Nykyinen salasana"
 
 #: noggin/form/password_reset.py:28
 msgid "Current password must not be empty"
-msgstr ""
+msgstr "Nykyinen salasana ei saa olla tyhjä"
 
 #: noggin/form/password_reset.py:29
 msgid "Just the password, don't add the OTP token if you have one"
-msgstr ""
+msgstr "Vain salasana, älä lisää OTP-tunnusta, jos sinulla on sellainen"
 
 #: noggin/form/password_reset.py:37 noggin/form/register_user.py:24
 msgid "User name must not be empty"
-msgstr ""
+msgstr "Käyttäjänimi ei voi olla tyhjä"
 
 #: noggin/form/password_reset.py:38
 msgid "Enter your username to reset your password"
-msgstr ""
+msgstr "Anna käyttäjätunnuksesi palauttaaksesi salasanasi"
 
 #: noggin/form/register_user.py:35
 msgid "Please choose a strong password"
-msgstr ""
+msgstr "Valitse vahva salasana"
 
 #: noggin/form/register_user.py:38
 msgid "Confirm Password"
-msgstr ""
+msgstr "Vahvista salasana"
 
 #: noggin/form/register_user.py:49 noggin/templates/index.html:19
 msgid "Register"
-msgstr ""
+msgstr "Rekisteröi"
 
 #: noggin/form/remove_group_member.py:10
 msgid "Username must not be empty"
-msgstr ""
+msgstr "Käyttäjänimi ei saa olla tyhjä"
 
 #: noggin/form/sync_token.py:19 noggin/templates/sync-token.html:22
 msgid "First OTP"
-msgstr ""
+msgstr "Ensimmäinen OTP"
 
 #: noggin/form/sync_token.py:20
 msgid "You must provide a first code"
-msgstr ""
+msgstr "Sinun on annettava ensimmäinen koodi"
 
 #: noggin/form/sync_token.py:24 noggin/templates/sync-token.html:25
 msgid "Second OTP"
-msgstr ""
+msgstr "Toinen OTP"
 
 #: noggin/form/sync_token.py:25
 msgid "You must provide a second code"
-msgstr ""
+msgstr "Sinun on annettava toiinen koodi"
 
 #: noggin/form/sync_token.py:28 noggin/templates/sync-token.html:28
 msgid "Token ID"
-msgstr ""
+msgstr "Token-tunniste"
 
 #: noggin/templates/404.html:3
 msgid "You've ruined everything."
-msgstr ""
+msgstr "Olet pilannut kaiken."
 
 #: noggin/templates/404.html:10
 msgid "That page wasn't found. You've gone and ruined everything."
-msgstr ""
+msgstr "Sivua ei löytynyt. Olet mennyt ja pilannut kaiken."
 
 #: noggin/templates/_login_form.html:11
 msgid "Forgot password?"
-msgstr ""
+msgstr "Unohtuiko salasana?"
 
 #: noggin/templates/_login_form.html:13
 msgid "Forgotten password or lost OTP token?"
-msgstr ""
+msgstr "Unohtuiko salasana tai kadotitko OTP-tunnuksen?"
 
 #: noggin/templates/_login_form.html:16
 msgid "Sync Token"
-msgstr ""
+msgstr "Synkronointitunnus"
 
 #: noggin/templates/forgot-password-ask.html:2
 msgid "Password Recovery"
-msgstr ""
+msgstr "Salasanan palautus"
 
 #: noggin/templates/forgot-password-ask.html:16
 msgid "Did you forget your password?"
-msgstr ""
+msgstr "Unohditko salasanasi?"
 
 #: noggin/templates/forgot-password-ask.html:17
 msgid ""
 "Enter your username and an email will be sent to your address with "
 "further instructions."
 msgstr ""
+"Syötä käyttäjänimesi ja lähetetään osoitteeseesi sähköposti lisäohjeineen."
 
 #: noggin/templates/forgot-password-ask.html:22
 msgid "Send"
-msgstr ""
+msgstr "Lähetä"
 
 #: noggin/templates/forgot-password-change.html:2
 #: noggin/templates/forgot-password-change.html:23
 msgid "Reset Password"
-msgstr ""
+msgstr "Nollaa salasana"
 
 #: noggin/templates/forgot-password-change.html:16
 #, python-format
 msgid "Password Reset for %(username)s"
-msgstr ""
+msgstr "Salasanan nollaus %(username)s:lle"
 
 #: noggin/templates/group.html:5
 #, python-format
 msgid "%(groupname)s Group"
-msgstr ""
+msgstr "%(groupname)s ryhmä"
 
 #: noggin/templates/group.html:31
 msgid "To join this group, contact a group sponsor."
-msgstr ""
+msgstr "Liity tähän ryhmään ottamalla yhteyttä ryhmän sponsoriin."
 
 #: noggin/templates/group.html:38
 msgid "Sponsors"
-msgstr ""
+msgstr "Sponsorit"
 
 #: noggin/templates/group.html:42
 msgid "no sponsors"
-msgstr ""
+msgstr "ei sponsoreita"
 
 #: noggin/templates/group.html:68
 msgid "Members"
-msgstr ""
+msgstr "Jäsenet"
 
 #: noggin/templates/group.html:75
 msgid "add user..."
-msgstr ""
+msgstr "lisää käyttäjä..."
 
 #: noggin/templates/group.html:83
 msgid "No members yet."
-msgstr ""
+msgstr "Ei vielä jäseniä."
 
 #: noggin/templates/groups.html:5 noggin/templates/groups.html:12
 msgid "Group List"
-msgstr ""
+msgstr "Ryhmäluettelo"
 
 #: noggin/templates/groups.html:30
 #, python-format
 msgid "%(member_count)s members"
-msgstr ""
+msgstr "%(member_count)s jäsentä"
 
 #: noggin/templates/index.html:16 noggin/templates/login.html:2
 msgid "Login"
-msgstr ""
+msgstr "Sisäänkirjautuminen"
 
 #: noggin/templates/password-reset.html:2
 msgid "Expired Password Reset"
-msgstr ""
+msgstr "Salasanan nollaus on vanhentunut"
 
 #: noggin/templates/password-reset.html:15
 #, python-format
 msgid "Expired Password Reset for %(username)s"
-msgstr ""
+msgstr "Vanhentunut salasanan nollaus %(username)s:lle"
 
 #: noggin/templates/password-reset.html:24
 #: noggin/templates/user-settings-password.html:7
 #: noggin/templates/user-settings-password.html:16
 msgid "Change Password"
-msgstr ""
+msgstr "Vaihda salasana"
 
 #: noggin/templates/register.html:2
 msgid "Registration"
-msgstr ""
+msgstr "Rekisteröinti"
 
 #: noggin/templates/sync-token.html:2
 msgid "Sync OTP Token"
-msgstr ""
+msgstr "Synkronointi-OTP-tunnus"
 
 #: noggin/templates/sync-token.html:10
 msgid "Synchronize OTP Token"
-msgstr ""
+msgstr "Synkronoi OTP-tunnus"
 
 #: noggin/templates/sync-token.html:33
 msgid "Sync"
-msgstr ""
+msgstr "Synkronointi"
 
 #: noggin/templates/user-settings-keys.html:8
 msgid "GPG Key ID"
-msgstr ""
+msgstr "GPG-avaimen tunniste"
 
 #: noggin/templates/user-settings-keys.html:9
 msgid "SSH Public Key"
-msgstr ""
+msgstr "Julkinen SSH-avain"
 
 #: noggin/templates/user-settings-keys.html:13
 #: noggin/templates/user-settings-profile.html:22
 msgid "Save"
-msgstr ""
+msgstr "Tallenna"
 
 #: noggin/templates/user-settings-otp.html:11
 msgid "Scan your new token"
-msgstr ""
+msgstr "Skannaa uusi tunnuksesi"
 
 #: noggin/templates/user-settings-otp.html:18
 msgid ""
 "Your new token is ready. Click on the button below to reveal the QR code "
 "and scan it."
 msgstr ""
+"Uusi tunnuksesi on valmis. Napsauta alla olevaa painiketta paljastaa QR-"
+"koodi ja skannata se."
 
 #: noggin/templates/user-settings-otp.html:19
 msgid "Reveal"
-msgstr ""
+msgstr "Paljasta"
 
 #: noggin/templates/user-settings-otp.html:21
 msgid "or copy and paste the following token URL if you can't scan the QR code:"
 msgstr ""
+"tai kopioi ja liitä seuraava tunnuksen URL, jos et voi skannata QR-koodia:"
 
 #: noggin/templates/user-settings-otp.html:23
 msgid ""
 "This will never be shown to you again, don't close this window until your"
 " token is saved."
 msgstr ""
+"Tätä ei enää näytetä sinulle enää, älä sulje tätä ikkunaa, ennen kuin "
+"tunnuksesi on tallennettu."
 
 #: noggin/templates/user-settings-otp.html:31
 msgid "OTP Tokens"
-msgstr ""
+msgstr "OTP-tunnukset"
 
 #: noggin/templates/user-settings-otp.html:33
 msgid "Add OTP Token"
-msgstr ""
+msgstr "Lisää OTP-tunnus"
 
 #: noggin/templates/user-settings-otp.html:38
 msgid "Password or Password + One-Time-Password"
-msgstr ""
+msgstr "Salasana tai salasana + Kertakäyttöinen salasana (eng. OTP)"
 
 #: noggin/templates/user-settings-otp.html:40
 msgid "Generate"
-msgstr ""
+msgstr "Tuota"
 
 #: noggin/templates/user-settings-otp.html:59
 msgid "Disable"
-msgstr ""
+msgstr "Poista käytöstä"
 
 #: noggin/templates/user-settings-otp.html:62
 msgid "Disabled"
-msgstr ""
+msgstr "Ei käytössä"
 
 #: noggin/templates/user-settings-otp.html:72
 msgid "You have no OTP tokens"
-msgstr ""
+msgstr "Sinulla ei ole OTP-tunnuksia"
 
 #: noggin/templates/user-settings.html:3 noggin/templates/user-settings.html:14
 #, python-format
 msgid "Settings for %(username)s"
-msgstr ""
+msgstr "Asetukset %(username)s:lle"
 
 #: noggin/templates/user-settings.html:19 noggin/templates/user.html:21
 #: noggin/themes/default/templates/main.html:25
 #: noggin/themes/fas/templates/main.html:27
 msgid "Profile"
-msgstr ""
+msgstr "Profiili"
 
 #: noggin/templates/user-settings.html:22
 msgid "SSH &amp; GPG Keys"
-msgstr ""
+msgstr "SSH &amp; GPG-avaimet"
 
 #: noggin/templates/user-settings.html:25
 msgid "OTP"
-msgstr ""
+msgstr "Kertakäyttöinen salasana"
 
 #: noggin/templates/user.html:3
 #, python-format
 msgid "Profile for %(username)s"
-msgstr ""
+msgstr "Profiili %(username)s:lle"
 
 #: noggin/templates/user.html:24 noggin/themes/default/templates/main.html:17
 #: noggin/themes/fas/templates/main.html:19
 msgid "Groups"
-msgstr ""
+msgstr "Ryhmät"
 
 #: noggin/templates/user.html:44
 msgid "RHBZ E-Mail"
-msgstr ""
+msgstr "RHBZ-Sähköpostil"
 
 #: noggin/templates/user.html:62 noggin/themes/default/templates/main.html:26
 #: noggin/themes/fas/templates/main.html:28
 msgid "Settings"
-msgstr ""
+msgstr "Asetukset"
 
 #: noggin/templates/user.html:86
 msgid "sponsor"
-msgstr ""
+msgstr "sponsori"
 
 #: noggin/templates/user.html:86
 msgid "member"
-msgstr ""
+msgstr "jäsen"
 
 #: noggin/themes/default/templates/forgot-password-email.html:2
 #: noggin/themes/fas/templates/forgot-password-email.html:2
 #: noggin/themes/openSUSE/templates/forgot-password-email.html:2
 msgid "To reset your password, click on the link below:"
-msgstr ""
+msgstr "Voit nollata salasanasi napsauttamalla alla olevaa linkkiä:"
 
 #: noggin/themes/default/templates/forgot-password-email.html:8
 #: noggin/themes/fas/templates/forgot-password-email.html:8
@@ -619,31 +639,31 @@ msgstr ""
 msgid ""
 "If you did not request your password to be reset, you can ignore this "
 "email."
-msgstr ""
+msgstr "Jos et pyytänyt salasanasi vaihtamista, voit ohittaa tämän sähköpostin."
 
 #: noggin/themes/default/templates/forgot-password-email.html:10
 msgid "The Noggin team"
-msgstr ""
+msgstr "Noggin-joukkue"
 
 #: noggin/themes/default/templates/main.html:14
 #: noggin/themes/fas/templates/main.html:16
 msgid "search..."
-msgstr ""
+msgstr "haku.."
 
 #: noggin/themes/default/templates/main.html:27
 #: noggin/themes/fas/templates/main.html:29
 msgid "Log Out"
-msgstr ""
+msgstr "Kirjaudu ulos"
 
 #: noggin/themes/default/templates/main.html:61
 #: noggin/themes/fas/templates/main.html:63
 #, python-format
 msgid "Powered by %(noggin_link)s"
-msgstr ""
+msgstr "Voimanlähteenä %(noggin_link)s"
 
 #: noggin/themes/default/templates/main.html:77
 msgid "Welcome to noggin!"
-msgstr ""
+msgstr "Tervetuloa nogginiin!"
 
 #: noggin/themes/default/templates/main.html:79
 msgid ""
@@ -651,36 +671,42 @@ msgid ""
 "allows you to do things like create an account, change your password, "
 "manage group membership, and more."
 msgstr ""
+"Tämä on FreeIPA:n avoimen lähdekoodin yhteisöportaali. Sen avulla voit tehdä "
+"esimerkiksi tilin luomisen, salasanan vaihtamisen, ryhmäjäsenyyden hallinnan "
+"ja paljon muuta."
 
 #: noggin/themes/fas/templates/main.html:88
 msgid "Fedora Accounts"
-msgstr ""
+msgstr "Fedora-tilit"
 
 #: noggin/themes/fas/templates/main.html:90
 msgid ""
 "Fedora Accounts allows you to create and manage an account for Fedora "
 "Tools and Infrastructure."
 msgstr ""
+"Fedora-tilien avulla voit luoda ja hallita tiliä Fedora-työkaluille ja "
+"infrastruktuurille."
 
 #: noggin/themes/fas/templates/main.html:100
 msgid "file a Fedora Infra ticket to change the details or sponsors of this group"
 msgstr ""
+"jätä Fedora Infra -lippu muuttaaksesi tämän ryhmän tietoja tai sponsoreita"
 
 #: noggin/themes/fas/templates/main.html:101
 msgid "Request Change of Details"
-msgstr ""
+msgstr "Yksityiskohtien muutoksen pyyntö"
 
 #: noggin/themes/fas/templates/main.html:113
 msgid "Create a PDR request to disable your account"
-msgstr ""
+msgstr "Luo PDR-pyyntö tilisi poistamiseksi käytöstä"
 
 #: noggin/themes/fas/templates/main.html:114
 msgid "Request account deletion"
-msgstr ""
+msgstr "Tilin poistamispyyntö"
 
 #: noggin/themes/fas/templates/main.html:125
 msgid "Did you lose your OTP token?"
-msgstr ""
+msgstr "Menetitkö OTP-tunnuksesi?"
 
 #: noggin/themes/fas/templates/main.html:129
 #, python-format
@@ -690,8 +716,12 @@ msgid ""
 " your account if possible, so that the administrator can verify your "
 "identity."
 msgstr ""
+"Jos olet kadottanut OTP-tunnuksesi, sinun on lähetettävä "
+"sähköposti%(admin_email)s:een. Ole hyvä ja allekirjoita tämä sähköposti "
+"käyttämällä tilisi GPG-avainta, jos mahdollista, jotta järjestelmänvalvoja "
+"voi vahvistaa henkilöllisyytesi."
 
 #: noggin/utility/__init__.py:66
 #, python-format
 msgid "Group %(groupname)s could not be found."
-msgstr ""
+msgstr "Ryhmää %(groupname)s ei löytynyt."
