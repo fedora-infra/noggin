@@ -184,9 +184,7 @@ def user_settings_otp(ipa, username):
         try:
             maybe_ipa_login(current_app, session, username, addotpform.password.data)
             result = ipa.otptoken_add(
-                o_ipatokenowner=username,
-                o_ipatokenotpalgorithm='sha512',
-                o_description=addotpform.description.data,
+                o_ipatokenowner=username, o_description=addotpform.description.data,
             )['result']
 
             uri = urlparse(result['uri'])
