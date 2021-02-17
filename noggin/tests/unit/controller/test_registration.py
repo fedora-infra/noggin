@@ -39,6 +39,17 @@ def post_data_step_1():
 
 
 @pytest.fixture
+def post_data_non_ascii():
+    return {
+        "register-firstname": "习近平 äöü ß",
+        "register-lastname": "ÄÖÜ ẞ 安倍 晋三",
+        "register-mail": "dummy@example.com",
+        "register-username": "dummy",
+        "register-submit": "1",
+    }
+
+
+@pytest.fixture
 def post_data_step_3():
     return {"password": "password", "password_confirm": "password"}
 
@@ -101,6 +112,21 @@ def test_step_1(client, post_data_step_1, cleanup_dummy_user, mocker):
     assert user.locale == current_app.config["USER_DEFAULTS"]["locale"]
     # Timezone
     assert user.timezone == current_app.config["USER_DEFAULTS"]["timezone"]
+
+
+@pytest.mark.vcr()
+def test_gecos(client, post_data_non_ascii, cleanup_dummy_user, mocker):
+    record_signal = mocker.Mock()
+    with mailer.record_messages() as _, stageuser_created.connected_to(
+        record_signal
+    ):
+        result = client.post('/', data=post_data_non_ascii)
+    assert result.status_code == 302
+
+    # Check that default values are added
+    user = User(ipa_admin.stageuser_show("dummy")['result'])
+
+    assert user.gecos == "Xi Jin Ping aeoeue ss AeOeUe Ss An Bei Jin San"
 
 
 @pytest.mark.vcr()
