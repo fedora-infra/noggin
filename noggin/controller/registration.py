@@ -16,6 +16,8 @@ from flask import (
 )
 from flask_babel import _
 from flask_mail import Message
+from unidecode import unidecode
+from translitcodec import codecs
 
 from noggin.app import csrf, ipa_admin, mailer
 from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
@@ -83,15 +85,22 @@ def _handle_registration_validation_error(username, e):
 def handle_register_form(form):
     username = form.username.data
     now = datetime.datetime.utcnow().replace(microsecond=0)
+    common_name = form.firstname.data + " " + form.lastname.data
+    gecos = (
+        unidecode(codecs.encode(common_name, "translit/long"))
+        .replace("  ", " ")
+        .strip()
+    )
     # First, create the stage user.
     try:
         user = ipa_admin.stageuser_add(
             a_uid=username,
             o_givenname=form.firstname.data,
             o_sn=form.lastname.data,
-            o_cn=form.firstname.data + " " + form.lastname.data,
+            o_cn=common_name,
             o_mail=form.mail.data,
             o_loginshell='/bin/bash',
+            o_gecos=gecos,
             fascreationtime=f"{now.isoformat()}Z",
             faslocale=guess_locale(),
             fastimezone=current_app.config["USER_DEFAULTS"]["timezone"],
