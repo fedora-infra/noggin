@@ -11,7 +11,8 @@ USER_DEFAULTS = {
 THEME = "default"
 PASSWORD_POLICY = {"min": 8, "max": -1}
 PASSWORD_RESET_EXPIRATION = 10  # in minutes
-PASSWORD_RESET_LOCK_DIR = "/tmp/noggin-pw-reset"
+# We're running in Openshift, so nobody else has access to /tmp
+PASSWORD_RESET_LOCK_DIR = "/tmp/noggin-pw-reset"  # nosec
 ACTIVATION_TOKEN_EXPIRATION = 30  # in minutes
 REGISTRATION_OPEN = True
 HIDE_GROUPS_IN = "hidden_groups"
