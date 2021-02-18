@@ -24,6 +24,8 @@
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="{{ url_for('.user', username=current_user.username) }}">{{_("Profile")}}</a>
                     <a class="dropdown-item" href="{{ url_for('.user_settings_profile', username=current_user.username) }}">{{_("Settings")}}</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="https://docs.fedoraproject.org/en-US/fedora-accounts/user/" target="_blank" rel="noopener noreferrer">{{_("Help")}}</a>
                     <a class="dropdown-item" href="{{ url_for('.logout') }}">{{_("Log Out")}}</a>
                 </div>
             </li>
@@ -101,3 +103,11 @@
 {% macro lost_otp_token() %}
 {% endmacro %}
 #}
+
+{# an optional macro to show a note that when applied it also applies to kinit / krb5 / kerberos #}
+{% macro otp_notice() %}
+<div class="alert alert-info text-center">
+    <div><strong>{{_("Additional configuration is required when using Kerberos tickets when OTP is enabled")}}</strong></div>
+    <div>{{_("Read the <a href='https://docs.fedoraproject.org/en-US/fedora-accounts/user/#pkinit'>documentation</a> for details on configuring your system")}}</div>
+</div>
+{% endmacro %}
