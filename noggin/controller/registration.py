@@ -16,8 +16,8 @@ from flask import (
 )
 from flask_babel import _
 from flask_mail import Message
-from unidecode import unidecode
 from translitcodec import codecs
+from unidecode import unidecode
 
 from noggin.app import csrf, ipa_admin, mailer
 from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
