@@ -25,7 +25,7 @@ def ACTIVE_DISTROS = ["f31", "f32", "latest"]
 def stages = [:]
 def fedora_containers = [
                 containerTemplate(name: 'jnlp',
-                                  image: "docker-registry.default.svc:5000/openshift/cico-workspace:latest",
+                                  image: "quay.io/centosci/cico-workspace:latest",
                                   ttyEnabled: false,
                                   args: '${computer.jnlpmac} ${computer.name}',
                                   workingDir: "/workdir")
