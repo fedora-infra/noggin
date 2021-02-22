@@ -154,3 +154,12 @@
     {{ _("To let admins know that you're not a spammer, please send an email to %(email_link)s and explain the situation.", email_link=email_link) }}
 </p>
 {% endmacro %}
+
+{# an optional macro to show a note between the password field and the submite button on the login page #}
+{% macro login_note() %}
+<div class="alert alert-info text-center mb-0">
+    <div>
+        {{ _("By using a Fedora account, you agree to follow the <a href='https://docs.fedoraproject.org/en-US/project/code-of-conduct/'>Fedora&nbsp;Code&nbsp;of&nbsp;Conduct</a>.") }}
+    </div>
+</div>
+{% endmacro %}
