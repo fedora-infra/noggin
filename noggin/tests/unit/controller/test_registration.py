@@ -682,8 +682,7 @@ def test_spamcheck(client, dummy_stageuser, mocker, spamcheck_status, spamcheck_
 @pytest.mark.vcr()
 def test_spamcheck_disabled(client, dummy_user):
     response = client.post(
-        "/register/spamcheck-hook",
-        json={"token": "foobar", "status": "active"},
+        "/register/spamcheck-hook", json={"token": "foobar", "status": "active"},
     )
     assert response.status_code == 501
     assert response.json == {"error": "Spamcheck disabled"}
@@ -699,10 +698,7 @@ def test_spamcheck_bad_payload(client, dummy_user, mocker, spamcheck_on):
 @pytest.mark.parametrize("payload", [{"token": "foobar"}, {"status": "active"}])
 @pytest.mark.vcr()
 def test_spamcheck_bad_missing_key(client, dummy_user, mocker, payload, spamcheck_on):
-    response = client.post(
-        "/register/spamcheck-hook",
-        json=payload,
-    )
+    response = client.post("/register/spamcheck-hook", json=payload,)
     assert response.status_code == 400
     assert response.json["error"].startswith("Missing key: ")
 
@@ -711,8 +707,7 @@ def test_spamcheck_bad_missing_key(client, dummy_user, mocker, payload, spamchec
 def test_spamcheck_expired_token(client, dummy_user, mocker, spamcheck_on):
     token = make_token({"sub": "dummy"}, audience=Audience.spam_check, ttl=-1)
     response = client.post(
-        "/register/spamcheck-hook",
-        json={"token": token, "status": "active"},
+        "/register/spamcheck-hook", json={"token": token, "status": "active"},
     )
     assert response.status_code == 400
     assert response.json == {"error": "The token has expired"}
@@ -722,8 +717,7 @@ def test_spamcheck_expired_token(client, dummy_user, mocker, spamcheck_on):
 def test_spamcheck_invalid_token(client, dummy_user, mocker, spamcheck_on):
     token = make_token({"sub": "dummy"}, audience=Audience.email_validation)
     response = client.post(
-        "/register/spamcheck-hook",
-        json={"token": token, "status": "active"},
+        "/register/spamcheck-hook", json={"token": token, "status": "active"},
     )
     assert response.status_code == 400
     assert response.json["error"] == "Invalid token: Invalid audience"
@@ -733,8 +727,7 @@ def test_spamcheck_invalid_token(client, dummy_user, mocker, spamcheck_on):
 def test_spamcheck_wrong_status(client, dummy_user, mocker, spamcheck_on):
     token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
     response = client.post(
-        "/register/spamcheck-hook",
-        json={"token": token, "status": "this-is-wrong"},
+        "/register/spamcheck-hook", json={"token": token, "status": "this-is-wrong"},
     )
     assert response.status_code == 400
     assert response.json == {"error": "Invalid status: this-is-wrong."}
