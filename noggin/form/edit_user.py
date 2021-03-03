@@ -94,7 +94,7 @@ class UserSettingsAddOTPForm(BaseForm):
     description = StringField(
         _('Token name'),
         validators=[Optional()],
-        description=_("add an optional name to help you identify this token"),
+        description=_("Add an optional name to help you identify this token"),
     )
 
     password = PasswordField(
@@ -106,11 +106,11 @@ class UserSettingsAddOTPForm(BaseForm):
 
 class UserSettingsOTPStatusChange(BaseForm):
     token = HiddenField(
-        'token', validators=[DataRequired(message=_('token must not be empty'))]
+        'token', validators=[DataRequired(message=_('Token must not be empty'))]
     )
 
 
 class UserSettingsAgreementSign(BaseForm):
     agreement = HiddenField(
-        'agreement', validators=[DataRequired(message=_('agreement must not be empty'))]
+        'agreement', validators=[DataRequired(message=_('Agreement must not be empty'))]
     )
