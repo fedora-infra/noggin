@@ -1,5 +1,5 @@
 from flask_babel import lazy_gettext as _
-from wtforms import PasswordField, StringField
+from wtforms import BooleanField, PasswordField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo
 
@@ -34,6 +34,15 @@ class RegisterUserForm(ModestForm):
             Email(message=_('Email must be valid')),
         ],
         filters=[strip],
+    )
+
+    underage = BooleanField(
+        _('I am over 16 years old'),
+        validators=[
+            DataRequired(
+                message=_("You must be over 16 years old to create an account")
+            )
+        ],
     )
 
     submit = SubmitButtonField(_("Register"))
