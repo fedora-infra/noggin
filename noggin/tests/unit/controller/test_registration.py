@@ -34,19 +34,17 @@ def post_data_step_1():
         "register-lastname": "User",
         "register-mail": "dummy@example.com",
         "register-username": "dummy",
+        "register-underage": "true",
         "register-submit": "1",
     }
 
 
 @pytest.fixture
-def post_data_non_ascii():
-    return {
-        "register-firstname": "习近平 äöü ß",
-        "register-lastname": "ÄÖÜ ẞ 安倍 晋三",
-        "register-mail": "dummy@example.com",
-        "register-username": "dummy",
-        "register-submit": "1",
-    }
+def post_data_non_ascii(post_data_step_1):
+    post_data_step_1.update(
+        {"register-firstname": "习近平 äöü ß", "register-lastname": "ÄÖÜ ẞ 安倍 晋三"}
+    )
+    return post_data_step_1
 
 
 @pytest.fixture
@@ -554,6 +552,18 @@ def test_empty_email(client, post_data_step_1):
     result = client.post('/', data=post_data_step_1)
     assert_form_field_error(
         result, field_name="register-mail", expected_message='Email must not be empty'
+    )
+
+
+@pytest.mark.vcr()
+def test_underage(client, post_data_step_1):
+    """Register a user that is too young"""
+    post_data_step_1["register-underage"] = ""
+    result = client.post('/', data=post_data_step_1)
+    assert_form_field_error(
+        result,
+        field_name="register-underage",
+        expected_message="You must be over 16 years old to create an account",
     )
 
 

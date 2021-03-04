@@ -1,0 +1,70 @@
+interactions:
+- request:
+    body: user=admin&password=adminPassw0rd%21
+    headers:
+      Accept:
+      - text/plain
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '36'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Referer:
+      - https://ipa.noggin.test/ipa/session/login_password
+      User-Agent:
+      - python-requests/2.25.1
+    method: POST
+    uri: https://ipa.noggin.test/ipa/session/login_password
+  response:
+    body:
+      string: '<html>
+
+        <head>
+
+        <title>401 Unauthorized</title>
+
+        </head>
+
+        <body>
+
+        <h1>Invalid Authentication</h1>
+
+        <p>
+
+        <strong>kinit: Password incorrect while getting initial credentials
+
+        </strong>
+
+        </p>
+
+        </body>
+
+        </html>'
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Thu, 04 Mar 2021 11:27:49 GMT
+      Keep-Alive:
+      - timeout=30, max=100
+      Server:
+      - Apache/2.4.46 (Fedora) OpenSSL/1.1.1g mod_wsgi/4.7.1 Python/3.9 mod_auth_gssapi/1.6.3
+      Transfer-Encoding:
+      - chunked
+      X-Frame-Options:
+      - DENY
+      X-IPA-Rejection-Reason:
+      - invalid-password
+    status:
+      code: 401
+      message: Unauthorized
+version: 1
