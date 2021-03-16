@@ -12,7 +12,7 @@
     {% set buttontext = _('Change Avatar')%}
     {%- if OPENID is defined %}
     <form method="GET" action="https://www.libravatar.org/openid/login/">
-      <input type="hidden" name="openid_identifier" value="{{ 'https://'+user.username+OPENID }}">
+      <input type="hidden" name="openid_identifier" value="{{ OPENID % (user.username) }}">
       <input name="change-avatar" type="submit" value="{{ buttontext }}" class="btn btn-sm btn-outline-primary">
     </form>
     {%- else %}
