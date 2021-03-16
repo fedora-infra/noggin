@@ -4,7 +4,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import current_app
 
-from noggin.app import ipa_admin
+from noggin.app import ipa_admin, talisman
 
 
 @pytest.fixture
@@ -26,6 +26,14 @@ def nonfas_user(ipa_testing_config, app):
     )
     yield
     ipa_admin.user_del("nonfas-user")
+
+
+@pytest.fixture
+def client_with_https(client):
+    current_app.debug = False
+    talisman.force_https = True
+    yield client
+    talisman.force_https = False
 
 
 def test_root(client):
@@ -126,3 +134,16 @@ def test_healthz_readiness_not_ok(client):
         result = client.get('/healthz/ready')
     assert result.status_code == 503
     assert result.data == b"Can't connect to the FreeIPA Server\n"
+
+
+@pytest.mark.vcr()
+def test_healthz_no_https(client_with_https):
+    """Test that the healthz endpoints don't require HTTPS"""
+    # Make sure we force HTTPS on regular endpoints
+    result = client_with_https.get('/')
+    assert result.status_code == 302
+    # The heathlz endpoints should not be redirected
+    result = client_with_https.get('/healthz/live')
+    assert result.status_code == 200
+    result = client_with_https.get('/healthz/ready')
+    assert result.status_code == 200

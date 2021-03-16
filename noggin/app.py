@@ -91,5 +91,7 @@ def create_app(config=None):
     import_all("noggin.controller")
     app.register_blueprint(blueprint)
     app.register_blueprint(healthz, url_prefix="/healthz")
+    # Don't force the Openshift health views to HTTPS
+    talisman(force_https=False)(app.view_functions["healthz.check"])
 
     return app
