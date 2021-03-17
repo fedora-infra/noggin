@@ -26,6 +26,11 @@ groups = {
     "ambassadors": 30,
 }
 
+# Add heaps of groups
+for word in fake.words(nb=600, unique=True):
+    groups["sysadmin-"+word] = 5
+    groups["z-git-"+word] = 5
+
 ipa = python_freeipa.ClientLegacy(host="ipa.noggin.test", verify_ssl="/etc/ipa/ca.crt")
 ipa.login("{{ ipa_admin_user }}", "{{ ipa_admin_password }}")
 
@@ -35,8 +40,8 @@ untouched_ipa = python_freeipa.ClientLegacy(
 
 ipa._request("fasagreement_add", "FPCA", {"description": "This ia the FPCA agreement"})
 
-
 for group in groups.keys():
+    print(f"adding group: {group}")
     ipa.group_add(group, f"A group for {group}", fasgroup=True)
     ipa._request("fasagreement_add_group", "FPCA", {"group": group})
 
