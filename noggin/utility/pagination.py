@@ -24,6 +24,30 @@ class PagedResult:
     def has_next_page(self):
         return self.page_number < self.total_pages
 
+    def truncated_pages_list(self, margin=4):
+        num_pages = (2 * margin) + 1
+
+        if self.page_number <= margin + 1:
+            # Current `self.page_number` is close to the beginning of `self.total_pages`
+            min_page = 1
+            max_page = min(self.total_pages, num_pages)
+        elif (self.total_pages - self.page_number) >= margin:
+            min_page = max(self.page_number - margin, 1)
+            max_page = min(self.page_number + margin, self.total_pages)
+        else:
+            # Current `self.page_number` is close to the end of `self.total_pages`
+            max_page = min(self.total_pages, self.page_number + margin)
+            min_page = max(max_page - (num_pages - 1), 1)
+
+        therange = list(range(min_page, max_page + 1))
+
+        if max_page != self.total_pages:
+            therange = therange + [None, self.total_pages]
+        if min_page != 1:
+            therange = [1, None] + therange
+
+        return therange
+
     def page_url(self, page_number):
         if page_number < 1 or page_number > self.total_pages:
             return None

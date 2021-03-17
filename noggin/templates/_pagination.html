@@ -3,15 +3,13 @@
     <nav aria-label="Pagination">
       <ul class="pagination justify-content-center my-4">
         {# Previous page #}
+        {% if result.has_previous_page %}
         <li class="page-item {% if not result.has_previous_page %}disabled{% endif %}">
-          {% if result.has_previous_page %}
             <a class="page-link" href="{{ result.page_url(result.page_number - 1) }}">{{ _("Previous") }}</a>
-          {% else %}
-            <span class="page-link">{{ _("Previous") }}</span>
-          {% endif %}
         </li>
+        {% endif %}
         {# Page list #}
-        {% for page_number in range(1, result.total_pages + 1) %}
+        {% for page_number in result.truncated_pages_list(margin=6) %}
           {% if page_number == result.page_number %}
             <li class="page-item active" aria-current="page">
               <span class="page-link">
@@ -19,6 +17,10 @@
                 <span class="sr-only">({{ _("current") }})</span>
               </span>
             </li>
+          {% elif page_number == None %}
+          <li class="page-item disabled">
+            <span class="page-link">...</span>
+          </li>
           {% else %}
             <li class="page-item">
               <a class="page-link" href="{{ result.page_url(page_number) }}">
@@ -28,13 +30,11 @@
           {% endif %}
         {% endfor %}
         {# Next page #}
+        {% if result.has_next_page %}
         <li class="page-item {% if not result.has_next_page %}disabled{% endif %}">
-          {% if result.has_next_page %}
             <a class="page-link" href="{{ result.page_url(result.page_number + 1) }}">{{ _("Next") }}</a>
-          {% else %}
-            <span class="page-link">{{ _("Next") }}</span>
-          {% endif %}
         </li>
+        {% endif %}
       </ul>
     </nav>
   {% endif %}
