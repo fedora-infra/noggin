@@ -708,14 +708,6 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
-name = "pyhamcrest"
-version = "2.0.2"
-description = "Hamcrest framework for matcher objects"
-category = "main"
-optional = false
-python-versions = ">=3.5"
-
-[[package]]
 name = "pyjwt"
 version = "1.7.1"
 description = "JSON Web Token implementation in Python"
@@ -1101,32 +1093,42 @@ python-versions = ">=3"
 
 [[package]]
 name = "twisted"
-version = "20.3.0"
+version = "21.2.0"
 description = "An asynchronous networking framework written in Python"
 category = "main"
 optional = false
-python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
+python-versions = ">=3.5.4"
 
 [package.dependencies]
 attrs = ">=19.2.0"
-Automat = ">=0.3.0"
+Automat = ">=0.8.0"
 constantly = ">=15.1"
 hyperlink = ">=17.1.1"
 incremental = ">=16.10.1"
-PyHamcrest = ">=1.9.0,<1.10.0 || >1.10.0"
+twisted-iocpsupport = {version = ">=1.0.0,<1.1.0", markers = "platform_system == \"Windows\""}
 "zope.interface" = ">=4.4.2"
 
 [package.extras]
-all_non_platform = ["pyopenssl (>=16.0.0)", "service_identity (>=18.1.0)", "idna (>=0.6,!=2.3)", "pyasn1", "cryptography (>=2.5)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)", "soappy", "pyserial (>=3.0)", "h2 (>=3.0,<4.0)", "priority (>=1.1.0,<2.0)", "pywin32 (!=226)"]
-conch = ["pyasn1", "cryptography (>=2.5)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)"]
-dev = ["pyflakes (>=1.0.0)", "twisted-dev-tools (>=0.0.2)", "python-subunit", "sphinx (>=1.3.1)", "towncrier (>=17.4.0)"]
+all_non_platform = ["cython-test-exception-raiser (>=1.0,<2.0)", "PyHamcrest (>=1.9.0)", "pyopenssl (>=16.0.0)", "service-identity (>=18.1.0)", "idna (>=2.4)", "pyasn1", "cryptography (>=2.6)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)", "pyserial (>=3.0)", "h2 (>=3.0,<4.0)", "priority (>=1.1.0,<2.0)", "pywin32 (!=226)", "contextvars (>=2.4,<3)"]
+conch = ["pyasn1", "cryptography (>=2.6)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)"]
+contextvars = ["contextvars (>=2.4,<3)"]
+dev = ["towncrier (>=17.4.0)", "sphinx-rtd-theme (>=0.5.0,<0.6.0)", "readthedocs-sphinx-ext (>=2.1,<3.0)", "sphinx (>=3.3,<4.0)", "pyflakes (>=1.0.0)", "python-subunit", "twistedchecker (>=0.7.2)", "pydoctor (>=20.12.1)"]
+dev_release = ["towncrier (>=17.4.0)", "sphinx-rtd-theme (>=0.5.0,<0.6.0)", "readthedocs-sphinx-ext (>=2.1,<3.0)", "sphinx (>=3.3,<4.0)", "pydoctor (>=20.12.1)"]
 http2 = ["h2 (>=3.0,<4.0)", "priority (>=1.1.0,<2.0)"]
-macos_platform = ["pyobjc-core", "pyobjc-framework-cfnetwork", "pyobjc-framework-cocoa", "pyopenssl (>=16.0.0)", "service_identity (>=18.1.0)", "idna (>=0.6,!=2.3)", "pyasn1", "cryptography (>=2.5)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)", "soappy", "pyserial (>=3.0)", "h2 (>=3.0,<4.0)", "priority (>=1.1.0,<2.0)", "pywin32 (!=226)"]
-osx_platform = ["pyobjc-core", "pyobjc-framework-cfnetwork", "pyobjc-framework-cocoa", "pyopenssl (>=16.0.0)", "service_identity (>=18.1.0)", "idna (>=0.6,!=2.3)", "pyasn1", "cryptography (>=2.5)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)", "soappy", "pyserial (>=3.0)", "h2 (>=3.0,<4.0)", "priority (>=1.1.0,<2.0)", "pywin32 (!=226)"]
+macos_platform = ["pyobjc-core", "pyobjc-framework-cfnetwork", "pyobjc-framework-cocoa", "cython-test-exception-raiser (>=1.0,<2.0)", "PyHamcrest (>=1.9.0)", "pyopenssl (>=16.0.0)", "service-identity (>=18.1.0)", "idna (>=2.4)", "pyasn1", "cryptography (>=2.6)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)", "pyserial (>=3.0)", "h2 (>=3.0,<4.0)", "priority (>=1.1.0,<2.0)", "pywin32 (!=226)", "contextvars (>=2.4,<3)"]
+osx_platform = ["pyobjc-core", "pyobjc-framework-cfnetwork", "pyobjc-framework-cocoa", "cython-test-exception-raiser (>=1.0,<2.0)", "PyHamcrest (>=1.9.0)", "pyopenssl (>=16.0.0)", "service-identity (>=18.1.0)", "idna (>=2.4)", "pyasn1", "cryptography (>=2.6)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)", "pyserial (>=3.0)", "h2 (>=3.0,<4.0)", "priority (>=1.1.0,<2.0)", "pywin32 (!=226)", "contextvars (>=2.4,<3)"]
 serial = ["pyserial (>=3.0)", "pywin32 (!=226)"]
-soap = ["soappy"]
-tls = ["pyopenssl (>=16.0.0)", "service_identity (>=18.1.0)", "idna (>=0.6,!=2.3)"]
-windows_platform = ["pywin32 (!=226)", "pyopenssl (>=16.0.0)", "service_identity (>=18.1.0)", "idna (>=0.6,!=2.3)", "pyasn1", "cryptography (>=2.5)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)", "soappy", "pyserial (>=3.0)", "h2 (>=3.0,<4.0)", "priority (>=1.1.0,<2.0)", "pywin32 (!=226)"]
+test = ["cython-test-exception-raiser (>=1.0,<2.0)", "PyHamcrest (>=1.9.0)"]
+tls = ["pyopenssl (>=16.0.0)", "service-identity (>=18.1.0)", "idna (>=2.4)"]
+windows_platform = ["pywin32 (!=226)", "cython-test-exception-raiser (>=1.0,<2.0)", "PyHamcrest (>=1.9.0)", "pyopenssl (>=16.0.0)", "service-identity (>=18.1.0)", "idna (>=2.4)", "pyasn1", "cryptography (>=2.6)", "appdirs (>=1.4.0)", "bcrypt (>=3.0.0)", "pyserial (>=3.0)", "h2 (>=3.0,<4.0)", "priority (>=1.1.0,<2.0)", "pywin32 (!=226)", "contextvars (>=2.4,<3)"]
+
+[[package]]
+name = "twisted-iocpsupport"
+version = "1.0.1"
+description = "An extension for use in the twisted I/O Completion Ports reactor."
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "typed-ast"
@@ -1741,10 +1743,6 @@ pygments = [
     {file = "Pygments-2.8.1-py3-none-any.whl", hash = "sha256:534ef71d539ae97d4c3a4cf7d6f110f214b0e687e92f9cb9d2a3b0d3101289c8"},
     {file = "Pygments-2.8.1.tar.gz", hash = "sha256:2656e1a6edcdabf4275f9a3640db59fd5de107d88e8663c5d4e9a0fa62f77f94"},
 ]
-pyhamcrest = [
-    {file = "PyHamcrest-2.0.2-py3-none-any.whl", hash = "sha256:7ead136e03655af85069b6f47b23eb7c3e5c221aa9f022a4fbb499f5b7308f29"},
-    {file = "PyHamcrest-2.0.2.tar.gz", hash = "sha256:412e00137858f04bde0729913874a48485665f2d36fe9ee449f26be864af9316"},
-]
 pyjwt = [
     {file = "PyJWT-1.7.1-py2.py3-none-any.whl", hash = "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e"},
     {file = "PyJWT-1.7.1.tar.gz", hash = "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"},
@@ -1938,29 +1936,26 @@ translitcodec = [
     {file = "translitcodec-0.6.0.tar.gz", hash = "sha256:dcc8425447c704d1c5dc46c39fbb4eaf42d4ff224c9f8e250a74b2011dae02f6"},
 ]
 twisted = [
-    {file = "Twisted-20.3.0-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:cdbc4c7f0cd7a2218b575844e970f05a1be1861c607b0e048c9bceca0c4d42f7"},
-    {file = "Twisted-20.3.0-cp27-cp27m-manylinux1_i686.whl", hash = "sha256:d267125cc0f1e8a0eed6319ba4ac7477da9b78a535601c49ecd20c875576433a"},
-    {file = "Twisted-20.3.0-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:356e8d8dd3590e790e3dba4db139eb8a17aca64b46629c622e1b1597a4a92478"},
-    {file = "Twisted-20.3.0-cp27-cp27m-win32.whl", hash = "sha256:ca3a0b8c9110800e576d89b5337373e52018b41069bc879f12fa42b7eb2d0274"},
-    {file = "Twisted-20.3.0-cp27-cp27m-win_amd64.whl", hash = "sha256:cd1dc5c85b58494138a3917752b54bb1daa0045d234b7c132c37a61d5483ebad"},
-    {file = "Twisted-20.3.0-cp27-cp27mu-manylinux1_i686.whl", hash = "sha256:94ac3d55a58c90e2075c5fe1853f2aa3892b73e3bf56395f743aefde8605eeaa"},
-    {file = "Twisted-20.3.0-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:7408c6635ee1b96587289283ebe90ee15dbf9614b05857b446055116bc822d29"},
-    {file = "Twisted-20.3.0-cp35-cp35m-macosx_10_6_intel.whl", hash = "sha256:c09c47ff9750a8e3aa60ad169c4b95006d455a29b80ad0901f031a103b2991cd"},
-    {file = "Twisted-20.3.0-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:158ddb80719a4813d292293ac44ba41d8b56555ed009d90994a278237ee63d2c"},
-    {file = "Twisted-20.3.0-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:040eb6641125d2a9a09cf198ec7b83dd8858c6f51f6770325ed9959c00f5098f"},
-    {file = "Twisted-20.3.0-cp35-cp35m-win32.whl", hash = "sha256:147780b8caf21ba2aef3688628eaf13d7e7fe02a86747cd54bfaf2140538f042"},
-    {file = "Twisted-20.3.0-cp35-cp35m-win_amd64.whl", hash = "sha256:25ffcf37944bdad4a99981bc74006d735a678d2b5c193781254fbbb6d69e3b22"},
-    {file = "Twisted-20.3.0-cp36-cp36m-macosx_10_6_intel.whl", hash = "sha256:a58e61a2a01e5bcbe3b575c0099a2bcb8d70a75b1a087338e0c48dd6e01a5f15"},
-    {file = "Twisted-20.3.0-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:7c547fd0215db9da8a1bc23182b309e84a232364cc26d829e9ee196ce840b114"},
-    {file = "Twisted-20.3.0-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:2182000d6ffc05d269e6c03bfcec8b57e20259ca1086180edaedec3f1e689292"},
-    {file = "Twisted-20.3.0-cp36-cp36m-win32.whl", hash = "sha256:70952c56e4965b9f53b180daecf20a9595cf22b8d0935cd3bd664c90273c3ab2"},
-    {file = "Twisted-20.3.0-cp36-cp36m-win_amd64.whl", hash = "sha256:3281d9ce889f7b21bdb73658e887141aa45a102baf3b2320eafcfba954fcefec"},
-    {file = "Twisted-20.3.0-cp37-cp37m-macosx_10_6_intel.whl", hash = "sha256:e92703bed0cc21d6cb5c61d66922b3b1564015ca8a51325bd164a5e33798d504"},
-    {file = "Twisted-20.3.0-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:f058bd0168271de4dcdc39845b52dd0a4a2fecf5f1246335f13f5e96eaebb467"},
-    {file = "Twisted-20.3.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:894f6f3cfa57a15ea0d0714e4283913a5f2511dbd18653dd148eba53b3919797"},
-    {file = "Twisted-20.3.0-cp37-cp37m-win32.whl", hash = "sha256:f3c19e5bd42bbe4bf345704ad7c326c74d3fd7a1b3844987853bef180be638d4"},
-    {file = "Twisted-20.3.0-cp37-cp37m-win_amd64.whl", hash = "sha256:d95803193561a243cb0401b0567c6b7987d3f2a67046770e1dccd1c9e49a9780"},
-    {file = "Twisted-20.3.0.tar.bz2", hash = "sha256:d72c55b5d56e176563b91d11952d13b01af8725c623e498db5507b6614fc1e10"},
+    {file = "Twisted-21.2.0-py3-none-any.whl", hash = "sha256:aab38085ea6cda5b378b519a0ec99986874921ee8881318626b0a3414bb2631e"},
+    {file = "Twisted-21.2.0.tar.gz", hash = "sha256:77544a8945cf69b98d2946689bbe0c75de7d145cdf11f391dd487eae8fc95a12"},
+]
+twisted-iocpsupport = [
+    {file = "twisted-iocpsupport-1.0.1.tar.gz", hash = "sha256:bdda01692988f29d43d832a4b1f402199d0c7d80083ad65059a0892a3670fc9a"},
+    {file = "twisted_iocpsupport-1.0.1-cp27-cp27m-win32.whl", hash = "sha256:34a3dfd743f9b7a464ba72c9fa9fc21e2a5e5d2f5a8c805f3e3057a2b3c1f7de"},
+    {file = "twisted_iocpsupport-1.0.1-cp27-cp27m-win_amd64.whl", hash = "sha256:e9cfab3e9dbc3a541722b7e34656e3694a7a09d113c40b51213e8d8a5b6a2314"},
+    {file = "twisted_iocpsupport-1.0.1-cp35-cp35m-win32.whl", hash = "sha256:28770b4d0da9364df81371e962323a8390b181eeeccec91eb21316489a4ee337"},
+    {file = "twisted_iocpsupport-1.0.1-cp35-cp35m-win_amd64.whl", hash = "sha256:95595fb8d242b802b21f2c0652af0997287dcba67f4f85285be9adc15572e462"},
+    {file = "twisted_iocpsupport-1.0.1-cp36-cp36m-win32.whl", hash = "sha256:de5a2273df46fafab430fadfe0213943ffbc0cdb8ab5d49cb41e0610043ee70e"},
+    {file = "twisted_iocpsupport-1.0.1-cp36-cp36m-win_amd64.whl", hash = "sha256:f3c505de2237ed47c20e425dfc903a2ee1ee2cf08654f2c88898e50a60a5f210"},
+    {file = "twisted_iocpsupport-1.0.1-cp37-cp37m-win32.whl", hash = "sha256:90e6f15acf86de2b66e1441fb1c4bcbba4e1361b799fa5c20899e453eb66c5c9"},
+    {file = "twisted_iocpsupport-1.0.1-cp37-cp37m-win_amd64.whl", hash = "sha256:4b9fd9b059545536d5f7ac10f642ebba0437203e884479eb9d01d636dd287414"},
+    {file = "twisted_iocpsupport-1.0.1-cp38-cp38-win32.whl", hash = "sha256:e1dae2dd44a11153b169dda012b222bce524792dc64859ab2b86deb7a0915863"},
+    {file = "twisted_iocpsupport-1.0.1-cp38-cp38-win_amd64.whl", hash = "sha256:7f5c45094f16c1c0749453a9341bfe818cb5f4543e76ae744bc983c992a0abdd"},
+    {file = "twisted_iocpsupport-1.0.1-cp39-cp39-win32.whl", hash = "sha256:5b9ce8803023d0818ab2507fe222c16c193bae091abb59a45841a757ffe198fe"},
+    {file = "twisted_iocpsupport-1.0.1-cp39-cp39-win_amd64.whl", hash = "sha256:8dab94de3a9bafae1e3ec92aec01f1239b2b4b4f3866162f2c5f2e649e2661dc"},
+    {file = "twisted_iocpsupport-1.0.1-pp27-pypy_73-win32.whl", hash = "sha256:eb033bed4f20d2053767054c33be4d8ae09faf23d547681ecd5ff463d97bc099"},
+    {file = "twisted_iocpsupport-1.0.1-pp36-pypy36_pp73-win32.whl", hash = "sha256:ed8cb959d7dce287419e766267a280139fedf14217d85695d7b6384d8ccd3353"},
+    {file = "twisted_iocpsupport-1.0.1-pp37-pypy37_pp73-win32.whl", hash = "sha256:1535e537b6d60d0cfd2b4785f1c7a021beb62d8df6bac3dc6c45bb866ce648e4"},
 ]
 typed-ast = [
     {file = "typed_ast-1.4.2-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:7703620125e4fb79b64aa52427ec192822e9f45d37d4b6625ab37ef403e1df70"},
