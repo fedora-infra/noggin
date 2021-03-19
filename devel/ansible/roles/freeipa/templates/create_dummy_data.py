@@ -28,8 +28,8 @@ groups = {
 
 # Add heaps of groups
 for word in fake.words(nb=600, unique=True):
-    groups["sysadmin-"+word] = 5
-    groups["z-git-"+word] = 5
+    groups["sysadmin-" + word] = 5
+    groups["z-git-" + word] = 5
 
 ipa = python_freeipa.ClientLegacy(host="ipa.noggin.test", verify_ssl="/etc/ipa/ca.crt")
 ipa.login("{{ ipa_admin_user }}", "{{ ipa_admin_password }}")
