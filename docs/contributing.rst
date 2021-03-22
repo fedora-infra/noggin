@@ -39,6 +39,7 @@ Check out the code and run ``vagrant up``::
 
     $ git clone https://github.com/fedora-infra/noggin
     $ cd noggin
+    $ mkdir ../freeipa-fas
     $ vagrant up
 
 Next, SSH into your newly provisioned development environment:
