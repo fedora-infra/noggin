@@ -443,6 +443,17 @@ def test_invalid_username(client, post_data_step_1):
         expected_message='may only include letters, numbers, _, -, . and $',
     )
 
+@pytest.mark.vcr()
+def test_unallowed_username(client, post_data_step_1):
+    """Register a user with a username in the unallowed list"""
+    post_data_step_1["register-username"] = "notallowed"
+    result = client.post('/', data=post_data_step_1)
+    assert_form_field_error(
+        result,
+        field_name="register-username",
+        expected_message='This username is not allowed, please choose another one.',
+    )
+
 
 @pytest.mark.parametrize("field_name", ["firstname", "lastname"])
 @pytest.mark.vcr()
