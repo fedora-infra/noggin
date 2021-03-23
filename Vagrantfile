@@ -13,7 +13,6 @@ Vagrant.configure(2) do |config|
     freeipa.vm.hostname = "ipa.noggin.test"
     freeipa.hostmanager.aliases = ("kerberos.noggin.test")
     freeipa.vm.synced_folder '.', '/vagrant', disabled: true
-    freeipa.vm.synced_folder "../freeipa-fas", "/home/vagrant/freeipa-fas", type: "sshfs"
 
     freeipa.vm.provider :libvirt do |libvirt|
       libvirt.cpus = 2
