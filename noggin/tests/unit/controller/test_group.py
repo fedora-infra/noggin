@@ -1,3 +1,4 @@
+import datetime
 from unittest import mock
 
 import pytest
@@ -302,3 +303,52 @@ def test_group_remove_member_invalid_form(client, dummy_user_as_group_manager):
         expected_message="Username must not be empty",
         expected_category="danger",
     )
+
+
+@pytest.fixture
+def make_users(ipa_testing_config, app):
+    created_users = []
+
+    def _make_users(users):
+        now = datetime.datetime.utcnow().replace(microsecond=0)
+        batch_methods = [
+            {
+                "method": "user_add",
+                "params": [
+                    [name],
+                    dict(
+                        givenname=name.title(),
+                        sn="User",
+                        mail=f"{name}@example.com",
+                        userpassword="password",
+                        loginshell='/bin/bash',
+                        fascreationtime=f"{now.isoformat()}Z",
+                    ),
+                ],
+            }
+            for name in users
+        ]
+        ipa_admin.batch(batch_methods)
+        created_users.extend(users)
+
+    yield _make_users
+
+    batch_methods = [
+        {"method": "user_del", "params": [[name], {}]} for name in created_users
+    ]
+    ipa_admin.batch(batch_methods)
+
+
+@pytest.mark.vcr()
+def test_group_many_members(client, logged_in_dummy_user, dummy_group, make_users):
+    """Make sure all members are displayed on the group page"""
+    users = [f"testuser-{i}" for i in range(1, 120)]
+    make_users(users)
+    ipa_admin.group_add_member(a_cn="dummy-group", o_user=users)
+
+    result = client.get('/group/dummy-group/')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+
+    members = page.select("div[data-section='members'] ul li")
+    assert len(members) == len(users)
