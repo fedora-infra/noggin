@@ -91,6 +91,12 @@ def handle_register_form(form):
         .replace("  ", " ")
         .strip()
     )
+    # Here we should check if a username is allowed
+    unallowed_usernames = {"abuse","accounts","adm","admin","amanda","anonymous","apache","askfedora","asterisk","axk4545","bexelbie","bin","board","bodhi","bodhi2","canna","census","chair","chairman","containerbuild","cvsdirsec","cvsdocs","cvseclipse","cvsextras","cvsfont","daemon","dbus","decode","desktop","dgilmore","directors","dovecot","dumper","fama","famsco","fas","fas_sync","fax","fcaic","fedora","fedorarewards","fedora-admin-xmlrpc","fesco","freemedia","freshmaker","ftbfs","ftp","ftpadm","ftpadmin","ftpsync","games","gdm","git","gnomebackup","gopher","gregdek","grokmirror","halt","hostmaster","hotness","ident","info","ingres","jaboutboul","jan","jwf","keys","kojiadmin","ldap","legal","logo","lp","m8y","mail","mailnull","manager","marketing","masher","masta","mirrormanager","mysql","nagios","named","netdump","news","newsadm","newsadmin","nfsnobody","nobody","noc","notallowed","notifications","nrpe","nscd","ntp","nut","openvideo","operator","packager","pagure","paguremirroring","patrick","pcap","pkgdb","pkgsigner","postfix","postgres","postmaster","press","privoxy","pvm","quagga","radiusd","radvd","relnotes","relrod","rel-eng","root","rpc","rpcuser","rpm","rsc","s3-mirror","sales","scholarship","secalert","secondary-signer","security","server-wg","shutdown","smmsp","spevack","squid","sshd","support","sync","system","temp","test","tickets","toor","updates","usenet","uucp","vcsa","vendors","vendor-support","voting","webalizer","webmaster","wikiadmin","wnn","www","xfs","zabbix"}
+    if username in unallowed_usernames:
+        raise FormError(
+            "username", _("This username is not allowed, please choose another one.")
+        )
     # First, create the stage user.
     try:
         user = ipa_admin.stageuser_add(
