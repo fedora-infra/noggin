@@ -114,6 +114,9 @@
         $('#otp-toggle').click(function() {
           $('#otp-qrcode').slideToggle("fast");
         })
+        $('#otp-modal').on("hide.bs.modal", function (e) {
+          if(!confirm("{{_('Are you sure you want to close the OTP dialog? This code will not be shown again, and you will be locked out of your account if you have no way to generate your OTP')}}")) return false;
+        });
     });
   </script>
   {% endif %}
