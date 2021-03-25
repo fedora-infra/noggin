@@ -1,4 +1,5 @@
 TIMEZONES = [
+    'UTC',
     'Africa/Abidjan',
     'Africa/Accra',
     'Africa/Addis_Ababa',
@@ -587,7 +588,6 @@ TIMEZONES = [
     'US/Pacific',
     'US/Pacific-New',
     'US/Samoa',
-    'UTC',
     'Universal',
     'W-SU',
     'WET',

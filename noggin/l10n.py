@@ -28,6 +28,7 @@ def guess_locale():
 
 
 LOCALES = [
+    'en-US',
     'af-ZA',
     'am-ET',
     'ar-AE',
@@ -72,7 +73,6 @@ LOCALES = [
     'dsb-DE',
     'dv-MV',
     'el-GR',
-    'en-US',
     'en-GB',
     'en-029',
     'en-AU',
