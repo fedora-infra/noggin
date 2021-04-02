@@ -241,7 +241,7 @@ def user_settings_otp_disable(ipa, username):
             ):
                 flash(_('Sorry, You cannot disable your last active token.'), 'warning')
             else:
-                flash('Cannot disable the token.', 'danger')
+                flash(_('Cannot disable the token.'), 'danger')
                 current_app.logger.error(
                     f'Something went wrong disabling an OTP token for user {username}: {e}'
                 )
