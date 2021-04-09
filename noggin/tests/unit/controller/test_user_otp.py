@@ -238,7 +238,7 @@ def test_user_settings_otp_disable_invalid_form(client, logged_in_dummy_user):
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/otp/",
-        expected_message="token must not be empty",
+        expected_message="Token must not be empty",
         expected_category="danger",
     )
 
@@ -352,7 +352,7 @@ def test_user_settings_otp_delete_invalid_form(client, logged_in_dummy_user):
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/otp/",
-        expected_message="token must not be empty",
+        expected_message="Token must not be empty",
         expected_category="danger",
     )
 
@@ -482,7 +482,7 @@ def test_user_settings_otp_enable_invalid_form(client, logged_in_dummy_user):
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/otp/",
-        expected_message="token must not be empty",
+        expected_message="Token must not be empty",
         expected_category="danger",
     )
 
