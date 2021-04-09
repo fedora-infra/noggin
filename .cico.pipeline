@@ -42,9 +42,10 @@ ACTIVE_DISTROS.each { fedora ->
                         sh "rm -rf .tox"
                         try {
                             sh "tox --skip-missing-interpreters"
-                            githubNotify context: "CI on ${fedora}", status: 'SUCCESS'
+                            githubNotify context: 'CI on ${fedora}', status: 'SUCCESS', credentialsId: 'status-push-cred'
                         } catch(error) {
-                            githubNotify context: "CI on ${fedora}", status: 'FAILURE'
+                            githubNotify context: 'CI on ${fedora}', status: 'FAILURE', credentialsId: 'status-push-cred'
+
                             throw error
                         }
                     }
