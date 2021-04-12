@@ -20,7 +20,22 @@
         <div id="otp-qrcode" class="text-center mt-3" style="display:none"></div>
         <p class="mb-1 mt-4">{{ _("or copy and paste the following token URL if you can't scan the QR code:") }}</p>
         <input id="otp-uri" class="form-control" readonly value="{{otp_uri|safe}}" />
-        <div class="alert alert-warning my-4">{{ _("This will never be shown to you again, don't close this window until your token is saved.") }}</div>
+        <form action="{{ url_for('.user_settings_otp', username=current_user.username) }}" method="post" class="py-3" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          {{ confirmotpform.secret() }}
+          {{ confirmotpform.description() }}
+          <div class="form-group">
+        {{ _("After enrolling the token in your application, verify it by generating your first code and entering it below:")}}
+          {{ macros.with_errors(confirmotpform.code, label=False, placeholder=_("Verification Code"))}}
+          </div>
+          <div>{{ macros.non_field_errors(confirmotpform) }}</div>
+          <div class="d-flex justify-content-between">
+          {{ confirmotpform.submit(color="primary") }}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Cancel">
+            {{ _("Cancel") }}
+          </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -52,7 +67,7 @@
           <div class="form-group">{{ macros.with_errors(addotpform.password, label=False, tabindex="3", placeholder=_("Password"))}}</div>
           {% endif %}
           <div>{{ macros.non_field_errors(addotpform) }}</div>
-          <button class="btn btn-primary btn-block" id="submit" type="submit" tabindex="4">{{ _("Generate OTP Token") }}</button>
+          {{ addotpform.submit(color="primary", class="btn-block", tabindex="4") }}
         </form>
       </div>
     </div>
@@ -66,12 +81,12 @@
   </div>
 </div>
 
-<div class="list-group">
+<div class="list-group list-group-flush mt-3">
 {% for token in tokens %}
   <div class="list-group-item {{'text-muted bg-light' if token.disabled}}">
     <div class="row align-items-center">
-      <div class="col h6">
-        <div data-role="token-description">{{token.description if token.description}}</div>
+      <div class="col">
+        <div data-role="token-description" class="font-weight-bold">{{token.description if token.description}}</div>
         <div class="text-monospace">{{token.uniqueid}}</div>
       </div>
       <div class="col-auto">
@@ -99,8 +114,10 @@
     <div><small>{{ _("Add an OTP token to enable two-factor authentication on your account.") }}</small></div>
   </div>
 {% endfor %}
-{{ otp_notice() if otp_notice is defined and tokens }}
 </div>
+
+{{ otp_notice() if otp_notice is defined and tokens }}
+
 {% endblock %}
 
 {% block scripts %}
@@ -117,9 +134,12 @@
     });
   </script>
   {% endif %}
+
+  {# Show the modals if there are form errors #}
   {% if addotpform.errors %}
     <script nonce="{{ csp_nonce() }}">
       $(document).ready(function() {$('#add-token-modal').modal('show');});
     </script>
   {% endif %}
+
 {% endblock %}
