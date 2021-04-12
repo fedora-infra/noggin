@@ -1,4 +1,5 @@
 from flask_babel import lazy_gettext as _
+from pyotp import TOTP
 from wtforms import (
     BooleanField,
     FieldList,
@@ -9,13 +10,20 @@ from wtforms import (
     TextAreaField,
 )
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.validators import AnyOf, DataRequired, Length, Optional, URL
+from wtforms.validators import (
+    AnyOf,
+    DataRequired,
+    Length,
+    Optional,
+    URL,
+    ValidationError,
+)
 
 from noggin.form.validators import Email
 from noggin.l10n import LOCALES
 from noggin.utility.timezones import TIMEZONES
 
-from .base import BaseForm, CSVListField, strip
+from .base import BaseForm, CSVListField, ModestForm, strip, SubmitButtonField
 
 
 class UserSettingsProfileForm(BaseForm):
@@ -90,7 +98,7 @@ class UserSettingsKeysForm(BaseForm):
     )
 
 
-class UserSettingsAddOTPForm(BaseForm):
+class UserSettingsAddOTPForm(ModestForm):
     description = StringField(
         _('Token name'),
         validators=[Optional()],
@@ -102,6 +110,26 @@ class UserSettingsAddOTPForm(BaseForm):
         validators=[DataRequired(message=_('You must provide a password'))],
         description=_("please reauthenticate so we know it is you"),
     )
+
+    submit = SubmitButtonField(_("Generate OTP Token"))
+
+
+class UserSettingsConfirmOTPForm(ModestForm):
+    secret = HiddenField(
+        "secret",
+        validators=[DataRequired(message=_('Could not find the token secret'))],
+    )
+    description = HiddenField("description", validators=[Optional()],)
+    code = StringField(
+        _("Verification Code"),
+        validators=[DataRequired(message=_('You must provide a verification code'))],
+    )
+    submit = SubmitButtonField(_("Verify and Enable OTP Token"))
+
+    def validate_code(form, field):
+        totp = TOTP(form.secret.data)
+        if not totp.verify(field.data):
+            raise ValidationError(_('The code is wrong, please try again.'))
 
 
 class UserSettingsOTPStatusChange(BaseForm):

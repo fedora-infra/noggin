@@ -1,4 +1,5 @@
-from urllib.parse import quote, urlparse
+import os
+from base64 import b32encode
 
 import python_freeipa
 from flask import (
@@ -12,10 +13,13 @@ from flask import (
     url_for,
 )
 from flask_babel import _
+from pyotp import TOTP
+from werkzeug.datastructures import MultiDict
 
 from noggin.form.edit_user import (
     UserSettingsAddOTPForm,
     UserSettingsAgreementSign,
+    UserSettingsConfirmOTPForm,
     UserSettingsKeysForm,
     UserSettingsOTPStatusChange,
     UserSettingsProfileForm,
@@ -31,6 +35,11 @@ from noggin.utility.forms import FormError, handle_form_errors
 from noggin_messages import UserUpdateV1
 
 from . import blueprint as bp
+
+
+# Must be the same as KEY_LENGTH in ipaserver/plugins/otptoken.py
+# For maximum compatibility, must be a multiple of 5.
+OTP_KEY_LENGTH = 35
 
 
 @bp.route('/user/<username>/')
@@ -178,37 +187,56 @@ def user_settings_keys(ipa, username):
 @with_ipa()
 @require_self
 def user_settings_otp(ipa, username):
-    addotpform = UserSettingsAddOTPForm()
+    addotpform = UserSettingsAddOTPForm(prefix="add-")
+    confirmotpform = UserSettingsConfirmOTPForm(prefix="confirm-")
     user = User(user_or_404(ipa, username))
+    secret = None
     if addotpform.validate_on_submit():
         try:
             maybe_ipa_login(current_app, session, username, addotpform.password.data)
-            result = ipa.otptoken_add(
-                o_ipatokenowner=username, o_description=addotpform.description.data,
-            )['result']
-
-            uri = urlparse(result['uri'])
-
-            # Use the provided description in the token, so it shows up in the user's app instead of
-            # the token's UUID
-            principal = uri.path.split(":", 1)[0]
-            new_uri = uri._replace(
-                path=f"{principal.lower()}:{quote(addotpform.description.data)}"
-            )
-            session['otp_uri'] = new_uri.geturl()
         except python_freeipa.exceptions.InvalidSessionPassword:
             addotpform.password.errors.append(_("Incorrect password"))
+        else:
+            secret = b32encode(os.urandom(OTP_KEY_LENGTH)).decode('ascii')
+            # Prefill the form for the next step
+            confirmotpform.process(
+                MultiDict(
+                    {
+                        "confirm-secret": secret,
+                        "confirm-description": addotpform.description.data,
+                    }
+                )
+            )
+    if confirmotpform.validate_on_submit():
+        try:
+            ipa.otptoken_add(
+                o_ipatokenowner=username,
+                o_description=confirmotpform.description.data,
+                o_ipatokenotpkey=confirmotpform.secret.data,
+            )
         except python_freeipa.exceptions.FreeIPAError as e:
             current_app.logger.error(
                 f'An error happened while creating an OTP token for user {username}: {e.message}'
             )
-            addotpform.non_field_errors.errors.append(_('Cannot create the token.'))
+            confirmotpform.non_field_errors.errors.append(_('Cannot create the token.'))
         else:
+            flash(_('The token has been created.'), "success")
             return redirect(url_for('.user_settings_otp', username=username))
 
-    otp_uri = session.get('otp_uri')
-    session['otp_uri'] = None
+    if confirmotpform.is_submitted():
+        # This form is inside the modal. Keep a value in otp_uri or the modal will not open
+        # to show the errors.
+        secret = confirmotpform.secret.data
 
+    # Compute the token URI
+    if secret:
+        description = addotpform.description.data or confirmotpform.description.data
+        token = TOTP(secret)
+        otp_uri = token.provisioning_uri(name=username, issuer_name=description)
+    else:
+        otp_uri = None
+
+    # List existing tokens
     tokens = [
         OTPToken(t) for t in ipa.otptoken_find(o_ipatokenowner=username)["result"]
     ]
@@ -217,6 +245,7 @@ def user_settings_otp(ipa, username):
     return render_template(
         'user-settings-otp.html',
         addotpform=addotpform,
+        confirmotpform=confirmotpform,
         user=user,
         activetab="otp",
         tokens=tokens,
