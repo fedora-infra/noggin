@@ -69,6 +69,9 @@ class PagedResult:
             ]
         )
 
+    def __len__(self):
+        return self.total
+
 
 def paginated_find(ipa, representation, *args, **kwargs):
     kwargs.setdefault("o_sizelimit", 0)

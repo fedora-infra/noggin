@@ -341,8 +341,8 @@ def make_users(ipa_testing_config, app):
 
 @pytest.mark.vcr()
 def test_group_many_members(client, logged_in_dummy_user, dummy_group, make_users):
-    """Make sure all members are displayed on the group page"""
-    users = [f"testuser-{i}" for i in range(1, 120)]
+    """Make sure the group page is paginated with all its members"""
+    users = [f"testuser-{i}" for i in range(1, 63)]
     make_users(users)
     ipa_admin.group_add_member(a_cn="dummy-group", o_user=users)
 
@@ -350,5 +350,19 @@ def test_group_many_members(client, logged_in_dummy_user, dummy_group, make_user
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
 
-    members = page.select("div[data-section='members'] ul li")
-    assert len(members) == len(users)
+    # Only the first page is displayed
+    members = page.select("div[data-section='members'] ul li div.card")
+    assert len(members) == 30
+
+    # But the total should be right
+    total = page.select_one("div[data-section='members'] div.h4 span.badge")
+    assert total.get_text(strip=True) == str(len(users))
+
+    # The pagination bar should be present
+    pagination_bar = page.select_one("ul.pagination")
+    assert pagination_bar is not None
+    page_items = pagination_bar.select("li.page-item")
+    pages_bar_list = [
+        p.select(".page-link:last-child")[0].get_text(strip=True) for p in page_items
+    ]
+    assert pages_bar_list == ['1(current)', '2', '3', 'Next']
