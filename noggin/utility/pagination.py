@@ -74,7 +74,7 @@ class PagedResult:
 
 
 def paginated_find(ipa, representation, *args, **kwargs):
-    kwargs.setdefault("o_sizelimit", 0)
+    kwargs.setdefault("sizelimit", 0)
     pkey_name = representation.get_ipa_pkey()
     object_name = representation.ipa_object
     find_method = getattr(ipa, f"{object_name}_find")
