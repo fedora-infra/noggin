@@ -75,6 +75,7 @@ class PagedResult:
 
 def paginated_find(ipa, representation, *args, **kwargs):
     kwargs.setdefault("sizelimit", 0)
+    default_page_size = kwargs.pop("default_page_size", current_app.config["PAGE_SIZE"])
     pkey_name = representation.get_ipa_pkey()
     object_name = representation.ipa_object
     find_method = getattr(ipa, f"{object_name}_find")
@@ -86,7 +87,7 @@ def paginated_find(ipa, representation, *args, **kwargs):
     try:
         page_size = int(request.args.get('page_size'))
     except (TypeError, ValueError):
-        page_size = current_app.config["PAGE_SIZE"]
+        page_size = default_page_size
     # If we don't want pagination, take a shortcut
     if page_size == 0:
         results = find_method(*args, **kwargs, all=True)["result"]
