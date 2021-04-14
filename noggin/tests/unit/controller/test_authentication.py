@@ -93,6 +93,27 @@ def test_login(client, dummy_user):
 
 
 @pytest.mark.vcr()
+def test_login_with_otp(client, dummy_user):
+    """Test a successful Login with password + otp"""
+    result = client.post(
+        '/',
+        data={
+            "login-username": "dummy",
+            "login-password": "dummy_password",
+            "login-otp": "123456",
+            "login-submit": "1",
+        },
+        follow_redirects=True,
+    )
+    page = BeautifulSoup(result.data, 'html.parser')
+    messages = page.select(".flash-messages .alert-success")
+    assert len(messages) == 1
+    assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
+    assert session.get("noggin_username") == "dummy"
+    assert session.get("noggin_session") is not None
+
+
+@pytest.mark.vcr()
 def test_login_no_password(client, dummy_user):
     """Test not giving a password"""
     result = client.post(
