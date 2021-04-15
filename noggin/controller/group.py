@@ -22,15 +22,12 @@ def group(ipa, groupname):
     sponsor_form = AddGroupMemberForm(groupname=groupname)
     remove_form = RemoveGroupMemberForm(groupname=groupname)
 
-    members = [
-        User(u) for u in ipa.user_find(in_group=groupname, sizelimit=0)['result']
-    ]
+    members = paginated_find(ipa, User, in_group=groupname, default_page_size=48)
 
     batch_methods = [
         {"method": "user_find", "params": [[], {"uid": sponsorname, 'all': True}]}
         for sponsorname in group.sponsors
     ]
-
     # Don't call remote batch method with an empty list
     if batch_methods:
         sponsors = [
