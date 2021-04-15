@@ -203,7 +203,7 @@ def test_change_get(client, dummy_user, token_for_dummy_user, patched_lock_activ
     page = BeautifulSoup(result.data, 'html.parser')
     form = page.select_one(f"form[action='{url}']")
     assert form is not None
-    assert len(form.select("input[type='password']")) == 2
+    assert len(form.select("input[type='password']")) == 3
 
 
 @pytest.mark.vcr()

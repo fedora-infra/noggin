@@ -1,6 +1,6 @@
 from flask_babel import lazy_gettext as _
 from wtforms import PasswordField, StringField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 from .base import ModestForm, SubmitButtonField
 
@@ -17,7 +17,8 @@ class LoginUserForm(ModestForm):
     )
 
     otp = PasswordField(
-        _('One-Time-Password'),
+        _('One-Time Password'),
+        validators=[Optional()],
     )
 
     submit = SubmitButtonField(_('Log In'))

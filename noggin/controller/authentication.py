@@ -20,10 +20,9 @@ from . import blueprint as bp
 def handle_login_form(form):
     username = form.username.data.lower()
     password = form.password.data
-    otp = form.otp.data
 
-    if otp is not None:
-        password += otp
+    if form.otp.data:
+        password += form.otp.data
 
     try:
         # This call will set the cookie itself, we don't have to.

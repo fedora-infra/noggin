@@ -61,10 +61,9 @@
         <form action="{{ url_for('.user_settings_otp', username=current_user.username) }}" method="post" class="px-4 py-3" novalidate>
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div class="form-group">{{ macros.with_errors(addotpform.description, label=False, tabindex="2", placeholder=_("Token name"))}}</div>
-          {% if tokens %}
-          <div class="form-group">{{ macros.with_errors(addotpform.password, label=False, tabindex="3", placeholder=_("Password + One-Time-Password"))}}</div>
-          {% else %}
           <div class="form-group">{{ macros.with_errors(addotpform.password, label=False, tabindex="3", placeholder=_("Password"))}}</div>
+          {% if tokens %}
+          <div class="form-group">{{ macros.with_errors(addotpform.otp, label=False, tabindex="3", placeholder=_("One-Time Password (optional)"))}}</div>
           {% endif %}
           <div>{{ macros.non_field_errors(addotpform) }}</div>
           {{ addotpform.submit(color="primary", class="btn-block", tabindex="4") }}

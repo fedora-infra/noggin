@@ -1,6 +1,6 @@
 from flask_babel import lazy_gettext as _
 from wtforms import PasswordField, StringField
-from wtforms.validators import DataRequired, EqualTo
+from wtforms.validators import DataRequired, EqualTo, Optional
 
 from .base import BaseForm
 from .validators import PasswordLength
@@ -19,8 +19,10 @@ class NewPasswordForm(BaseForm):
 
     password_confirm = PasswordField(_('Confirm New Password'))
 
-    otp = StringField(
-        _('OTP Token'), description=_("Enter your OTP token if you have enrolled one")
+    otp = PasswordField(
+        _('One-Time Password'),
+        validators=[Optional()],
+        description=_("Enter your One-Time Password token if you have enrolled one"),
     )
 
 
