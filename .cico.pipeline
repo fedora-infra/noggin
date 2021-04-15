@@ -17,7 +17,7 @@
  * Distros we want to test on
  */
 //def ACTIVE_DISTROS = ["f31", "f32", "epel7", "rawhide"]
-def ACTIVE_DISTROS = ["f31", "f32", "latest"]
+def ACTIVE_DISTROS = ["f32", "f33", "latest"]
 
 
 
@@ -45,7 +45,6 @@ ACTIVE_DISTROS.each { fedora ->
                             githubNotify context: "CI on ${fedora}", status: 'SUCCESS', credentialsId: 'status-push-cred'
                         } catch(error) {
                             githubNotify context: "CI on ${fedora}", status: 'FAILURE', credentialsId: 'status-push-cred'
-
                             throw error
                         }
                     }
