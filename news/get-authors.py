@@ -19,14 +19,22 @@ Authors:
 """
 
 import os
+import sys
 from subprocess import check_output
 
+
+EXCLUDE = ["dependabot-preview[bot]", "Weblate (bot)"]
+
+try:
+    target = sys.argv[1].strip()
+except IndexError:
+    target = "HEAD"
 
 last_tag = check_output(
     "git tag | sort -n | tail -n 1", shell=True, universal_newlines=True
 )
 authors = {}
-log_range = last_tag.strip() + "..HEAD"
+log_range = last_tag.strip() + ".." + target
 output = check_output(
     ["git", "log", log_range, "--format=%ae\t%an"], universal_newlines=True
 )
@@ -38,6 +46,8 @@ for line in output.splitlines():
     authors[email] = fullname
 
 for nick, fullname in authors.items():
+    if fullname in EXCLUDE:
+        continue
     filename = "{}.author".format(nick)
     if os.path.exists(filename):
         continue
