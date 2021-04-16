@@ -16,7 +16,7 @@ def test_user(dummy_user_dict):
     assert user.timezone == "UTC"
     assert user.locale == "en-US"
     assert user.ircnick == ["dummy", "dummy_"]
-    assert user.gpgkeys == ["key1", "key2"]
+    assert user.gpgkeys == ["dummy-gpg-key-id-1", "dummy-gpg-key-id-2"]
     assert user.groups == ["ipausers"]
     assert user.github == "dummy"
     assert user.gitlab == "dummy"

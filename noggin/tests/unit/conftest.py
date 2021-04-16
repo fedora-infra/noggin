@@ -219,7 +219,7 @@ def logged_in_dummy_user(client, dummy_user, app):
 
 @pytest.fixture
 def dummy_user_with_gpg_key(client, dummy_user):
-    ipa_admin.user_mod(a_uid="dummy", fasgpgkeyid=["dummygpgkeyid"])
+    ipa_admin.user_mod(a_uid="dummy", fasgpgkeyid=["dummy-gpg-key-id"])
 
 
 @pytest.fixture

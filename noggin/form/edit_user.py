@@ -94,7 +94,8 @@ class UserSettingsKeysForm(BaseForm):
     )
 
     gpgkeys = FieldList(
-        StringField(validators=[Optional(), Length(max=16)]), label=_('GPG Keys')
+        StringField(validators=[Optional(), Length(min=16, max=40)]),
+        label=_('GPG Keys'),
     )
 
 

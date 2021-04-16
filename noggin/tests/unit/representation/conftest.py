@@ -10,7 +10,7 @@ def dummy_user_dict():
         'fascreationtime': ['20200122162312Z'],
         'fasgithubusername': ['dummy'],
         'fasgitlabusername': ['dummy'],
-        'fasgpgkeyid': ['key1', 'key2'],
+        'fasgpgkeyid': ['dummy-gpg-key-id-1', 'dummy-gpg-key-id-2'],
         'fasircnick': ['dummy', "dummy_"],
         'faslocale': ['en-US'],
         'fasrhbzemail': ['dummy@example.com'],
