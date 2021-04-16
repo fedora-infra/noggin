@@ -128,7 +128,7 @@ class UserSettingsConfirmOTPForm(ModestForm):
 
     def validate_code(form, field):
         totp = TOTP(form.secret.data)
-        if not totp.verify(field.data):
+        if not totp.verify(field.data, valid_window=1):
             raise ValidationError(_('The code is wrong, please try again.'))
 
 
