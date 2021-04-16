@@ -41,11 +41,11 @@ Check out the code and run ``vagrant up``::
     $ cd noggin
     $ vagrant up
 
-Next, SSH into your newly provisioned development environment:
+Next, SSH into your newly provisioned development environment::
 
     $ vagrant ssh
 
-where you can run the following commands:
+where you can run the following commands::
 
     $ noggin-restart
     $ noggin-stop
