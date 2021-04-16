@@ -1,4 +1,4 @@
-from .base import Representation
+from .base import CONVERTERS, Representation
 
 
 class User(Representation):
@@ -14,7 +14,6 @@ class User(Representation):
         "sshpubkeys": "ipasshpubkey",
         "last_password_change": "krblastpwdchange",
         "agreements": "memberof_fasagreement",
-        "groups": "memberof_group",
         "timezone": "fastimezone",
         "locale": "faslocale",
         "ircnick": "fasircnick",
@@ -47,6 +46,13 @@ class User(Representation):
     def locked(self):
         # Unlike the others nsAccountLock is not a list.
         return self.raw.get("nsaccountlock", False)
+
+    @property
+    def groups(self):
+        """Merge the direct and the indirect groups."""
+        direct_groups = self.raw.get("memberof_group", [])
+        indirect_groups = self.raw.get("memberofindirect_group", [])
+        return CONVERTERS["list"](direct_groups + indirect_groups)
 
     def anonymize(self):
         not_hidden = [

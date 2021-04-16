@@ -324,6 +324,35 @@ def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
 
 
 @pytest.mark.vcr()
+def test_user_with_indirect_groups(
+    client, logged_in_dummy_user, dummy_group, make_group
+):
+    make_group("parent-group")
+    ipa_admin.group_add_member("parent-group", o_group="dummy-group")
+    ipa_admin.group_add_member("dummy-group", o_user="dummy")
+    result = client.get('/user/dummy/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert (
+        page.select_one('.list-group-item.text-right.bg-light strong').get_text(
+            strip=True
+        )
+        == '2 Group Memberships'
+    )
+    assert len(page.select('.list-group .list-group-item span.title')) == 2
+
+
+@pytest.mark.vcr()
+def test_user_with_no_groups(client, logged_in_dummy_user, dummy_group):
+    ipa_admin.group_remove_member("ipausers", o_user="dummy")
+    result = client.get('/user/dummy/')
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert (
+        page.select_one('.list-group-item.h4').get_text(strip=True)
+        == 'dummy has no group memberships'
+    )
+
+
+@pytest.mark.vcr()
 def test_user_settings_agreements(client, logged_in_dummy_user, dummy_agreement):
     """Test getting the user agreements page: /user/<username>/settings/agreements/"""
     result = client.get('/user/dummy/settings/agreements/')
