@@ -49,21 +49,28 @@ def user(ipa, username):
     # As a speed optimization, we make two separate calls.
     # Just doing a group_find (with all=True) is super slow here, with a lot of
     # groups.
-    member_groups = [
-        Group(group)
-        for group in ipa.group_find(o_user=username, o_all=False, fasgroup=True)[
-            'result'
-        ]
+    batch_methods = [
+        {"method": "group_show", "params": [[name], {"no_members": True}]}
+        for name in user.groups
     ]
+    # Don't call remote batch method with an empty list
+    if batch_methods:
+        member_groups = [
+            Group(g["result"])
+            for g in ipa.batch(batch_methods)["results"]
+            if g["result"].get("fasgroup", False)
+        ]
+    else:
+        member_groups = []
+
     managed_groups = [
         Group(group)
         for group in ipa.group_find(
             o_membermanager_user=username, o_all=False, fasgroup=True
         )['result']
     ]
-    groups = [
-        group for group in managed_groups if group not in member_groups
-    ] + member_groups
+    groups = sorted(list(set(managed_groups + member_groups)), key=lambda g: g.name)
+
     # Privacy setting
     if user != g.current_user and user.is_private:
         user.anonymize()

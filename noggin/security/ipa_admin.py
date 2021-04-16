@@ -25,6 +25,7 @@ class IPAAdmin:
         "group_find",
         "group_add_member",
         "group_add_member_manager",
+        "group_remove_member",
         "pwpolicy_add",
         "pwpolicy_mod",
         "pwpolicy_show",
