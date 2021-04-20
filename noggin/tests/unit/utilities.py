@@ -1,4 +1,3 @@
-import hashlib
 from contextlib import contextmanager
 from urllib import parse
 
