@@ -324,7 +324,7 @@ def test_change_post_with_otp(
 def test_change_post_password_with_otp_not_given(
     client,
     dummy_user,
-        logged_in_dummy_user_with_otp,
+    logged_in_dummy_user_with_otp,
     token_for_dummy_user,
     patched_lock_active,
     mocker,
