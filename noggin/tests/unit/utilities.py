@@ -61,7 +61,7 @@ def get_otp(secret):
     """
     Return an TOTP OTP from the given secret
     """
-    totp = pyotp.TOTP(secret, 6, hashlib.sha512)
+    totp = pyotp.TOTP(secret, 6)
     return totp.now()
 
 
