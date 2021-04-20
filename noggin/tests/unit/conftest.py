@@ -10,6 +10,7 @@ from noggin.app import create_app, ipa_admin
 from noggin.representation.agreement import Agreement
 from noggin.representation.otptoken import OTPToken
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
+from noggin.tests.unit.utilities import get_otp, otp_secret_from_uri
 
 
 @pytest.fixture(scope="session")
@@ -223,7 +224,16 @@ def dummy_user_with_gpg_key(client, dummy_user):
 
 
 @pytest.fixture
-def dummy_user_with_otp(client, logged_in_dummy_user):
+def dummy_user_with_otp(client, dummy_user):
+    result = ipa_admin.otptoken_add(o_ipatokenowner="dummy", o_description="dummy's token")
+    token = OTPToken(result["result"])
+    yield token
+    # Deletion needs to be done as admin to remove the last token
+    ipa_admin.otptoken_del(token.uniqueid)
+
+
+@pytest.fixture
+def logged_in_dummy_user_with_otp(client, logged_in_dummy_user):
     ipa = logged_in_dummy_user
     result = ipa.otptoken_add(o_ipatokenowner="dummy", o_description="dummy's token",)
     token = OTPToken(result['result'])

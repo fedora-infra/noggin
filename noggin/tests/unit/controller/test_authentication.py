@@ -8,10 +8,11 @@ from bs4 import BeautifulSoup
 from flask import current_app, get_flashed_messages, session
 
 from noggin.app import ipa_admin
+from noggin.representation.otptoken import OTPToken
 from noggin.tests.unit.utilities import (
     assert_form_field_error,
     assert_form_generic_error,
-    assert_redirects_with_flash,
+    assert_redirects_with_flash, get_otp, otp_secret_from_uri,
 )
 
 
@@ -93,19 +94,21 @@ def test_login(client, dummy_user):
 
 
 @pytest.mark.vcr()
-def test_login_with_otp(client, dummy_user):
+def test_login_with_otp(client, dummy_user_with_otp):
     """Test a successful Login with password + otp"""
+    otp = get_otp(otp_secret_from_uri(dummy_user_with_otp.uri))
     result = client.post(
         '/',
         data={
             "login-username": "dummy",
             "login-password": "dummy_password",
-            "login-otp": "123456",
+            "login-otp": otp,
             "login-submit": "1",
         },
         follow_redirects=True,
     )
     page = BeautifulSoup(result.data, 'html.parser')
+    print(page.prettify())
     messages = page.select(".flash-messages .alert-success")
     assert len(messages) == 1
     assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
@@ -322,7 +325,7 @@ def test_otp_sync_no_username(client, dummy_user):
 
 
 @pytest.mark.vcr()
-def test_otp_sync_invalid_codes(client, dummy_user_with_otp):
+def test_otp_sync_invalid_codes(client, logged_in_dummy_user_with_otp):
     """Test synchronising OTP token with madeup codes"""
     result = client.post(
         '/otp/sync/',
@@ -340,7 +343,7 @@ def test_otp_sync_invalid_codes(client, dummy_user_with_otp):
 
 
 @pytest.mark.vcr()
-def test_otp_sync_http_error(client, dummy_user_with_otp, mocker):
+def test_otp_sync_http_error(client, logged_in_dummy_user_with_otp, mocker):
     """Test synchronising OTP token with mocked http error"""
     logger = mocker.patch.object(current_app._get_current_object(), "logger")
     method = mocker.patch("requests.sessions.Session.post")
@@ -362,7 +365,7 @@ def test_otp_sync_http_error(client, dummy_user_with_otp, mocker):
 
 
 @pytest.mark.vcr()
-def test_otp_sync_rejected(client, dummy_user_with_otp):
+def test_otp_sync_rejected(client, logged_in_dummy_user_with_otp):
     """Test synchronising OTP token when freeipa rejects the request"""
     with mock.patch("requests.post") as method:
         method.return_value.status_code = 200
@@ -383,7 +386,7 @@ def test_otp_sync_rejected(client, dummy_user_with_otp):
 
 
 @pytest.mark.vcr()
-def test_otp_sync_success(client, dummy_user_with_otp):
+def test_otp_sync_success(client, logged_in_dummy_user_with_otp):
     """Test synchronising OTP token"""
     with mock.patch("requests.sessions.Session.post") as method:
         method.return_value.status_code = 200

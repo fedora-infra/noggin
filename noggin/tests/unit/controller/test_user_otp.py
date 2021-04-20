@@ -16,13 +16,13 @@ from noggin.tests.unit.utilities import (
 
 
 @pytest.fixture
-def dummy_user_with_2_otp(client, logged_in_dummy_user, dummy_user_with_otp):
+def dummy_user_with_2_otp(client, logged_in_dummy_user, logged_in_dummy_user_with_otp):
     ipa = logged_in_dummy_user
     result = ipa.otptoken_add(
         o_ipatokenowner="dummy", o_description="dummy's other token",
     )['result']
     token = OTPToken(result)
-    yield dummy_user_with_otp, token
+    yield logged_in_dummy_user_with_otp, token
     try:
         ipa_admin.otptoken_del(token.uniqueid)
     except python_freeipa.exceptions.NotFound:
@@ -147,7 +147,33 @@ def test_user_settings_otp_confirm(
 
 @pytest.mark.vcr()
 def test_user_settings_otp_add_second(
-    client, dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens, totp_token
+    client, logged_in_dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens, totp_token
+):
+    """Test posting to the create OTP endpoint"""
+    result = client.post(
+        "/user/dummy/settings/otp/",
+        data={
+            "add-description": "pants token",
+            "add-password": "dummy_password",
+            "add-otp": totp_token.now(),
+            "add-submit": "1",
+        },
+    )
+    page = BeautifulSoup(result.data, "html.parser")
+    tokenlist = page.select_one("div.list-group")
+    assert tokenlist is not None
+    # check we are showing 2 tokens
+    tokens = tokenlist.select(".list-group-item div[data-role='token-description']")
+    assert len(tokens) == 2
+    # check the 2nd token is in the list
+    assert tokens[1].get_text(strip=True) == "pants token"
+    # check the modal is closed
+    assert page.select_one("#otp-modal") is None
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_add_second_confirm(
+    client, logged_in_dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens, totp_token
 ):
     """Test posting to the create OTP endpoint"""
     result = client.post(
@@ -387,12 +413,12 @@ def test_user_settings_otp_disable(client, logged_in_dummy_user, dummy_user_with
 
 @pytest.mark.vcr()
 def test_user_settings_otp_disable_lasttoken(
-    client, logged_in_dummy_user, dummy_user_with_otp
+    client, logged_in_dummy_user, logged_in_dummy_user_with_otp
 ):
     """Test trying to disable the last token"""
     result = client.post(
         "/user/dummy/settings/otp/disable/",
-        data={"token": dummy_user_with_otp.uniqueid},
+        data={"token": logged_in_dummy_user_with_otp.uniqueid},
     )
     assert_redirects_with_flash(
         result,
@@ -524,7 +550,7 @@ def test_user_settings_otp_delete(client, logged_in_dummy_user, dummy_user_with_
 
 @pytest.mark.vcr()
 def test_user_settings_otp_delete_lasttoken(
-    client, logged_in_dummy_user, dummy_user_with_otp
+    client, logged_in_dummy_user, logged_in_dummy_user_with_otp
 ):
     """Test trying to delete the last token"""
     result = client.get("/user/dummy/settings/otp/")
