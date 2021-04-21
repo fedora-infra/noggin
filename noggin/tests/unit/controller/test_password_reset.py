@@ -84,7 +84,9 @@ def test_password_changes_user(client, logged_in_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_password_form_with_otp(client, logged_in_dummy_user, logged_in_dummy_user_with_otp):
+def test_password_form_with_otp(
+    client, logged_in_dummy_user, logged_in_dummy_user_with_otp
+):
     """Verify that the password change form shows OTP form elements
        when a user has OTP enabled"""
     result = client.get("/user/dummy/settings/password")

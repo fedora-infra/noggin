@@ -295,7 +295,11 @@ def test_change_post_generic_error(
 
 @pytest.mark.vcr()
 def test_change_post_with_otp(
-    client, dummy_user, logged_in_dummy_user_with_otp, token_for_dummy_user, patched_lock_active
+    client,
+    dummy_user,
+    logged_in_dummy_user_with_otp,
+    token_for_dummy_user,
+    patched_lock_active,
 ):
     otp = get_otp(otp_secret_from_uri(logged_in_dummy_user_with_otp.uri))
     with fml_testing.mock_sends(

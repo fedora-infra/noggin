@@ -214,10 +214,7 @@ def user_settings_otp(ipa, username):
             # Prefill the form for the next step
             confirmotpform.process(
                 MultiDict(
-                    {
-                        "confirm-secret": secret,
-                        "confirm-description": description,
-                    }
+                    {"confirm-secret": secret, "confirm-description": description,}
                 )
             )
     if confirmotpform.validate_on_submit():
