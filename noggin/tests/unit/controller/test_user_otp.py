@@ -11,7 +11,9 @@ from noggin.representation.otptoken import OTPToken
 from noggin.tests.unit.utilities import (
     assert_form_field_error,
     assert_form_generic_error,
-    assert_redirects_with_flash, get_otp, otp_secret_from_uri,
+    assert_redirects_with_flash,
+    get_otp,
+    otp_secret_from_uri,
 )
 
 
@@ -19,7 +21,8 @@ from noggin.tests.unit.utilities import (
 def dummy_user_with_2_otp(client, logged_in_dummy_user, logged_in_dummy_user_with_otp):
     ipa = logged_in_dummy_user
     result = ipa.otptoken_add(
-        o_ipatokenowner="dummy", o_description="dummy's other token",
+        o_ipatokenowner="dummy",
+        o_description="dummy's other token",
     )['result']
     token = OTPToken(result)
     yield logged_in_dummy_user_with_otp, token
@@ -172,20 +175,24 @@ def test_user_settings_otp_add_second(
     confirm_form = modal.select_one("form")
     assert confirm_form is not None
     assert (
-            confirm_form.select_one("input[name='confirm-description']")["value"]
-            == "pants token 2"
+        confirm_form.select_one("input[name='confirm-description']")["value"]
+        == "pants token 2"
     )
     otp_uri = page.select_one("input#otp-uri")
     parsed_otp_uri_query = parse_qs(urlparse(otp_uri["value"]).query)
     assert (
-            confirm_form.select_one("input[name='confirm-secret']")["value"]
-            == parsed_otp_uri_query["secret"][0]
+        confirm_form.select_one("input[name='confirm-secret']")["value"]
+        == parsed_otp_uri_query["secret"][0]
     )
 
 
 @pytest.mark.vcr()
 def test_user_settings_otp_add_second_confirm(
-    client, logged_in_dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens, totp_token
+    client,
+    logged_in_dummy_user_with_otp,
+    logged_in_dummy_user,
+    cleanup_dummy_tokens,
+    totp_token,
 ):
     """Test posting to the create OTP endpoint"""
     result = client.post(

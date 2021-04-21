@@ -11,7 +11,9 @@ from noggin.app import ipa_admin
 from noggin.tests.unit.utilities import (
     assert_form_field_error,
     assert_form_generic_error,
-    assert_redirects_with_flash, get_otp, otp_secret_from_uri,
+    assert_redirects_with_flash,
+    get_otp,
+    otp_secret_from_uri,
 )
 
 
