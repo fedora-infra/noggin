@@ -11,7 +11,7 @@ from noggin.representation.otptoken import OTPToken
 from noggin.tests.unit.utilities import (
     assert_form_field_error,
     assert_form_generic_error,
-    assert_redirects_with_flash,
+    assert_redirects_with_flash, get_otp, otp_secret_from_uri,
 )
 
 
@@ -147,28 +147,40 @@ def test_user_settings_otp_confirm(
 
 @pytest.mark.vcr()
 def test_user_settings_otp_add_second(
-    client, logged_in_dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens, totp_token
+    client, logged_in_dummy_user_with_otp, cleanup_dummy_tokens
 ):
     """Test posting to the create OTP endpoint"""
+    otp = get_otp(otp_secret_from_uri(logged_in_dummy_user_with_otp.uri))
     result = client.post(
         "/user/dummy/settings/otp/",
         data={
-            "add-description": "pants token",
+            "add-description": "pants token 2",
             "add-password": "dummy_password",
-            "add-otp": totp_token.now(),
+            "add-otp": otp,
             "add-submit": "1",
         },
     )
     page = BeautifulSoup(result.data, "html.parser")
     tokenlist = page.select_one("div.list-group")
     assert tokenlist is not None
-    # check we are showing 2 tokens
     tokens = tokenlist.select(".list-group-item div[data-role='token-description']")
-    assert len(tokens) == 2
-    # check the 2nd token is in the list
-    assert tokens[1].get_text(strip=True) == "pants token"
-    # check the modal is closed
-    assert page.select_one("#otp-modal") is None
+    assert len(tokens) == 1
+
+    modal = page.select_one("#otp-modal")
+    assert modal is not None
+
+    confirm_form = modal.select_one("form")
+    assert confirm_form is not None
+    assert (
+            confirm_form.select_one("input[name='confirm-description']")["value"]
+            == "pants token 2"
+    )
+    otp_uri = page.select_one("input#otp-uri")
+    parsed_otp_uri_query = parse_qs(urlparse(otp_uri["value"]).query)
+    assert (
+            confirm_form.select_one("input[name='confirm-secret']")["value"]
+            == parsed_otp_uri_query["secret"][0]
+    )
 
 
 @pytest.mark.vcr()

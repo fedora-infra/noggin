@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 from flask import current_app, get_flashed_messages, session
 
 from noggin.app import ipa_admin
-from noggin.representation.otptoken import OTPToken
 from noggin.tests.unit.utilities import (
     assert_form_field_error,
     assert_form_generic_error,
@@ -108,7 +107,6 @@ def test_login_with_otp(client, dummy_user_with_otp):
         follow_redirects=True,
     )
     page = BeautifulSoup(result.data, 'html.parser')
-    print(page.prettify())
     messages = page.select(".flash-messages .alert-success")
     assert len(messages) == 1
     assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'

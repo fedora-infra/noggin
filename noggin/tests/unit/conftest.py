@@ -10,7 +10,6 @@ from noggin.app import create_app, ipa_admin
 from noggin.representation.agreement import Agreement
 from noggin.representation.otptoken import OTPToken
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
-from noggin.tests.unit.utilities import get_otp, otp_secret_from_uri
 
 
 @pytest.fixture(scope="session")
