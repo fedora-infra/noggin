@@ -22,7 +22,7 @@ class NewPasswordForm(BaseForm):
     otp = PasswordField(
         _('One-Time Password'),
         validators=[Optional()],
-        description=_("Enter your One-Time Password token if you have enrolled one"),
+        description=_("Enter your One-Time Password (if you have one)"),
     )
 
 
