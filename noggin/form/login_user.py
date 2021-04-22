@@ -16,10 +16,6 @@ class LoginUserForm(ModestForm):
         validators=[DataRequired(message=_('You must provide a password'))],
     )
 
-    otp = StringField(
-        _('One-Time Password'),
-        validators=[Optional()],
-        description=_("Enter your One-Time Password (if you have one)"),
-    )
+    otp = StringField(_('One-Time Password'), validators=[Optional()])
 
     submit = SubmitButtonField(_('Log In'))

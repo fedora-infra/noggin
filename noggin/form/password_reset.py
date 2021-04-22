@@ -19,11 +19,7 @@ class NewPasswordForm(BaseForm):
 
     password_confirm = PasswordField(_('Confirm New Password'))
 
-    otp = PasswordField(
-        _('One-Time Password'),
-        validators=[Optional()],
-        description=_("Enter your One-Time Password (if you have one)"),
-    )
+    otp = StringField(_('One-Time Password'), validators=[Optional()])
 
 
 class PasswordResetForm(NewPasswordForm):
@@ -31,7 +27,6 @@ class PasswordResetForm(NewPasswordForm):
     current_password = PasswordField(
         _('Current Password'),
         validators=[DataRequired(message=_('Current password must not be empty'))],
-        description=_("Just the password, don't add the OTP token if you have one"),
     )
 
 
