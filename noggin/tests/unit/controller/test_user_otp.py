@@ -187,11 +187,7 @@ def test_user_settings_otp_add_second(
 
 @pytest.mark.vcr()
 def test_user_settings_otp_add_second_confirm(
-    client,
-    logged_in_dummy_user_with_otp,
-    logged_in_dummy_user,
-    cleanup_dummy_tokens,
-    totp_token,
+    client, logged_in_dummy_user_with_otp, cleanup_dummy_tokens, totp_token,
 ):
     """Test posting to the create OTP endpoint"""
     result = client.post(
@@ -430,9 +426,7 @@ def test_user_settings_otp_disable(client, logged_in_dummy_user, dummy_user_with
 
 
 @pytest.mark.vcr()
-def test_user_settings_otp_disable_lasttoken(
-    client, logged_in_dummy_user, logged_in_dummy_user_with_otp
-):
+def test_user_settings_otp_disable_lasttoken(client, logged_in_dummy_user_with_otp):
     """Test trying to disable the last token"""
     result = client.post(
         "/user/dummy/settings/otp/disable/",

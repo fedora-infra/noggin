@@ -115,7 +115,7 @@ class UserSettingsAddOTPForm(ModestForm):
     otp = PasswordField(
         _('One-Time Password'),
         validators=[Optional()],
-        description=_("Enter your One-Time Password token if you have enrolled one"),
+        description=_("Enter your One-Time Password"),
     )
 
     submit = SubmitButtonField(_("Generate OTP Token"))

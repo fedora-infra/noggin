@@ -18,7 +18,7 @@ def compile_catalogs():
 
 @pytest.mark.vcr()
 def test_translation_in_code_french(
-    client, logged_in_dummy_user, logged_in_dummy_user_with_otp, compile_catalogs
+    client, logged_in_dummy_user_with_otp, compile_catalogs
 ):
     """Test translations are working if the string is in the code"""
     headers = {"Accept-Language": "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3"}

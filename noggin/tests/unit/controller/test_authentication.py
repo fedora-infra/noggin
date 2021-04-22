@@ -84,12 +84,14 @@ def test_login(client, dummy_user):
             "login-password": "dummy_password",
             "login-submit": "1",
         },
-        follow_redirects=True,
+        follow_redirects=False,
     )
-    page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .alert-success")
-    assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/",
+        expected_message="Welcome, dummy!",
+        expected_category="success",
+    )
     assert session.get("noggin_username") == "dummy"
     assert session.get("noggin_session") is not None
 
@@ -106,12 +108,14 @@ def test_login_with_otp(client, dummy_user_with_otp):
             "login-otp": otp,
             "login-submit": "1",
         },
-        follow_redirects=True,
+        follow_redirects=False,
     )
-    page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .alert-success")
-    assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/",
+        expected_message="Welcome, dummy!",
+        expected_category="success",
+    )
     assert session.get("noggin_username") == "dummy"
     assert session.get("noggin_session") is not None
 
