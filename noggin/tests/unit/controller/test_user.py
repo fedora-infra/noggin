@@ -58,7 +58,7 @@ def test_user_unauthed(client):
     result = client.get('/user/dudemcpants/')
     assert_redirects_with_flash(
         result,
-        expected_url="/",
+        expected_url="/?next=/user/dudemcpants/%3F",
         expected_message="Please log in to continue.",
         expected_category="warning",
     )
