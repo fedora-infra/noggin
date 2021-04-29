@@ -1,5 +1,5 @@
 {% import '_form_macros.html' as macros %}
-<form action="{{ url_for('.root') }}" method="post" novalidate>
+<form action="{{ url_for('.root') }}{% if request.args.get('next') %}?next={{ request.args.get('next') | urlencode }}{% endif %}" method="post" novalidate>
   {{ login_form.csrf_token }}
   <div class="card-body">
     <div class="form-group">

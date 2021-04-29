@@ -1,4 +1,5 @@
 from unittest import mock
+from urllib.parse import quote
 
 import pytest
 from flask import current_app, g, get_flashed_messages, session
@@ -64,7 +65,27 @@ def test_with_ipa_anonymous(client):
         wrapped = with_ipa()(view)
         response = wrapped("arg")
         assert response.status_code == 302
-        assert response.location == "/"
+        assert response.location == "/?next=/%3F"
+        view.assert_not_called()
+        assert "ipa" not in g
+        assert "current_user" not in g
+        messages = get_flashed_messages(with_categories=True)
+        assert len(messages) == 1
+        category, message = messages[0]
+        assert message == "Please log in to continue."
+        assert category == "warning"
+
+
+@pytest.mark.vcr()
+def test_with_ipa_anonymous_and_redirect(client):
+    """Test the with_ipa decorator on anonymous users with a redirect"""
+    view = mock.Mock()
+    orig_url = "/groups/?page_size=30&page_number=2"
+    with current_app.test_request_context(orig_url):
+        wrapped = with_ipa()(view)
+        response = wrapped("arg")
+        assert response.status_code == 302
+        assert response.location == f"/?next={quote(orig_url)}"
         view.assert_not_called()
         assert "ipa" not in g
         assert "current_user" not in g
