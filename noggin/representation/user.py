@@ -26,6 +26,7 @@ class User(Representation):
         "creation_time": "fascreationtime",
         "is_private": "fasisprivate",
         "pronouns": "faspronoun",
+        "krbname": "krbcanonicalname",
     }
     attr_types = {
         "sshpubkeys": "list",
