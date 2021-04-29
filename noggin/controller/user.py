@@ -239,7 +239,7 @@ def user_settings_otp(ipa, username):
     if secret:
         description = addotpform.description.data or confirmotpform.description.data
         token = TOTP(secret)
-        otp_uri = token.provisioning_uri(name=username, issuer_name=description)
+        otp_uri = token.provisioning_uri(name=description, issuer_name=user.krbname)
     else:
         otp_uri = None
 
