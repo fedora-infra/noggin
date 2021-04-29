@@ -17,7 +17,7 @@
         {# Only show the QR code when the user is ready, this gives them time to pick up their phone and check noone is looking over their shoulders #}
         <p>{{ _("Your new token is ready. Click on the button below to reveal the QR code and scan it.") }}</p>
         <div class="text-center"><button id="otp-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="false">{{ _("Reveal") }}</button></div>
-        <div id="otp-qrcode" class="text-center mt-3" style="display:none"></div>
+        <div id="otp-qrcode" class="text-center mt-3"></div>
         <p class="mb-1 mt-4">{{ _("or copy and paste the following token URL if you can't scan the QR code:") }}</p>
         <input id="otp-uri" class="form-control" readonly value="{{otp_uri|safe}}" />
         <form action="{{ url_for('.user_settings_otp', username=current_user.username) }}" method="post" class="py-3" novalidate>
@@ -127,7 +127,7 @@
   <script nonce="{{ csp_nonce() }}">
     $(document).ready(function() {
         $('#otp-modal').modal('show');
-        $('#otp-qrcode').qrcode("{{ otp_uri|safe }}");
+        $('#otp-qrcode').hide().qrcode("{{ otp_uri|safe }}");
         $('#otp-toggle').click(function() {
           $('#otp-qrcode').slideToggle("fast");
         })
