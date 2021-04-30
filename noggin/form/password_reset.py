@@ -1,6 +1,6 @@
 from flask_babel import lazy_gettext as _
 from wtforms import PasswordField, StringField
-from wtforms.validators import DataRequired, EqualTo
+from wtforms.validators import DataRequired, EqualTo, Optional
 
 from .base import BaseForm
 from .validators import PasswordLength
@@ -19,9 +19,7 @@ class NewPasswordForm(BaseForm):
 
     password_confirm = PasswordField(_('Confirm New Password'))
 
-    otp = StringField(
-        _('OTP Token'), description=_("Enter your OTP token if you have enrolled one")
-    )
+    otp = StringField(_('One-Time Password'), validators=[Optional()])
 
 
 class PasswordResetForm(NewPasswordForm):
@@ -29,7 +27,6 @@ class PasswordResetForm(NewPasswordForm):
     current_password = PasswordField(
         _('Current Password'),
         validators=[DataRequired(message=_('Current password must not be empty'))],
-        description=_("Just the password, don't add the OTP token if you have one"),
     )
 
 

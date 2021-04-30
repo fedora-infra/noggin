@@ -17,6 +17,7 @@ Features
 * The GPG key ID fields now refuse key IDs shorter than 16 characters, and
   allow up to 40 characters (the full fingerprint) (:issue:`556`).
 * Paginate the group members list (:issue:`580`).
+* Handle separately OTP from password in UI (:issue:`572`).
 
 Bug Fixes
 ^^^^^^^^^

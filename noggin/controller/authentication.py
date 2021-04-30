@@ -21,6 +21,9 @@ def handle_login_form(form):
     username = form.username.data.lower()
     password = form.password.data
 
+    if form.otp.data:
+        password += form.otp.data
+
     try:
         # This call will set the cookie itself, we don't have to.
         ipa = maybe_ipa_login(current_app, session, username, password)

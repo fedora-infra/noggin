@@ -223,7 +223,18 @@ def dummy_user_with_gpg_key(client, dummy_user):
 
 
 @pytest.fixture
-def dummy_user_with_otp(client, logged_in_dummy_user):
+def dummy_user_with_otp(client, dummy_user):
+    result = ipa_admin.otptoken_add(
+        o_ipatokenowner="dummy", o_description="dummy's token"
+    )
+    token = OTPToken(result["result"])
+    yield token
+    # Deletion needs to be done as admin to remove the last token
+    ipa_admin.otptoken_del(token.uniqueid)
+
+
+@pytest.fixture
+def logged_in_dummy_user_with_otp(client, logged_in_dummy_user):
     ipa = logged_in_dummy_user
     result = ipa.otptoken_add(o_ipatokenowner="dummy", o_description="dummy's token",)
     token = OTPToken(result['result'])
