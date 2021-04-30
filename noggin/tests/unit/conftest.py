@@ -164,17 +164,30 @@ def dummy_user_with_case(make_user):
 
 
 @pytest.fixture
-def dummy_group(ipa_testing_config):
-    ipa_admin.group_add(
-        a_cn='dummy-group',
-        o_description="A dummy group",
-        fasgroup=True,
-        fasurl="http://dummygroup.org",
-        fasmailinglist="dummy@mailinglist.org",
-        fasircchannel="irc:///freenode.net/#dummy-group",
-    )
-    yield
-    ipa_admin.group_del(a_cn='dummy-group')
+def make_group(ipa_testing_config, app):
+    created = []
+
+    def _make_group(name):
+        result = ipa_admin.group_add(
+            name,
+            o_description=f"The {name} group",
+            fasgroup=True,
+            fasurl=f"http://{name}.example.com",
+            fasmailinglist=f"{name}@lists.example.com",
+            fasircchannel=f"irc:///freenode.net/#{name}",
+        )
+        created.append(name)
+        return result
+
+    yield _make_group
+
+    for name in created:
+        ipa_admin.group_del(name)
+
+
+@pytest.fixture
+def dummy_group(make_group):
+    make_group("dummy-group")
 
 
 @pytest.fixture
@@ -206,7 +219,7 @@ def logged_in_dummy_user(client, dummy_user, app):
 
 @pytest.fixture
 def dummy_user_with_gpg_key(client, dummy_user):
-    ipa_admin.user_mod(a_uid="dummy", fasgpgkeyid=["dummygpgkeyid"])
+    ipa_admin.user_mod(a_uid="dummy", fasgpgkeyid=["dummy-gpg-key-id"])
 
 
 @pytest.fixture

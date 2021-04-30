@@ -106,8 +106,10 @@
 
 {# an optional macro to show a note that when applied it also applies to kinit / krb5 / kerberos #}
 {% macro otp_notice() %}
-<div class="alert alert-info text-center">
-    <div><strong>{{_("Additional configuration is required when using Kerberos tickets when OTP is enabled")}}</strong></div>
-    <div>{{_("Read the <a href='https://docs.fedoraproject.org/en-US/fedora-accounts/user/#pkinit'>documentation</a> for details on configuring your system")}}</div>
+<div class="card-body">
+    <div class="alert alert-info text-center my-3">
+        <div><strong>{{_("Additional configuration is required when using Kerberos tickets when OTP is enabled")}}</strong></div>
+        <div>{{_("Read the <a href='https://docs.fedoraproject.org/en-US/fedora-accounts/user/#pkinit'>documentation</a> for details on configuring your system")}}</div>
+    </div>
 </div>
 {% endmacro %}

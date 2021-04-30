@@ -1,5 +1,13 @@
 import python_freeipa
-from flask import current_app, flash, redirect, render_template, session, url_for
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_babel import _
 
 from noggin.form.sync_token import SyncTokenForm
@@ -38,7 +46,13 @@ def handle_login_form(form):
         raise FormError("non_field_errors", _('Could not log in to the IPA server.'))
 
     flash(_('Welcome, %(username)s!', username=username), 'success')
-    return redirect(url_for('.user', username=username))
+    next = request.args.get("next")
+    # Keep the same domain
+    if next and not next.startswith("/"):
+        next = None
+    if next is None:
+        next = url_for('.user', username=username)
+    return redirect(next)
 
 
 @bp.route('/otp/sync/', methods=['GET', 'POST'])

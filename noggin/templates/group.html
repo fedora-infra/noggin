@@ -1,4 +1,5 @@
 {% extends "main.html" %}
+{% import '_pagination.html' as pagination_macros %}
 
 {# Here it is relatively safe to assume that 'ipa' exists and is valid. We would not be here otherwise. #}
 
@@ -18,7 +19,7 @@
           </h3>
           {% if group.description %}<div>{{ group.description }}</div>{% endif %}
           {% if group.mailing_list %}
-            <div id="group-mailinglist"><i class="fa fa-fw fa-envelope" aria-hidden="true"></i> <a href="{{group.mailing_list}}">{{group.mailing_list}}</a></div>
+            <div id="group-mailinglist"><i class="fa fa-fw fa-envelope" aria-hidden="true"></i> <a href="mailto:{{group.mailing_list}}">{{group.mailing_list}}</a></div>
           {% endif %}
           {% if group.irc_channel %}
             <div id="group-ircchannel"><i class="fa fa-fw fa-comments-o" aria-hidden="true"></i> <a href="{{group.irc_channel}}">{{group.irc_channel}}</a></div>
@@ -106,7 +107,7 @@
           {{ sponsor_form.hidden_tag() }}
           <ul class="list-unstyled row">
             {% set sponsor_usernames = sponsors|map(attribute='username') %}
-            {% for member in members|sort(attribute='username') %}
+            {% for member in members.items %}
               <li class="col-lg-3 col-md-4 col-sm-6">
               <div class="card card-body mb-4 px-2 py-3">
                 <div class="media align-items-center">
@@ -130,6 +131,7 @@
             {% endfor %}
           </ul>
         </form>
+        {{ pagination_macros.pagination_bar(members) }}
         {% endif %}
       </div>
       </div>

@@ -4,6 +4,7 @@ from urllib.parse import parse_qs, urlparse
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
+from pyotp import TOTP
 
 from noggin.app import ipa_admin
 from noggin.representation.otptoken import OTPToken
@@ -11,8 +12,6 @@ from noggin.tests.unit.utilities import (
     assert_form_field_error,
     assert_form_generic_error,
     assert_redirects_with_flash,
-    get_otp,
-    otp_secret_from_uri,
 )
 
 
@@ -28,6 +27,11 @@ def dummy_user_with_2_otp(client, logged_in_dummy_user, dummy_user_with_otp):
         ipa_admin.otptoken_del(token.uniqueid)
     except python_freeipa.exceptions.NotFound:
         pass  # already deleted, it's fine.
+
+
+@pytest.fixture
+def totp_token():
+    return TOTP("BJ3F2NQ2CADX6ZOEDGGKATDQMVTKY3XLC73ASUHIBVGGGWJJOYFXIFIT")
 
 
 @pytest.mark.vcr()
@@ -72,60 +76,114 @@ def test_user_settings_otp_no_permission(client, logged_in_dummy_user):
 
 @pytest.mark.vcr()
 def test_user_settings_otp_add(client, logged_in_dummy_user, cleanup_dummy_tokens):
-    """Test posting to the create OTP endpoint"""
+    """Test the first step of OTP creation"""
     result = client.post(
         "/user/dummy/settings/otp/",
-        data={"description": "pants token", "password": "dummy_password"},
-        follow_redirects=True,
+        data={
+            "add-description": "pants token",
+            "add-password": "dummy_password",
+            "add-submit": "1",
+        },
     )
+    page = BeautifulSoup(result.data, "html.parser")
+    # The token has not been added yet
+    tokenlist = page.select_one("div.list-group")
+    assert tokenlist is not None
+    assert "You have no OTP tokens" in tokenlist.get_text(strip=True)
+    # check the modal is on the page
+    modal = page.select_one("#otp-modal")
+    assert modal is not None
+    # check the next step form is properly pre-filled
+    confirm_form = modal.select_one("form")
+    assert confirm_form is not None
+    assert (
+        confirm_form.select_one("input[name='confirm-description']")["value"]
+        == "pants token"
+    )
+    otp_uri = page.select_one("input#otp-uri")
+    parsed_otp_uri_query = parse_qs(urlparse(otp_uri["value"]).query)
+    assert (
+        confirm_form.select_one("input[name='confirm-secret']")["value"]
+        == parsed_otp_uri_query["secret"][0]
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_confirm(
+    client, logged_in_dummy_user, cleanup_dummy_tokens, totp_token
+):
+    """Test OTP creation"""
+    result = client.post(
+        "/user/dummy/settings/otp/",
+        data={
+            "confirm-description": "pants token",
+            "confirm-secret": totp_token.secret,
+            "confirm-code": totp_token.now(),
+            "confirm-submit": "1",
+        },
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="The token has been created.",
+        expected_category="success",
+    )
+    result = client.get("/user/dummy/settings/otp/")
     page = BeautifulSoup(result.data, "html.parser")
     tokenlist = page.select_one("div.list-group")
     assert tokenlist is not None
     # check this is not the no tokens message
     assert "You have no OTP tokens" not in tokenlist.get_text(strip=True)
     # check we are showing 1 token
-    tokens = tokenlist.select(".list-group-item .h6")
+    tokens = tokenlist.select(".list-group-item .col")
     assert len(tokens) == 1
     # check the token is in the list
     description = tokens[0].select_one("div[data-role='token-description']")
+    assert description is not None
     assert description.get_text(strip=True) == "pants token"
-    # check the modal is on the page
-    assert len(page.select("#otp-modal")) == 1
+    # check the modal is closed
+    assert page.select_one("#otp-modal") is None
 
 
 @pytest.mark.vcr()
 def test_user_settings_otp_add_second(
-    client, dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens
+    client, dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens, totp_token
 ):
     """Test posting to the create OTP endpoint"""
-    current_otp = get_otp(otp_secret_from_uri(dummy_user_with_otp.uri))
     result = client.post(
         "/user/dummy/settings/otp/",
-        data={"description": "pants token", "password": f"dummy_password{current_otp}"},
+        data={
+            "confirm-description": "pants token",
+            "confirm-secret": totp_token.secret,
+            "confirm-code": totp_token.now(),
+            "confirm-submit": "1",
+        },
         follow_redirects=True,
     )
     page = BeautifulSoup(result.data, "html.parser")
     tokenlist = page.select_one("div.list-group")
     assert tokenlist is not None
     # check we are showing 2 tokens
-    tokens = tokenlist.select(".list-group-item .h6 div[data-role='token-description']")
+    tokens = tokenlist.select(".list-group-item div[data-role='token-description']")
     assert len(tokens) == 2
     # check the 2nd token is in the list
     assert tokens[1].get_text(strip=True) == "pants token"
-    # check the modal is on the page
-    assert len(page.select("#otp-modal")) == 1
+    # check the modal is closed
+    assert page.select_one("#otp-modal") is None
 
 
 @pytest.mark.vcr()
 def test_user_settings_otp_check_no_description(
-    client, dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens
+    client, logged_in_dummy_user, cleanup_dummy_tokens, totp_token
 ):
     """Test an OTP token without a description"""
-    current_otp = get_otp(otp_secret_from_uri(dummy_user_with_otp.uri))
-
     result = client.post(
         "/user/dummy/settings/otp/",
-        data={"password": f"dummy_password{current_otp}"},
+        data={
+            "confirm-secret": totp_token.secret,
+            "confirm-code": totp_token.now(),
+            "confirm-submit": "1",
+        },
         follow_redirects=True,
     )
 
@@ -134,45 +192,53 @@ def test_user_settings_otp_check_no_description(
 
     assert tokenlist is not None
 
-    tokens = tokenlist.select(".list-group-item .h6 div[data-role='token-description']")
-    assert len(tokens) == 2
+    tokens = tokenlist.select(".list-group-item div[data-role='token-description']")
+    assert len(tokens) == 1
 
     assert tokens[0].get_text(strip=True) == ""
-    assert tokens[1].get_text(strip=True) == "dummy's token"
 
 
 @pytest.mark.vcr()
 def test_user_settings_otp_check_description_escaping(
-    client, dummy_user_with_otp, logged_in_dummy_user, cleanup_dummy_tokens
+    client, logged_in_dummy_user, cleanup_dummy_tokens
 ):
     """Test that we escape the token description when constructing the OTP URI"""
-    current_otp = get_otp(otp_secret_from_uri(dummy_user_with_otp.uri))
-
     result = client.post(
         "/user/dummy/settings/otp/",
-        data={"description": "pants token", "password": f"dummy_password{current_otp}"},
+        data={
+            "add-description": "pants token",
+            "add-password": "dummy_password",
+            "add-submit": "1",
+        },
         follow_redirects=True,
     )
 
     page = BeautifulSoup(result.data, "html.parser")
     otp_uri = page.select_one("input#otp-uri")
+    print(page.prettify())
+    assert otp_uri is not None
     parsed_otp_uri = urlparse(otp_uri["value"])
-    parsed_query = parse_qs(parsed_otp_uri.query)
 
     # Not sure we need all of these checked
     assert parsed_otp_uri.scheme == "otpauth"
     assert parsed_otp_uri.netloc == "totp"
-    assert parsed_otp_uri.path == "/dummy@noggin.test:pants%20token"
+    assert parsed_otp_uri.path == "/dummy%40NOGGIN.TEST:pants%20token"
 
+    parsed_query = parse_qs(parsed_otp_uri.query)
     assert parsed_query["issuer"] == ["dummy@NOGGIN.TEST"]
 
 
 @pytest.mark.vcr()
-def test_user_settings_otp_add_no_permission(client, logged_in_dummy_user):
+def test_user_settings_otp_add_no_permission(client, logged_in_dummy_user, totp_token):
     """Verify that another user can't make an otp token. """
     result = client.post(
         "/user/dudemcpants/settings/otp/",
-        data={"description": "pants token", "password": "dummy_password"},
+        data={
+            "confirm-description": "pants token",
+            "confirm-secret": totp_token.secret,
+            "confirm-code": totp_token.now(),
+            "confirm-submit": "1",
+        },
     )
     assert_redirects_with_flash(
         result,
@@ -185,8 +251,8 @@ def test_user_settings_otp_add_no_permission(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_otp_add_invalid_form(client, logged_in_dummy_user):
     """Test an invalid form when adding an otp token"""
-    result = client.post("/user/dummy/settings/otp/", data={})
-    assert_form_field_error(result, "password", "You must provide a password")
+    result = client.post("/user/dummy/settings/otp/", data={"add-submit": "1"})
+    assert_form_field_error(result, "add-password", "You must provide a password")
 
 
 @pytest.mark.vcr()
@@ -194,13 +260,34 @@ def test_user_settings_otp_add_wrong_password(client, logged_in_dummy_user):
     """Test adding an otp token with the wrong password"""
     result = client.post(
         "/user/dummy/settings/otp/",
-        data={"description": "pants token", "password": "pants"},
+        data={
+            "add-description": "pants token",
+            "add-password": "pants",
+            "add-submit": "1",
+        },
     )
-    assert_form_field_error(result, "password", "Incorrect password")
+    assert_form_field_error(result, "add-password", "Incorrect password")
 
 
 @pytest.mark.vcr()
-def test_user_settings_otp_add_invalid(client, logged_in_dummy_user):
+def test_user_settings_otp_add_wrong_code(client, logged_in_dummy_user, totp_token):
+    """Test failure when adding an otptoken"""
+    result = client.post(
+        "/user/dummy/settings/otp/",
+        data={
+            "confirm-description": "pants token",
+            "confirm-secret": totp_token.secret,
+            "confirm-code": "123456",
+            "confirm-submit": "1",
+        },
+    )
+    assert_form_field_error(
+        result, "confirm-code", "The code is wrong, please try again."
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_add_invalid(client, logged_in_dummy_user, totp_token):
     """Test failure when adding an otptoken"""
     with mock.patch("noggin.security.ipa.Client.otptoken_add") as method:
         method.side_effect = python_freeipa.exceptions.ValidationError(
@@ -211,7 +298,12 @@ def test_user_settings_otp_add_invalid(client, logged_in_dummy_user):
         )
         result = client.post(
             "/user/dummy/settings/otp/",
-            data={"description": "pants token", "password": "dummy_password"},
+            data={
+                "confirm-description": "pants token",
+                "confirm-secret": totp_token.secret,
+                "confirm-code": totp_token.now(),
+                "confirm-submit": "1",
+            },
         )
     assert_form_generic_error(result, expected_message="Cannot create the token.")
 
@@ -238,7 +330,7 @@ def test_user_settings_otp_disable_invalid_form(client, logged_in_dummy_user):
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/otp/",
-        expected_message="token must not be empty",
+        expected_message="Token must not be empty",
         expected_category="danger",
     )
 
@@ -352,7 +444,7 @@ def test_user_settings_otp_delete_invalid_form(client, logged_in_dummy_user):
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/otp/",
-        expected_message="token must not be empty",
+        expected_message="Token must not be empty",
         expected_category="danger",
     )
 
@@ -482,7 +574,7 @@ def test_user_settings_otp_enable_invalid_form(client, logged_in_dummy_user):
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/otp/",
-        expected_message="token must not be empty",
+        expected_message="Token must not be empty",
         expected_category="danger",
     )
 

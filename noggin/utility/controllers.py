@@ -1,7 +1,8 @@
 from functools import wraps
+from urllib.parse import quote
 
 import python_freeipa
-from flask import abort, current_app, flash, g, redirect, session, url_for
+from flask import abort, current_app, flash, g, redirect, request, session, url_for
 from flask_babel import lazy_gettext as _
 
 from noggin.representation.user import User
@@ -19,8 +20,9 @@ def with_ipa():
                 g.ipa = ipa
                 g.current_user = User(g.ipa.user_find(whoami=True)['result'][0])
                 return f(*args, **kwargs, ipa=ipa)
+            coming_from = quote(request.full_path)
             flash('Please log in to continue.', 'warning')
-            return redirect(url_for('.root'))
+            return redirect(f"{url_for('.root')}?next={coming_from}")
 
         return fn
 

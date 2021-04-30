@@ -45,6 +45,9 @@ class Representation:
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.raw == other.raw
 
+    def __hash__(self):
+        return hash(self.dn)
+
     @property
     def dn(self):
         return self.raw.get("dn")

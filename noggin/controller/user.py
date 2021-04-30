@@ -1,4 +1,5 @@
-from urllib.parse import quote, urlparse
+import os
+from base64 import b32encode
 
 import python_freeipa
 from flask import (
@@ -12,10 +13,13 @@ from flask import (
     url_for,
 )
 from flask_babel import _
+from pyotp import TOTP
+from werkzeug.datastructures import MultiDict
 
 from noggin.form.edit_user import (
     UserSettingsAddOTPForm,
     UserSettingsAgreementSign,
+    UserSettingsConfirmOTPForm,
     UserSettingsKeysForm,
     UserSettingsOTPStatusChange,
     UserSettingsProfileForm,
@@ -33,6 +37,11 @@ from noggin_messages import UserUpdateV1
 from . import blueprint as bp
 
 
+# Must be the same as KEY_LENGTH in ipaserver/plugins/otptoken.py
+# For maximum compatibility, must be a multiple of 5.
+OTP_KEY_LENGTH = 35
+
+
 @bp.route('/user/<username>/')
 @with_ipa()
 def user(ipa, username):
@@ -40,21 +49,28 @@ def user(ipa, username):
     # As a speed optimization, we make two separate calls.
     # Just doing a group_find (with all=True) is super slow here, with a lot of
     # groups.
-    member_groups = [
-        Group(group)
-        for group in ipa.group_find(o_user=username, o_all=False, fasgroup=True)[
-            'result'
-        ]
+    batch_methods = [
+        {"method": "group_show", "params": [[name], {"no_members": True}]}
+        for name in user.groups
     ]
+    # Don't call remote batch method with an empty list
+    if batch_methods:
+        member_groups = [
+            Group(g["result"])
+            for g in ipa.batch(batch_methods)["results"]
+            if g["result"].get("fasgroup", False)
+        ]
+    else:
+        member_groups = []
+
     managed_groups = [
         Group(group)
         for group in ipa.group_find(
             o_membermanager_user=username, o_all=False, fasgroup=True
         )['result']
     ]
-    groups = [
-        group for group in managed_groups if group not in member_groups
-    ] + member_groups
+    groups = sorted(list(set(managed_groups + member_groups)), key=lambda g: g.name)
+
     # Privacy setting
     if user != g.current_user and user.is_private:
         user.anonymize()
@@ -178,37 +194,56 @@ def user_settings_keys(ipa, username):
 @with_ipa()
 @require_self
 def user_settings_otp(ipa, username):
-    addotpform = UserSettingsAddOTPForm()
+    addotpform = UserSettingsAddOTPForm(prefix="add-")
+    confirmotpform = UserSettingsConfirmOTPForm(prefix="confirm-")
     user = User(user_or_404(ipa, username))
+    secret = None
     if addotpform.validate_on_submit():
         try:
             maybe_ipa_login(current_app, session, username, addotpform.password.data)
-            result = ipa.otptoken_add(
-                o_ipatokenowner=username, o_description=addotpform.description.data,
-            )['result']
-
-            uri = urlparse(result['uri'])
-
-            # Use the provided description in the token, so it shows up in the user's app instead of
-            # the token's UUID
-            principal = uri.path.split(":", 1)[0]
-            new_uri = uri._replace(
-                path=f"{principal.lower()}:{quote(addotpform.description.data)}"
-            )
-            session['otp_uri'] = new_uri.geturl()
         except python_freeipa.exceptions.InvalidSessionPassword:
             addotpform.password.errors.append(_("Incorrect password"))
+        else:
+            secret = b32encode(os.urandom(OTP_KEY_LENGTH)).decode('ascii')
+            # Prefill the form for the next step
+            confirmotpform.process(
+                MultiDict(
+                    {
+                        "confirm-secret": secret,
+                        "confirm-description": addotpform.description.data,
+                    }
+                )
+            )
+    if confirmotpform.validate_on_submit():
+        try:
+            ipa.otptoken_add(
+                o_ipatokenowner=username,
+                o_description=confirmotpform.description.data,
+                o_ipatokenotpkey=confirmotpform.secret.data,
+            )
         except python_freeipa.exceptions.FreeIPAError as e:
             current_app.logger.error(
                 f'An error happened while creating an OTP token for user {username}: {e.message}'
             )
-            addotpform.non_field_errors.errors.append(_('Cannot create the token.'))
+            confirmotpform.non_field_errors.errors.append(_('Cannot create the token.'))
         else:
+            flash(_('The token has been created.'), "success")
             return redirect(url_for('.user_settings_otp', username=username))
 
-    otp_uri = session.get('otp_uri')
-    session['otp_uri'] = None
+    if confirmotpform.is_submitted():
+        # This form is inside the modal. Keep a value in otp_uri or the modal will not open
+        # to show the errors.
+        secret = confirmotpform.secret.data
 
+    # Compute the token URI
+    if secret:
+        description = addotpform.description.data or confirmotpform.description.data
+        token = TOTP(secret)
+        otp_uri = token.provisioning_uri(name=description, issuer_name=user.krbname)
+    else:
+        otp_uri = None
+
+    # List existing tokens
     tokens = [
         OTPToken(t) for t in ipa.otptoken_find(o_ipatokenowner=username)["result"]
     ]
@@ -217,6 +252,7 @@ def user_settings_otp(ipa, username):
     return render_template(
         'user-settings-otp.html',
         addotpform=addotpform,
+        confirmotpform=confirmotpform,
         user=user,
         activetab="otp",
         tokens=tokens,

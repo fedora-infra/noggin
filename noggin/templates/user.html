@@ -61,10 +61,12 @@
                 </li>
               {% endif %}
               {% if user.gpgkeys %}
-                <li class="list-group-item d-flex justify-content-between">
+                <li class="list-group-item">
                   <strong title='{{_("GPG Keys")}}'><i class="fa fa-fw fa-key"></i> {{_("GPG Keys")}}</strong>
-                  <div class="text-right">
-                    {% for pgpkey in user.gpgkeys %}<pre class="mb-1 bg-light border px-2 rounded"><i class="fa fa-fw fa-key text-muted"></i> {{ pgpkey }}</pre>{% endfor %}
+                  <div class="mt-1">
+                    {% for keyid in user.gpgkeys %}
+                      <pre class="mb-1 bg-light border px-2 py-1 rounded">{{ keyid }}</pre>
+                    {% endfor %}
                   </div>
                 </li>
               {% endif %}

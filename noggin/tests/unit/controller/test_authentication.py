@@ -1,4 +1,5 @@
 from unittest import mock
+from urllib.parse import quote
 
 import pytest
 import python_freeipa
@@ -235,6 +236,51 @@ def test_login_expired_password(client, dummy_user_expired_password):
     # We are not logged in
     assert "noggin_session" not in session
     assert "noggin_username" not in session
+
+
+@pytest.mark.vcr()
+def test_login_form_redirect(client):
+    """Test that the login form has redirect information"""
+    redirect_url = "/groups/?page_size=30&page_number=2"
+    url = f"/?next={quote(redirect_url)}"
+    result = client.get(url)
+    page = BeautifulSoup(result.data, 'html.parser')
+    forms = page.select("form")
+    for form in forms:
+        if form["action"] == url:
+            break
+    else:
+        assert False, "No form found with the expected action"
+
+
+@pytest.mark.vcr()
+def test_login_with_redirect(client, dummy_user):
+    """Test a successful login with a redirect"""
+    redirect_url = "/groups/?page_size=30&page_number=2"
+    result = client.post(
+        f"/?next={quote(redirect_url)}",
+        data={
+            "login-username": "dummy",
+            "login-password": "dummy_password",
+            "login-submit": "1",
+        },
+    )
+    assert_redirects_with_flash(result, redirect_url, "Welcome, dummy!", "success")
+
+
+@pytest.mark.vcr()
+def test_login_with_bad_redirect(client, dummy_user):
+    """Test a successful login with a bad redirect"""
+    redirect_url = "http://example.com"
+    result = client.post(
+        f"/?next={quote(redirect_url)}",
+        data={
+            "login-username": "dummy",
+            "login-password": "dummy_password",
+            "login-submit": "1",
+        },
+    )
+    assert_redirects_with_flash(result, "/user/dummy/", "Welcome, dummy!", "success")
 
 
 @pytest.mark.vcr()

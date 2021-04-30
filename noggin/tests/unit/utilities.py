@@ -1,4 +1,3 @@
-import hashlib
 from contextlib import contextmanager
 from urllib import parse
 
@@ -29,6 +28,7 @@ def assert_form_field_error(response, field_name, expected_message):
     assert response.status_code == 200
     page = BeautifulSoup(response.data, 'html.parser')
     field = page.select_one(f"input[name='{field_name}']")
+    assert field is not None, "Can't find the field"
     assert 'is-invalid' in field['class']
     invalidfeedback = field.find_next('div', class_='invalid-feedback')
     message = invalidfeedback.get_text(strip=True)
@@ -60,7 +60,7 @@ def get_otp(secret):
     """
     Return an TOTP OTP from the given secret
     """
-    totp = pyotp.TOTP(secret, 6, hashlib.sha512)
+    totp = pyotp.TOTP(secret, 6)
     return totp.now()
 
 
