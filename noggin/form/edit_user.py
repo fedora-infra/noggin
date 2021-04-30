@@ -112,6 +112,12 @@ class UserSettingsAddOTPForm(ModestForm):
         description=_("please reauthenticate so we know it is you"),
     )
 
+    otp = PasswordField(
+        _('One-Time Password'),
+        validators=[Optional()],
+        description=_("Enter your One-Time Password"),
+    )
+
     submit = SubmitButtonField(_("Generate OTP Token"))
 
 

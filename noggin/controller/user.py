@@ -198,9 +198,15 @@ def user_settings_otp(ipa, username):
     confirmotpform = UserSettingsConfirmOTPForm(prefix="confirm-")
     user = User(user_or_404(ipa, username))
     secret = None
+
     if addotpform.validate_on_submit():
+        description = addotpform.description.data
+        password = addotpform.password.data
+        if addotpform.otp.data:
+            password += addotpform.otp.data
+
         try:
-            maybe_ipa_login(current_app, session, username, addotpform.password.data)
+            maybe_ipa_login(current_app, session, username, password)
         except python_freeipa.exceptions.InvalidSessionPassword:
             addotpform.password.errors.append(_("Incorrect password"))
         else:
@@ -208,10 +214,7 @@ def user_settings_otp(ipa, username):
             # Prefill the form for the next step
             confirmotpform.process(
                 MultiDict(
-                    {
-                        "confirm-secret": secret,
-                        "confirm-description": addotpform.description.data,
-                    }
+                    {"confirm-secret": secret, "confirm-description": description}
                 )
             )
     if confirmotpform.validate_on_submit():

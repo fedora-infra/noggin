@@ -84,18 +84,12 @@ def test_password_changes_user(client, logged_in_dummy_user):
 
 
 @pytest.mark.vcr()
-def test_password_form_with_otp(client, logged_in_dummy_user, dummy_user_with_otp):
+def test_password_form_with_otp(client, logged_in_dummy_user_with_otp):
     """Verify that the password change form shows OTP form elements
        when a user has OTP enabled"""
     result = client.get("/user/dummy/settings/password")
 
     page = BeautifulSoup(result.data, "html.parser")
-
-    currentpasswordinput = page.select_one("#currentpasswordinput .form-text")
-    assert currentpasswordinput is not None
-    expected = "Just the password, don't add the OTP token if you have one"
-    assert expected in currentpasswordinput.get_text(strip=True)
-
     otpinput = page.select("#otpinput")
     assert len(otpinput) == 1
 
