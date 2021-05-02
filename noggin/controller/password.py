@@ -126,7 +126,7 @@ def user_settings_password(ipa, username):
 def forgot_password_ask():
     form = ForgottenPasswordForm()
     if form.validate_on_submit():
-        username = form.username.data
+        username = form.username.data.lower()
         lock = PasswordResetLock(username)
         valid_until = lock.valid_until()
         now = datetime.datetime.now()
