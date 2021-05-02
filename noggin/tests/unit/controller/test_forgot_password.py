@@ -94,10 +94,8 @@ def test_ask_post_non_existant_user(client):
 
 
 @pytest.mark.vcr()
-def test_ask_post_mix_case_user(client, dummy_user, patched_lock):
-    with mailer.record_messages() as outbox:
-        result = client.post('/forgot-password/ask', data={"username": "DuMmY"})
-    # Confirmation message
+def test_ask_post_mix_case_user(client, dummy_user_with_case, patched_lock):
+    result = client.post('/forgot-password/ask', data={"username": "DuMmY"})
     assert_redirects_with_flash(
         result,
         expected_url="/",
