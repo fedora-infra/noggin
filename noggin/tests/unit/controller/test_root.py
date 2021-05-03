@@ -4,6 +4,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import current_app
 
+from noggin import __version__
 from noggin.app import ipa_admin, talisman
 
 
@@ -147,3 +148,54 @@ def test_healthz_no_https(client_with_https):
     assert result.status_code == 200
     result = client_with_https.get('/healthz/ready')
     assert result.status_code == 200
+
+
+def test_version(client):
+    """Test the version in the footer"""
+    result = client.get('/')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    powered_by = page.select_one("footer div div small")
+    assert (
+        powered_by.prettify()
+        == """
+<small>
+ Powered by
+ <a href="https://github.com/fedora-infra/noggin">
+  noggin
+ </a>
+ v{}
+</small>
+""".strip().format(
+            __version__
+        )
+    )
+
+
+def test_version_openshift(mocker, client):
+    """Test the version in the footer in openshift"""
+    mocker.patch.dict(
+        "noggin.controller.os.environ",
+        {
+            "OPENSHIFT_BUILD_REFERENCE": "tests",
+            "OPENSHIFT_BUILD_COMMIT": "abcdef0123456789",
+        },
+    )
+    result = client.get('/')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    powered_by = page.select_one("footer div div small")
+    assert (
+        powered_by.prettify()
+        == """
+<small>
+ Powered by
+ <a href="https://github.com/fedora-infra/noggin">
+  noggin
+ </a>
+ v{} (tests:abcdef0)
+</small>
+""".strip().format(
+            __version__
+        )
+    )
