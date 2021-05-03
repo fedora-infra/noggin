@@ -32,8 +32,8 @@ Bug Fixes
 Documentation Improvements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Add rstcheck to check our rst files (:issue:`1c2205f`).
-* Update the release docs (:issue:`96b08ea`).
+* Add rstcheck to check our rst files (:commit:`1c2205f`).
+* Update the release docs (:commit:`96b08ea`).
 * Fix code-block format in contributing docs (:pr:`595`).
 
 Contributors
