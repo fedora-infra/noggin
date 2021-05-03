@@ -19,9 +19,8 @@ Authors:
 """
 
 import os
-import sys
-from subprocess import check_output
 from argparse import ArgumentParser
+from subprocess import check_output
 
 
 EXCLUDE = ["dependabot-preview[bot]", "Weblate (bot)"]
