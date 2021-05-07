@@ -36,12 +36,23 @@
         {% if flashes %}
         <div class="container flash-messages mt-4">
             {% for category, flash in flashes %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show">
-                {{ flash }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+                {% if category == 'success' %} 
+                {# Hide out success messages in 10 seconds #}
+                <div class="alert alert-{{ category }} alert-dismissible fade show fadeout-success">
+                    {{ flash }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% else %}
+                {# Other messages require a click to close #}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ flash }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endif %}
             {% endfor %}
         </div>
         {% endif %}
