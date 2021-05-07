@@ -94,6 +94,20 @@ def test_ask_post_non_existant_user(client):
 
 
 @pytest.mark.vcr()
+def test_ask_post_mix_case_user(client, dummy_user_with_case, patched_lock):
+    result = client.post('/forgot-password/ask', data={"username": "DuMmY"})
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message=(
+            "An email has been sent to your address with instructions on how to reset "
+            "your password"
+        ),
+        expected_category="success",
+    )
+
+
+@pytest.mark.vcr()
 def test_ask_no_smtp(client, dummy_user, patched_lock, mocker):
     mailer = mocker.patch("noggin.controller.password.mailer")
     mailer.send.side_effect = ConnectionRefusedError

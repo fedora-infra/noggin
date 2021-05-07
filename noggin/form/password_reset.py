@@ -2,7 +2,7 @@ from flask_babel import lazy_gettext as _
 from wtforms import PasswordField, StringField
 from wtforms.validators import DataRequired, EqualTo, Optional
 
-from .base import BaseForm
+from .base import BaseForm, lower
 from .validators import PasswordLength
 
 
@@ -36,4 +36,5 @@ class ForgottenPasswordForm(BaseForm):
         _('Username'),
         validators=[DataRequired(message=_('User name must not be empty'))],
         description=_("Enter your username to reset your password"),
+        filters=[lower],
     )
