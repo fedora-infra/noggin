@@ -37,10 +37,10 @@ class RegisterUserForm(ModestForm):
     )
 
     underage = BooleanField(
-        _('I am over 16 years old'),
+        _('I am over 13 years old'),
         validators=[
             DataRequired(
-                message=_("You must be over 16 years old to create an account")
+                message=_("You must be over 13 years old to create an account")
             )
         ],
     )

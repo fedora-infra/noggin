@@ -563,7 +563,7 @@ def test_underage(client, post_data_step_1):
     assert_form_field_error(
         result,
         field_name="register-underage",
-        expected_message="You must be over 16 years old to create an account",
+        expected_message="You must be over 13 years old to create an account",
     )
 
 
