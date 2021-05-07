@@ -27,7 +27,10 @@ class PasswordResetLock:
         open(file_path, "w").close()
 
     def delete(self):
-        os.remove(self._get_file_path())
+        try:
+            os.remove(self._get_file_path())
+        except FileNotFoundError:
+            pass  # It's already been removed
 
     def _get_file_path(self):
         base_dir = current_app.config["PASSWORD_RESET_LOCK_DIR"]
