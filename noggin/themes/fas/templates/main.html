@@ -68,49 +68,56 @@
 {% block footer %}
 <div class="footer py-5 text-white">
     <div class="container">
-            <div class="row footerlinks justify-content-center">
-               <div class="col-sm-3 col-4 mt-3">
-                  <div>
-                     <dl>
+        <div class="row footerlinks justify-content-center">
+            <div class="col-sm-3 col-4 mt-3">
+                <div>
+                    <dl>
                         <dt class="text-uppercase h4"><strong>About</strong></dt>
                         <dd><a href="https://getfedora.org/">Get Fedora Linux</a></dd>
                         <dd><a href="https://getfedora.org/en/sponsors/">Sponsors</a></dd>
                         <dd><a href="https://fedoramagazine.org">Fedora Magazine</a></dd>
                         <dd><a href="https://fedoraproject.org/wiki/Legal:Main#Legal">Legal</a></dd>
-                     </dl>
-                  </div>
-               </div>
-               <div class="col-sm-3 col-4 mt-3">
-                  <div>
-                     <dl>
+                    </dl>
+                </div>
+           </div>
+           <div class="col-sm-3 col-4 mt-3">
+                <div>
+                    <dl>
                         <dt class="text-uppercase h4"><strong>Support</strong></dt>
                         <dd><a href="https://fedoraproject.org/wiki/Communicating_and_getting_help">Get Help</a></dd>
                         <dd><a href="https://ask.fedoraproject.org/">Ask Fedora</a></dd>
                         <dd><a href="https://fedoraproject.org/wiki/Common_F33_bugs">Common Bugs</a></dd>
                         <dd><a href="https://developer.fedoraproject.org/">Fedora Developer Portal</a></dd>
-                     </dl>
-                  </div>
-               </div>
-               <div class="col-sm-3 col-4 mt-3">
-                  <div>
-                     <dl>
+                    </dl>
+                </div>
+           </div>
+           <div class="col-sm-3 col-4 mt-3">
+                <div>
+                    <dl>
                         <dt class="text-uppercase h4"><strong>Community</strong></dt>
                         <dd><a href="https://fedoraproject.org/wiki/Join">Join Fedora</a></dd>
                         <dd><a href="https://fedoraproject.org/wiki/Overview">About Fedora</a></dd>
                         <dd><a href="http://fedoraplanet.org">Planet Fedora</a></dd>
                         <dd><a href="https://accounts.fedoraproject.org/">Fedora Accounts</a></dd>
-                     </dl>
-                  </div>
-               </div>
+                    </dl>
+                </div>
+           </div>
+        </div>
+        <div class="row footerlinks">
+            <div class="col-12 text-center">
+                <p> Fedora is sponsored by Red Hat. <a href="https://www.redhat.com/en/technologies/linux-platforms/articles/relationship-between-fedora-and-rhel">Learn more about the relationship between Red Hat and Fedora »</a> </p>
+                <div class="py-3"> <a href="https://www.redhat.com/"><img class="rh-logo" height=24px src="{{ url_for('theme.static', filename='images/redhat.png') }}" alt="Red Hat Logo"></a> </div>
+                <p> © 2021 Red Hat, Inc. and others. </p>
             </div>
-            <div class="row footerlinks">
-               <div class="col-12 text-center">
-                  <p> Fedora is sponsored by Red Hat. <a href="https://www.redhat.com/en/technologies/linux-platforms/articles/relationship-between-fedora-and-rhel">Learn more about the relationship between Red Hat and Fedora »</a> </p>
-                  <div class="py-3"> <a href="https://www.redhat.com/"><img class="rh-logo" height=24px src="{{ url_for('theme.static', filename='images/redhat.png') }}" alt="Red Hat Logo"></a> </div>
-                  <p> © 2021 Red Hat, Inc. and others. </p>
-               </div>
+            <div class="col-12 text-center">
+                {% set noggin_link %}
+                    <a href="https://github.com/fedora-infra/noggin">noggin</a>
+                {% endset %}
+                <p>{{_("Powered by %(noggin_link)s", noggin_link=noggin_link)}} v{{ noggin_version }}</p>
+                <p class="text-muted">{{ ipa.ipa_version|default('') }}</p>
             </div>
-         </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
