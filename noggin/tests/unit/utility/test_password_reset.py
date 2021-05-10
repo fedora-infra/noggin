@@ -32,3 +32,12 @@ def test_lock_delete(tmp_lock_dir):
     lock.store()
     lock.delete()
     assert lock.valid_until() is None
+
+
+def test_lock_delete_alread_deleted(tmp_lock_dir):
+    lock = PasswordResetLock("dummy")
+    try:
+        lock.delete()
+    except FileNotFoundError:
+        assert False, "delete() crashes on absent files"
+    assert lock.valid_until() is None
