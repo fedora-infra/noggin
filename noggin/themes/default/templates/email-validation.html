@@ -6,6 +6,13 @@
     {{ url_for('.activate_account', _external=True) }}?token={{ token }}
   </a>
 </p>
+<p>
+  {{_("This link will be valid for %(ttl)s minutes (until %(valid_until)s UTC).", ttl=ttl, valid_until=valid_until.strftime("%H:%M"))}}
+  {{_("If the link has expired, you can request a new one here: ")}}
+  <a href="{{ url_for('.confirm_registration', _external=True) }}?username={{ user.username }}">
+    {{ url_for('.confirm_registration', _external=True) }}?username={{ user.username }}
+  </a>
+</p>
 <p>{{_("If you did not create an account for username %(username)s, you can ignore this email.", username=user.username)}}</p>
 
 <p><em>{{_("The Noggin team")}}</em></p>
