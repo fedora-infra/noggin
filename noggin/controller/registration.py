@@ -44,12 +44,19 @@ IPA_TO_FORM_FIELDS = {
 
 
 def _send_validation_email(user):
+    ttl = current_app.config["ACTIVATION_TOKEN_EXPIRATION"]
     token = make_token(
         {"sub": user.username, "mail": user.mail},
         audience=Audience.email_validation,
-        ttl=current_app.config["ACTIVATION_TOKEN_EXPIRATION"],
+        ttl=ttl,
     )
-    email_context = {"token": token, "user": user}
+    valid_until = datetime.datetime.utcnow() + datetime.timedelta(minutes=ttl)
+    email_context = {
+        "token": token,
+        "user": user,
+        "ttl": ttl,
+        "valid_until": valid_until,
+    }
     email = Message(
         body=render_template("email-validation.txt", **email_context),
         html=render_template("email-validation.html", **email_context),
