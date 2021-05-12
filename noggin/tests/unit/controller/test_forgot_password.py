@@ -6,7 +6,6 @@ import python_freeipa
 from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 from flask import current_app
-from noggin_messages import UserUpdateV1
 
 from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
@@ -20,6 +19,7 @@ from noggin.tests.unit.utilities import (
 )
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import Audience, make_token, read_token
+from noggin_messages import UserUpdateV1
 
 
 @pytest.fixture
