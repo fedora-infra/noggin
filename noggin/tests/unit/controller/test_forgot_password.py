@@ -6,6 +6,7 @@ import python_freeipa
 from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 from flask import current_app
+from noggin_messages import UserUpdateV1
 
 from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
@@ -19,7 +20,6 @@ from noggin.tests.unit.utilities import (
 )
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import Audience, make_token, read_token
-from noggin_messages import UserUpdateV1
 
 
 @pytest.fixture
@@ -94,8 +94,9 @@ def test_ask_post_non_existant_user(client):
 
 
 @pytest.mark.vcr()
-def test_ask_post_mix_case_user(client, dummy_user_with_case, patched_lock):
-    result = client.post('/forgot-password/ask', data={"username": "DuMmY"})
+def test_ask_post_mix_case_user(client, dummy_user_with_case, patched_lock, mocker):
+    lock_init = mocker.patch.object(PasswordResetLock, "__init__", return_value=None)
+    result = client.post("/forgot-password/ask", data={"username": "DuMmY"})
     assert_redirects_with_flash(
         result,
         expected_url="/",
@@ -105,6 +106,8 @@ def test_ask_post_mix_case_user(client, dummy_user_with_case, patched_lock):
         ),
         expected_category="success",
     )
+    lock_init.assert_called_once_with("dummy")
+    patched_lock["store"].assert_called_once()
 
 
 @pytest.mark.vcr()
