@@ -158,6 +158,36 @@ def group_remove_member(ipa, groupname):
     return redirect(url_for('.group', groupname=groupname))
 
 
+@bp.route('/group/<groupname>/sponsors/remove', methods=['POST'])
+@with_ipa()
+def group_remove_sponsor(ipa, groupname):
+    group = Group(group_or_404(ipa, groupname))
+    # Don't allow removing the last sponsor
+    if len(group.sponsors) < 2:
+        flash("Removing the last sponsor is not allowed.", "danger")
+        return redirect(url_for('.group', groupname=groupname))
+    # Only removing onelself from sponsors is allowed
+    username = g.current_user.username
+    try:
+        result = ipa.group_remove_member_manager(groupname, o_user=username)
+        raise_on_failed(result)
+    except python_freeipa.exceptions.ValidationError as e:
+        # e.message is a dict that we have to process ourselves for now:
+        # https://github.com/opennode/python-freeipa/issues/24
+        for error in e.message['membermanager']['user']:
+            flash(f"Unable to remove user {error[0]}: {error[1]}", "danger")
+        return redirect(url_for('.group', groupname=groupname))
+    flash(
+        _(
+            'You got it! %(username)s is no longer a sponsor of %(groupname)s.',
+            username=username,
+            groupname=groupname,
+        ),
+        'success',
+    )
+    return redirect(url_for('.group', groupname=groupname))
+
+
 @bp.route('/groups/')
 @with_ipa()
 def groups(ipa):
