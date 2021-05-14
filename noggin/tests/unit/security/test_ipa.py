@@ -223,19 +223,11 @@ def test_ipa_client_fasagreement_add_user(
 
 @pytest.mark.vcr
 def test_ipa_client_fasagreement_add_group(
-    client, logged_in_dummy_user, dummy_group, dummy_agreement
+    client, logged_in_dummy_user, dummy_group_with_agreement
 ):
     """Check the IPAClient fasagreement_add_group"""
     with client.session_transaction() as sess:
         ipa = maybe_ipa_session(current_app, sess)
-
-        # add a user to the agreement
-        ipa_admin.fasagreement_add_group("dummy agreement", group="dummy-group")
-
-        # check it worked
         result = ipa.fasagreement_find(all=True, cn="dummy agreement")
         assert len(result) == 1
         assert result[0]["member_group"] == ["dummy-group"]
-
-        # cleanup
-        ipa_admin.fasagreement_remove_group("dummy agreement", group="dummy-group")

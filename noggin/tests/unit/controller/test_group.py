@@ -168,6 +168,23 @@ def test_group_add_unknown_member(client, dummy_user_as_group_manager):
 
 
 @pytest.mark.vcr()
+def test_group_add_member_forbidden(
+    client, dummy_user_as_group_manager, dummy_group_with_agreement, make_user
+):
+    """Test failure when adding a member to a group"""
+    make_user("testuser")
+    result = client.post(
+        '/group/dummy-group/members/', data={"new_member_username": "testuser"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/group/dummy-group/",
+        expected_message="Unable to add user testuser: missing user agreement: dummy agreement",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
 def test_group_add_member_invalid(client, dummy_user_as_group_manager, make_user):
     """Test failure when adding a member to a group"""
     make_user("testuser")
@@ -289,6 +306,20 @@ def test_group_remove_member_invalid(client, dummy_user_as_group_manager):
         result,
         expected_url="/group/dummy-group/",
         expected_message="Unable to remove user testuser: something went wrong",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_group_remove_member_unknown(client, dummy_user_as_group_manager):
+    """Test failure when removing a member from a group"""
+    result = client.post(
+        '/group/dummy-group/members/remove', data={"username": "nobody"}
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/group/dummy-group/",
+        expected_message="Unable to remove user nobody: This entry is not a member",
         expected_category="danger",
     )
 
