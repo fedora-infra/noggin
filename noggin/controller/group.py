@@ -2,8 +2,7 @@ import python_freeipa
 from flask import flash, g, redirect, render_template, url_for
 from flask_babel import _
 
-from noggin.form.add_group_member import AddGroupMemberForm
-from noggin.form.remove_group_member import RemoveGroupMemberForm
+from noggin.form.group import AddGroupMemberForm, RemoveGroupMemberForm
 from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.security.ipa import raise_on_failed
