@@ -30,7 +30,7 @@ def test_groups_list(client, logged_in_dummy_user, dummy_group):
     group_mc = group_block.find("div", attrs={"data-role": "members-count"})
     assert group_mc.get_text(strip=True) == "0 members"
     group_desc = group_block.find("div", attrs={"data-role": "description"})
-    assert group_desc.get_text(strip=True) == "A dummy group"
+    assert group_desc.get_text(strip=True) == "The dummy-group group"
 
 
 @pytest.mark.vcr()
@@ -71,7 +71,9 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     assert page.title.string == 'dummy-group Group - noggin'
     title = page.select_one("div[data-section='identity'] > .col > h3")
     assert title.get_text(strip=True) == "dummy-group"
-    assert title.find_next_sibling("div").get_text(strip=True) == "A dummy group"
+    assert (
+        title.find_next_sibling("div").get_text(strip=True) == "The dummy-group group"
+    )
     # Check the sponsors list
     sponsors = page.select(
         "div[data-section='sponsors'] .list-unstyled.row .col-lg-3.col-md-4.col-sm-6"
@@ -91,14 +93,15 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     assert len(page.select("form[action='/group/dummy-group/members/']")) == 1
     assert (
         page.select_one("#group-mailinglist a").get_text(strip=True)
-        == "dummy@mailinglist.org"
+        == "dummy-group@lists.example.com"
     )
     assert (
         page.select_one("#group-ircchannel a").get_text(strip=True)
         == "irc:///freenode.net/#dummy-group"
     )
     assert (
-        page.select_one("#group-urls a").get_text(strip=True) == "http://dummygroup.org"
+        page.select_one("#group-urls a").get_text(strip=True)
+        == "http://dummy-group.example.com"
     )
 
 
