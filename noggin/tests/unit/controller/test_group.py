@@ -400,3 +400,54 @@ def test_group_many_members(client, logged_in_dummy_user, dummy_group, make_user
         p.select(".page-link:last-child")[0].get_text(strip=True) for p in page_items
     ]
     assert pages_bar_list == ['1(current)', '2', 'Next']
+
+
+@pytest.mark.vcr()
+def test_group_remove_sponsor(client, dummy_user_as_group_manager, make_user):
+    """Test removing a sponsor from a group"""
+    make_user("testuser")
+    ipa_admin.group_add_member_manager(a_cn="dummy-group", o_user="testuser")
+    result = client.post('/group/dummy-group/sponsors/remove')
+    expected_message = "You got it! dummy is no longer a sponsor of dummy-group."
+    assert_redirects_with_flash(
+        result,
+        expected_url="/group/dummy-group/",
+        expected_message=expected_message,
+        expected_category="success",
+    )
+
+
+@pytest.mark.vcr()
+def test_group_remove_sponsor_last(client, dummy_user_as_group_manager):
+    """Test removing the last sponsor from a group"""
+    result = client.post('/group/dummy-group/sponsors/remove')
+    expected_message = "Removing the last sponsor is not allowed."
+    assert_redirects_with_flash(
+        result,
+        expected_url="/group/dummy-group/",
+        expected_message=expected_message,
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_group_remove_sponsor_unknown(
+    client, logged_in_dummy_user, dummy_group, make_user
+):
+    """Test removing an unknown sponsor from a group"""
+    make_user("testuser-1")
+    ipa_admin.group_add_member_manager(a_cn="dummy-group", o_user="testuser-1")
+    make_user("testuser-2")
+    ipa_admin.group_add_member_manager(a_cn="dummy-group", o_user="testuser-2")
+    result = client.post('/group/dummy-group/sponsors/remove')
+    expected_message = (
+        "Unable to remove user dummy: Insufficient access: Insufficient "
+        "'write' privilege to the 'memberManager' attribute of entry "
+        "'cn=dummy-group,cn=groups,cn=accounts,dc=noggin,dc=test'."
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/group/dummy-group/",
+        expected_message=expected_message,
+        expected_category="danger",
+    )

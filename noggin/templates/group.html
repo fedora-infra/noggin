@@ -57,24 +57,33 @@
           </li>
         </ul>
         {% else %}
-        <ul class="list-unstyled row">
-          {% for sponsor in sponsors|sort(attribute='username') %}
-            <li class="col-lg-3 col-md-4 col-sm-6">
-              <div class="card card-body mb-4">
-              <div class="media align-items-center">
-                <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 50) }}" alt="gravatar">
-                <div class="media-body ml-2">
-                    <div class="my-0 font-weight-bold">
-                      <a href="{{ url_for('.user', username=sponsor.username) }}">
-                        <span class="title">{{ sponsor.username }}</span>
-                      </a>
-                    </div>
-                    <div>{{ sponsor.name }}</div>
+        <form action="{{ url_for('.group_remove_sponsor', groupname=group.name) }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <ul class="list-unstyled row">
+            {% for sponsor in sponsors|sort(attribute='username') %}
+              <li class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card card-body mb-4 px-2 py-3">
+                <div class="media align-items-center">
+                  <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 50) }}" alt="gravatar">
+                  <div class="media-body ml-2">
+                      <div class="my-0 font-weight-bold">
+                        <a href="{{ url_for('.user', username=sponsor.username) }}">
+                          <span class="title">{{ sponsor.username }}</span>
+                        </a>
+                      </div>
+                      <div>{{ sponsor.name }}</div>
+                  </div>
+                  {% if current_user.username == sponsor.username and sponsors|length > 1 %}
+                  <button type="submit" class="btn btn-outline-danger border-0">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                  {% endif %}
                 </div>
-              </div>
-              </div>
-            </li>
-          {% endfor %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </form>
         {% endif %}
       </div>
       <div class="col-12" data-section="members">
