@@ -70,6 +70,10 @@ def strip(value):
     return value.strip() if value else value
 
 
+def lower(value):
+    return value.lower() if value else value
+
+
 class CSVListField(Field):
     widget = TextInput()
 
