@@ -18,7 +18,7 @@ from . import blueprint as bp
 
 
 def handle_login_form(form):
-    username = form.username.data.lower()
+    username = form.username.data
     password = form.password.data
 
     if form.otp.data:

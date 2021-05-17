@@ -3,7 +3,7 @@ from wtforms import BooleanField, PasswordField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo
 
-from noggin.form.validators import Email, PasswordLength
+from noggin.form.validators import Email, no_mixed_case, PasswordLength
 
 from .base import BaseForm, ModestForm, strip, SubmitButtonField
 
@@ -23,7 +23,10 @@ class RegisterUserForm(ModestForm):
 
     username = StringField(
         _('Username'),
-        validators=[DataRequired(message=_('User name must not be empty'))],
+        validators=[
+            DataRequired(message=_('User name must not be empty')),
+            no_mixed_case,
+        ],
         filters=[strip],
     )
 
