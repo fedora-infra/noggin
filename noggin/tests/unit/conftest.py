@@ -261,3 +261,10 @@ def dummy_agreement():
     )
     yield Agreement(agreement)
     ipa_admin.fasagreement_del("dummy agreement")
+
+
+@pytest.fixture
+def dummy_group_with_agreement(dummy_group, dummy_agreement):
+    ipa_admin.fasagreement_add_group("dummy agreement", group="dummy-group")
+    yield
+    ipa_admin.fasagreement_remove_group("dummy agreement", group="dummy-group")

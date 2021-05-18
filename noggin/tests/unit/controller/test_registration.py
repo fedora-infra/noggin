@@ -147,6 +147,22 @@ def test_step_1_registration_closed(
 
 
 @pytest.mark.vcr()
+def test_step_1_mixed_case(client, post_data_step_1, mocker):
+    """Try to register a user with mixed case username"""
+    post_data_step_1["register-username"] = "DummY"
+    record_signal = mocker.Mock()
+    with mailer.record_messages() as outbox, stageuser_created.connected_to(
+        record_signal
+    ):
+        result = client.post('/', data=post_data_step_1)
+    assert_form_field_error(
+        result, "register-username", "Mixed case is not allowed, try lower case."
+    )
+    record_signal.assert_not_called()
+    assert len(outbox) == 0
+
+
+@pytest.mark.vcr()
 def test_step_1_spamcheck(
     client, post_data_step_1, cleanup_dummy_user, spamcheck_on, mocker
 ):

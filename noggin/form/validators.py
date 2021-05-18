@@ -30,3 +30,8 @@ class PasswordLength:
             message=self.message,
         )
         validator(form, field)
+
+
+def no_mixed_case(form, field):
+    if field.data != field.data.lower():
+        raise ValidationError(_("Mixed case is not allowed, try lower case."))

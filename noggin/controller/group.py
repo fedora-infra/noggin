@@ -2,10 +2,10 @@ import python_freeipa
 from flask import flash, g, redirect, render_template, url_for
 from flask_babel import _
 
-from noggin.form.add_group_member import AddGroupMemberForm
-from noggin.form.remove_group_member import RemoveGroupMemberForm
+from noggin.form.group import AddGroupMemberForm, RemoveGroupMemberForm
 from noggin.representation.group import Group
 from noggin.representation.user import User
+from noggin.security.ipa import raise_on_failed
 from noggin.utility import messaging
 from noggin.utility.controllers import group_or_404, with_ipa
 from noggin.utility.pagination import paginated_find
@@ -67,7 +67,8 @@ def group_add_member(ipa, groupname):
             )
             return redirect(url_for('.group', groupname=groupname))
         try:
-            ipa.group_add_member(a_cn=groupname, o_user=username)
+            result = ipa.group_add_member(a_cn=groupname, o_user=username)
+            raise_on_failed(result)
         except python_freeipa.exceptions.ValidationError as e:
             # e.message is a dict that we have to process ourselves for now:
             # https://github.com/opennode/python-freeipa/issues/24
@@ -126,12 +127,13 @@ def group_remove_member(ipa, groupname):
     if form.validate_on_submit():
         username = form.username.data
         try:
-            ipa.group_remove_member(a_cn=groupname, o_user=username)
+            result = ipa.group_remove_member(groupname, o_user=username)
+            raise_on_failed(result)
         except python_freeipa.exceptions.ValidationError as e:
             # e.message is a dict that we have to process ourselves for now:
             # https://github.com/opennode/python-freeipa/issues/24
             for error in e.message['member']['user']:
-                flash('Unable to remove user %s: %s' % (error[0], error[1]), 'danger')
+                flash(f"Unable to remove user {error[0]}: {error[1]}", "danger")
             return redirect(url_for('.group', groupname=groupname))
         flash_text = _(
             'You got it! %(username)s has been removed from %(groupname)s.',
@@ -153,6 +155,36 @@ def group_remove_member(ipa, groupname):
     for field_errors in form.errors.values():
         for error in field_errors:
             flash(error, 'danger')
+    return redirect(url_for('.group', groupname=groupname))
+
+
+@bp.route('/group/<groupname>/sponsors/remove', methods=['POST'])
+@with_ipa()
+def group_remove_sponsor(ipa, groupname):
+    group = Group(group_or_404(ipa, groupname))
+    # Don't allow removing the last sponsor
+    if len(group.sponsors) < 2:
+        flash("Removing the last sponsor is not allowed.", "danger")
+        return redirect(url_for('.group', groupname=groupname))
+    # Only removing onelself from sponsors is allowed
+    username = g.current_user.username
+    try:
+        result = ipa.group_remove_member_manager(groupname, o_user=username)
+        raise_on_failed(result)
+    except python_freeipa.exceptions.ValidationError as e:
+        # e.message is a dict that we have to process ourselves for now:
+        # https://github.com/opennode/python-freeipa/issues/24
+        for error in e.message['membermanager']['user']:
+            flash(f"Unable to remove user {error[0]}: {error[1]}", "danger")
+        return redirect(url_for('.group', groupname=groupname))
+    flash(
+        _(
+            'You got it! %(username)s is no longer a sponsor of %(groupname)s.',
+            username=username,
+            groupname=groupname,
+        ),
+        'success',
+    )
     return redirect(url_for('.group', groupname=groupname))
 
 

@@ -23,7 +23,7 @@ from argparse import ArgumentParser
 from subprocess import check_output
 
 
-EXCLUDE = ["dependabot-preview[bot]", "Weblate (bot)"]
+EXCLUDE = ["dependabot[bot]", "dependabot-preview[bot]", "Weblate (bot)"]
 
 last_tag = check_output(
     "git tag | sort -n | tail -n 1", shell=True, universal_newlines=True

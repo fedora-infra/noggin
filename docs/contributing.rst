@@ -202,10 +202,14 @@ When cutting a new release, follow these steps:
 #. Commit the changes
 #. Push the commit to the upstream Github repository (via a PR or not).
 #. Change to the stable branch and cherry-pick the commit (or merge if appropriate)
+#. Run the checks one last time to be sure: ``tox``,
 #. Tag the commit with ``-s`` to generate a signed tag
 #. Push the commit to the upstream Github repository with ``git push``,
    and the new tag with ``git push --tags``
 #. Generate a tarball and push to PyPI with the command ``poetry publish --build``
+#. Create `the release on GitHub <https://github.com/fedora-infra/noggin/tags>`_ and copy the
+   release notes in there,
+#. Deploy and announce.
 
 
 Translations

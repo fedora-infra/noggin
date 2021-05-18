@@ -4,6 +4,34 @@ Release notes
 
 .. towncrier release notes start
 
+v1.2.0
+======
+Released on 2021-05-18.
+
+
+Features
+^^^^^^^^
+
+* Display the version in the page footer (:issue:`592`).
+* Allow sponsors to resign from their position in the group (:issue:`599`).
+
+Bug Fixes
+^^^^^^^^^
+
+* Lowercase the username in Forgot Password Ask controller (:issue:`573`).
+* Skipped autocomplete in OTP fields (:issue:`593`).
+
+Contributors
+^^^^^^^^^^^^
+
+Many thanks to the contributors of bug reports, pull requests, and pull request
+reviews for this release:
+
+* Aurélien Bompard
+* Josseline Perdomo
+* Yaron Shahrabani
+
+
 v1.1.0
 ======
 
@@ -32,8 +60,8 @@ Bug Fixes
 Documentation Improvements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Add rstcheck to check our rst files (:issue:`1c2205f`).
-* Update the release docs (:issue:`96b08ea`).
+* Add rstcheck to check our rst files (:commit:`1c2205f`).
+* Update the release docs (:commit:`96b08ea`).
 * Fix code-block format in contributing docs (:pr:`595`).
 
 Contributors

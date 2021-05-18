@@ -3,7 +3,7 @@ import random
 import python_freeipa
 from cryptography.fernet import Fernet
 from python_freeipa.client_meta import ClientMeta as IPAClient
-from python_freeipa.exceptions import BadRequest
+from python_freeipa.exceptions import BadRequest, ValidationError
 from requests import RequestException
 
 
@@ -110,6 +110,17 @@ class Client(IPAClient):
         Disable an agreement
         """
         self._request('fasagreement_disable', agreement, kwargs)
+
+
+def raise_on_failed(result):
+    failed = result.get("failed", {})
+    num_failed = sum(
+        sum(len(failures) for failures in object_types.values())
+        for object_types in failed.values()
+    )
+    if num_failed == 0:
+        return  # no actual failure
+    raise ValidationError(failed)
 
 
 # Construct an IPA client from app config, but don't attempt to log in with it
