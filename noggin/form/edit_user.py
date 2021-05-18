@@ -37,14 +37,6 @@ class UserSettingsProfileForm(BaseForm):
         validators=[DataRequired(message=_('Last name must not be empty'))],
     )
 
-    mail = EmailField(
-        _('E-mail Address'),
-        validators=[
-            DataRequired(message=_('Email must not be empty')),
-            Email(message=_('Email must be valid')),
-        ],
-    )
-
     locale = SelectField(
         _('Locale'),
         choices=[(locale, locale) for locale in LOCALES],
@@ -73,8 +65,6 @@ class UserSettingsProfileForm(BaseForm):
         _('GitLab Username'), validators=[Optional()], filters=[strip_at]
     )
 
-    rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
-
     website_url = URLField(
         _('Website or Blog URL'),
         validators=[Optional(), URL(message=_('Valid URL required'))],
@@ -89,6 +79,18 @@ class UserSettingsProfileForm(BaseForm):
     )
 
     pronouns = StringField(_('Pronouns'), validators=[Optional()],)
+
+
+class UserSettingsEmailForm(BaseForm):
+    mail = EmailField(
+        _('E-mail Address'),
+        validators=[
+            DataRequired(message=_('Email must not be empty')),
+            Email(message=_('Email must be valid')),
+        ],
+    )
+
+    rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
 
 
 class UserSettingsKeysForm(BaseForm):
