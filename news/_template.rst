@@ -8,6 +8,7 @@
    {%- endif -%}
 {%- endmacro -%}
 
+Released on {{ versiondata.date }}.
 This is a {major|feature|bugfix} release that adds [short summary].
 
 {% for section, _ in sections.items() %}
