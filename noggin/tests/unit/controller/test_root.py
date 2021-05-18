@@ -18,7 +18,7 @@ def nonfas_group(ipa_testing_config, app):
 @pytest.fixture
 def nonfas_user(ipa_testing_config, app):
     ipa_admin.user_add(
-        a_uid="nonfas-user",
+        "nonfas-user",
         o_givenname="NonFAS",
         o_sn="User",
         o_cn="NonFAS User",
