@@ -14,6 +14,8 @@ Features
 
 * Display the version in the page footer (:issue:`592`).
 * Allow sponsors to resign from their position in the group (:issue:`599`).
+* Disallow login and register with mixed-case usernames (:issue:`594`).
+* Add information in the validation email (:issue:`629`).
 
 Bug Fixes
 ^^^^^^^^^
