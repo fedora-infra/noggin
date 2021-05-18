@@ -23,7 +23,7 @@ from noggin.form.validators import Email
 from noggin.l10n import LOCALES
 from noggin.utility.timezones import TIMEZONES
 
-from .base import BaseForm, CSVListField, ModestForm, strip, SubmitButtonField
+from .base import BaseForm, CSVListField, ModestForm, strip, strip_at, SubmitButtonField
 
 
 class UserSettingsProfileForm(BaseForm):
@@ -65,9 +65,13 @@ class UserSettingsProfileForm(BaseForm):
         ],
     )
 
-    github = StringField(_('GitHub Username'), validators=[Optional()])
+    github = StringField(
+        _('GitHub Username'), validators=[Optional()], filters=[strip_at]
+    )
 
-    gitlab = StringField(_('GitLab Username'), validators=[Optional()])
+    gitlab = StringField(
+        _('GitLab Username'), validators=[Optional()], filters=[strip_at]
+    )
 
     rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
 

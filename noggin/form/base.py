@@ -70,6 +70,10 @@ def strip(value):
     return value.strip() if value else value
 
 
+def strip_at(value):
+    return value.lstrip("@") if value else value
+
+
 def lower(value):
     return value.lower() if value else value
 

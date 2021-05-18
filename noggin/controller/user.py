@@ -129,28 +129,14 @@ def user_settings_profile(ipa, username):
     form = UserSettingsProfileForm(obj=user)
 
     if form.validate_on_submit():
-        result = _user_mod(
-            ipa,
-            form,
-            user,
-            {
-                'o_givenname': form.firstname.data,
-                'o_sn': form.lastname.data,
-                'o_cn': '%s %s' % (form.firstname.data, form.lastname.data),
-                'o_displayname': '%s %s' % (form.firstname.data, form.lastname.data),
-                'o_mail': form.mail.data,
-                'fasircnick': form.ircnick.data,
-                'faslocale': form.locale.data,
-                'fastimezone': form.timezone.data,
-                'fasgithubusername': form.github.data.lstrip('@'),
-                'fasgitlabusername': form.gitlab.data.lstrip('@'),
-                'fasrhbzemail': form.rhbz_mail.data,
-                'faswebsiteurl': form.website_url.data,
-                'fasisprivate': form.is_private.data,
-                'faspronoun': form.pronouns.data,
-            },
-            ".user_settings_profile",
-        )
+        changes = {
+            user.get_attr_option(field.short_name): getattr(form, field.short_name).data
+            for field in form
+            if field.short_name in user
+        }
+        fullname = f"{form.firstname.data} {form.lastname.data}"
+        changes["o_cn"] = changes["o_displayname"] = fullname
+        result = _user_mod(ipa, form, user, changes, ".user_settings_profile",)
         if result:
             return result
 
