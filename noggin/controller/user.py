@@ -1,6 +1,7 @@
 import os
 from base64 import b32encode
 
+import jwt
 import python_freeipa
 from flask import (
     current_app,
@@ -9,17 +10,22 @@ from flask import (
     Markup,
     redirect,
     render_template,
+    request,
     session,
     url_for,
 )
 from flask_babel import _
+from flask_mail import Message
 from pyotp import TOTP
 from werkzeug.datastructures import MultiDict
 
+from noggin.app import mailer
+from noggin.form.base import BaseForm
 from noggin.form.edit_user import (
     UserSettingsAddOTPForm,
     UserSettingsAgreementSign,
     UserSettingsConfirmOTPForm,
+    UserSettingsEmailForm,
     UserSettingsKeysForm,
     UserSettingsOTPStatusChange,
     UserSettingsProfileForm,
@@ -32,6 +38,7 @@ from noggin.security.ipa import maybe_ipa_login
 from noggin.utility import messaging
 from noggin.utility.controllers import require_self, user_or_404, with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
+from noggin.utility.token import Audience, make_token, read_token
 from noggin_messages import UserUpdateV1
 
 from . import blueprint as bp
@@ -142,6 +149,136 @@ def user_settings_profile(ipa, username):
 
     return render_template(
         'user-settings-profile.html', user=user, form=form, activetab="profile"
+    )
+
+
+def _send_validation_email(user, attr, value):
+    token = make_token(
+        {"sub": user.username, "attr": attr, "mail": value},
+        audience=Audience.email_validation,
+        ttl=current_app.config["ACTIVATION_TOKEN_EXPIRATION"],
+    )
+    email_context = {"token": token, "user": user, "address": value}
+    email = Message(
+        body=render_template("settings-email-validation.txt", **email_context),
+        html=render_template("settings-email-validation.html", **email_context),
+        recipients=[value],
+        subject=_("Verify your email address"),
+    )
+    if current_app.config["DEBUG"]:  # pragma: no cover
+        current_app.logger.debug(email)
+    mailer.send(email)
+
+
+@bp.route('/user/<username>/settings/email/', methods=['GET', 'POST'])
+@with_ipa()
+@require_self
+def user_settings_email(ipa, username):
+    user = User(user_or_404(ipa, username))
+    form = UserSettingsEmailForm(obj=user)
+    attrs = ["mail", "rhbz_mail"]
+
+    if form.validate_on_submit():
+        change_now = {}
+        needs_validation = {}
+        for attr in attrs:
+            value = getattr(form, attr).data
+            old_value = getattr(user, attr) or ""
+            option_name = user.get_attr_option(attr)
+            if value != old_value:
+                if not value:
+                    # email has been removed
+                    change_now[option_name] = value
+                else:
+                    needs_validation[attr] = value
+        should_redirect = False
+        if change_now:
+            should_redirect = _user_mod(
+                ipa, form, user, change_now, ".user_settings_email",
+            )
+        if needs_validation:
+            for attr, value in needs_validation.items():
+                try:
+                    _send_validation_email(user, attr, value)
+                except ConnectionRefusedError as e:
+                    current_app.logger.error(
+                        f"Impossible to send an address validation email: {e}"
+                    )
+                    form["non_field_errors"].errors.append(
+                        _(
+                            "We could not send you the address validation email, please retry later"
+                        )
+                    )
+                    break
+                flash(
+                    _(
+                        "The email address %(mail)s needs to be validated. Please check your "
+                        "inbox and click on the link to proceed. If you can't find the email "
+                        "in a couple minutes, check your spam folder.",
+                        mail=value,
+                    ),
+                    "info",
+                )
+                should_redirect = redirect(
+                    url_for('.user_settings_email', username=user.username)
+                )
+        if should_redirect:
+            return should_redirect
+        if not change_now and not needs_validation:
+            form["non_field_errors"].errors.append(_("No modifications."))
+
+    return render_template(
+        'user-settings-email.html', user=user, form=form, activetab="email"
+    )
+
+
+@bp.route('/user/<username>/settings/email/validate', methods=['GET', 'POST'])
+@with_ipa()
+@require_self
+def user_settings_email_validate(ipa, username):
+    user = User(user_or_404(ipa, username))
+
+    url = url_for('.user_settings_email', username=user.username)
+    token_string = request.args.get('token')
+
+    if not token_string:
+        flash(
+            _('No token provided, please check your email validation link.'), 'warning'
+        )
+        return redirect(url)
+
+    try:
+        token = read_token(token_string, audience=Audience.email_validation)
+    except jwt.exceptions.DecodeError:
+        flash(_("The token is invalid, please set the email again."), "warning")
+        return redirect(url)
+    except jwt.exceptions.ExpiredSignatureError:
+        flash(
+            _("This token is no longer valid, please set the email again."), "warning"
+        )
+        return redirect(url)
+    if token["sub"] != user.username:
+        flash(_("This token does not belong to you."), "warning")
+        return redirect(url)
+
+    attr = token["attr"]
+    value = token["mail"]
+    form = BaseForm()
+
+    if form.validate_on_submit():
+        option_name = user.get_attr_option(token["attr"])
+        result = _user_mod(
+            ipa, form, user, {option_name: value}, ".user_settings_email",
+        )
+        if result:
+            return result
+
+    return render_template(
+        'user-settings-email-validation.html',
+        form=form,
+        user=user,
+        attr_label=UserSettingsEmailForm()[attr].label,
+        value=value,
     )
 
 
