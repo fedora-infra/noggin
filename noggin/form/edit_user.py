@@ -23,7 +23,7 @@ from noggin.form.validators import Email
 from noggin.l10n import LOCALES
 from noggin.utility.timezones import TIMEZONES
 
-from .base import BaseForm, CSVListField, ModestForm, strip, SubmitButtonField
+from .base import BaseForm, CSVListField, ModestForm, strip, strip_at, SubmitButtonField
 
 
 class UserSettingsProfileForm(BaseForm):
@@ -35,14 +35,6 @@ class UserSettingsProfileForm(BaseForm):
     lastname = StringField(
         _('Last Name'),
         validators=[DataRequired(message=_('Last name must not be empty'))],
-    )
-
-    mail = EmailField(
-        _('E-mail Address'),
-        validators=[
-            DataRequired(message=_('Email must not be empty')),
-            Email(message=_('Email must be valid')),
-        ],
     )
 
     locale = SelectField(
@@ -65,11 +57,13 @@ class UserSettingsProfileForm(BaseForm):
         ],
     )
 
-    github = StringField(_('GitHub Username'), validators=[Optional()])
+    github = StringField(
+        _('GitHub Username'), validators=[Optional()], filters=[strip_at]
+    )
 
-    gitlab = StringField(_('GitLab Username'), validators=[Optional()])
-
-    rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
+    gitlab = StringField(
+        _('GitLab Username'), validators=[Optional()], filters=[strip_at]
+    )
 
     website_url = URLField(
         _('Website or Blog URL'),
@@ -85,6 +79,18 @@ class UserSettingsProfileForm(BaseForm):
     )
 
     pronouns = StringField(_('Pronouns'), validators=[Optional()],)
+
+
+class UserSettingsEmailForm(BaseForm):
+    mail = EmailField(
+        _('E-mail Address'),
+        validators=[
+            DataRequired(message=_('Email must not be empty')),
+            Email(message=_('Email must be valid')),
+        ],
+    )
+
+    rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
 
 
 class UserSettingsKeysForm(BaseForm):

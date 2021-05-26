@@ -14,7 +14,8 @@ def assert_redirects_with_flash(
         response.location == f"http://localhost{expected_url}"
     ), f"Expected URL http://localhost{expected_url}, got {response.location}"
     messages = get_flashed_messages(with_categories=True)
-    assert len(messages) == 1, "No flash message was set"
+    assert len(messages) > 0, "No flash message was set"
+    assert len(messages) == 1, "More than one flash message were set"
     category, message = messages[0]
     assert (
         message == expected_message
@@ -42,7 +43,10 @@ def assert_form_generic_error(response, expected_message):
     page = BeautifulSoup(response.data, 'html.parser')
     error_message = page.select_one("#formerrors .text-danger")
     assert error_message is not None
-    assert error_message.get_text(strip=True) == expected_message
+    message = error_message.get_text(strip=True)
+    assert (
+        message == expected_message
+    ), f"\nExpected message: {expected_message!r}\nActual message:   {message!r}"
 
 
 def otp_secret_from_page(page):
