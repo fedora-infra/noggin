@@ -92,7 +92,7 @@ def _handle_registration_validation_error(username, e):
 def handle_register_form(form):
     username = form.username.data
     now = datetime.datetime.utcnow().replace(microsecond=0)
-    common_name = form.firstname.data + " " + form.lastname.data
+    common_name = f"{form.firstname.data} {form.lastname.data}"
     gecos = (
         unidecode(codecs.encode(common_name, "translit/long"))
         .replace("  ", " ")
@@ -101,7 +101,7 @@ def handle_register_form(form):
     # First, create the stage user.
     try:
         user = ipa_admin.stageuser_add(
-            a_uid=username,
+            username,
             o_givenname=form.firstname.data,
             o_sn=form.lastname.data,
             o_cn=common_name,
