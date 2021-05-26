@@ -1,0 +1,11 @@
+== {{_("openSUSE Accounts")}} ==
+
+{{_("Hello %(name)s,", name=user.name)}}
+
+{{_("To validate the email address %(address)s, click on the link below:", address=address)}}
+
+  {{ url_for('.user_settings_email_validate', username=user.username,   _external=True) }}?token={{ token }}
+
+{{_("If you did not set the email address %(address)s in your account %(username)s, you can ignore this email.", username=user.username, address=address)}}
+
+-- {{_("openSUSE Admins")}}

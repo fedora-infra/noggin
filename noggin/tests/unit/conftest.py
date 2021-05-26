@@ -132,7 +132,7 @@ def make_user(ipa_testing_config, app):
         now = datetime.datetime.utcnow().replace(microsecond=0)
         password = f'{name}_password'
         ipa_admin.user_add(
-            a_uid=name,
+            name,
             o_givenname=name.title(),
             o_sn='User',
             o_cn=f'{name.title()} User',

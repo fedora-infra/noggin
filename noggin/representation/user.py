@@ -36,6 +36,11 @@ class User(Representation):
         "agreements": "list",
         "is_private": "bool",
     }
+    attr_options = {
+        "firstname": "o_givenname",
+        "lastname": "o_sn",
+        "mail": "o_mail",
+    }
     pkey = "username"
     ipa_object = "user"
 

@@ -56,7 +56,7 @@ def post_data_step_3():
 def dummy_stageuser(ipa_testing_config):
     now = datetime.datetime.utcnow().replace(microsecond=0)
     user = ipa_admin.stageuser_add(
-        a_uid="dummy",
+        "dummy",
         o_givenname="Dummy",
         o_sn="User",
         o_cn="Dummy User",

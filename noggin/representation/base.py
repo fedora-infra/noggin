@@ -25,6 +25,7 @@ class Representation:
 
     attr_names = {}
     attr_types = {}
+    attr_options = {}
     pkey = None
 
     def __init__(self, raw):
@@ -71,8 +72,12 @@ class Representation:
                 f"Can't diff a {self.__class__.__name__} instance against a "
                 f"{other.__class__.__name__} instance"
             )
-
         return [key for key in self if getattr(self, key) != getattr(other, key)]
 
     def as_dict(self):
         return {attr: getattr(self, attr) for attr in self.attr_names}
+
+    def get_attr_option(self, attr):
+        attr_to_options = self.attr_names.copy()
+        attr_to_options.update(self.attr_options)
+        return attr_to_options[attr]

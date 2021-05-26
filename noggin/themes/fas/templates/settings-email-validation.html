@@ -1,0 +1,11 @@
+<p><strong>{{_("Fedora Accounts System")}}</strong></p>
+<p>{{_("Hello %(name)s,", name=user.name)}}</p>
+<p>{{_("To validate the email address %(address)s, click on the link below:", address=address)}}</p>
+<p>
+  <a href="{{ url_for('.user_settings_email_validate', username=user.username, _external=True) }}?token={{ token }}">
+    {{ url_for('.user_settings_email_validate', username=user.username, _external=True) }}?token={{ token }}
+  </a>
+</p>
+<p>{{_("If you did not set the email address %(address)s in your account %(username)s, you can ignore this email.", username=user.username, address=address)}}</p>
+
+<p><em>{{_("Fedora Accounts System")}}</em></p>
