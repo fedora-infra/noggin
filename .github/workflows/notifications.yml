@@ -13,8 +13,7 @@ jobs:
         channel: '#fedora-aaa-activity'
         nickname: github
         message: |-
-          ${{ github.actor }} pushed ${{ github.event.ref }} ${{ github.event.compare }}
-          ${{ join(github.event.commits.*.message) }}
+          ${{ github.actor }} pushed to ${{ github.event.ref }} ${{ github.event.compare }}
     - name: Notify pull requests
       if: github.event_name == 'pull_request'
       uses: Gottox/irc-message-action@v1
