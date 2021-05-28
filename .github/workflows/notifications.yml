@@ -1,35 +1,36 @@
-- name: Notify actions on IRC
-  on: [push, pull_request, create]
-  jobs:
-    notification:
-      runs-on: ubuntu-latest
-      name: Notifications
-      steps:
-      - name: Notify push
-        if: github.event_name == 'push'
-        uses: Gottox/irc-message-action@v1
-        with:
-          server: irc.libera.chat
-          channel: '#fedora-aaa-activity'
-          nickname: github
-          message: |-
-            ${{ github.actor }} pushed ${{ github.event.ref }} ${{ github.event.compare }}
-            ${{ join(github.event.commits.*.message) }}
-      - name: Notify pull requests
-        if: github.event_name == 'pull_request'
-        uses: Gottox/irc-message-action@v1
-        with:
-          server: irc.libera.chat
-          channel: '#fedora-aaa-activity'
-          nickname: github
-          message: |-
-            ${{ github.actor }} opened PR ${{ github.event.html_url }}
-      - name: Notify tags
-        if: github.event_name == 'create' && github.event.ref_type == 'tag'
-        uses: Gottox/irc-message-action@v1
-        with:
-          server: irc.libera.chat
-          channel: '#fedora-aaa-activity'
-          nickname: github
-          message: |-
-            ${{ github.actor }} tagged ${{ github.repository }} ${{ github.event.ref }}
+name: Notify actions on IRC
+on: [push, pull_request, create]
+jobs:
+  notification:
+    runs-on: ubuntu-latest
+    name: Notifications
+    steps:
+    - name: Notify push
+      if: github.event_name == 'push' && github.repository == 'fedora-infra/noggin'
+      uses: Gottox/irc-message-action@v1
+      with:
+        server: irc.libera.chat
+        channel: '#fedora-aaa-activity'
+        nickname: github
+        message: |-
+          ${{ github.actor }} pushed ${{ github.event.ref }} ${{ github.event.compare }}
+          ${{ join(github.event.commits.*.message) }}
+    - name: Notify pull requests
+      if: github.event_name == 'pull_request'
+      uses: Gottox/irc-message-action@v1
+      with:
+        server: irc.libera.chat
+        channel: '#fedora-aaa-activity'
+        nickname: github
+        message: |-
+          ${{ github.actor }} opened PR ${{ github.event.pull_request.html_url }} : ${{ github.event.pull_request.title }}
+        debug: true
+    - name: Notify tags
+      if: github.event_name == 'create' && github.event.ref_type == 'tag'
+      uses: Gottox/irc-message-action@v1
+      with:
+        server: irc.libera.chat
+        channel: '#fedora-aaa-activity'
+        nickname: github
+        message: |-
+          ${{ github.actor }} tagged ${{ github.repository }} ${{ github.event.ref }}
