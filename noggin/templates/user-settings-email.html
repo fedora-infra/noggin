@@ -1,0 +1,22 @@
+{% extends "user-settings.html" %}
+
+{% import '_form_macros.html' as macros %}
+
+{% block settings_content %}
+<form class="needs-validation" action="{{ url_for('.user_settings_email', username=user.username) }}" method="post" novalidate>
+    {{ form.csrf_token }}
+    <div class="card-body">
+      <div class="form-group">{{ macros.with_errors(form.mail) }}</div>
+      <div class="form-group">{{ macros.with_errors(form.rhbz_mail) }}</div>
+    </div>
+    <div class="card-footer d-flex justify-content-between">
+      <div>{{ macros.non_field_errors(form) }}</div>
+      <button class="btn btn-primary" id="submit" type="submit">{{_("Save")}}</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+  {{ super () }}
+  {{ macros.unsaved_changes() }}
+{% endblock %}
