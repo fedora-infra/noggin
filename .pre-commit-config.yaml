@@ -1,0 +1,47 @@
+repos:
+  # - repo: https://github.com/asottile/pyupgrade
+  #   rev: v2.15.0
+  #   hooks:
+  #     - id: pyupgrade
+  #       args:
+  #         - --py36-plus
+
+  - repo: https://github.com/psf/black
+    rev: 21.5b2
+    hooks:
+      - id: black
+        language_version: python3
+        args: ["-c"]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.8.0
+    hooks:
+      - id: isort
+        args: ["-c"]
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-bandit
+    rev: v1.0.5
+    hooks:
+      - id: python-bandit-vulnerability-check
+        alias: bandit
+        args: ["-r", "noggin/", "-x", "noggin/tests/", "-ll"]
+  # - repo: local
+  #   hooks:
+  #     - id: bandit-local
+  #       name: bandit
+  #       entry: bandit
+  #       args: ["-r", "noggin/", "-x", "noggin/tests/", "-ll"]
+  #       pass_filenames: false
+  #       language: system
+
+  - repo: https://github.com/myint/rstcheck
+    rev: 3f92957
+    hooks:
+      - id: rstcheck
+        args: ["-r", "docs"]
+        additional_dependencies: [sphinx]
