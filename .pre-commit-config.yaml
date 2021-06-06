@@ -45,3 +45,18 @@ repos:
       - id: rstcheck
         args: ["-r", "docs"]
         additional_dependencies: [sphinx]
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.2.1
+    hooks:
+      - id: python-safety-dependencies-check
+        alias: safety
+        additional_dependencies: ["poetry"]
+  # - repo: local
+  #   hooks:
+  #     - id: safety-local
+  #       name: safety
+  #       entry: safety
+  #       args: [check, --full-report]
+  #       language: system
+  #       pass_filenames: false
