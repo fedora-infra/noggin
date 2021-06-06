@@ -15,7 +15,7 @@
   {% endif %}
   {{ field(class=css_class, **kwargs) }}
   {% if field.type == 'BooleanField' %}
-      <label class="form-check-label ml-1"><strong>{{ field.label.text }}</strong></label>
+    <label class="form-check-label ml-1" {% if field.id %}for="{{ field.id }}"{% endif %}><strong>{{ field.label.text }}</strong></label>
   {% endif %}
   {% if field.description %}
     <small class="form-text text-muted">{{ field.description }}</small>
