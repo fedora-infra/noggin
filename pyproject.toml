@@ -29,7 +29,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.1"
 cryptography = "^2.9"
 flask = "^1.1"
 flask-wtf = "^0.14"
@@ -67,6 +67,7 @@ Faker = "^4.0.3"
 pytest-mock = "^3.0.0"
 isort = "^5.1.4"
 rstcheck = "^3.3.1"
+pre-commit = "^2.13.0"
 
 [tool.poetry.extras]
 deploy = ["gunicorn"]
@@ -80,7 +81,7 @@ filename = "docs/release_notes.rst"
 directory = "news/"
 title_format = "v{version}"
 issue_format = "{issue}"
-template = "news/_template.rst"
+template = "news/_template.rst.j2"
 underlines = "=^-"
 wrap = true
 all_bullets = true
@@ -159,6 +160,11 @@ profile = "black"
 known_first_party = ["noggin", "noggin_messages"]
 lines_after_imports = 2
 force_alphabetical_sort_within_sections = true
+
+[tool.pytest.ini_options]
+testpaths = [
+    "noggin/tests/unit",
+]
 
 [build-system]
 requires = ["poetry>=1.0.0"]
