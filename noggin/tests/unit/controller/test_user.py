@@ -257,7 +257,6 @@ def test_user_settings_email_post_multiple(client, logged_in_dummy_user):
     assert result.location == "http://localhost/user/dummy/settings/email/"
     # Flash messages
     messages = get_flashed_messages(with_categories=True)
-    print(messages)
     assert len(messages) == 2
     assert set(msg[0] for msg in messages) == {"info"}
     # Sent email
@@ -278,8 +277,13 @@ def test_user_settings_email_removal(client, logged_in_dummy_user):
     ipa_admin.user_mod("dummy", fasrhbzemail="dummy-rhbz@noggin.test")
     data = POST_CONTENTS_EMAIL.copy()
     data["rhbz_mail"] = ""
-    with mailer.record_messages() as outbox:
-        result = client.post('/user/dummy/settings/email/', data=data)
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {"msg": {"agent": "dummy", "user": "dummy", "fields": ['rhbz_mail']}}
+        )
+    ):
+        with mailer.record_messages() as outbox:
+            result = client.post('/user/dummy/settings/email/', data=data)
     assert_redirects_with_flash(
         result,
         expected_url="/user/dummy/settings/email/",
@@ -288,6 +292,7 @@ def test_user_settings_email_removal(client, logged_in_dummy_user):
         ),
         expected_category="success",
     )
+    # No validation required on removal
     assert len(outbox) == 0
     # Check that value has been changed
     user = User(ipa_admin.user_show("dummy")['result'])
