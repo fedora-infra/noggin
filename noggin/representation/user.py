@@ -35,6 +35,7 @@ class User(Representation):
         "groups": "list",
         "agreements": "list",
         "is_private": "bool",
+        "pronouns": "list",
     }
     attr_options = {
         "firstname": "o_givenname",
