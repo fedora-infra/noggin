@@ -78,7 +78,7 @@ class UserSettingsProfileForm(BaseForm):
         validators=[Optional()],
     )
 
-    pronouns = StringField(_('Pronouns'), validators=[Optional()],)
+    pronouns = CSVListField(_('Pronouns'), validators=[Optional()])
 
 
 class UserSettingsEmailForm(BaseForm):
