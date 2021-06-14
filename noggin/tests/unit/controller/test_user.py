@@ -550,7 +550,7 @@ def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
         page.select_one('.list-group-item.text-right.bg-light strong').get_text(
             strip=True
         )
-        == '1 Group Memberships'
+        == '1 Group(s), 0 Agreement(s)'
     )
 
 
@@ -567,7 +567,7 @@ def test_user_with_indirect_groups(
         page.select_one('.list-group-item.text-right.bg-light strong').get_text(
             strip=True
         )
-        == '2 Group Memberships'
+        == '2 Group(s), 0 Agreement(s)'
     )
     assert len(page.select('.list-group .list-group-item span.title')) == 2
 

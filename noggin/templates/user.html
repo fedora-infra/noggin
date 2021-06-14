@@ -55,7 +55,7 @@
                   </strong>
                   <div class="text-right">
                     {% for ircnick in user.ircnick %}
-                    <div class="mb-0 p-1 text-monospace">{{ ircnick }}</div>
+                    <div class="mb-0 py-1 text-monospace">{{ ircnick }}</div>
                     {% endfor %}
                   </div>
                 </li>
@@ -99,16 +99,31 @@
       </div>
       <div class="col-md-8">
         <ul class="list-group h-100">
-          {% for group in groups %}
-            {% if loop.index == 1 %}
-            <li class="list-group-item text-right bg-light">
-                {% set groupcount = groups | count %}
-                <strong>{{_("%(groupcount)s Group Memberships", groupcount=groupcount)}}</strong>
+          <li class="list-group-item text-right bg-light">
+              <strong>{{_("%(groupcount)s Group(s), %(agreementcount)s Agreement(s)", groupcount=groups|count, agreementcount=user.agreements|count)}}</strong>
+          </li>
+          {% for agreement in user.agreements %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="media align-items-center">
+                <i class="fa fa-fw fa-check-circle fa-2x text-muted mr-3"></i>
+                <div class="media-body">
+                    <div class="my-0 font-weight-bold">
+                      <a href="{{ url_for('.user_settings_agreements', username=user.username) }}">
+                        <span class="title">{{ agreement }}</span>
+                      </a>
+                    </div>
+                    {% if agreement.description %}
+                      <div>{{ agreement.description }}</div>
+                    {% endif %}
+                </div>
+              </div>
+              <div class="text-info px-2">{{ _('signed') }}</div>
             </li>
-            {% endif %}
+          {% endfor %}
+          {% for group in groups %}
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="media align-items-center">
-                  <i class="fa fa-group fa-2x text-muted mr-3"></i>
+                  <i class="fa fa-fw fa-group fa-2x text-muted mr-3"></i>
                   <div class="media-body">
                       <div class="my-0 font-weight-bold">
                         <a href="{{ url_for('.group', groupname=group.name) }}">
