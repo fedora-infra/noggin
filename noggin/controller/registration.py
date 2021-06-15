@@ -116,7 +116,12 @@ def handle_register_form(form):
         user = User(user)
     except python_freeipa.exceptions.DuplicateEntry:
         raise FormError(
-            "username", _("This username is already taken, please choose another one.")
+            "non_field_errors",
+            _(
+                "The username '%(username)s' or the email address '%(email)s' are already taken.",
+                username=username,
+                email=form.mail.data,
+            ),
         )
     except python_freeipa.exceptions.ValidationError as e:
         # for example: invalid username. We don't know which field to link it to
