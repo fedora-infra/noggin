@@ -441,10 +441,12 @@ def test_short_password_policy(
 def test_duplicate(client, post_data_step_1, cleanup_dummy_user, dummy_user):
     """Register a user that already exists"""
     result = client.post('/', data=post_data_step_1)
-    assert_form_field_error(
+    assert_form_generic_error(
         result,
-        field_name="register-username",
-        expected_message='This username is already taken, please choose another one.',
+        expected_message=(
+            "The username 'dummy' or the email address 'dummy@example.com' "
+            "are already taken."
+        ),
     )
 
 
