@@ -77,7 +77,7 @@ def dummy_group_dict():
             'posixgroup',
         ],
         'fasurl': ['http://example.com', "https://www.dummygroup.com.au"],
-        'fasircchannel': ["irc://freenode.net/#dummy-group"],
+        'fasircchannel': ["irc://irc.example.org/#dummy-group"],
         'fasmailinglist': ['dummygroup@lists.fedoraproject.org'],
     }
 

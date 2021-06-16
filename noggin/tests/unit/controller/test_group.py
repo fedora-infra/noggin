@@ -97,7 +97,7 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     )
     assert (
         page.select_one("#group-ircchannel a").get_text(strip=True)
-        == "irc:///freenode.net/#dummy-group"
+        == "irc:///irc.example.org/#dummy-group"
     )
     assert (
         page.select_one("#group-urls a").get_text(strip=True)
