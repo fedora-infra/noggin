@@ -35,6 +35,9 @@
     {% for subfield in field %}
       {{ form_field(subfield, label=False, **kwargs) }}
     {% endfor %}
+    {% if field.description %}
+      <small class="form-text text-muted">{{ field.description }}</small>
+    {% endif %}
   {% else %}
     {{ form_field(field, **kwargs) }}
   {% endif %}

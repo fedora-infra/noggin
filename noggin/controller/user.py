@@ -146,6 +146,8 @@ def user_settings_profile(ipa, username):
         result = _user_mod(ipa, form, user, changes, ".user_settings_profile",)
         if result:
             return result
+    if not form.errors:
+        form.ircnick.append_entry()
 
     return render_template(
         'user-settings-profile.html', user=user, form=form, activetab="profile"

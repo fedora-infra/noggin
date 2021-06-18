@@ -29,6 +29,12 @@ HEALTHZ = {
 
 PAGE_SIZE = 30
 
+CHAT_NETWORKS = {
+    "irc": {"default_server": "irc.libera.chat"},
+    "matrix": {"default_server": "matrix.org"},
+}
+
+
 BASSET_URL = None
 SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 

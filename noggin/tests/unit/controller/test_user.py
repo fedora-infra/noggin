@@ -19,7 +19,10 @@ from noggin_messages import UserUpdateV1
 POST_CONTENTS = {
     "firstname": "Dummy",
     "lastname": "User",
-    "ircnick": "dummy,dummy_",
+    "ircnick-0-type": "irc",
+    "ircnick-0-value": "dummy",
+    "ircnick-1-type": "irc",
+    "ircnick-1-value": "dummy_",
     "locale": "en-US",
     "timezone": "UTC",
     "github": "@dummy",

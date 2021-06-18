@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import pytest
 from flask import current_app
 from flask_wtf import FlaskForm
@@ -72,3 +74,16 @@ def test_csvlistfield(client, test_input, expected):
 
     form.csvfield.process_formdata(test_input)
     assert form.csvfield.data == expected
+
+
+@pytest.mark.parametrize(
+    "data,expected", [(["one", "two", "three"], "one,two,three"), ([""], ""), ([], "")],
+)
+def test_csvlistfield_read(client, data, expected):
+    class DummyForm(FlaskForm):
+        csvfield = CSVListField('csv field')
+
+    Obj = namedtuple("Obj", ["csvfield"])
+
+    form = DummyForm(obj=Obj(csvfield=data))
+    assert form.csvfield._value() == expected
