@@ -42,6 +42,12 @@ def app(app_config):
     return create_app(app_config)
 
 
+@pytest.fixture
+def request_context(app):
+    with app.test_request_context('/'):
+        yield
+
+
 @pytest.fixture(scope="session")
 def ipa_cert():
     """Create a CA cert usable for tests.
