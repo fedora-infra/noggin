@@ -52,12 +52,12 @@
               {% endif %}
               {% if user.ircnick %}
                 <li class="list-group-item d-flex justify-content-between">
-                  <strong title="{{_('IRC Nicknames')}}">
-                    <i class="fa fa-fw fa-comments-o"></i> {{_("IRC Nicknames")}}
+                  <strong title="{{_('Chat')}}">
+                    <i class="fa fa-fw fa-comments-o"></i> {{_("Chat")}}
                   </strong>
                   <div class="text-right">
                     {% for ircnick in user.ircnick %}
-                    <div class="mb-0 py-1 text-monospace">{{ ircnick }}</div>
+                    <div class="mb-0 text-monospace">{{ ircnick|nickname }}</div>
                     {% endfor %}
                   </div>
                 </li>
