@@ -41,6 +41,10 @@ class IPAAdmin:
         "fasagreement_remove_group",
         "fasagreement_remove_user",
         "fasagreement_disable",
+        "role_add",
+        "role_del",
+        "role_add_privilege",
+        "role_add_member",
     )
 
     def __init__(self, app=None):

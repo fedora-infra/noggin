@@ -34,6 +34,8 @@ def app_config(ipa_cert):
         MAIL_DEFAULT_SENDER="Noggin <noggin@example.com>",
         # Set a different password policy betweed the form and the server so we can test both
         PASSWORD_POLICY={"min": 6},
+        # Don't delete the role we may have in the dev env
+        STAGE_USERS_ROLE="Testing Stage Users Admins",
     )
 
 
@@ -119,6 +121,12 @@ def ipa_testing_config(vcr_session, app):
         except python_freeipa.exceptions.BadRequest as e:
             if not e.message == "no modifications to be performed":
                 raise
+        # Stage users admin role
+        sua_role = app.config["STAGE_USERS_ROLE"]
+        ipa_admin.role_add(sua_role)
+        ipa_admin.role_add_privilege(
+            sua_role, o_privilege=["Stage User Administrators"]
+        )
         yield
         try:
             ipa_admin.pwpolicy_mod(
@@ -128,6 +136,7 @@ def ipa_testing_config(vcr_session, app):
         except python_freeipa.exceptions.BadRequest as e:
             if not e.message == "no modifications to be performed":
                 raise
+        ipa_admin.role_del(sua_role)
 
 
 @pytest.fixture
