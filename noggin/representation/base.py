@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def attr_to_str(value):
     if not value:
         return None
@@ -14,10 +17,18 @@ def attr_to_bool(value):
     return value[0] == "TRUE"
 
 
+def attr_to_date(value):
+    if value is None:
+        return None
+    dt = value[0]["__datetime__"]
+    return datetime.strptime(dt, r"%Y%m%d%H%M%SZ")
+
+
 CONVERTERS = {
     "str": attr_to_str,
     "list": attr_to_list,
     "bool": attr_to_bool,
+    "date": attr_to_date,
 }
 
 
