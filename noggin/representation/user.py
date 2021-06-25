@@ -27,6 +27,7 @@ class User(Representation):
         "is_private": "fasisprivate",
         "pronouns": "faspronoun",
         "krbname": "krbcanonicalname",
+        "roles": "memberof_role",
     }
     attr_types = {
         "sshpubkeys": "list",
@@ -36,6 +37,7 @@ class User(Representation):
         "agreements": "list",
         "is_private": "bool",
         "pronouns": "list",
+        "roles": "list",
     }
     attr_options = {
         "firstname": "o_givenname",

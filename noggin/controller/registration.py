@@ -20,11 +20,16 @@ from translitcodec import codecs
 from unidecode import unidecode
 
 from noggin.app import csrf, ipa_admin, mailer
-from noggin.form.register_user import PasswordSetForm, ResendValidationEmailForm
+from noggin.form.register_user import (
+    PasswordSetForm,
+    RegisteringActionForm,
+    ResendValidationEmailForm,
+)
 from noggin.l10n import guess_locale
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
 from noggin.signals import stageuser_created, user_registered
+from noggin.utility.controllers import with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.token import Audience, make_token, read_token
 
@@ -359,3 +364,91 @@ def spamcheck_hook():
         _send_validation_email(user)
 
     return jsonify({"status": "success"})
+
+
+@bp.route('/registering/', methods=["GET", "POST"])
+@with_ipa()
+def registering_users(ipa):
+    stage_users = ipa.stageuser_find()["result"]
+    stage_users = [User(su) for su in stage_users]
+
+    statuses = [
+        {"name": "", "title": _("All")},
+        {"name": "spamcheck_manual", "title": _("Unknown")},
+        {"name": "active", "title": _("Not Spam")},
+        {"name": "spamcheck_denied", "title": _("Spam")},
+        {"name": "spamcheck_awaiting", "title": _("Awaiting")},
+    ]
+    for status in statuses:
+        status["count"] = len(
+            [
+                su
+                for su in stage_users
+                if status["name"] == "" or su.status_note == status["name"]
+            ]
+        )
+
+    status_filter = request.args.get("status", "")
+    if status_filter:
+        stage_users = [su for su in stage_users if su.status_note == status_filter]
+    stage_users.sort(key=lambda u: u.creation_time)
+    stage_users.reverse()
+
+    form = RegisteringActionForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        action = form.action.data
+        try:
+            user = [su for su in stage_users if su.username == username][0]
+        except IndexError:
+            flash(f"Unknown user: {username}", "danger")
+            return redirect(request.url)
+
+        if action == "accept":
+            try:
+                current_app.logger.info(f"Accepting registering user {username}")
+                ipa.stageuser_mod(username, fasstatusnote="active")
+                _send_validation_email(user)
+            except Exception as e:
+                form.non_field_errors.errors.append(
+                    f"Could not accept registering user {username}: {e}"
+                )
+            else:
+                flash(f"Accepted registering user {username}", "success")
+                return redirect(request.url)
+
+        elif action == "spam":
+            try:
+                current_app.logger.info(f"Flagging registering user {username} as spam")
+                ipa.stageuser_mod(username, fasstatusnote="spamcheck_denied")
+            except Exception as e:
+                form.non_field_errors.errors.append(
+                    f"Could not flag registering user {username} as spam: {e}"
+                )
+            else:
+                flash(f"Flagged registering user {username} as spam", "success")
+                return redirect(request.url)
+
+        elif action == "delete":
+            try:
+                current_app.logger.info(f"Deleting registering user {username}")
+                ipa.stageuser_del(username)
+            except Exception as e:
+                form.non_field_errors.errors.append(
+                    f"Could not delete registering user {username}: {e}"
+                )
+            else:
+                flash(f"Deleted registering user {username}", "success")
+                return redirect(request.url)
+
+        else:
+            form.non_field_errors.errors.append(f"Invalid action: {action}")
+
+    return render_template(
+        "registering.html",
+        statuses=statuses,
+        stage_users=stage_users,
+        form=form,
+        filter=status_filter,
+    )

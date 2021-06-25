@@ -34,6 +34,7 @@ CHAT_NETWORKS = {
     "matrix": {"default_server": "matrix.org"},
 }
 
+STAGE_USERS_ROLE = "Stage User Managers"
 
 BASSET_URL = None
 SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes

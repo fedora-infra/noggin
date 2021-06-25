@@ -1,5 +1,5 @@
 from flask_babel import lazy_gettext as _
-from wtforms import BooleanField, PasswordField, StringField
+from wtforms import BooleanField, HiddenField, PasswordField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo
 
@@ -71,3 +71,8 @@ class PasswordSetForm(BaseForm):
     password_confirm = PasswordField(_('Confirm Password'), filters=[strip])
 
     submit = SubmitButtonField(_("Activate"))
+
+
+class RegisteringActionForm(BaseForm):
+    username = HiddenField(validators=[DataRequired()])
+    action = StringField(validators=[DataRequired()])
