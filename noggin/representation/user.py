@@ -37,6 +37,8 @@ class User(Representation):
         "agreements": "list",
         "is_private": "bool",
         "pronouns": "list",
+        "creation_time": "date",
+        "last_password_change": "date",
         "roles": "list",
     }
     attr_options = {
