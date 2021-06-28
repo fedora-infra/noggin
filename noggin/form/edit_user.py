@@ -101,10 +101,6 @@ class UserSettingsProfileForm(BaseForm):
     ircnick = NonEmptyFieldList(
         ProtocolAndNickField(validators=[Optional()]),
         label=_('Chat Nicknames'),
-        description=_(
-            "The format is either \"username\" or \"username:server.name\" "
-            "if you're not using the default server."
-        ),
     )
 
     timezone = SelectField(
