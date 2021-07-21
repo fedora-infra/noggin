@@ -61,7 +61,7 @@ MAIL_DEFAULT_SENDER = "Noggin <noggin@example.com>"
 # https://pythonhosted.org/Flask-Mail/#configuring-flask-mail
 MAIL_SUPPRESS_SEND = True
 
-# email domains that a user cannot use to register or change to
+# Email domains that a user cannot use to register or change to
 # MAIL_DOMAIN_BLOCKLIST = ['fedoraproject.org']
 
 # URL for the avatar service, typically either
@@ -72,6 +72,20 @@ MAIL_SUPPRESS_SEND = True
 # The default to show if a user has not set an avatar with the service
 # other options are: "mp", "identicon", "monsterid", "wavatar", "retro", "robohash"
 # AVATAR_DEFAULT_TYPE = "robohash"
+
+# Probe endpoints for OpenShift
+# https://github.com/fedora-infra/flask-healthz/
+# HEALTHZ = {
+#     "live": "noggin.controller.root.liveness",
+#     "ready": "noggin.controller.root.readiness",
+# }
+
+# Page size when paginating results
+# PAGE_SIZE = 30
+
+# IPA role allowed to modify and delete stage users. The stage users admin page
+# will only be accessible to users that have this role.
+# STAGE_USERS_ROLE = "Stage User Managers"
 
 # Spam checking
 # BASSET_URL = None
