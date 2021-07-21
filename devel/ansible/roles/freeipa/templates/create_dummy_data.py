@@ -31,21 +31,21 @@ for word in fake.words(nb=600, unique=True):
     groups["sysadmin-" + word] = 5
     groups["z-git-" + word] = 5
 
-ipa = python_freeipa.ClientLegacy(host="ipa.noggin.test", verify_ssl="/etc/ipa/ca.crt")
+ipa = python_freeipa.ClientMeta(host="ipa.noggin.test", verify_ssl="/etc/ipa/ca.crt")
 ipa.login("{{ ipa_admin_user }}", "{{ ipa_admin_password }}")
 
-untouched_ipa = python_freeipa.ClientLegacy(
+untouched_ipa = python_freeipa.ClientMeta(
     host="ipa.noggin.test", verify_ssl="/etc/ipa/ca.crt"
 )
 
-ipa._request("fasagreement_add", "FPCA", {"description": "This ia the FPCA agreement"})
+ipa._request("fasagreement_add", "FPCA", {"description": "This is the FPCA agreement"})
 
 for group in groups.keys():
     print(f"adding group: {group}")
-    ipa.group_add(group, f"A group for {group}", fasgroup=True)
+    ipa.group_add(group, o_description=f"A group for {group}", fasgroup=True)
     ipa._request("fasagreement_add_group", "FPCA", {"group": group})
 
-ipa.group_add("general", "A group for general stuff", fasgroup=True)
+ipa.group_add("general", o_description="A group for general stuff", fasgroup=True)
 
 
 for x in range(100):
@@ -57,11 +57,11 @@ for x in range(100):
     try:
         ipa.user_add(
             username,
-            firstName,
-            lastName,
-            fullname,
-            disabled=False,
-            user_password=USER_PASSWORD,
+            o_givenname=firstName,
+            o_sn=lastName,
+            o_cn=fullname,
+            o_nsaccountlock=False,
+            o_userpassword=USER_PASSWORD,
             fasircnick=[username, username + "_"],
             faslocale="en-US",
             fastimezone="Australia/Brisbane",
@@ -78,17 +78,24 @@ for x in range(100):
             ipa._request("fasagreement_add_user", "FPCA", {"user": username})
             has_signed_fpca = True
         else:
-            ipa.group_add_member("general", username)
+            ipa.group_add_member("general", o_user=username)
 
         # add to groups
         for groupname, chance in groups.items():
             if rando(chance) and has_signed_fpca:
-                ipa.group_add_member(groupname, username)
+                ipa.group_add_member(groupname, o_user=username)
                 # add member manager (sponsor)
                 if rando(30):
-                    ipa._request(
-                        "group_add_member_manager", groupname, {"user": username}
-                    )
+                    ipa.group_add_member_manager(groupname, o_user=username)
 
     except python_freeipa.exceptions.FreeIPAError as e:
         print(e)
+
+
+# Create the stage user managers role and assign it to the infra group
+ipa.privilege_add("Stage User Managers", o_description="Manage registering users in Noggin")
+for perm in ("System: Read Stage Users", "System: Modify Stage User", "System: Remove Stage User"):
+    ipa.privilege_add_permission("Stage User Managers", o_permission=perm)
+ipa.role_add("Stage User Managers", o_description="Manage registering users in Noggin")
+ipa.role_add_privilege("Stage User Managers", o_privilege="Stage User Managers")
+ipa.role_add_member("Stage User Managers", o_group="infra")
