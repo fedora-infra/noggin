@@ -4,6 +4,50 @@ Release notes
 
 .. towncrier release notes start
 
+v1.3.0
+======
+
+Released on 2021-07-21.
+
+Features
+^^^^^^^^
+
+* Add a page to manage registering users (:pr:`672`).
+* Allow template override with a custom directory, see the
+  ``TEMPLATES_CUSTOM_DIRECTORIES`` configration value (:pr:`701`).
+* Allow users to declare their Matrix IDs in addition to the IRC nicknames
+  (:issue:`248`).
+* Display on users' profiles the agreements they have signed (:issue:`576`).
+* Validate email addresses when changed in the ``mail`` or ``rhbz_mail``
+  attributes (:issue:`610`).
+* Allow users to select multiple pronouns (:issue:`646`).
+
+Bug Fixes
+^^^^^^^^^
+
+* Don't tell users signing up that their username is already taken when it can
+  be the email address (:pr:`665`).
+* Add the ``for`` attribute to checkbox labels (:issue:`658`).
+
+Development Improvements
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Start using `pre-commit <https://pre-commit.com/>`_ to run the simple
+  checkers (linters, formatters, security checks). Run ``poetry install`` to
+  install the new dependencies, and then run ``pre-commit install`` to setup
+  the git hook. Also add the `safety <https://pyup.io/safety/>`_ tool
+  (:pr:`659`).
+
+Contributors
+^^^^^^^^^^^^
+
+Many thanks to the contributors of bug reports, pull requests, and pull request
+reviews for this release:
+
+* Aurélien Bompard
+* Calvin Goodale
+
+
 v1.2.0
 ======
 Released on 2021-05-18.
