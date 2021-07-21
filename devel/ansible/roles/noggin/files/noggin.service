@@ -7,6 +7,7 @@ Wants=network-online.target
 Environment=FLASK_APP=/home/vagrant/noggin/noggin/app.py
 Environment=NOGGIN_CONFIG_PATH=/home/vagrant/noggin.cfg
 Environment=FLASK_DEBUG=1
+Environment=PYTHONUNBUFFERED=1
 User=vagrant
 WorkingDirectory=/home/vagrant/noggin/noggin
 ExecStart=poetry run flask run -h 0.0.0.0

@@ -2,6 +2,7 @@ import os
 from logging.config import dictConfig
 
 import flask_talisman
+import jinja2
 from flask import Flask
 from flask_healthz import healthz
 from flask_mail import Mail
@@ -14,6 +15,7 @@ from noggin.middleware import IPAErrorHandler
 from noggin.security.ipa_admin import IPAAdmin
 from noggin.themes import Theme
 from noggin.utility import import_all
+from noggin.utility.templates import format_nickname
 
 
 # Forms
@@ -54,6 +56,15 @@ def create_app(config=None):
     if app.config.get("TEMPLATES_AUTO_RELOAD"):
         app.jinja_env.auto_reload = True
 
+    # Custom template folders
+    if app.config["TEMPLATES_CUSTOM_DIRECTORIES"]:
+        app.jinja_loader = jinja2.ChoiceLoader(
+            [
+                jinja2.FileSystemLoader(app.config["TEMPLATES_CUSTOM_DIRECTORIES"]),
+                app.jinja_loader,
+            ]
+        )
+
     # Logging
     if app.config.get("LOGGING"):
         dictConfig(app.config["LOGGING"])
@@ -82,10 +93,18 @@ def create_app(config=None):
                 # https://csp.withgoogle.com/docs/strict-csp.html#example
                 "'strict-dynamic'",
             ],
-            "img-src": ["'self'", "seccdn.libravatar.org"],
+            "img-src": ["'self'", "seccdn.libravatar.org"]
+            + app.config["ACCEPT_IMAGES_FROM"],
+            # The style-src directive needs to be specified (even if it's the same as default-src)
+            # to add the nonce.
+            "style-src": "'self'",
         },
-        content_security_policy_nonce_in=['script-src'],
+        content_security_policy_nonce_in=['script-src', 'style-src'],
     )
+
+    # Template filters
+    # If there are too many, group them in an extension
+    app.jinja_env.filters["nickname"] = format_nickname
 
     # Register views
     import_all("noggin.controller")

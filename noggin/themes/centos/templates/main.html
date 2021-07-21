@@ -1,4 +1,4 @@
-{% extends "master.html" %}
+{% extends "base.html" %}
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('theme.static', filename='vendor/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css">
@@ -24,6 +24,9 @@
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="{{ url_for('.user', username=current_user.username) }}">{{_("Profile")}}</a>
                     <a class="dropdown-item" href="{{ url_for('.user_settings_profile', username=current_user.username) }}">{{_("Settings")}}</a>
+                    {% if config["STAGE_USERS_ROLE"] in current_user.roles %}
+                    <a class="dropdown-item" href="{{ url_for('.registering_users') }}">{{_("Registering Users")}}</a>
+                    {% endif %}
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="https://docs.fedoraproject.org/en-US/fedora-accounts/user/" target="_blank" rel="noopener noreferrer">{{_("Help")}}</a>
                     <a class="dropdown-item" href="{{ url_for('.logout') }}">{{_("Log Out")}}</a>

@@ -9,13 +9,11 @@
     {% set css_class = css_class + ' is-invalid ' %}
   {% endif %}
   {% if kwargs.pop('label', True) and field.type != "BooleanField" %}
-    <strong>
       {{ field.label }}
-    </strong>
   {% endif %}
   {{ field(class=css_class, **kwargs) }}
   {% if field.type == 'BooleanField' %}
-      <label class="form-check-label ml-1"><strong>{{ field.label.text }}</strong></label>
+    <label class="form-check-label ml-1" for="{{ field.id }}">{{ field.label.text }}</label>
   {% endif %}
   {% if field.description %}
     <small class="form-text text-muted">{{ field.description }}</small>
@@ -35,6 +33,9 @@
     {% for subfield in field %}
       {{ form_field(subfield, label=False, **kwargs) }}
     {% endfor %}
+    {% if field.description %}
+      <small class="form-text text-muted">{{ field.description }}</small>
+    {% endif %}
   {% else %}
     {{ form_field(field, **kwargs) }}
   {% endif %}

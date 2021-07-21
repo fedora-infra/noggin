@@ -61,7 +61,7 @@ MAIL_DEFAULT_SENDER = "Noggin <noggin@example.com>"
 # https://pythonhosted.org/Flask-Mail/#configuring-flask-mail
 MAIL_SUPPRESS_SEND = True
 
-# email domains that a user cannot use to register or change to
+# Email domains that a user cannot use to register or change to
 # MAIL_DOMAIN_BLOCKLIST = ['fedoraproject.org']
 
 # URL for the avatar service, typically either
@@ -72,6 +72,35 @@ MAIL_SUPPRESS_SEND = True
 # The default to show if a user has not set an avatar with the service
 # other options are: "mp", "identicon", "monsterid", "wavatar", "retro", "robohash"
 # AVATAR_DEFAULT_TYPE = "robohash"
+
+# Probe endpoints for OpenShift
+# https://github.com/fedora-infra/flask-healthz/
+# HEALTHZ = {
+#     "live": "noggin.controller.root.liveness",
+#     "ready": "noggin.controller.root.readiness",
+# }
+
+# Page size when paginating results
+# PAGE_SIZE = 30
+
+# IPA role allowed to modify and delete stage users. The stage users admin page
+# will only be accessible to users that have this role.
+# STAGE_USERS_ROLE = "Stage User Managers"
+
+# Additional directories to look up folders in. The templates in these directories
+# will override the app's template with the same filename. You can also create the
+# following templates to insert HTML in the output:
+# - `after-navbar.html`: will be inserted between the navbar and the main content
+#   on every page
+# - `before-footer.html`: will be inserted between the main content and the footer
+#   on every page
+# - `head.html`: will be inserted at the end of the <head> tag on every page
+# TEMPLATES_CUSTOM_DIRECTORIES = []
+
+# The following sources will be added to the Content Security Policy for images.
+# This can be useful if you want to add images in custom templates.
+# https://content-security-policy.com/img-src/
+# ACCEPT_IMAGES_FROM = []
 
 # Spam checking
 # BASSET_URL = None

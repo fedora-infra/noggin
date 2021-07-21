@@ -27,6 +27,7 @@ class User(Representation):
         "is_private": "fasisprivate",
         "pronouns": "faspronoun",
         "krbname": "krbcanonicalname",
+        "roles": "memberof_role",
     }
     attr_types = {
         "sshpubkeys": "list",
@@ -35,6 +36,15 @@ class User(Representation):
         "groups": "list",
         "agreements": "list",
         "is_private": "bool",
+        "pronouns": "list",
+        "creation_time": "date",
+        "last_password_change": "date",
+        "roles": "list",
+    }
+    attr_options = {
+        "firstname": "o_givenname",
+        "lastname": "o_sn",
+        "mail": "o_mail",
     }
     pkey = "username"
     ipa_object = "user"

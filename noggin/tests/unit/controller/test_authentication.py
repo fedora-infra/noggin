@@ -20,7 +20,7 @@ from noggin.tests.unit.utilities import (
 @pytest.fixture
 def dummy_user_expired_password():
     ipa_admin.user_add(
-        a_uid='dummy',
+        'dummy',
         o_givenname='Dummy',
         o_sn='User',
         o_cn='Dummy User',

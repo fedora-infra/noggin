@@ -34,12 +34,20 @@ def app_config(ipa_cert):
         MAIL_DEFAULT_SENDER="Noggin <noggin@example.com>",
         # Set a different password policy betweed the form and the server so we can test both
         PASSWORD_POLICY={"min": 6},
+        # Don't delete the role we may have in the dev env
+        STAGE_USERS_ROLE="Testing Stage Users Admins",
     )
 
 
 @pytest.fixture(scope="session")
 def app(app_config):
     return create_app(app_config)
+
+
+@pytest.fixture
+def request_context(app):
+    with app.test_request_context('/'):
+        yield
 
 
 @pytest.fixture(scope="session")
@@ -113,6 +121,12 @@ def ipa_testing_config(vcr_session, app):
         except python_freeipa.exceptions.BadRequest as e:
             if not e.message == "no modifications to be performed":
                 raise
+        # Stage users admin role
+        sua_role = app.config["STAGE_USERS_ROLE"]
+        ipa_admin.role_add(sua_role)
+        ipa_admin.role_add_privilege(
+            sua_role, o_privilege=["Stage User Administrators"]
+        )
         yield
         try:
             ipa_admin.pwpolicy_mod(
@@ -122,6 +136,7 @@ def ipa_testing_config(vcr_session, app):
         except python_freeipa.exceptions.BadRequest as e:
             if not e.message == "no modifications to be performed":
                 raise
+        ipa_admin.role_del(sua_role)
 
 
 @pytest.fixture
@@ -132,7 +147,7 @@ def make_user(ipa_testing_config, app):
         now = datetime.datetime.utcnow().replace(microsecond=0)
         password = f'{name}_password'
         ipa_admin.user_add(
-            a_uid=name,
+            name,
             o_givenname=name.title(),
             o_sn='User',
             o_cn=f'{name.title()} User',

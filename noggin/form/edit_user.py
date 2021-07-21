@@ -1,3 +1,6 @@
+import re
+from urllib.parse import urlparse, urlunparse
+
 from flask_babel import lazy_gettext as _
 from pyotp import TOTP
 from wtforms import (
@@ -23,7 +26,56 @@ from noggin.form.validators import Email
 from noggin.l10n import LOCALES
 from noggin.utility.timezones import TIMEZONES
 
-from .base import BaseForm, CSVListField, ModestForm, strip, SubmitButtonField
+from .base import (
+    BaseForm,
+    CSVListField,
+    ModestForm,
+    NonEmptyFieldList,
+    replace,
+    strip,
+    strip_at,
+    SubmitButtonField,
+    TypeAndStringField,
+)
+
+
+NICK_RE = {
+    "irc": re.compile(r"^[a-z_\[\]\\^{}|`-][a-z0-9_\[\]\\^{}|`-]*$", re.IGNORECASE),
+    "matrix": re.compile(r"^[a-z0-9.=_/-]+$", re.IGNORECASE),
+}
+SERVER_RE = re.compile(r"^[a-z0-9][a-z0-9.-]*(:[0-9]+)?$", re.IGNORECASE)
+
+
+class ProtocolAndNickField(TypeAndStringField):
+    def __init__(self, *args, **kwargs):
+        kwargs["choices"] = [("irc", "IRC"), ("matrix", "Matrix")]
+        kwargs["filters"] = [replace(" ", ""), strip_at, replace("@", ":")]
+        kwargs["validators"] = [self._validate]
+        super().__init__(*args, **kwargs)
+
+    def _parse_data(self, data):
+        url = urlparse(data)
+        nick = url.path.lstrip("/")
+        if url.netloc:
+            nick = f"{nick}:{url.netloc}"
+        scheme = url.scheme or "irc"
+        return (scheme, nick)
+
+    def _serialize_data(self, scheme, value):
+        nick, sep_, server = value.partition(":")
+        return urlunparse((scheme, server.strip(), f"/{nick.strip()}", "", "", ""))
+
+    @staticmethod
+    def _validate(form, field):
+        scheme = field.subfields[0].data
+        value = field.subfields[1].data
+        if not value:
+            return
+        nick, sep_, server = value.partition(":")
+        if not NICK_RE[scheme].match(nick):
+            raise ValidationError(_("This does not look like a valid nickname."))
+        if server and not SERVER_RE.match(server):
+            raise ValidationError(_("This does not look like a valid server name."))
 
 
 class UserSettingsProfileForm(BaseForm):
@@ -37,14 +89,6 @@ class UserSettingsProfileForm(BaseForm):
         validators=[DataRequired(message=_('Last name must not be empty'))],
     )
 
-    mail = EmailField(
-        _('E-mail Address'),
-        validators=[
-            DataRequired(message=_('Email must not be empty')),
-            Email(message=_('Email must be valid')),
-        ],
-    )
-
     locale = SelectField(
         _('Locale'),
         choices=[(locale, locale) for locale in LOCALES],
@@ -54,7 +98,10 @@ class UserSettingsProfileForm(BaseForm):
         ],
     )
 
-    ircnick = CSVListField(_('IRC Nicknames'), validators=[Optional()])
+    ircnick = NonEmptyFieldList(
+        ProtocolAndNickField(validators=[Optional()]),
+        label=_('Chat Nicknames'),
+    )
 
     timezone = SelectField(
         _('Timezone'),
@@ -65,11 +112,13 @@ class UserSettingsProfileForm(BaseForm):
         ],
     )
 
-    github = StringField(_('GitHub Username'), validators=[Optional()])
+    github = StringField(
+        _('GitHub Username'), validators=[Optional()], filters=[strip_at]
+    )
 
-    gitlab = StringField(_('GitLab Username'), validators=[Optional()])
-
-    rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
+    gitlab = StringField(
+        _('GitLab Username'), validators=[Optional()], filters=[strip_at]
+    )
 
     website_url = URLField(
         _('Website or Blog URL'),
@@ -84,7 +133,19 @@ class UserSettingsProfileForm(BaseForm):
         validators=[Optional()],
     )
 
-    pronouns = StringField(_('Pronouns'), validators=[Optional()],)
+    pronouns = CSVListField(_('Pronouns'), validators=[Optional()])
+
+
+class UserSettingsEmailForm(BaseForm):
+    mail = EmailField(
+        _('E-mail Address'),
+        validators=[
+            DataRequired(message=_('Email must not be empty')),
+            Email(message=_('Email must be valid')),
+        ],
+    )
+
+    rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
 
 
 class UserSettingsKeysForm(BaseForm):

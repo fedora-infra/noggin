@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
 from markupsafe import escape, Markup
 from wtforms import Field, SubmitField
+from wtforms.fields.core import FieldList, SelectField, StringField
+from wtforms.utils import unset_value
 from wtforms.widgets import TextInput
 from wtforms.widgets.core import html_params
 
@@ -70,8 +72,19 @@ def strip(value):
     return value.strip() if value else value
 
 
+def strip_at(value):
+    return value.lstrip("@") if value else value
+
+
 def lower(value):
     return value.lower() if value else value
+
+
+def replace(target, replacement):
+    def _replace(value):
+        return value.replace(target, replacement) if value else value
+
+    return _replace
 
 
 class CSVListField(Field):
@@ -88,3 +101,89 @@ class CSVListField(Field):
             self.data = [x.strip() for x in values[0].split(',') if x.strip()]
         else:
             self.data = []
+
+
+class TypeAndStringWidget(TextInput):
+    def __call__(self, field, **kwargs):
+        kwargs.setdefault('id', field.id)
+        errors = [str(e) for e in field.errors or []]
+        if errors:
+            errors.insert(0, '<div class="invalid-feedback d-block">')
+            errors.append('</div>')
+        html = [
+            '<div class="input-group">',
+            '<div class="input-group-prepend">',
+            field.subfields[0](class_="custom-select"),
+            '</div>',
+            field.subfields[1](**kwargs),
+            '<div class="input-group-append">',
+            '<button class="btn btn-outline-secondary form-control" '
+            'data-action="clear" type="button">',
+            '<i class="fa fa-fw fa-times"></i>',
+            '</button>',
+            '</div>',
+            '</div>',
+            " ".join(errors),
+        ]
+        return Markup(''.join(html))
+
+
+class TypeAndStringField(Field):
+    widget = TypeAndStringWidget()
+
+    def __init__(self, *args, **kwargs):
+        choices = kwargs.pop("choices", None)
+        super().__init__(*args, **kwargs)
+        self._prefix = kwargs.get('_prefix', '')
+        self.subfields = []
+        self._add_field("type", SelectField(choices=choices))
+        self._add_field(
+            "value",
+            StringField(
+                filters=kwargs.get("filters"), validators=kwargs.get("validators")
+            ),
+        )
+
+    def _parse_data(self, data):
+        raise NotImplementedError  # pragma: no cover
+
+    def _serialize_data(self, scheme, value):
+        raise NotImplementedError  # pragma: no cover
+
+    def _add_field(self, name, unbound_field):
+        self.subfields.append(
+            unbound_field.bind(
+                form=None,
+                name=f"{self.short_name}-{name}",
+                prefix=self._prefix,
+                id=f"{self.id}-{name}",
+                _meta=self.meta,
+                translations=self._translations,
+            )
+        )
+
+    def process(self, formdata, data=unset_value):
+        if data:
+            data = self._parse_data(data)
+        else:
+            data = (unset_value, unset_value)
+        for field, field_data in zip(self.subfields, data):
+            field.process(formdata, field_data)
+
+    @property
+    def data(self):
+        scheme = self.subfields[0].data
+        value = self.subfields[1].data
+        if not value:
+            return ""
+        return self._serialize_data(scheme, value)
+
+
+class NonEmptyFieldList(FieldList):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.type = "FieldList"
+
+    @property
+    def data(self):
+        return [f.data.strip() for f in self.entries if f.data and f.data.strip()]

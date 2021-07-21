@@ -2,11 +2,13 @@ import datetime
 
 import pytest
 import python_freeipa
+from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 from flask import current_app
 
 from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
+from noggin.security.ipa import maybe_ipa_login
 from noggin.signals import stageuser_created, user_registered
 from noggin.tests.unit.utilities import (
     assert_form_field_error,
@@ -56,13 +58,14 @@ def post_data_step_3():
 def dummy_stageuser(ipa_testing_config):
     now = datetime.datetime.utcnow().replace(microsecond=0)
     user = ipa_admin.stageuser_add(
-        a_uid="dummy",
+        "dummy",
         o_givenname="Dummy",
         o_sn="User",
         o_cn="Dummy User",
         o_mail="dummy@example.com",
         o_loginshell='/bin/bash',
         fascreationtime=f"{now.isoformat()}Z",
+        fasstatusnote="spamcheck_awaiting",
     )['result']
     yield User(user)
     try:
@@ -299,7 +302,6 @@ def test_step_2_unknown_user(client):
 @pytest.mark.vcr()
 def test_step_2_spamchecking_user(client, dummy_stageuser, spamcheck_on):
     """Register a user, step 2, but the user hasn't been checked for spam"""
-    ipa_admin.stageuser_mod(a_uid="dummy", fasstatusnote="spamcheck_awaiting")
     result = client.get('/register/confirm?username=dummy')
     assert result.status_code == 401
 
@@ -350,7 +352,7 @@ def test_step_3_garbled_token(client, dummy_stageuser):
 
 
 @pytest.mark.vcr()
-def test_step_3_invalid_token(client, dummy_stageuser, mocker):
+def test_step_3_invalid_token(client, dummy_stageuser):
     """Registration activation page with an invalid token"""
     token = make_token(
         {"sub": dummy_stageuser.username, "mail": dummy_stageuser.mail},
@@ -399,7 +401,7 @@ def test_step_3_wrong_address(client, token_for_dummy_user, mocker):
 
 @pytest.mark.vcr()
 def test_short_password_form(
-    client, post_data_step_3, token_for_dummy_user, cleanup_dummy_user, mocker
+    client, post_data_step_3, token_for_dummy_user, cleanup_dummy_user
 ):
     """Register a user with too short a password"""
     post_data_step_3["password"] = post_data_step_3["password_confirm"] = "42"
@@ -441,10 +443,12 @@ def test_short_password_policy(
 def test_duplicate(client, post_data_step_1, cleanup_dummy_user, dummy_user):
     """Register a user that already exists"""
     result = client.post('/', data=post_data_step_1)
-    assert_form_field_error(
+    assert_form_generic_error(
         result,
-        field_name="register-username",
-        expected_message='This username is already taken, please choose another one.',
+        expected_message=(
+            "The username 'dummy' or the email address 'dummy@example.com' "
+            "are already taken."
+        ),
     )
 
 
@@ -757,3 +761,157 @@ def test_spamcheck_wrong_status(client, dummy_user, mocker, spamcheck_on):
     )
     assert response.status_code == 400
     assert response.json == {"error": "Invalid status: this-is-wrong."}
+
+
+@pytest.fixture
+@pytest.mark.vcr()
+def logged_in_stage_users_admin(client, make_user, app):
+    make_user("stageadmin")
+    ipa_admin.role_add_member(app.config["STAGE_USERS_ROLE"], o_user=["stageadmin"])
+    with client.session_transaction() as sess:
+        ipa = maybe_ipa_login(
+            app, sess, username="stageadmin", userpassword="stageadmin_password"
+        )
+    yield ipa
+    ipa.logout()
+    with client.session_transaction() as sess:
+        sess.clear()
+
+
+@pytest.mark.vcr()
+def test_registering(client, logged_in_stage_users_admin, dummy_stageuser):
+    response = client.get("/registering/?status=spamcheck_awaiting")
+    page = BeautifulSoup(response.data, 'html.parser')
+    # Tabs
+    tab = page.select_one(".nav-tabs .nav-link.active")
+    assert tab is not None
+    assert tab.get_text("|", strip=True) == "Awaiting|1"
+    assert tab["href"] == "?status=spamcheck_awaiting"
+    # Pills (users)
+    links = page.select(".nav-pills .nav-link#t-dummy[href='#u-dummy']")
+    assert len(links) == 1
+    link = links[0]
+    assert link.get_text(strip=True) == "dummy (Dummy User)"
+    assert link["id"] == "t-dummy"
+    assert link["href"] == "#u-dummy"
+    tabcontent = page.select_one('.tab-content #u-dummy')
+    assert tabcontent is not None
+    assert tabcontent.h2.get_text(strip=True) == "dummy"
+    assert (
+        tabcontent.form["action"]
+        == "http://localhost/registering/?status=spamcheck_awaiting"
+    )
+
+
+@pytest.mark.parametrize(
+    "action,status,message",
+    [
+        ("accept", "active", "Accepted registering user dummy"),
+        ("spam", "spamcheck_denied", "Flagged registering user dummy as spam"),
+    ],
+)
+@pytest.mark.vcr()
+def test_registering_change_status(
+    client, logged_in_stage_users_admin, dummy_stageuser, action, status, message
+):
+    with mailer.record_messages() as outbox:
+        response = client.post(
+            "/registering/", data={"username": "dummy", "action": action}
+        )
+    assert_redirects_with_flash(response, "/registering/", message, "success")
+    # Check that the status was changed
+    user = User(ipa_admin.stageuser_show("dummy")["result"])
+    assert user.status_note == status
+    # Sent email
+    if action == "accept":
+        assert len(outbox) == 1
+        message = outbox[0]
+        assert message.subject == "Verify your email address"
+        assert message.recipients == ["dummy@example.com"]
+    else:
+        assert len(outbox) == 0
+
+
+@pytest.mark.vcr()
+def test_registering_delete(client, logged_in_stage_users_admin, dummy_stageuser):
+    with mailer.record_messages() as outbox:
+        response = client.post(
+            "/registering/", data={"username": "dummy", "action": "delete"}
+        )
+    assert_redirects_with_flash(
+        response, "/registering/", "Deleted registering user dummy", "success"
+    )
+    with pytest.raises(python_freeipa.exceptions.NotFound):
+        ipa_admin.stageuser_show("dummy")
+    assert len(outbox) == 0
+
+
+@pytest.mark.vcr()
+def test_registering_invalid_action(
+    client, logged_in_stage_users_admin, dummy_stageuser
+):
+    with mailer.record_messages() as outbox:
+        response = client.post(
+            "/registering/", data={"username": "dummy", "action": "unknown-action"}
+        )
+    assert_form_generic_error(response, "Invalid action: unknown-action")
+    # Check that the status was not changed
+    user = User(ipa_admin.stageuser_show("dummy")["result"])
+    assert user.status_note == "spamcheck_awaiting"
+    assert len(outbox) == 0
+
+
+@pytest.mark.vcr()
+def test_registering_unknown_user(client, logged_in_stage_users_admin):
+    response = client.post(
+        "/registering/", data={"username": "dummy", "action": "accept"}
+    )
+    assert_redirects_with_flash(
+        response, "/registering/", "Unknown user: dummy", "danger"
+    )
+
+
+@pytest.mark.parametrize(
+    "action,message",
+    [
+        ("accept", "Could not accept registering user dummy"),
+        ("spam", "Could not flag registering user dummy as spam"),
+    ],
+)
+@pytest.mark.vcr()
+def test_registering_change_status_error(
+    client, logged_in_stage_users_admin, dummy_stageuser, mocker, action, message
+):
+    stageuser_mod = mocker.patch("noggin.security.ipa.Client.stageuser_mod")
+    stageuser_mod.side_effect = python_freeipa.exceptions.BadRequest(
+        message="something went wrong", code="4242"
+    )
+    with mailer.record_messages() as outbox:
+        response = client.post(
+            "/registering/", data={"username": "dummy", "action": action}
+        )
+    assert_form_generic_error(response, f"{message}: something went wrong")
+    # Check that the status was not changed and that no email was sent
+    user = User(ipa_admin.stageuser_show("dummy")["result"])
+    assert user.status_note == "spamcheck_awaiting"
+    assert len(outbox) == 0
+
+
+@pytest.mark.vcr()
+def test_registering_delete_error(
+    client, logged_in_stage_users_admin, dummy_stageuser, mocker,
+):
+    method = mocker.patch("noggin.security.ipa.Client.stageuser_del")
+    method.side_effect = python_freeipa.exceptions.BadRequest(
+        message="something went wrong", code="4242"
+    )
+    with mailer.record_messages() as outbox:
+        response = client.post(
+            "/registering/", data={"username": "dummy", "action": "delete"}
+        )
+    expected_msg = "Could not delete registering user dummy: something went wrong"
+    assert_form_generic_error(response, expected_msg)
+    # Check that the status was not changed and that no email was sent
+    user = User(ipa_admin.stageuser_show("dummy")["result"])
+    assert user.status_note == "spamcheck_awaiting"
+    assert len(outbox) == 0

@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def attr_to_str(value):
     if not value:
         return None
@@ -14,10 +17,18 @@ def attr_to_bool(value):
     return value[0] == "TRUE"
 
 
+def attr_to_date(value):
+    if value is None:
+        return None
+    dt = value[0]["__datetime__"]
+    return datetime.strptime(dt, r"%Y%m%d%H%M%SZ")
+
+
 CONVERTERS = {
     "str": attr_to_str,
     "list": attr_to_list,
     "bool": attr_to_bool,
+    "date": attr_to_date,
 }
 
 
@@ -25,6 +36,7 @@ class Representation:
 
     attr_names = {}
     attr_types = {}
+    attr_options = {}
     pkey = None
 
     def __init__(self, raw):
@@ -71,8 +83,12 @@ class Representation:
                 f"Can't diff a {self.__class__.__name__} instance against a "
                 f"{other.__class__.__name__} instance"
             )
-
         return [key for key in self if getattr(self, key) != getattr(other, key)]
 
     def as_dict(self):
         return {attr: getattr(self, attr) for attr in self.attr_names}
+
+    def get_attr_option(self, attr):
+        attr_to_options = self.attr_names.copy()
+        attr_to_options.update(self.attr_options)
+        return attr_to_options[attr]

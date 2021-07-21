@@ -1,0 +1,33 @@
+{% extends "main.html" %}
+{% block title %}{{_("Validate your email")}}{% endblock %}
+
+{% block content %}
+  {{ super() }}
+
+
+{% import '_form_macros.html' as macros %}
+
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-6 mx-auto">
+        <div class="card">
+          <form action="{{ request.url }}" method="post">
+            {{ form.csrf_token }}
+            <div class="card-body">
+              <h4 class="card-title">{{_("Validate your email")}}</h4>
+              <p>{{_("Hello %(user_name)s. Do you want to set your %(attr_name)s to %(mail)s?", user_name=user.name, attr_name=attr_label, mail=value)}}</p>
+            </div>
+            <div class="card-footer">
+              <div>{{ macros.non_field_errors(form) }}</div>
+              <div class="d-flex justify-content-between">
+                <a href="{{ url_for('.user_settings_email', username=user.username) }}" class="btn btn-secondary">{{_("Cancel")}}</a>
+                <button type="submit" class="btn btn-primary">{{_("Do it")}}</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div> <!-- ./row -->
+  </div>
+
+{% endblock %}

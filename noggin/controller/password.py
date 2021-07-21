@@ -151,7 +151,7 @@ def forgot_password_ask():
                     "username", _("User %(username)s does not exist", username=username)
                 )
             token = make_token(
-                {"sub": user.username, "lpc": user.last_password_change},
+                {"sub": user.username, "lpc": user.last_password_change.isoformat()},
                 audience=Audience.password_reset,
             )
             # Send the email
@@ -207,7 +207,7 @@ def forgot_password_change():
         flash(_("The token has expired, please request a new one."), "warning")
         return redirect(url_for('.forgot_password_ask'))
     user = User(ipa_admin.user_show(a_uid=username)['result'])
-    if user.last_password_change != token_data["lpc"]:
+    if user.last_password_change.isoformat() != token_data["lpc"]:
         lock.delete()
         flash(
             _(
@@ -266,7 +266,7 @@ def forgot_password_change():
             # re-generate a token so they can keep going.
             user = User(ipa_admin.user_show(a_uid=username)['result'])
             token = make_token(
-                {"sub": user.username, "lpc": user.last_password_change},
+                {"sub": user.username, "lpc": user.last_password_change.isoformat()},
                 audience=Audience.password_reset,
             )
             form.otp.errors.append(_("Incorrect value."))

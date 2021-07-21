@@ -1,4 +1,5 @@
 import hashlib
+from urllib.parse import urlparse
 
 from flask import current_app, Markup
 from flask_babel import lazy_gettext as _
@@ -34,3 +35,33 @@ def undo_button(form_action, submit_name, submit_value, hidden_tag):
         </form>
     </span>"""
     return Markup(template)
+
+
+def format_nickname(value):
+    url = urlparse(value)
+    name = url.path.lstrip("/").lstrip("@")
+    scheme = url.scheme
+    if not scheme:
+        scheme = "irc"
+    try:
+        default_server = current_app.config["CHAT_NETWORKS"][scheme]["default_server"]
+    except KeyError:
+        raise ValueError(f"Unsupported chat protocol: '{scheme}'")
+    server = url.netloc if url.netloc else default_server
+
+    if scheme == "irc":
+        protocol = "IRC"
+        # https://www.w3.org/Addressing/draft-mirashi-url-irc-01.txt
+        href = f"irc://{server}/{name},isnick"
+    elif scheme == "matrix":
+        protocol = "Matrix"
+        # https://matrix.org/docs/spec/#users
+        href = f"https://matrix.to/#/@{name}:{server}"
+        name = f"@{name}"
+        if server != default_server:
+            name += f":{server}"
+    else:
+        raise ValueError(f"Can't parse '{value}'")
+
+    title = _("%(protocol)s on %(server)s", protocol=protocol, server=server)
+    return Markup(f"""<a href="{href}" title="{title}">{name}</a>""")

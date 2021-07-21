@@ -29,6 +29,16 @@ HEALTHZ = {
 
 PAGE_SIZE = 30
 
+CHAT_NETWORKS = {
+    "irc": {"default_server": "irc.libera.chat"},
+    "matrix": {"default_server": "matrix.org"},
+}
+
+STAGE_USERS_ROLE = "Stage User Managers"
+
+TEMPLATES_CUSTOM_DIRECTORIES = []
+ACCEPT_IMAGES_FROM = []
+
 BASSET_URL = None
 SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 
