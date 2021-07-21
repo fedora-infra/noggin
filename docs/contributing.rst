@@ -196,7 +196,7 @@ When cutting a new release, follow these steps:
 #. Run ``poetry install`` to update the version in the metadata
 #. Add missing authors to the release notes fragments by changing to the ``news`` directory and
    running the ``get-authors.py`` script, but check for duplicates and errors
-#. Generate the release notes by running ``towncrier`` (in the base directory)
+#. Generate the release notes by running ``poetry run towncrier`` (in the base directory)
 #. Adjust the release notes in ``docs/release_notes.rst``.
 #. Generate the docs with ``tox -e docs`` and check them in ``docs/_build/html``.
 #. Commit the changes
