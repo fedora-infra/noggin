@@ -11,5 +11,5 @@ TMPFILE=$(mktemp -t noggin-requirements-XXXXXX.txt)
 # and liccheck crashes on packages listed in the req file but not installed.
 # poetry export --dev -f requirements.txt -o $TMPFILE
 
-pip freeze --exclude-editable --isolated > $TMPFILE
-liccheck -r $TMPFILE
+poetry run pip freeze --exclude-editable --isolated > $TMPFILE
+poetry run liccheck -r $TMPFILE
