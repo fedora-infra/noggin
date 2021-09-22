@@ -12,8 +12,9 @@
             <img class="w-50  border d-md-none" src="{{ gravatar(user.mail if user.mail else 'default', 400) }}" alt="gravatar"/>
             <h3 class="mt-2 mb-0" id="user_fullname">{{ user.name if user.name else user.username }}</h3>
             <h5 class="mb-2" id="user_username">{{ user.username }}</h5>
+            <h5 class="mb-3" id="user_mail"><a href="mailto:{{ user.mail }}">{{ user.mail }}</a></h5>
             {% if user.username == current_user.username %}
-            <a href="{{ url_for('.user_settings_profile', username=user.username) }}" class="btn btn-outline-primary btn-block my-2">{{_("Edit Profile")}}</a>
+            <a href="{{ url_for('.user_settings_profile', username=user.username) }}" class="btn btn-outline-primary btn-block my-3">{{_("Edit Profile")}}</a>
             {% endif %}
           </div>
           <ul class="list-group list-group-flush" id="user_attributes">
