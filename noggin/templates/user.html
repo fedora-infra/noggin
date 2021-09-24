@@ -72,6 +72,16 @@
                   </div>
                 </li>
               {% endif %}
+              {% if user.sshpubkeys %}
+                <li class="list-group-item">
+                  <strong title='{{_("SSH Keys")}}'><i class="fa fa-fw fa-key"></i> {{_("SSH Keys")}}</strong>
+                  <div class="mt-1">
+                    {% for key in user.sshpubkeys %}
+                      <pre class="mb-1 bg-light border px-2 py-1 rounded">{{ key }}</pre>
+                    {% endfor %}
+                  </div>
+                </li>
+              {% endif %}
               {% if user.website_url %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <strong title='{{_("Website")}}'><i class="fa fa-fw fa-link" aria-hidden="true"></i> {{_("Website")}}</strong>
