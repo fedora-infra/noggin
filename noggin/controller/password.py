@@ -29,7 +29,7 @@ from noggin.utility import messaging
 from noggin.utility.controllers import require_self, user_or_404, with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.password_reset import PasswordResetLock
-from noggin.utility.token import Audience, make_token, read_token
+from noggin.utility.token import Audience, make_password_change_token, read_token
 from noggin_messages import UserUpdateV1
 
 from . import blueprint as bp
@@ -150,10 +150,7 @@ def forgot_password_ask():
                 raise FormError(
                     "username", _("User %(username)s does not exist", username=username)
                 )
-            token = make_token(
-                {"sub": user.username, "lpc": user.last_password_change.isoformat()},
-                audience=Audience.password_reset,
-            )
+            token = make_password_change_token(user)
             # Send the email
             email_context = {"token": token, "username": username}
             email = Message(
@@ -207,7 +204,10 @@ def forgot_password_change():
         flash(_("The token has expired, please request a new one."), "warning")
         return redirect(url_for('.forgot_password_ask'))
     user = User(ipa_admin.user_show(a_uid=username)['result'])
-    if user.last_password_change.isoformat() != token_data["lpc"]:
+    lpc = user.last_password_change
+    if lpc is not None:
+        lpc = lpc.isoformat()
+    if lpc != token_data["lpc"]:
         lock.delete()
         flash(
             _(
@@ -265,10 +265,7 @@ def forgot_password_change():
             # Oh noes, the token is now invalid since the user's password was changed! Let's
             # re-generate a token so they can keep going.
             user = User(ipa_admin.user_show(a_uid=username)['result'])
-            token = make_token(
-                {"sub": user.username, "lpc": user.last_password_change.isoformat()},
-                audience=Audience.password_reset,
-            )
+            token = make_password_change_token(user)
             form.otp.errors.append(_("Incorrect value."))
         except python_freeipa.exceptions.FreeIPAError as e:
             # If we made it here, we hit something weird not caught above.
