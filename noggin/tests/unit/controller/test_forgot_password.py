@@ -18,7 +18,12 @@ from noggin.tests.unit.utilities import (
     otp_secret_from_uri,
 )
 from noggin.utility.password_reset import PasswordResetLock
-from noggin.utility.token import Audience, make_token, read_token
+from noggin.utility.token import (
+    Audience,
+    make_password_change_token,
+    make_token,
+    read_token,
+)
 from noggin_messages import UserUpdateV1
 
 
@@ -48,6 +53,32 @@ def patched_lock_active(patched_lock):
     expiry = datetime.datetime.now() + datetime.timedelta(minutes=2)
     patched_lock["valid_until"].return_value = expiry
     yield patched_lock
+
+
+@pytest.fixture
+def dummy_user_no_password(ipa_testing_config, app):
+    # Unfortunately we can't delete the krbLastPwdChange attribute until this is fixed:
+    # https://pagure.io/freeipa/issue/9004
+
+    now = datetime.datetime.utcnow().replace(microsecond=0)
+    name = "dummy"
+    # password = f"{name}_password"
+    ipa_admin.user_add(
+        name,
+        o_givenname=name.title(),
+        o_sn='User',
+        o_cn=f'{name.title()} User',
+        o_mail=f"{name}@example.com",
+        # o_userpassword=password,
+        o_loginshell='/bin/bash',
+        fascreationtime=f"{now.isoformat()}Z",
+    )
+    # ipa = untouched_ipa_client(app)
+    # ipa.change_password(name, password, password)
+
+    yield
+
+    ipa_admin.user_del(name)
 
 
 def test_ask_get(client):
@@ -144,6 +175,34 @@ def test_ask_still_valid(client, patched_lock_active):
     )
     # No sent email
     assert len(outbox) == 0
+
+
+@pytest.mark.vcr()
+def test_ask_post_no_last_password_change(client, dummy_user_no_password, patched_lock):
+    """Test with a user that has never changed their password"""
+    with mailer.record_messages() as outbox:
+        result = client.post('/forgot-password/ask', data={"username": "dummy"})
+    # Confirmation message
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message=(
+            "An email has been sent to your address with instructions on how to reset "
+            "your password"
+        ),
+        expected_category="success",
+    )
+    # Sent email
+    assert len(outbox) == 1
+    message = outbox[0]
+    # Valid token
+    token_match = re.search(r"\?token=([^\s\"']+)", message.body)
+    assert token_match is not None
+    token = token_match.group(1)
+    token_data = read_token(token, audience=Audience.password_reset)
+    assert token_data.get("sub") == "dummy"
+    assert "lpc" in token_data
+    assert token_data["lpc"] is None
 
 
 def test_change_no_token(client):
@@ -382,4 +441,26 @@ def test_change_post_password_with_otp_wrong_value(
     logger.info.assert_called_with(
         "Password for dummy was changed to a random string because the OTP token "
         "they provided was wrong."
+    )
+
+
+@pytest.mark.vcr()
+def test_change_post_no_earlier_password_change(
+    client, dummy_user_no_password, patched_lock_active, mocker
+):
+    user = User(ipa_admin.user_show("dummy")["result"])
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {"msg": {"agent": "dummy", "user": "dummy", "fields": ["password"]}}
+        )
+    ):
+        result = client.post(
+            f'/forgot-password/change?token={make_password_change_token(user)}',
+            data={"password": "newpassword", "password_confirm": "newpassword"},
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Your password has been changed.",
+        expected_category="success",
     )

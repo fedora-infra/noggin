@@ -34,3 +34,12 @@ def read_token(token, audience=None):
         algorithms=["HS256"],
         audience=audience.value,
     )
+
+
+def make_password_change_token(user):
+    lpc = user.last_password_change
+    if lpc is not None:
+        lpc = lpc.isoformat()
+    return make_token(
+        {"sub": user.username, "lpc": lpc}, audience=Audience.password_reset,
+    )
