@@ -180,11 +180,13 @@
       <div class="col-6 mx-auto">
         <div class="card">
             <div class="card-body">
-              <h5 id="pageheading">{{_("Did you lose your OTP token?")}}</h5>
-              {% set admin_email %}
-              <a href="mailto:admin@fedoraproject.org?Subject=Lost%20OTP" target="_top">admin@fedoraproject.org</a>
-              {% endset %}
-              <p>{{_("If you have lost your OTP token you need to send an email to %(admin_email)s. Please sign this email using the GPG key associated with your account if possible, so that the administrator can verify your identity.", admin_email=admin_email)}}</p>
+              <h5 id="pageheading">{{_("Did you lose your last OTP token?")}}</h5>
+              {% set admin_email -%}
+                <code>admin at fedoraproject.org</code>
+              {%- endset %}
+              <p>{{_("If you have lost your last OTP token you need to send an email to %(admin_email)s. Please sign this email using the GPG key associated with your account if possible, so that the administrator can verify your identity.", admin_email=admin_email)}}</p>
+              <p>{{_("If you had multiple tokens and lost one, you can use another to login and delete the lost token from your account.")}}</p>
+              <p class="mb-0">{{_("If you haven't enrolled a OTP token, you don't have one and this doesn't apply to you.")}}</p>
             </div>
         </div>
       </div>
