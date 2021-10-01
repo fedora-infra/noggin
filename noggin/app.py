@@ -15,7 +15,7 @@ from noggin.middleware import IPAErrorHandler
 from noggin.security.ipa_admin import IPAAdmin
 from noggin.themes import Theme
 from noggin.utility import import_all
-from noggin.utility.templates import format_nickname
+from noggin.utility.templates import format_channel, format_nickname
 
 
 # Forms
@@ -105,6 +105,7 @@ def create_app(config=None):
     # Template filters
     # If there are too many, group them in an extension
     app.jinja_env.filters["nickname"] = format_nickname
+    app.jinja_env.filters["channel"] = format_channel
 
     # Register views
     import_all("noggin.controller")

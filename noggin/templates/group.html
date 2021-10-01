@@ -22,7 +22,7 @@
             <div id="group-mailinglist"><i class="fa fa-fw fa-envelope" aria-hidden="true"></i> <a href="mailto:{{group.mailing_list}}">{{group.mailing_list}}</a></div>
           {% endif %}
           {% if group.irc_channel %}
-            <div id="group-ircchannel"><i class="fa fa-fw fa-comments-o" aria-hidden="true"></i> <a href="{{group.irc_channel}}">{{group.irc_channel}}</a></div>
+            <div id="group-ircchannel"><i class="fa fa-fw fa-comments-o" aria-hidden="true"></i> {{ group.irc_channel | channel }}</div>
           {% endif %}
       </div>
       {% if group.urls %}

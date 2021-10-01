@@ -189,7 +189,7 @@ def make_group(ipa_testing_config, app):
             fasgroup=True,
             fasurl=f"http://{name}.example.com",
             fasmailinglist=f"{name}@lists.example.com",
-            fasircchannel=f"irc:///freenode.net/#{name}",
+            fasircchannel=f"irc://freenode.net/#{name}",
         )
         created.append(name)
         return result
