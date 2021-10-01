@@ -38,8 +38,20 @@ def undo_button(form_action, submit_name, submit_value, hidden_tag):
 
 
 def format_nickname(value):
+    return format_chat(value, isnick=True)
+
+
+def format_channel(value):
+    return format_chat(value, isnick=False)
+
+
+def format_chat(value, isnick):
     url = urlparse(value)
-    name = url.path.lstrip("/").lstrip("@")
+    name = url.path.lstrip("/")
+    if isnick:
+        name = name.lstrip("@")
+    elif not name and url.fragment:
+        name = url.fragment
     scheme = url.scheme
     if not scheme:
         scheme = "irc"
@@ -52,13 +64,20 @@ def format_nickname(value):
     if scheme == "irc":
         protocol = "IRC"
         # https://www.w3.org/Addressing/draft-mirashi-url-irc-01.txt
-        href = f"irc://{server}/{name},isnick"
+        href = f"irc://{server}/{name}"
+        if isnick:
+            href = f"{href},isnick"
+        else:
+            name = f"#{name}@{server}"
     elif scheme == "matrix":
         protocol = "Matrix"
+        if isnick:
+            name = f"@{name}"
+        else:
+            name = f"#{name}"
         # https://matrix.org/docs/spec/#users
-        href = f"https://matrix.to/#/@{name}:{server}"
-        name = f"@{name}"
-        if server != default_server:
+        href = f"https://matrix.to/#/{name}:{server}"
+        if server != default_server or not isnick:
             name += f":{server}"
     else:
         raise ValueError(f"Can't parse '{value}'")

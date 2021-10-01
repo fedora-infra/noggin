@@ -1,6 +1,6 @@
 import pytest
 
-from noggin.utility.templates import format_nickname
+from noggin.utility.templates import format_channel, format_nickname
 
 
 @pytest.mark.parametrize(
@@ -74,3 +74,69 @@ def test_format_nickname_invalid_with_config(app, request_context, mocker):
     with pytest.raises(ValueError) as e:
         format_nickname("new-scheme:/username")
         assert str(e) == "ValueError: Can't parse 'new-scheme:/username'"
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (
+            "irc:/channel",
+            {
+                "href": "irc://irc.libera.chat/channel",
+                "title": "IRC on irc.libera.chat",
+                "name": "#channel@irc.libera.chat",
+            },
+        ),
+        (
+            "irc:///channel",
+            {
+                "href": "irc://irc.libera.chat/channel",
+                "title": "IRC on irc.libera.chat",
+                "name": "#channel@irc.libera.chat",
+            },
+        ),
+        (
+            "irc://irc.example.com/#channel",
+            {
+                "href": "irc://irc.example.com/channel",
+                "title": "IRC on irc.example.com",
+                "name": "#channel@irc.example.com",
+            },
+        ),
+        (
+            "matrix:/channel",
+            {
+                "href": "https://matrix.to/#/#channel:matrix.org",
+                "title": "Matrix on matrix.org",
+                "name": "#channel:matrix.org",
+            },
+        ),
+        (
+            "matrix://example.com/#channel",
+            {
+                "href": "https://matrix.to/#/#channel:example.com",
+                "title": "Matrix on example.com",
+                "name": "#channel:example.com",
+            },
+        ),
+        (
+            "channel",
+            {
+                "href": "irc://irc.libera.chat/channel",
+                "title": "IRC on irc.libera.chat",
+                "name": "#channel@irc.libera.chat",
+            },
+        ),
+        (
+            "#channel",
+            {
+                "href": "irc://irc.libera.chat/channel",
+                "title": "IRC on irc.libera.chat",
+                "name": "#channel@irc.libera.chat",
+            },
+        ),
+    ],
+)
+def test_format_channel(request_context, value, expected):
+    expected_html = '<a href="{href}" title="{title}">{name}</a>'.format(**expected)
+    assert str(format_channel(value)) == expected_html
