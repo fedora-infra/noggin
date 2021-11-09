@@ -33,6 +33,10 @@ CHAT_NETWORKS = {
     "irc": {"default_server": "irc.libera.chat"},
     "matrix": {"default_server": "fedora.im"},
 }
+# Link to matrix rooms and usernames using the element.io web client
+# instance at chat.fedoraproject.org. Set this variable to a falsy
+# value to use element.io.
+CHAT_MATRIX_TO_ARGS = "web-instance[element.io]=chat.fedoraproject.org"
 
 STAGE_USERS_ROLE = "Stage User Managers"
 
