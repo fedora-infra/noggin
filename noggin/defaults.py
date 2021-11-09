@@ -31,7 +31,7 @@ PAGE_SIZE = 30
 
 CHAT_NETWORKS = {
     "irc": {"default_server": "irc.libera.chat"},
-    "matrix": {"default_server": "matrix.org"},
+    "matrix": {"default_server": "fedora.im"},
 }
 
 STAGE_USERS_ROLE = "Stage User Managers"
