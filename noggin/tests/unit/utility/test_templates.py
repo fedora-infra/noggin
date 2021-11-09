@@ -1,4 +1,5 @@
 import pytest
+from flask import current_app
 
 from noggin.utility.templates import format_channel, format_nickname
 
@@ -25,7 +26,10 @@ from noggin.utility.templates import format_channel, format_nickname
         (
             "matrix:/username",
             {
-                "href": "https://matrix.to/#/@username:fedora.im",
+                "href": (
+                    "https://matrix.to/#/@username:fedora.im"
+                    "?web-instance[element.io]=chat.fedoraproject.org"
+                ),
                 "title": "Matrix on fedora.im",
                 "name": "@username",
             },
@@ -33,7 +37,10 @@ from noggin.utility.templates import format_channel, format_nickname
         (
             "matrix://example.com/username",
             {
-                "href": "https://matrix.to/#/@username:example.com",
+                "href": (
+                    "https://matrix.to/#/@username:example.com"
+                    "?web-instance[element.io]=chat.fedoraproject.org"
+                ),
                 "title": "Matrix on example.com",
                 "name": "@username:example.com",
             },
@@ -58,6 +65,16 @@ from noggin.utility.templates import format_channel, format_nickname
 )
 def test_format_nickname(request_context, value, expected):
     expected_html = '<a href="{href}" title="{title}">{name}</a>'.format(**expected)
+    assert str(format_nickname(value)) == expected_html
+
+
+def test_format_nickname_no_matrixto_args(request_context):
+    value = "matrix://example.com/username"
+    name = "@username:example.com"
+    title = "Matrix on example.com"
+    href = "https://matrix.to/#/@username:example.com"
+    expected_html = f'<a href="{href}" title="{title}">{name}</a>'
+    current_app.config["CHAT_MATRIX_TO_ARGS"] = None
     assert str(format_nickname(value)) == expected_html
 
 

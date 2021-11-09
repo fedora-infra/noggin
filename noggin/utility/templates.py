@@ -77,6 +77,9 @@ def format_chat(value, isnick):
             name = f"#{name}"
         # https://matrix.org/docs/spec/#users
         href = f"https://matrix.to/#/{name}:{server}"
+        matrixto_args = current_app.config["CHAT_MATRIX_TO_ARGS"]
+        if matrixto_args:
+            href = f"{href}?{matrixto_args}"
         if server != default_server or not isnick:
             name += f":{server}"
     else:
