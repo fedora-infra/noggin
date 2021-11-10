@@ -4,6 +4,42 @@ Release notes
 
 .. towncrier release notes start
 
+v1.4.0
+======
+
+Released on 2021-11-10.
+This is a feature and bugfix release.
+
+Features
+^^^^^^^^
+
+* Improve the display of group communication channels (IRC or Matrix)
+  (:issue:`309`).
+* Add the email address in the user's profile (:issue:`568`).
+* Display the SSH public keys on the user's profile (:issue:`676`).
+* Mention that Fedora and CentOS accounts are merged (:issue:`689`).
+* The Matrix server now defaults to fedora.im, and the Matrix web client
+  instance defaults to https://chat.fedoraproject.org (:issue:`780`).
+
+Bug Fixes
+^^^^^^^^^
+
+* Change the Lost OTP link and wording to limit spam email on our admin mailbox
+  (:issue:`678`).
+* Handle password changes for manually created users (:issue:`719`).
+
+Contributors
+^^^^^^^^^^^^
+
+Many thanks to the contributors of bug reports, pull requests, and pull request
+reviews for this release:
+
+* Aurélien Bompard
+* Charles Lee
+* Hela Basa
+* Josep M. Ferrer
+
+
 v1.3.0
 ======
 
