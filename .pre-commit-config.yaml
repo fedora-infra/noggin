@@ -46,22 +46,6 @@ repos:
         args: ["-r", "docs"]
         additional_dependencies: [sphinx]
 
-  # - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-  #   rev: v1.2.1
-  #   hooks:
-  #     - id: python-safety-dependencies-check
-  #       alias: safety
-  #       additional_dependencies: ["poetry"]
-  - repo: local
-    hooks:
-      - id: safety
-        name: safety
-        entry: poetry
-        args: [run, safety, check, --full-report, -i, "42050"]
-        language: system
-        pass_filenames: false
-
-
   - repo: local
     hooks:
       - id: liccheck
