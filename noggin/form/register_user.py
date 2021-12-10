@@ -1,9 +1,9 @@
 from flask_babel import lazy_gettext as _
 from wtforms import BooleanField, HiddenField, PasswordField, StringField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, EqualTo
+from wtforms.validators import DataRequired, EqualTo, Length
 
-from noggin.form.validators import Email, PasswordLength, username_format
+from noggin.form.validators import Email, PasswordLength, StopOnError, username_format
 
 from .base import BaseForm, ModestForm, strip, SubmitButtonField
 
@@ -25,6 +25,7 @@ class RegisterUserForm(ModestForm):
         _('Username'),
         validators=[
             DataRequired(message=_('User name must not be empty')),
+            StopOnError(Length(min=3, max=32)),
             username_format,
         ],
         filters=[strip],

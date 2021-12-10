@@ -1,7 +1,7 @@
 from flask import current_app
 from flask_babel import lazy_gettext as _
 from wtforms.validators import Email as WTFormsEmailValidator
-from wtforms.validators import Length, Regexp, ValidationError
+from wtforms.validators import Length, Regexp, StopValidation, ValidationError
 
 
 class Email(WTFormsEmailValidator):
@@ -41,3 +41,14 @@ def username_format(form, field):
             chars="\", \"".join(current_app.config["ALLOWED_USERNAME_HUMAN"]),
         ),
     )(form, field)
+
+
+class StopOnError:
+    def __init__(self, validator):
+        self.validator = validator
+
+    def __call__(self, form, field):
+        try:
+            self.validator(form, field)
+        except ValidationError as e:
+            raise StopValidation(str(e))
