@@ -149,17 +149,21 @@ def test_step_1_registration_closed(
     assert len(outbox) == 0
 
 
-@pytest.mark.vcr()
-def test_step_1_mixed_case(client, post_data_step_1, mocker):
-    """Try to register a user with mixed case username"""
-    post_data_step_1["register-username"] = "DummY"
+@pytest.mark.parametrize(
+    "username", ["dummy_user", "dummy.user", "dummy user", "_dummy", ".dummy", "dummy-"]
+)
+def test_step_1_bad_format(client, post_data_step_1, mocker, username):
+    """Try to register a user with an invalid username"""
+    post_data_step_1["register-username"] = username
     record_signal = mocker.Mock()
     with mailer.record_messages() as outbox, stageuser_created.connected_to(
         record_signal
     ):
         result = client.post('/', data=post_data_step_1)
     assert_form_field_error(
-        result, "register-username", "Mixed case is not allowed, try lower case."
+        result,
+        "register-username",
+        "Only these characters are allowed: \"a-z\", \"0-9\", \"-\".",
     )
     record_signal.assert_not_called()
     assert len(outbox) == 0
@@ -449,18 +453,6 @@ def test_duplicate(client, post_data_step_1, cleanup_dummy_user, dummy_user):
             "The username 'dummy' or the email address 'dummy@example.com' "
             "are already taken."
         ),
-    )
-
-
-@pytest.mark.vcr()
-def test_invalid_username(client, post_data_step_1):
-    """Register a user with an invalid username"""
-    post_data_step_1["register-username"] = "this is invalid"
-    result = client.post('/', data=post_data_step_1)
-    assert_form_field_error(
-        result,
-        field_name="register-username",
-        expected_message='may only include letters, numbers, _, -, . and $',
     )
 
 
