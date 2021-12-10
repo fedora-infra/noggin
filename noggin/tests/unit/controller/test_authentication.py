@@ -168,7 +168,9 @@ def test_login_username_case(client, dummy_user):
         },
     )
     assert_form_field_error(
-        result, "login-username", "Mixed case is not allowed, try lower case.",
+        result,
+        "login-username",
+        'Only these characters are allowed: "a-z", "0-9", "-".',
     )
 
 

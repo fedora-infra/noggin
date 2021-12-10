@@ -1,7 +1,7 @@
 from flask import current_app
 from flask_babel import lazy_gettext as _
 from wtforms.validators import Email as WTFormsEmailValidator
-from wtforms.validators import Length, ValidationError
+from wtforms.validators import Length, Regexp, ValidationError
 
 
 class Email(WTFormsEmailValidator):
@@ -32,6 +32,12 @@ class PasswordLength:
         validator(form, field)
 
 
-def no_mixed_case(form, field):
-    if field.data != field.data.lower():
-        raise ValidationError(_("Mixed case is not allowed, try lower case."))
+def username_format(form, field):
+    # Don't use it directly to allow access to current_app
+    return Regexp(
+        current_app.config["ALLOWED_USERNAME_PATTERN"],
+        message=_(
+            "Only these characters are allowed: \"%(chars)s\".",
+            chars="\", \"".join(current_app.config["ALLOWED_USERNAME_HUMAN"]),
+        ),
+    )(form, field)

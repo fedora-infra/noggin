@@ -16,6 +16,9 @@ PASSWORD_RESET_LOCK_DIR = "/tmp/noggin-pw-reset"  # nosec
 ACTIVATION_TOKEN_EXPIRATION = 30  # in minutes
 REGISTRATION_OPEN = True
 HIDE_GROUPS_IN = "hidden_groups"
+ALLOWED_USERNAME_PATTERN = "^[a-z0-9][a-z0-9-]{3,30}[a-z0-9]$"
+# This is used to build the error message
+ALLOWED_USERNAME_HUMAN = ["a-z", "0-9", "-"]
 
 AVATAR_SERVICE_URL = "https://seccdn.libravatar.org/"
 AVATAR_DEFAULT_TYPE = "robohash"
