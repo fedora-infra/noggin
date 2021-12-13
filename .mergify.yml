@@ -2,8 +2,17 @@ queue_rules:
   - name: default
     conditions:
       # Conditions to get out of the queue (= merged)
-      - status-success=CI on f34
-      - status-success=CI on f35
+      - status-success=Misc tests (lint)
+      - status-success=Misc tests (format)
+      - status-success=Misc tests (licenses)
+      - status-success=Misc tests (security)
+      - status-success=Misc tests (docs)
+      - status-success=Unit tests (py36-unittest)
+      - status-success=Unit tests (py37-unittest)
+      - status-success=Unit tests (py38-unittest)
+      - status-success=Integration tests (3.6)
+      - status-success=Integration tests (3.7)
+      - status-success=Integration tests (3.8)
 
 
 pull_request_rules:
@@ -22,8 +31,17 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
       - "#changes-requested-reviews-by=0"
       - status-success=DCO
-      - status-success=CI on f34
-      - status-success=CI on f35
+      - status-success=Misc tests (lint)
+      - status-success=Misc tests (format)
+      - status-success=Misc tests (licenses)
+      - status-success=Misc tests (security)
+      - status-success=Misc tests (docs)
+      - status-success=Unit tests (py36-unittest)
+      - status-success=Unit tests (py37-unittest)
+      - status-success=Unit tests (py38-unittest)
+      - status-success=Integration tests (3.6)
+      - status-success=Integration tests (3.7)
+      - status-success=Integration tests (3.8)
 
   - name: Sensitive files
     actions:
@@ -39,8 +57,17 @@ pull_request_rules:
       - "#approved-reviews-by>=2"
       - "#changes-requested-reviews-by=0"
       - status-success=DCO
-      - status-success=CI on f34
-      - status-success=CI on f35
+      - status-success=Misc tests (lint)
+      - status-success=Misc tests (format)
+      - status-success=Misc tests (licenses)
+      - status-success=Misc tests (security)
+      - status-success=Misc tests (docs)
+      - status-success=Unit tests (py36-unittest)
+      - status-success=Unit tests (py37-unittest)
+      - status-success=Unit tests (py38-unittest)
+      - status-success=Integration tests (3.6)
+      - status-success=Integration tests (3.7)
+      - status-success=Integration tests (3.8)
 
   - name: Automatic merge Dependabot PRs
     actions:
@@ -55,5 +82,14 @@ pull_request_rules:
       - approved-reviews-by=github-actions[bot]
       - "#changes-requested-reviews-by=0"
       - status-success=DCO
-      - status-success=CI on f34
-      - status-success=CI on f35
+      - status-success=Misc tests (lint)
+      - status-success=Misc tests (format)
+      - status-success=Misc tests (licenses)
+      - status-success=Misc tests (security)
+      - status-success=Misc tests (docs)
+      - status-success=Unit tests (py36-unittest)
+      - status-success=Unit tests (py37-unittest)
+      - status-success=Unit tests (py38-unittest)
+      - status-success=Integration tests (3.6)
+      - status-success=Integration tests (3.7)
+      - status-success=Integration tests (3.8)

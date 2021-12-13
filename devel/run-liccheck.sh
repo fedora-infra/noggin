@@ -12,4 +12,5 @@ TMPFILE=$(mktemp -t noggin-requirements-XXXXXX.txt)
 # poetry export --dev -f requirements.txt -o $TMPFILE
 
 poetry run pip freeze --exclude-editable --isolated > $TMPFILE
+
 poetry run liccheck -r $TMPFILE
