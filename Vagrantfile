@@ -8,8 +8,8 @@ Vagrant.configure(2) do |config|
   config.hostmanager.manage_guest = true
 
   config.vm.define "freeipa" do |freeipa|
-    freeipa.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-33-1.2.x86_64.vagrant-libvirt.box"
-    freeipa.vm.box = "f33-cloud-libvirt"
+    freeipa.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/35/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-35-1.2.x86_64.vagrant-libvirt.box"
+    freeipa.vm.box = "f35-cloud-libvirt"
     freeipa.vm.hostname = "ipa.noggin.test"
     freeipa.hostmanager.aliases = ("kerberos.noggin.test")
     freeipa.vm.synced_folder '.', '/vagrant', disabled: true
@@ -26,8 +26,8 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.define "noggin" do |noggin|
-    noggin.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-33-1.2.x86_64.vagrant-libvirt.box"
-    noggin.vm.box = "f33-cloud-libvirt"
+    noggin.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/35/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-35-1.2.x86_64.vagrant-libvirt.box"
+    noggin.vm.box = "f35-cloud-libvirt"
     noggin.vm.hostname = "noggin.noggin.test"
 
     noggin.vm.synced_folder '.', '/vagrant', disabled: true
