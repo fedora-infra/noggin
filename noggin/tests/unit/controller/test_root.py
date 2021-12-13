@@ -116,7 +116,8 @@ def test_healthz_liveness(client):
     """Test the /healthz/live check endpoint"""
     result = client.get('/healthz/live')
     assert result.status_code == 200
-    assert result.data == b'OK\n'
+    assert result.json == {"status": 200, "title": "OK"}
+    assert result.data == b'{"status": 200, "title": "OK"}'
 
 
 @pytest.mark.vcr()
@@ -124,7 +125,8 @@ def test_healthz_readiness_ok(client):
     """Test the /healthz/ready check endpoint"""
     result = client.get('/healthz/ready')
     assert result.status_code == 200
-    assert result.data == b'OK\n'
+    assert result.json == {"status": 200, "title": "OK"}
+    assert result.data == b'{"status": 200, "title": "OK"}'
 
 
 @pytest.mark.vcr()
@@ -134,7 +136,14 @@ def test_healthz_readiness_not_ok(client):
         ipaping.side_effect = Exception()
         result = client.get('/healthz/ready')
     assert result.status_code == 503
-    assert result.data == b"Can't connect to the FreeIPA Server\n"
+    assert result.json == {
+        "status": 503,
+        "title": "Can't connect to the FreeIPA Server",
+    }
+    assert (
+        result.data
+        == b'{"status": 503, "title": "Can\'t connect to the FreeIPA Server"}'
+    )
 
 
 @pytest.mark.vcr()

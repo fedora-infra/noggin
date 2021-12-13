@@ -24,7 +24,7 @@ def make_token(data, audience, ttl=None):
     if ttl is not None:
         data["exp"] = datetime.utcnow() + timedelta(minutes=ttl)
     token = jwt.encode(data, current_app.config["SECRET_KEY"], algorithm="HS256")
-    return str(token, "ascii")
+    return token
 
 
 def read_token(token, audience=None):
@@ -41,5 +41,6 @@ def make_password_change_token(user):
     if lpc is not None:
         lpc = lpc.isoformat()
     return make_token(
-        {"sub": user.username, "lpc": lpc}, audience=Audience.password_reset,
+        {"sub": user.username, "lpc": lpc},
+        audience=Audience.password_reset,
     )

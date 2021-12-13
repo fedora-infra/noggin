@@ -3,16 +3,17 @@ from urllib.parse import urlparse, urlunparse
 
 from flask_babel import lazy_gettext as _
 from pyotp import TOTP
-from wtforms import (
+from wtforms.fields import (
     BooleanField,
+    EmailField,
     FieldList,
     HiddenField,
     PasswordField,
     SelectField,
     StringField,
     TextAreaField,
+    URLField,
 )
-from wtforms.fields.html5 import EmailField, URLField
 from wtforms.validators import (
     AnyOf,
     DataRequired,
@@ -187,7 +188,10 @@ class UserSettingsConfirmOTPForm(ModestForm):
         "secret",
         validators=[DataRequired(message=_('Could not find the token secret'))],
     )
-    description = HiddenField("description", validators=[Optional()],)
+    description = HiddenField(
+        "description",
+        validators=[Optional()],
+    )
     code = StringField(
         _("Verification Code"),
         validators=[DataRequired(message=_('You must provide a verification code'))],

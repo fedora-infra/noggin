@@ -1,6 +1,11 @@
 from flask_babel import lazy_gettext as _
-from wtforms import BooleanField, HiddenField, PasswordField, StringField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import (
+    BooleanField,
+    EmailField,
+    HiddenField,
+    PasswordField,
+    StringField,
+)
 from wtforms.validators import DataRequired, EqualTo, Length
 
 from noggin.form.validators import Email, PasswordLength, StopOnError, username_format
