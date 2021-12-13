@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 """
-
 This script browses through git commit history (starting at latest tag), collects all authors of
 commits and creates fragment for `towncrier`_ tool.
 
@@ -23,7 +22,7 @@ from argparse import ArgumentParser
 from subprocess import check_output
 
 
-EXCLUDE = ["dependabot[bot]", "dependabot-preview[bot]", "Weblate (bot)"]
+EXCLUDE = ["Weblate (bot)"]
 
 last_tag = check_output(
     "git tag | sort -n | tail -n 1", shell=True, universal_newlines=True
@@ -57,9 +56,9 @@ for line in output.splitlines():
     authors[email] = fullname
 
 for nick, fullname in authors.items():
-    if fullname in EXCLUDE:
+    if fullname in EXCLUDE or fullname.endswith("[bot]"):
         continue
-    filename = "{}.author".format(nick)
+    filename = f"{nick}.author"
     if os.path.exists(filename):
         continue
     print(f"Adding author {fullname} ({nick})")
