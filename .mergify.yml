@@ -1,45 +1,59 @@
+queue_rules:
+  - name: default
+    conditions:
+      # Conditions to get out of the queue (= merged)
+      - status-success=CI on f34
+      - status-success=CI on f35
+
+
 pull_request_rules:
 
-- name: Automatic merge on approval
-  actions:
-    merge:
-      method: rebase
-      rebase_fallback: null
-      strict: true
-  conditions:
-  - -files~=^noggin/security/
-  - label!=WIP
-  - approved-reviews-by=@fedora-infra/authdev
-  - "#approved-reviews-by>=1"
-  - status-success=DCO
-  - status-success=CI on f34
-  - status-success=CI on f35
+  - name: Automatic merge on approval
+    actions:
+      queue:
+        name: default
+        method: rebase
+        rebase_fallback: none
+    conditions:
+      - -files~=^noggin/security/
+      - label!=WIP
+      - -draft
+      - approved-reviews-by=@fedora-infra/authdev
+      - "#approved-reviews-by>=1"
+      - "#changes-requested-reviews-by=0"
+      - status-success=DCO
+      - status-success=CI on f34
+      - status-success=CI on f35
 
-- name: Sensitive files
-  actions:
-    merge:
-      method: rebase
-      rebase_fallback: null
-      strict: true
-  conditions:
-  - files~=^noggin/security/
-  - label!=WIP
-  - approved-reviews-by=@fedora-infra/authdev
-  - "#approved-reviews-by>=2"
-  - status-success=DCO
-  - status-success=CI on f34
-  - status-success=CI on f35
+  - name: Sensitive files
+    actions:
+      queue:
+        name: default
+        method: rebase
+        rebase_fallback: none
+    conditions:
+      - files~=^noggin/security/
+      - label!=WIP
+      - -draft
+      - approved-reviews-by=@fedora-infra/authdev
+      - "#approved-reviews-by>=2"
+      - "#changes-requested-reviews-by=0"
+      - status-success=DCO
+      - status-success=CI on f34
+      - status-success=CI on f35
 
-- name: Automatic merge Dependabot PRs
-  actions:
-    merge:
-      method: rebase
-      rebase_fallback: null
-      strict: true
-  conditions:
-  - label!=WIP
-  - author=dependabot[bot]
-  - approved-reviews-by=github-actions[bot]
-  - status-success=DCO
-  - status-success=CI on f34
-  - status-success=CI on f35
+  - name: Automatic merge Dependabot PRs
+    actions:
+      queue:
+        name: default
+        method: rebase
+        rebase_fallback: none
+    conditions:
+      - label!=WIP
+      - -draft
+      - author=dependabot[bot]
+      - approved-reviews-by=github-actions[bot]
+      - "#changes-requested-reviews-by=0"
+      - status-success=DCO
+      - status-success=CI on f34
+      - status-success=CI on f35
