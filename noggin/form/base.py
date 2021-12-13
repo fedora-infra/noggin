@@ -1,10 +1,9 @@
 from flask_wtf import FlaskForm
 from markupsafe import escape, Markup
 from wtforms import Field, SubmitField
-from wtforms.fields.core import FieldList, SelectField, StringField
+from wtforms.fields import FieldList, SelectField, StringField
 from wtforms.utils import unset_value
-from wtforms.widgets import TextInput
-from wtforms.widgets.core import html_params
+from wtforms.widgets import html_params, TextInput
 
 
 class BaseForm(FlaskForm):
