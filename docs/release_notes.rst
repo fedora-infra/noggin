@@ -4,6 +4,18 @@ Release notes
 
 .. towncrier release notes start
 
+v1.5.1
+======
+
+Released on 2021-12-15. This is a bugfix release.
+
+Bug Fixes
+^^^^^^^^^
+
+* Let users login even if they registered with a username that is now invalid
+  (:pr:`831`).
+
+
 v1.5.0
 ======
 
