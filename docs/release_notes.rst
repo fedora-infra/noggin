@@ -4,6 +4,28 @@ Release notes
 
 .. towncrier release notes start
 
+v1.5.0
+======
+
+Released on 2021-12-15.
+
+Dependency Changes
+^^^^^^^^^^^^^^^^^^
+
+* Update to Flask 2.0, and update other dependencies (:pr:`828`).
+
+Features
+^^^^^^^^
+
+* Allow the configuration of a regexp to validate usernames, and limit its
+  length (:pr:`827`).
+
+Development Improvements
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Use Github Actions for CI (:pr:`828`).
+
+
 v1.4.0
 ======
 
