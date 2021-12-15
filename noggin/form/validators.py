@@ -5,8 +5,8 @@ from wtforms.validators import Length, Regexp, StopValidation, ValidationError
 
 
 class Email(WTFormsEmailValidator):
-    """ Extend the WTForms email validator, adding the ability to blocklist
-        email addresses
+    """Extend the WTForms email validator, adding the ability to blocklist
+    email addresses
     """
 
     def __call__(self, form, field):
@@ -30,6 +30,11 @@ class PasswordLength:
             message=self.message,
         )
         validator(form, field)
+
+
+def no_mixed_case(form, field):
+    if field.data != field.data.lower():
+        raise ValidationError(_("Mixed case is not allowed, try lower case."))
 
 
 def username_format(form, field):

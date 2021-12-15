@@ -170,7 +170,7 @@ def test_login_username_case(client, dummy_user):
     assert_form_field_error(
         result,
         "login-username",
-        'Only these characters are allowed: "a-z", "0-9", "-".',
+        "Mixed case is not allowed, try lower case.",
     )
 
 
@@ -192,6 +192,31 @@ def test_login_username_created_with_case(client, dummy_user_with_case):
     assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
     assert session.get("noggin_username") == "dummy"
     assert session.get("noggin_session") is not None
+
+
+@pytest.mark.parametrize(
+    "username", ["dummy_user", "dummy.user", "_dummy", ".dummy", "dummy-"]
+)
+def test_login_bad_format(client, mocker, username):
+    """Let users login even if they registered with a username that is now invalid"""
+    maybe_ipa_login = mocker.patch("noggin.controller.authentication.maybe_ipa_login")
+    result = client.post(
+        '/',
+        data={
+            "login-username": username,
+            "login-password": "dummy_password",
+            "login-submit": "1",
+        },
+        follow_redirects=False,
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url=f"/user/{username}/",
+        expected_message=f"Welcome, {username}!",
+        expected_category="success",
+    )
+    maybe_ipa_login.assert_called()
+    assert maybe_ipa_login.call_args_list[0][0][2] == username
 
 
 @pytest.mark.vcr()

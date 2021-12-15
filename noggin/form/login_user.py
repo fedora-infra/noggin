@@ -3,7 +3,7 @@ from wtforms import PasswordField, StringField
 from wtforms.validators import DataRequired, Optional
 
 from .base import ModestForm, SubmitButtonField
-from .validators import username_format
+from .validators import no_mixed_case
 
 
 class LoginUserForm(ModestForm):
@@ -11,7 +11,7 @@ class LoginUserForm(ModestForm):
         _('Username'),
         validators=[
             DataRequired(message=_('You must provide a user name')),
-            username_format,
+            no_mixed_case,
         ],
     )
 
