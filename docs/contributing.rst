@@ -193,16 +193,15 @@ Releasing
 When cutting a new release, follow these steps:
 
 #. Update the version in ``pyproject.toml``
-#. Remove the ``.egg-info`` directory to update the version in the metadata
 #. Add missing authors to the release notes fragments by changing to the ``news`` directory and
    running the ``get-authors.py`` script, but check for duplicates and errors
 #. Generate the release notes by running ``poetry run towncrier`` (in the base directory)
 #. Adjust the release notes in ``docs/release_notes.rst``.
-#. Generate the docs with ``tox -e docs`` and check them in ``docs/_build/html``.
+#. Generate the docs with ``tox -r -e docs`` and check them in ``docs/_build/html``.
 #. Commit the changes
 #. Push the commit to the upstream Github repository (via a PR or not).
 #. Change to the stable branch and cherry-pick the commit (or merge if appropriate)
-#. Run the checks one last time to be sure: ``tox``,
+#. Run the checks one last time to be sure: ``tox -r``,
 #. Tag the commit with ``-s`` to generate a signed tag
 #. Push the commit to the upstream Github repository with ``git push``,
    and the new tag with ``git push --tags``

@@ -47,15 +47,6 @@ for information on migrating applications to the new API.
     :target: https://noggin-aaa.readthedocs.io/en/latest/?badge=latest
 
 
-.. Release Notes
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Release Notes
-
-   release_notes
-
-
 .. User Guide
 
 .. toctree::
@@ -74,13 +65,22 @@ for information on migrating applications to the new API.
    installation
 
 
-.. Contributor Guide
+.. Contributor's Guide
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contributor Guide
+   :caption: Contributor's Guide
 
    contributing
+
+
+.. Release Notes
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Release Notes
+
+   release_notes
 
 
 .. toctree::
