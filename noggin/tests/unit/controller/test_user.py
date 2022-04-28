@@ -118,7 +118,7 @@ def test_user_edit_post(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_edit_post_minimal_values(client, logged_in_dummy_user):
     """Test posting to the user edit page: /user/<username>/settings/profile/
-        with the bare minimum of values """
+    with the bare minimum of values"""
     with fml_testing.mock_sends(
         UserUpdateV1(
             {

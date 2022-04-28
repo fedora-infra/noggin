@@ -21,7 +21,7 @@ def test_password_reset(client):
 
 
 def test_password_reset_no_username(client):
-    """Test the password reset page with no username """
+    """Test the password reset page with no username"""
     result = client.get('/password-reset')
     assert result.status_code == 404
 
@@ -86,7 +86,7 @@ def test_password_changes_user(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_password_form_with_otp(client, logged_in_dummy_user_with_otp):
     """Verify that the password change form shows OTP form elements
-       when a user has OTP enabled"""
+    when a user has OTP enabled"""
     result = client.get("/user/dummy/settings/password")
 
     page = BeautifulSoup(result.data, "html.parser")
@@ -97,7 +97,7 @@ def test_password_form_with_otp(client, logged_in_dummy_user_with_otp):
 @pytest.mark.vcr()
 def test_password_form_without_otp(client, logged_in_dummy_user):
     """Verify that the password change form shows OTP form elements
-       when a user has OTP disabled"""
+    when a user has OTP disabled"""
     result = client.get("/user/dummy/settings/password")
 
     page = BeautifulSoup(result.data, "html.parser")

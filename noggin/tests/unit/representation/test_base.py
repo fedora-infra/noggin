@@ -6,7 +6,7 @@ from noggin.representation.user import User
 
 
 def test_diff_fields(dummy_user_dict):
-    """ Check the method to compare the diff between two User objects works"""
+    """Check the method to compare the diff between two User objects works"""
     user = User(dummy_user_dict)
 
     new_data = dummy_user_dict.copy()
@@ -18,7 +18,7 @@ def test_diff_fields(dummy_user_dict):
 
 
 def test_diff_fields_check_mismatch(dummy_user_dict, dummy_group_dict):
-    """ Check we cannot diff two different objects"""
+    """Check we cannot diff two different objects"""
     user = User(dummy_user_dict)
     group = Group(dummy_group_dict)
 

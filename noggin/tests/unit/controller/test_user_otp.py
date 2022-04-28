@@ -21,7 +21,8 @@ from noggin.tests.unit.utilities import (
 def dummy_user_with_2_otp(client, logged_in_dummy_user, logged_in_dummy_user_with_otp):
     ipa = logged_in_dummy_user
     result = ipa.otptoken_add(
-        o_ipatokenowner="dummy", o_description="dummy's other token",
+        o_ipatokenowner="dummy",
+        o_description="dummy's other token",
     )['result']
     token = OTPToken(result)
     yield logged_in_dummy_user_with_otp, token
@@ -187,7 +188,10 @@ def test_user_settings_otp_add_second(
 
 @pytest.mark.vcr()
 def test_user_settings_otp_add_second_confirm(
-    client, logged_in_dummy_user_with_otp, cleanup_dummy_tokens, totp_token,
+    client,
+    logged_in_dummy_user_with_otp,
+    cleanup_dummy_tokens,
+    totp_token,
 ):
     """Test posting to the create OTP endpoint"""
     result = client.post(
@@ -270,7 +274,7 @@ def test_user_settings_otp_check_description_escaping(
 
 @pytest.mark.vcr()
 def test_user_settings_otp_add_no_permission(client, logged_in_dummy_user, totp_token):
-    """Verify that another user can't make an otp token. """
+    """Verify that another user can't make an otp token."""
     result = client.post(
         "/user/dudemcpants/settings/otp/",
         data={
@@ -350,7 +354,7 @@ def test_user_settings_otp_add_invalid(client, logged_in_dummy_user, totp_token)
 
 @pytest.mark.vcr()
 def test_user_settings_otp_disable_no_permission(client, logged_in_dummy_user):
-    """Verify that another user can't disable an otp token. """
+    """Verify that another user can't disable an otp token."""
     result = client.post(
         "/user/dudemcpants/settings/otp/disable/",
         data={"description": "pants token", "password": "dummy_password"},
@@ -463,7 +467,7 @@ def test_user_settings_otp_disable_ipabadrequest(
 
 @pytest.mark.vcr()
 def test_user_settings_otp_delete_no_permission(client, logged_in_dummy_user):
-    """Verify that another user can't delete an otp token. """
+    """Verify that another user can't delete an otp token."""
     result = client.post(
         "/user/dudemcpants/settings/otp/delete/", data={"token": "aabbcc-aabbcc"}
     )
@@ -592,7 +596,7 @@ def test_user_settings_otp_delete_lasttoken(
 
 @pytest.mark.vcr()
 def test_user_settings_otp_enable_no_permission(client, logged_in_dummy_user):
-    """Verify that another user can't enable an otp token. """
+    """Verify that another user can't enable an otp token."""
     result = client.post(
         "/user/dudemcpants/settings/otp/enable/",
         data={"description": "pants token", "password": "dummy_password"},
