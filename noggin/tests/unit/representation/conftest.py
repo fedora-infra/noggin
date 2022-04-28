@@ -13,7 +13,7 @@ def dummy_user_dict():
         'fasgpgkeyid': ['dummy-gpg-key-id-1', 'dummy-gpg-key-id-2'],
         'fasircnick': ['dummy', "dummy_"],
         'faslocale': ['en-US'],
-        'fasrhbzemail': ['dummy@example.com'],
+        'fasrhbzemail': ['dummy@unit.tests'],
         'fastimezone': ['UTC'],
         'gecos': ['Dummy User'],
         'faspronoun': ['they / them / theirs'],
@@ -33,7 +33,7 @@ def dummy_user_dict():
         'krbpasswordexpiration': [{'__datetime__': '20200421162313Z'}],
         'krbprincipalname': ['dummy@EXAMPLE.COM'],
         'loginshell': ['/bin/bash'],
-        'mail': ['dummy@example.com'],
+        'mail': ['dummy@unit.tests'],
         'memberof_group': ['ipausers'],
         'nsaccountlock': False,
         'objectclass': [
@@ -76,8 +76,8 @@ def dummy_group_dict():
             'ipaobject',
             'posixgroup',
         ],
-        'fasurl': ['http://example.com', "https://www.dummygroup.com.au"],
-        'fasircchannel': ["irc://irc.example.com/#dummy-group"],
+        'fasurl': ['http://unit.tests', "https://www.dummygroup.com.au"],
+        'fasircchannel': ["irc://irc.unit.tests/#dummy-group"],
         'fasmailinglist': ['dummygroup@lists.fedoraproject.org'],
     }
 

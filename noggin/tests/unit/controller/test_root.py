@@ -22,7 +22,7 @@ def nonfas_user(ipa_testing_config, app):
         o_givenname="NonFAS",
         o_sn="User",
         o_cn="NonFAS User",
-        o_mail="nonfas-user@example.com",
+        o_mail="nonfas-user@unit.tests",
         o_userpassword="nonfas-user_password",
     )
     yield
@@ -51,7 +51,7 @@ def test_root_authenticated(client, logged_in_dummy_user):
     """Test the root page when the user is authenticated"""
     result = client.get('/')
     assert result.status_code == 302
-    assert result.location == "http://localhost/user/dummy/"
+    assert result.location == "/user/dummy/"
 
 
 def test_root_registration_closed(client, mocker):
@@ -81,7 +81,7 @@ def test_search_json(client, logged_in_dummy_user, dummy_group):
         {'cn': 'Dummy User', 'uid': 'dummy', 'url': '/user/dummy/'},
         {
             'cn': 'dummy-group',
-            'description': 'A dummy group',
+            'description': 'The dummy-group group',
             'url': '/group/dummy-group/',
         },
     ]

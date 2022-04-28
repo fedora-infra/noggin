@@ -23,7 +23,7 @@ def app_config(ipa_cert):
         FREEIPA_CACERT=ipa_cert,
         # Any user with admin privileges
         FREEIPA_ADMIN_USER='admin',
-        FREEIPA_ADMIN_PASSWORD='adminPassw0rd!',
+        FREEIPA_ADMIN_PASSWORD='password',
         # Fernet secret
         FERNET_SECRET=b'G8ObvrpEEwbjWUO9rU1qAkDQRafAFd39heVKYf6TZi8=',
         # Session secret
@@ -31,7 +31,7 @@ def app_config(ipa_cert):
         # We don't do https for testing
         SESSION_COOKIE_SECURE=False,
         # Email sender
-        MAIL_DEFAULT_SENDER="Noggin <noggin@example.com>",
+        MAIL_DEFAULT_SENDER="Noggin <noggin@unit.tests>",
         # Set a different password policy betweed the form and the server so we can test both
         PASSWORD_POLICY={"min": 6},
         # Don't delete the role we may have in the dev env
@@ -151,7 +151,7 @@ def make_user(ipa_testing_config, app):
             o_givenname=name.title(),
             o_sn='User',
             o_cn=f'{name.title()} User',
-            o_mail=f"{name}@example.com",
+            o_mail=f"{name}@unit.tests",
             o_userpassword=password,
             o_loginshell='/bin/bash',
             fascreationtime=f"{now.isoformat()}Z",
@@ -187,9 +187,9 @@ def make_group(ipa_testing_config, app):
             name,
             o_description=f"The {name} group",
             fasgroup=True,
-            fasurl=f"http://{name}.example.com",
-            fasmailinglist=f"{name}@lists.example.com",
-            fasircchannel=f"irc://irc.example.com/#{name}",
+            fasurl=f"http://{name}.unit.tests",
+            fasmailinglist=f"{name}@lists.unit.tests",
+            fasircchannel=f"irc://irc.unit.tests/#{name}",
         )
         created.append(name)
         return result

@@ -38,7 +38,7 @@ def test_logout_unauthed(client):
     """Test logout when not logged in"""
     result = client.get('/logout', follow_redirects=False)
     assert result.status_code == 302
-    assert result.location == "http://localhost/"
+    assert result.location == "/"
     # Make sure we haven't instructed the user to login in a flash message.
     messages = get_flashed_messages()
     assert len(messages) == 0
@@ -49,7 +49,7 @@ def test_logout(client, logged_in_dummy_user):
     """Test logout with a logged-in user"""
     result = client.get('/logout', follow_redirects=False)
     assert result.status_code == 302
-    assert result.location == "http://localhost/"
+    assert result.location == "/"
     assert "noggin_session" not in session
     assert "noggin_username" not in session
     assert "noggin_ipa_server_hostname" not in session
@@ -68,7 +68,7 @@ def test_logout_no_ipa(client, mocker):
 
     result = client.get('/logout', follow_redirects=False)
     assert result.status_code == 302
-    assert result.location == "http://localhost/"
+    assert result.location == "/"
     # Make sure we did clear the session
     session.clear.assert_called_once()
 
@@ -329,7 +329,7 @@ def test_login_with_redirect(client, dummy_user):
 @pytest.mark.vcr()
 def test_login_with_bad_redirect(client, dummy_user):
     """Test a successful login with a bad redirect"""
-    redirect_url = "http://example.com"
+    redirect_url = "http://unit.tests"
     result = client.post(
         f"/?next={quote(redirect_url)}",
         data={
@@ -358,6 +358,7 @@ def test_otp_sync_no_username(client, dummy_user):
     )
 
 
+@pytest.mark.skip("IPA never fails anymore on invalid token sync")
 @pytest.mark.vcr()
 def test_otp_sync_invalid_codes(client, logged_in_dummy_user_with_otp):
     """Test synchronising OTP token with madeup codes"""
@@ -401,9 +402,10 @@ def test_otp_sync_http_error(client, logged_in_dummy_user_with_otp, mocker):
 @pytest.mark.vcr()
 def test_otp_sync_rejected(client, logged_in_dummy_user_with_otp):
     """Test synchronising OTP token when freeipa rejects the request"""
-    with mock.patch("requests.post") as method:
-        method.return_value.status_code = 200
-        method.return_value.text = "Token sync rejected"
+    session = mock.Mock()
+    with mock.patch("python_freeipa.client.requests.Session", return_value=session):
+        session.post.return_value.status_code = 200
+        session.post.return_value.text = "Token sync rejected"
         result = client.post(
             '/otp/sync/',
             data={

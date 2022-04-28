@@ -30,7 +30,7 @@ def test_password_reset_no_username(client):
 def test_password_reset_user(client, logged_in_dummy_user):
     """Test the redirect to the authed password reset"""
     result = client.get('/password-reset')
-    assert result.location == "http://localhost/user/dummy/settings/password"
+    assert result.location == "/user/dummy/settings/password"
 
     result = client.get('/password-reset', follow_redirects=True)
     page = BeautifulSoup(result.data, 'html.parser')

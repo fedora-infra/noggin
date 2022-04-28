@@ -16,10 +16,10 @@ from noggin.utility.templates import format_channel, format_nickname
             },
         ),
         (
-            "irc://irc.example.com/username[m]",
+            "irc://irc.unit.tests/username[m]",
             {
-                "href": "irc://irc.example.com/username[m],isnick",
-                "title": "IRC on irc.example.com",
+                "href": "irc://irc.unit.tests/username[m],isnick",
+                "title": "IRC on irc.unit.tests",
                 "name": "username[m]",
             },
         ),
@@ -35,14 +35,14 @@ from noggin.utility.templates import format_channel, format_nickname
             },
         ),
         (
-            "matrix://example.com/username",
+            "matrix://unit.tests/username",
             {
                 "href": (
-                    "https://matrix.to/#/@username:example.com"
+                    "https://matrix.to/#/@username:unit.tests"
                     "?web-instance[element.io]=chat.fedoraproject.org"
                 ),
-                "title": "Matrix on example.com",
-                "name": "@username:example.com",
+                "title": "Matrix on unit.tests",
+                "name": "@username:unit.tests",
             },
         ),
         (
@@ -69,10 +69,10 @@ def test_format_nickname(request_context, value, expected):
 
 
 def test_format_nickname_no_matrixto_args(request_context):
-    value = "matrix://example.com/username"
-    name = "@username:example.com"
-    title = "Matrix on example.com"
-    href = "https://matrix.to/#/@username:example.com"
+    value = "matrix://unit.tests/username"
+    name = "@username:unit.tests"
+    title = "Matrix on unit.tests"
+    href = "https://matrix.to/#/@username:unit.tests"
     expected_html = f'<a href="{href}" title="{title}">{name}</a>'
     current_app.config["CHAT_MATRIX_TO_ARGS"] = None
     assert str(format_nickname(value)) == expected_html
@@ -86,7 +86,7 @@ def test_format_nickname_invalid(request_context):
 
 def test_format_nickname_invalid_with_config(app, request_context, mocker):
     mocker.patch.dict(
-        app.config["CHAT_NETWORKS"], {"new-scheme": {"default_server": "example.com"}}
+        app.config["CHAT_NETWORKS"], {"new-scheme": {"default_server": "unit.tests"}}
     )
     with pytest.raises(ValueError) as e:
         format_nickname("new-scheme:/username")
@@ -113,11 +113,11 @@ def test_format_nickname_invalid_with_config(app, request_context, mocker):
             },
         ),
         (
-            "irc://irc.example.com/#channel",
+            "irc://irc.unit.tests/#channel",
             {
-                "href": "irc://irc.example.com/channel",
-                "title": "IRC on irc.example.com",
-                "name": "#channel@irc.example.com",
+                "href": "irc://irc.unit.tests/channel",
+                "title": "IRC on irc.unit.tests",
+                "name": "#channel@irc.unit.tests",
             },
         ),
         (
@@ -129,11 +129,11 @@ def test_format_nickname_invalid_with_config(app, request_context, mocker):
             },
         ),
         (
-            "matrix://example.com/#channel",
+            "matrix://unit.tests/#channel",
             {
-                "href": "https://matrix.to/#/#channel:example.com",
-                "title": "Matrix on example.com",
-                "name": "#channel:example.com",
+                "href": "https://matrix.to/#/#channel:unit.tests",
+                "title": "Matrix on unit.tests",
+                "name": "#channel:unit.tests",
             },
         ),
         (
