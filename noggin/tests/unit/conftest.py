@@ -251,7 +251,10 @@ def dummy_user_with_otp(client, dummy_user):
 @pytest.fixture
 def logged_in_dummy_user_with_otp(client, logged_in_dummy_user):
     ipa = logged_in_dummy_user
-    result = ipa.otptoken_add(o_ipatokenowner="dummy", o_description="dummy's token",)
+    result = ipa.otptoken_add(
+        o_ipatokenowner="dummy",
+        o_description="dummy's token",
+    )
     token = OTPToken(result['result'])
     yield token
     # Deletion needs to be done as admin to remove the last token

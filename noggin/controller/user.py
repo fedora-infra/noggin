@@ -143,7 +143,13 @@ def user_settings_profile(ipa, username):
         }
         fullname = f"{form.firstname.data} {form.lastname.data}"
         changes["o_cn"] = changes["o_displayname"] = fullname
-        result = _user_mod(ipa, form, user, changes, ".user_settings_profile",)
+        result = _user_mod(
+            ipa,
+            form,
+            user,
+            changes,
+            ".user_settings_profile",
+        )
         if result:
             return result
     if not form.errors:
@@ -196,7 +202,11 @@ def user_settings_email(ipa, username):
         should_redirect = False
         if change_now:
             should_redirect = _user_mod(
-                ipa, form, user, change_now, ".user_settings_email",
+                ipa,
+                form,
+                user,
+                change_now,
+                ".user_settings_email",
             )
         if needs_validation:
             for attr, value in needs_validation.items():
@@ -270,7 +280,11 @@ def user_settings_email_validate(ipa, username):
     if form.validate_on_submit():
         option_name = user.get_attr_option(token["attr"])
         result = _user_mod(
-            ipa, form, user, {option_name: value}, ".user_settings_email",
+            ipa,
+            form,
+            user,
+            {option_name: value},
+            ".user_settings_email",
         )
         if result:
             return result

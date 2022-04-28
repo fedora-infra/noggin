@@ -77,7 +77,8 @@ def test_csvlistfield(client, test_input, expected):
 
 
 @pytest.mark.parametrize(
-    "data,expected", [(["one", "two", "three"], "one,two,three"), ([""], ""), ([], "")],
+    "data,expected",
+    [(["one", "two", "three"], "one,two,three"), ([""], ""), ([], "")],
 )
 def test_csvlistfield_read(client, data, expected):
     class DummyForm(FlaskForm):

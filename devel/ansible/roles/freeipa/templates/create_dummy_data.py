@@ -93,8 +93,14 @@ for x in range(100):
 
 
 # Create the stage user managers role and assign it to the infra group
-ipa.privilege_add("Stage User Managers", o_description="Manage registering users in Noggin")
-for perm in ("System: Read Stage Users", "System: Modify Stage User", "System: Remove Stage User"):
+ipa.privilege_add(
+    "Stage User Managers", o_description="Manage registering users in Noggin"
+)
+for perm in (
+    "System: Read Stage Users",
+    "System: Modify Stage User",
+    "System: Remove Stage User",
+):
     ipa.privilege_add_permission("Stage User Managers", o_permission=perm)
 ipa.role_add("Stage User Managers", o_description="Manage registering users in Noggin")
 ipa.role_add_privilege("Stage User Managers", o_privilege="Stage User Managers")

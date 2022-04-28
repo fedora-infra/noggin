@@ -120,5 +120,8 @@ def paginated_find(ipa, representation, *args, **kwargs):
         items = []
 
     return PagedResult(
-        items=items, page_size=page_size, page_number=page_number, total=total,
+        items=items,
+        page_size=page_size,
+        page_number=page_number,
+        total=total,
     )
