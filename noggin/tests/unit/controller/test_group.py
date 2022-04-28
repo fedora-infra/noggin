@@ -93,19 +93,19 @@ def test_group(client, dummy_user_as_group_manager, make_user):
     assert len(page.select("form[action='/group/dummy-group/members/']")) == 1
     assert (
         page.select_one("#group-mailinglist a").get_text(strip=True)
-        == "dummy-group@lists.example.com"
+        == "dummy-group@lists.unit.tests"
     )
     assert (
         page.select_one("#group-ircchannel a").get_text(strip=True)
-        == "#dummy-group@irc.example.com"
+        == "#dummy-group@irc.unit.tests"
     )
     assert (
         page.select_one("#group-ircchannel a")["href"]
-        == "irc://irc.example.com/dummy-group"
+        == "irc://irc.unit.tests/dummy-group"
     )
     assert (
         page.select_one("#group-urls a").get_text(strip=True)
-        == "http://dummy-group.example.com"
+        == "http://dummy-group.unit.tests"
     )
 
 
@@ -357,7 +357,7 @@ def make_users(ipa_testing_config, app):
                     dict(
                         givenname=name.title(),
                         sn="User",
-                        mail=f"{name}@example.com",
+                        mail=f"{name}@unit.tests",
                         userpassword="password",
                         loginshell='/bin/bash',
                         fascreationtime=f"{now.isoformat()}Z",

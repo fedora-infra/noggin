@@ -10,8 +10,8 @@ def test_group(dummy_group_dict):
     assert group.sponsors == ["dummy"]
     assert group.dn == "cn=dummy-group,cn=groups,cn=accounts,dc=example,dc=com"
     assert group.mailing_list == 'dummygroup@lists.fedoraproject.org'
-    assert group.urls == ['http://example.com', "https://www.dummygroup.com.au"]
-    assert group.irc_channel == 'irc://irc.example.com/#dummy-group'
+    assert group.urls == ['http://unit.tests', "https://www.dummygroup.com.au"]
+    assert group.irc_channel == 'irc://irc.unit.tests/#dummy-group'
 
 
 def test_group_no_dn(dummy_group_dict):

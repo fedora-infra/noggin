@@ -34,7 +34,7 @@ def post_data_step_1():
     return {
         "register-firstname": "Dummy",
         "register-lastname": "User",
-        "register-mail": "dummy@example.com",
+        "register-mail": "dummy@unit.tests",
         "register-username": "dummy",
         "register-underage": "true",
         "register-submit": "1",
@@ -62,10 +62,9 @@ def dummy_stageuser(ipa_testing_config):
         o_givenname="Dummy",
         o_sn="User",
         o_cn="Dummy User",
-        o_mail="dummy@example.com",
+        o_mail="dummy@unit.tests",
         o_loginshell='/bin/bash',
         fascreationtime=f"{now.isoformat()}Z",
-        fasstatusnote="spamcheck_awaiting",
     )['result']
     yield User(user)
     try:
@@ -96,15 +95,16 @@ def test_step_1(client, post_data_step_1, cleanup_dummy_user, mocker):
         record_signal
     ):
         result = client.post('/', data=post_data_step_1)
+    print(result.data.decode())
     assert result.status_code == 302
-    assert result.location == "http://localhost/register/confirm?username=dummy"
+    assert result.location == "/register/confirm?username=dummy"
     # Emitted signal
     record_signal.assert_called_once()
     # Sent email
     assert len(outbox) == 1
     message = outbox[0]
     assert message.subject == "Verify your email address"
-    assert message.recipients == ["dummy@example.com"]
+    assert message.recipients == ["dummy@unit.tests"]
     # Check that default values are added
     user = User(ipa_admin.stageuser_show("dummy")['result'])
     # Creation time
@@ -199,7 +199,7 @@ def test_step_1_spamcheck(
     ):
         result = client.post('/', data=post_data_step_1)
     assert result.status_code == 302
-    assert result.location == "http://localhost/register/spamcheck-wait?username=dummy"
+    assert result.location == "/register/spamcheck-wait?username=dummy"
     # Emitted signal
     record_signal.assert_called_once()
     # Basset called
@@ -298,7 +298,7 @@ def test_spamcheck_wait_active(client, dummy_stageuser):
     ipa_admin.stageuser_mod(a_uid="dummy", fasstatusnote="active")
     result = client.get('/register/spamcheck-wait?username=dummy')
     assert result.status_code == 302
-    assert result.location == "http://localhost/register/confirm?username=dummy"
+    assert result.location == "/register/confirm?username=dummy"
 
 
 @pytest.mark.vcr()
@@ -335,7 +335,7 @@ def test_step_2_resend(client, dummy_stageuser):
         result = client.post('/register/confirm?username=dummy', data={"submit": "1"})
     assert_redirects_with_flash(
         result,
-        expected_url="/register/confirm?username=dummy",
+        expected_url="http://localhost/register/confirm?username=dummy",
         expected_message=(
             "The address validation email has be sent again. Make sure it did not land "
             "in your spam folder"
@@ -346,7 +346,7 @@ def test_step_2_resend(client, dummy_stageuser):
     assert len(outbox) == 1
     message = outbox[0]
     assert message.subject == "Verify your email address"
-    assert message.recipients == ["dummy@example.com"]
+    assert message.recipients == ["dummy@unit.tests"]
 
 
 @pytest.mark.vcr()
@@ -407,7 +407,7 @@ def test_step_3_unknown_user(client, token_for_dummy_user):
 def test_step_3_wrong_address(client, token_for_dummy_user, mocker):
     """Registration activation page with a token containing the wrong email address"""
     logger = mocker.patch.object(current_app._get_current_object(), "logger")
-    ipa_admin.stageuser_mod(a_uid="dummy", mail="dummy-new@example.com")
+    ipa_admin.stageuser_mod(a_uid="dummy", mail="dummy-new@unit.tests")
     result = client.get(f'/register/activate?token={token_for_dummy_user}')
     assert_redirects_with_flash(
         result,
@@ -468,7 +468,7 @@ def test_duplicate(client, post_data_step_1, cleanup_dummy_user, dummy_user):
     assert_form_generic_error(
         result,
         expected_message=(
-            "The username 'dummy' or the email address 'dummy@example.com' "
+            "The username 'dummy' or the email address 'dummy@unit.tests' "
             "are already taken."
         ),
     )
@@ -714,7 +714,7 @@ def test_spamcheck(client, dummy_stageuser, mocker, spamcheck_status, spamcheck_
         assert len(outbox) == 1
         message = outbox[0]
         assert message.subject == "Verify your email address"
-        assert message.recipients == ["dummy@example.com"]
+        assert message.recipients == ["dummy@unit.tests"]
     else:
         assert len(outbox) == 0
 
@@ -731,8 +731,9 @@ def test_spamcheck_disabled(client, dummy_user):
 
 @pytest.mark.vcr()
 def test_spamcheck_bad_payload(client, dummy_user, mocker, spamcheck_on):
-    response = client.post("/register/spamcheck-hook")
+    response = client.post("/register/spamcheck-hook", json={})
     assert response.status_code == 400
+    print(response.data)
     assert response.json == {"error": "Bad payload"}
 
 
@@ -835,7 +836,9 @@ def test_registering_change_status(
         response = client.post(
             "/registering/", data={"username": "dummy", "action": action}
         )
-    assert_redirects_with_flash(response, "/registering/", message, "success")
+    assert_redirects_with_flash(
+        response, "http://localhost/registering/", message, "success"
+    )
     # Check that the status was changed
     user = User(ipa_admin.stageuser_show("dummy")["result"])
     assert user.status_note == status
@@ -844,7 +847,7 @@ def test_registering_change_status(
         assert len(outbox) == 1
         message = outbox[0]
         assert message.subject == "Verify your email address"
-        assert message.recipients == ["dummy@example.com"]
+        assert message.recipients == ["dummy@unit.tests"]
     else:
         assert len(outbox) == 0
 
@@ -856,7 +859,10 @@ def test_registering_delete(client, logged_in_stage_users_admin, dummy_stageuser
             "/registering/", data={"username": "dummy", "action": "delete"}
         )
     assert_redirects_with_flash(
-        response, "/registering/", "Deleted registering user dummy", "success"
+        response,
+        "http://localhost/registering/",
+        "Deleted registering user dummy",
+        "success",
     )
     with pytest.raises(python_freeipa.exceptions.NotFound):
         ipa_admin.stageuser_show("dummy")
@@ -884,7 +890,7 @@ def test_registering_unknown_user(client, logged_in_stage_users_admin):
         "/registering/", data={"username": "dummy", "action": "accept"}
     )
     assert_redirects_with_flash(
-        response, "/registering/", "Unknown user: dummy", "danger"
+        response, "http://localhost/registering/", "Unknown user: dummy", "danger"
     )
 
 

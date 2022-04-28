@@ -42,8 +42,8 @@ POST_CONTENTS_KEYS = {
 }
 
 POST_CONTENTS_EMAIL = {
-    "mail": "dummy@example.com",
-    "rhbz_mail": "dummy-rhbz@example.com",
+    "mail": "dummy@unit.tests",
+    "rhbz_mail": "dummy-rhbz@unit.tests",
 }
 
 
@@ -208,7 +208,7 @@ def test_user_settings_email(client, logged_in_dummy_user):
     assert page.title.string == 'Settings for dummy - noggin'
     form = page.select("form[action='/user/dummy/settings/email/']")
     assert len(form) == 1
-    assert form[0].find("input", attrs={"name": "mail"})["value"] == "dummy@example.com"
+    assert form[0].find("input", attrs={"name": "mail"})["value"] == "dummy@unit.tests"
     assert form[0].find("input", attrs={"name": "rhbz_mail"})["value"] == ""
 
 
@@ -221,7 +221,7 @@ def test_user_settings_email_post(client, logged_in_dummy_user):
         result,
         expected_url="/user/dummy/settings/email/",
         expected_message=(
-            "The email address dummy-rhbz@example.com needs to be validated. "
+            "The email address dummy-rhbz@unit.tests needs to be validated. "
             "Please check your inbox and click on the link to proceed. "
             "If you can't find the email in a couple minutes, check your spam folder."
         ),
@@ -231,7 +231,7 @@ def test_user_settings_email_post(client, logged_in_dummy_user):
     assert len(outbox) == 1
     message = outbox[0]
     assert message.subject == "Verify your email address"
-    assert message.recipients == ["dummy-rhbz@example.com"]
+    assert message.recipients == ["dummy-rhbz@unit.tests"]
     # Check that values have not been changed
     user = User(ipa_admin.user_show("dummy")['result'])
     assert user.rhbz_mail is None
@@ -253,11 +253,11 @@ def test_user_settings_email_no_change(client, logged_in_dummy_user):
 def test_user_settings_email_post_multiple(client, logged_in_dummy_user):
     """Edit multiple user email"""
     data = POST_CONTENTS_EMAIL.copy()
-    data["mail"] = "dummy2@example.com"
+    data["mail"] = "dummy2@unit.tests"
     with mailer.record_messages() as outbox:
         result = client.post('/user/dummy/settings/email/', data=data)
     assert result.status_code == 302
-    assert result.location == "http://localhost/user/dummy/settings/email/"
+    assert result.location == "/user/dummy/settings/email/"
     # Flash messages
     messages = get_flashed_messages(with_categories=True)
     assert len(messages) == 2
@@ -265,12 +265,12 @@ def test_user_settings_email_post_multiple(client, logged_in_dummy_user):
     # Sent email
     assert len(outbox) == 2
     assert [m.recipients for m in outbox] == [
-        ["dummy2@example.com"],
-        ["dummy-rhbz@example.com"],
+        ["dummy2@unit.tests"],
+        ["dummy-rhbz@unit.tests"],
     ]
     # Check that values have not been changed
     user = User(ipa_admin.user_show("dummy")['result'])
-    assert user.mail == "dummy@example.com"
+    assert user.mail == "dummy@unit.tests"
     assert user.rhbz_mail is None
 
 
@@ -320,7 +320,7 @@ def test_user_settings_email_post_no_smtp(client, logged_in_dummy_user, mocker):
 def test_user_settings_email_validation(client, logged_in_dummy_user):
     """Test the user email validation page"""
     token = make_token(
-        {"sub": "dummy", "attr": "rhbz_mail", "mail": "dummy-rhbz@example.com"},
+        {"sub": "dummy", "attr": "rhbz_mail", "mail": "dummy-rhbz@unit.tests"},
         audience=Audience.email_validation,
         ttl=current_app.config["ACTIVATION_TOKEN_EXPIRATION"],
     )
@@ -334,7 +334,7 @@ def test_user_settings_email_validation(client, logged_in_dummy_user):
 def test_user_settings_email_validation_post(client, logged_in_dummy_user):
     """Test posting to the user email validation page"""
     token = make_token(
-        {"sub": "dummy", "attr": "rhbz_mail", "mail": "dummy-rhbz@example.com"},
+        {"sub": "dummy", "attr": "rhbz_mail", "mail": "dummy-rhbz@unit.tests"},
         audience=Audience.email_validation,
         ttl=current_app.config["ACTIVATION_TOKEN_EXPIRATION"],
     )
@@ -352,7 +352,7 @@ def test_user_settings_email_validation_post(client, logged_in_dummy_user):
     )
     # Check that values have been changed
     user = User(ipa_admin.user_show("dummy")['result'])
-    assert user.rhbz_mail == "dummy-rhbz@example.com"
+    assert user.rhbz_mail == "dummy-rhbz@unit.tests"
 
 
 @pytest.mark.vcr()
@@ -383,7 +383,7 @@ def test_user_settings_email_validation_bad_token(client, logged_in_dummy_user):
 def test_user_settings_email_validation_expired_token(client, logged_in_dummy_user):
     """Test posting to the user email validation page with an expired token"""
     token = make_token(
-        {"sub": "dummy", "attr": "rhbz_mail", "mail": "dummy-rhbz@example.com"},
+        {"sub": "dummy", "attr": "rhbz_mail", "mail": "dummy-rhbz@unit.tests"},
         audience=Audience.email_validation,
         ttl=-1,
     )
@@ -400,7 +400,7 @@ def test_user_settings_email_validation_expired_token(client, logged_in_dummy_us
 def test_user_settings_email_validation_other_user(client, logged_in_dummy_user):
     """Test posting to the user email validation page with an expired token"""
     token = make_token(
-        {"sub": "someone-else", "attr": "rhbz_mail", "mail": "dummy-rhbz@example.com"},
+        {"sub": "someone-else", "attr": "rhbz_mail", "mail": "dummy-rhbz@unit.tests"},
         audience=Audience.email_validation,
         ttl=current_app.config["ACTIVATION_TOKEN_EXPIRATION"],
     )
@@ -419,7 +419,7 @@ def test_user_settings_email_validation_post_failure(
 ):
     """Test posting to the user email validation page"""
     token = make_token(
-        {"sub": "dummy", "attr": "rhbz_mail", "mail": "dummy-rhbz@example.com"},
+        {"sub": "dummy", "attr": "rhbz_mail", "mail": "dummy-rhbz@unit.tests"},
         audience=Audience.email_validation,
         ttl=current_app.config["ACTIVATION_TOKEN_EXPIRATION"],
     )

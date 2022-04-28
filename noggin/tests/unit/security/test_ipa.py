@@ -84,7 +84,7 @@ def test_ipa_untouched_client(client):
 def test_ipa_client_with_errors(ipa_call_error):
     with patch("noggin.security.ipa.Client._request") as request:
         request.return_value = ipa_call_error
-        client = Client("ipa.example.com")
+        client = Client("ipa.unit.tests")
         result = client.group_add_member_manager(a_cn="dummy-group", o_user="dummy")
         assert result['failed'] == {
             'member': {'group': [], 'user': ['this is an error']}
@@ -94,7 +94,7 @@ def test_ipa_client_with_errors(ipa_call_error):
 def test_ipa_client_skip_errors(ipa_call_error):
     with patch("noggin.security.ipa.Client._request") as request:
         request.return_value = ipa_call_error
-        client = Client("ipa.example.com")
+        client = Client("ipa.unit.tests")
         result = client.group_add_member_manager(
             a_cn="dummy-group", o_user="dummy", skip_errors=True
         )
@@ -114,7 +114,10 @@ def test_ipa_client_batch(client, logged_in_dummy_user, dummy_group):
         )
         assert result['count'] == 2
         assert result['results'][0]['result'][0]['uid'][0] == 'dummy'
-        assert result['results'][1]['result'][0]['description'][0] == 'A dummy group'
+        assert (
+            result['results'][1]['result'][0]['description'][0]
+            == 'The dummy-group group'
+        )
 
 
 @pytest.mark.vcr
@@ -156,7 +159,7 @@ def test_ipa_client_batch_unknown_option(client, logged_in_dummy_user):
 
 
 def test_ipa_client_change_password_error():
-    client = Client("ipa.example.com")
+    client = Client("ipa.unit.tests")
     with patch.object(client, "_session") as request:
         response = requests.Response()
         response.status_code = 400
@@ -166,7 +169,7 @@ def test_ipa_client_change_password_error():
 
 
 def test_ipa_client_change_password_empty_response():
-    client = Client("ipa.example.com")
+    client = Client("ipa.unit.tests")
     with patch.object(client, "_session") as request:
         response = requests.Response()
         response.status_code = 200

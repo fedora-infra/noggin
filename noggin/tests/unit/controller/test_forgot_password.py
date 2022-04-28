@@ -68,7 +68,7 @@ def dummy_user_no_password(ipa_testing_config, app):
         o_givenname=name.title(),
         o_sn='User',
         o_cn=f'{name.title()} User',
-        o_mail=f"{name}@example.com",
+        o_mail=f"{name}@unit.tests",
         # o_userpassword=password,
         o_loginshell='/bin/bash',
         fascreationtime=f"{now.isoformat()}Z",
@@ -104,7 +104,7 @@ def test_ask_post(client, dummy_user, patched_lock):
     assert len(outbox) == 1
     message = outbox[0]
     assert message.subject == "Password reset procedure"
-    assert message.recipients == ["dummy@example.com"]
+    assert message.recipients == ["dummy@unit.tests"]
     # Valid token
     token_match = re.search(r"\?token=([^\s\"']+)", message.body)
     assert token_match is not None

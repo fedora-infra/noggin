@@ -15,21 +15,21 @@ Obj = namedtuple("Obj", ["ircnick"])
         # Backend has good data
         ([None, "irc:/username"], ["irc", "username"]),
         (
-            [None, "irc://irc.example.com/username[m]"],
-            ["irc", "username[m]:irc.example.com"],
+            [None, "irc://irc.unit.tests/username[m]"],
+            ["irc", "username[m]:irc.unit.tests"],
         ),
         ([None, "matrix:/username"], ["matrix", "username"]),
         ([None, "matrix://matrix.org/username"], ["matrix", "username:matrix.org"]),
         # Backend has historic (unformatted) data
         ([None, "username"], ["irc", "username"]),
         ([None, "@username"], ["irc", "username"]),
-        ([None, "username@example.com"], ["irc", "username:example.com"]),
-        ([None, "username @ example.com"], ["irc", "username:example.com"]),
+        ([None, "username@unit.tests"], ["irc", "username:unit.tests"]),
+        ([None, "username @ unit.tests"], ["irc", "username:unit.tests"]),
         # User input
         ([("irc", "username"), None], ["irc", "username"]),
         ([("irc", "@username"), None], ["irc", "username"]),
-        ([("irc", "username@example.com"), None], ["irc", "username:example.com"]),
-        ([("irc", "username @ example.com"), None], ["irc", "username:example.com"]),
+        ([("irc", "username@unit.tests"), None], ["irc", "username:unit.tests"]),
+        ([("irc", "username @ unit.tests"), None], ["irc", "username:unit.tests"]),
         ([("matrix", "username"), None], ["matrix", "username"]),
         ([("matrix", "@username"), None], ["matrix", "username"]),
         ([("matrix", "username:matrix.org"), None], ["matrix", "username:matrix.org"]),

@@ -11,8 +11,8 @@ def assert_redirects_with_flash(
 ):
     assert response.status_code == 302, f"Response code was {response.status_code}"
     assert (
-        response.location == f"http://localhost{expected_url}"
-    ), f"Expected URL http://localhost{expected_url}, got {response.location}"
+        response.location == expected_url
+    ), f"Expected URL {expected_url}, got {response.location}"
     messages = get_flashed_messages(with_categories=True)
     assert len(messages) > 0, "No flash message was set"
     assert len(messages) == 1, "More than one flash message were set"

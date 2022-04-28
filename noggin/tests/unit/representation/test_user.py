@@ -8,7 +8,7 @@ def test_user(dummy_user_dict):
     assert user.firstname == "Dummy"
     assert user.lastname == "User"
     assert user.name == "Dummy User"
-    assert user.mail == "dummy@example.com"
+    assert user.mail == "dummy@unit.tests"
     assert user.sshpubkeys == [
         'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtX/SK86GrOa0xUadeZVbDXCj6wseamJQTpvjzNdKLgIBuQnA2dnR+jBS54rxUzHD1In/yI9r1VXr+KVZG4ULHmSuP3Icl0SUiVs+u+qeHP77Fa9rnQaxxCFL7uZgDSGSgMx0XtiQUrcumlD/9mrahCefU0BIKfS6e9chWwJnDnPSpyWf0y0NpaGYqPaV6Ukg2Z5tBvei6ghBb0e9Tusg9dHGvpv2B23dCzps6s5WBYY2TqjTHAEuRe6xR0agtPUE1AZ/DvSBKgwEz6RXIFOtv/fnZ0tERh238+n2nohMZNo1QAtQ6I0U9Kx2gdAgHRaMN6GzmbThji/MLgKlIJPSh',  # noqa: E501
         'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDuxGxBwWH5xMLAuIUAVU3O8ZViYWW64V3tJRob+eZngeR95PzUDeH0UlZ58bPyucpMowZNgJucsHyUjqal5bctv9Q5r224Of1R3DJqIViE16W3zncGNjbgiuc66wcO2o84HEm2Zi+v4cwU8ykM0m9zeG0257aVW4/L/fDAyR55NRJ7zLIyRmGMcjkN6j02wbGK89xXJKHMtRKa5Kg4GJx3HUae79C3B7SyoRAuyzLT6GmpMZ3XRa/khZ3t4xfUtSMV6DuvR5KJ9Wg5B20ecua1tNXOLHC3dU5L+P6Pb7+HL1sxHiYbaiBPJbosMkM2wqd3VyduQDQTO4BJyly/ruIN',  # noqa: E501
@@ -20,7 +20,7 @@ def test_user(dummy_user_dict):
     assert user.groups == ["ipausers"]
     assert user.github == "dummy"
     assert user.gitlab == "dummy"
-    assert user.rhbz_mail == "dummy@example.com"
+    assert user.rhbz_mail == "dummy@unit.tests"
     assert user.locked is False
     assert user.pronouns == ["they / them / theirs"]
 
