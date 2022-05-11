@@ -139,6 +139,37 @@ def test_user_edit_post_minimal_values(client, logged_in_dummy_user):
     )
 
 
+@pytest.mark.vcr()
+def test_user_edit_post_gecos(client, logged_in_dummy_user):
+    """Test that the GECOS is also edited"""
+    result = ipa_admin.user_mod("dummy", o_gecos="Dude McPants")
+    assert User(result["result"]).gecos == "Dude McPants"
+    with fml_testing.mock_sends(
+        UserUpdateV1(
+            {
+                "msg": {
+                    "agent": "dummy",
+                    "user": "dummy",
+                    "fields": [
+                        'gecos',
+                        'timezone',
+                        'locale',
+                    ],
+                }
+            }
+        )
+    ):
+        result = client.post('/user/dummy/settings/profile/', data=POST_CONTENTS_MIN)
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/profile/",
+        expected_message="Profile Updated: <a href=\"/user/dummy/\">view your profile</a>",
+        expected_category="success",
+    )
+    result = ipa_admin.user_show("dummy")
+    assert User(result["result"]).gecos == "Dummy User"
+
+
 @pytest.mark.parametrize("method", ["GET", "POST"])
 @pytest.mark.vcr()
 def test_user_edit_no_permission(method, client, logged_in_dummy_user):

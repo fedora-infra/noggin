@@ -142,7 +142,7 @@ def user_settings_profile(ipa, username):
             if field.short_name in user
         }
         fullname = f"{form.firstname.data} {form.lastname.data}"
-        changes["o_cn"] = changes["o_displayname"] = fullname
+        changes["o_cn"] = changes["o_displayname"] = changes["o_gecos"] = fullname
         result = _user_mod(
             ipa,
             form,
