@@ -149,7 +149,7 @@ def test_step_1_registration_closed(
     assert len(outbox) == 0
 
 
-@pytest.mark.parametrize("username", ["a", "ab", "a" * 33])
+@pytest.mark.parametrize("username", ["a", "ab", "abc", "abcd", "a" * 33])
 def test_step_1_bad_length(client, post_data_step_1, mocker, username):
     """Try to register a user with a username that has a bad length"""
     post_data_step_1["register-username"] = username
@@ -161,7 +161,7 @@ def test_step_1_bad_length(client, post_data_step_1, mocker, username):
     assert_form_field_error(
         result,
         "register-username",
-        "Field must be between 3 and 32 characters long.",
+        "Field must be between 5 and 32 characters long.",
     )
     record_signal.assert_not_called()
     assert len(outbox) == 0
