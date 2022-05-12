@@ -129,6 +129,17 @@ def test_gecos(client, post_data_non_ascii, cleanup_dummy_user, mocker):
 
 
 @pytest.mark.vcr()
+def test_lowercase_email(client, post_data_step_1, cleanup_dummy_user, mocker):
+    post_data_step_1["register-mail"] = "UPPERCASE-DUMMY@UNIT.TESTS"
+    record_signal = mocker.Mock()
+    with mailer.record_messages() as _, stageuser_created.connected_to(record_signal):
+        result = client.post('/', data=post_data_step_1)
+    assert result.status_code == 302
+    user = User(ipa_admin.stageuser_show("dummy")['result'])
+    assert user.mail == "uppercase-dummy@unit.tests"
+
+
+@pytest.mark.vcr()
 def test_step_1_registration_closed(
     client, post_data_step_1, cleanup_dummy_user, mocker
 ):
