@@ -210,6 +210,15 @@ class UserSettingsOTPStatusChange(BaseForm):
     )
 
 
+class UserSettingsOTPNameChange(BaseForm):
+    token = HiddenField(
+        'token', validators=[DataRequired(message=_('Token must not be empty'))]
+    )
+    description = StringField(
+        validators=[Optional()],
+    )
+
+
 class UserSettingsAgreementSign(BaseForm):
     agreement = HiddenField(
         'agreement', validators=[DataRequired(message=_('Agreement must not be empty'))]

@@ -239,7 +239,7 @@ def test_user_settings_otp_check_no_description(
     tokens = tokenlist.select(".list-group-item div[data-role='token-description']")
     assert len(tokens) == 1
 
-    assert tokens[0].get_text(strip=True) == ""
+    assert tokens[0].get_text(strip=True) == "(no name)"
 
 
 @pytest.mark.vcr()
@@ -694,3 +694,82 @@ def test_user_settings_otp_enable(client, logged_in_dummy_user, dummy_user_with_
     tokenlist = page.select("div.list-group .list-group-item.text-muted")
     # check we are showing 0 disabled tokens
     assert len(tokenlist) == 0
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_rename(client, logged_in_dummy_user_with_otp):
+    """Test renaming an otp token"""
+    tokenid = logged_in_dummy_user_with_otp.uniqueid
+    # rename the token
+    result = client.post(
+        "/user/dummy/settings/otp/rename/",
+        data={"token": tokenid, "description": "the new name"},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(result.data, "html.parser")
+    tokenlist = page.select("div.list-group .list-group-item")
+    assert len(tokenlist) == 1
+
+    desc = (
+        tokenlist[0]
+        .select("div[data-role='token-description']")[0]
+        .get_text(strip=True)
+    )
+    assert desc == "the new name"
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_rename_no_change(client, logged_in_dummy_user_with_otp):
+    """Test renaming an otp token with no actual change"""
+    tokenid = logged_in_dummy_user_with_otp.uniqueid
+    desc = logged_in_dummy_user_with_otp.description
+
+    result = client.post(
+        "/user/dummy/settings/otp/rename/",
+        data={"token": tokenid, "description": desc},
+        follow_redirects=True,
+    )
+
+    page = BeautifulSoup(result.data, "html.parser")
+    tokenlist = page.select("div.list-group .list-group-item")
+    assert len(tokenlist) == 1
+
+    new_desc = (
+        tokenlist[0]
+        .select("div[data-role='token-description']")[0]
+        .get_text(strip=True)
+    )
+    assert new_desc == desc
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_rename_ipaerror(client, logged_in_dummy_user_with_otp):
+    """Test failure when renaming an otptoken"""
+    tokenid = logged_in_dummy_user_with_otp.uniqueid
+    with mock.patch("noggin.security.ipa.Client.otptoken_mod") as method:
+        method.side_effect = python_freeipa.exceptions.FreeIPAError(
+            message="Whoops", code="4242"
+        )
+        result = client.post(
+            "/user/dummy/settings/otp/rename/",
+            data={"token": tokenid},
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot rename the token.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_user_settings_otp_rename_invalid_form(client, logged_in_dummy_user_with_otp):
+    """Test an invalid form when renaming an otp token"""
+    result = client.post("/user/dummy/settings/otp/rename/", data={})
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Token must not be empty",
+        expected_category="danger",
+    )

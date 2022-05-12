@@ -85,7 +85,17 @@
   <div class="list-group-item {{'text-muted bg-light' if token.disabled}}">
     <div class="row align-items-center">
       <div class="col">
-        <div data-role="token-description" class="font-weight-bold">{{token.description if token.description}}</div>
+        <div data-role="token-description" class="font-weight-bold otp-description">
+          {{token.description if token.description else _('(no name)')}}
+          <button class="btn btn-sm btn-outline-secondary ml-1" title="{{ _('Rename') }}"><i class="fa fa-edit"></i></button>
+        </div>
+        <div class="otp-rename-form d-none">
+          <form action="{{ url_for('.user_settings_otp_rename', username=current_user.username) }}" method="post" class="form-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="text" class="form-control form-control-sm mr-1" name="description" value="{{token.description if token.description}}" />
+            <button type="submit" class="btn btn-sm btn-primary" name="token" value="{{ token.uniqueid }}">{{ _("Rename") }}</button>
+          </form>
+        </div>
         <div class="text-monospace">{{token.uniqueid}}</div>
       </div>
       <div class="col-auto">
@@ -129,7 +139,7 @@
         $('#otp-qrcode').hide().qrcode("{{ otp_uri|safe }}");
         $('#otp-toggle').click(function() {
           $('#otp-qrcode').slideToggle("fast");
-        })
+        });
     });
   </script>
   {% endif %}
@@ -140,5 +150,15 @@
       $(document).ready(function() {$('#add-token-modal').modal('show');});
     </script>
   {% endif %}
+
+  <script nonce="{{ csp_nonce() }}">
+    $(document).ready(function() {
+        $(".otp-description button").click(function() {
+          let parent = $(this).parent().parent();
+          parent.find(".otp-description").addClass("d-none");
+          parent.find(".otp-rename-form").removeClass("d-none");
+        });
+    });
+  </script>
 
 {% endblock %}

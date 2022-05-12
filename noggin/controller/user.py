@@ -27,6 +27,7 @@ from noggin.form.edit_user import (
     UserSettingsConfirmOTPForm,
     UserSettingsEmailForm,
     UserSettingsKeysForm,
+    UserSettingsOTPNameChange,
     UserSettingsOTPStatusChange,
     UserSettingsProfileForm,
 )
@@ -400,6 +401,35 @@ def user_settings_otp(ipa, username):
         tokens=tokens,
         otp_uri=otp_uri,
     )
+
+
+@bp.route('/user/<username>/settings/otp/rename/', methods=['POST'])
+@with_ipa()
+@require_self
+def user_settings_otp_rename(ipa, username):
+    form = UserSettingsOTPNameChange()
+
+    if form.validate_on_submit():
+        try:
+            ipa.otptoken_mod(
+                a_ipatokenuniqueid=form.token.data,
+                o_description=form.description.data,
+            )
+        except (
+            python_freeipa.exceptions.BadRequest,
+            python_freeipa.exceptions.FreeIPAError,
+        ) as e:
+            if e.message != "no modifications to be performed":
+                flash(_('Cannot rename the token.'), 'danger')
+                current_app.logger.error(
+                    f'Something went wrong renaming an OTP token for user {username}: {e}'
+                )
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'danger')
+
+    return redirect(url_for('.user_settings_otp', username=username))
 
 
 @bp.route('/user/<username>/settings/otp/disable/', methods=['POST'])
