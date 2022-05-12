@@ -11,7 +11,7 @@ from wtforms.validators import DataRequired, EqualTo, Length, Regexp
 
 from noggin.form.validators import Email, PasswordLength, StopOnError, validator_proxy
 
-from .base import BaseForm, ModestForm, strip, SubmitButtonField
+from .base import BaseForm, lower, ModestForm, strip, SubmitButtonField
 
 
 class RegisterUserForm(ModestForm):
@@ -60,7 +60,7 @@ class RegisterUserForm(ModestForm):
             DataRequired(message=_('Email must not be empty')),
             Email(message=_('Email must be valid')),
         ],
-        filters=[strip],
+        filters=[strip, lower],
     )
 
     underage = BooleanField(
