@@ -19,7 +19,10 @@ class NewPasswordForm(BaseForm):
 
     password_confirm = PasswordField(_('Confirm New Password'))
 
-    otp = StringField(_('One-Time Password'), validators=[Optional()])
+    otp = StringField(
+        _('One-Time Password (if your account has Two-Factor Authentication enabled)'),
+        validators=[Optional()],
+    )
 
 
 class PasswordResetForm(NewPasswordForm):
