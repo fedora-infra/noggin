@@ -4,6 +4,26 @@ Release notes
 
 .. towncrier release notes start
 
+v1.6.0
+======
+
+Released on 2022-05-13. This is a feature release.
+
+Features
+^^^^^^^^
+
+* Support Python 3.9 and 3.10 (:pr:`832`).
+* Allow users to rename their 2FA token (:issue:`819`).
+
+Bug Fixes
+^^^^^^^^^
+
+* Make the password change page less confusing (:issue:`798`).
+* Lowercase email addresses upon registration (:issue:`834`).
+* Issue a proper error message when the username is too short (:issue:`866`).
+* Update the GECOS field when changing first name or last name (:issue:`913`).
+
+
 v1.5.1
 ======
 
