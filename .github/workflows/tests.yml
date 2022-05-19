@@ -13,12 +13,13 @@ name: Tests
 jobs:
   misc_tests:
     name: Misc tests
+    container:
+      image: fedorapython/fedora-python-tox
+      options: --user 1001:1001
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run tests
-        uses: fedora-python/tox-github-action@master
-        with:
-          tox_env: ${{ matrix.tox_env }}
+        run: tox -e ${{ matrix.tox_env }}
     strategy:
       matrix:
         tox_env:
