@@ -10,13 +10,6 @@ from flask import current_app
 from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
 from noggin.security.ipa import untouched_ipa_client
-from noggin.tests.unit.utilities import (
-    assert_form_field_error,
-    assert_form_generic_error,
-    assert_redirects_with_flash,
-    get_otp,
-    otp_secret_from_uri,
-)
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import (
     Audience,
@@ -25,6 +18,14 @@ from noggin.utility.token import (
     read_token,
 )
 from noggin_messages import UserUpdateV1
+
+from ..utilities import (
+    assert_form_field_error,
+    assert_form_generic_error,
+    assert_redirects_with_flash,
+    get_otp,
+    otp_secret_from_uri,
+)
 
 
 @pytest.fixture

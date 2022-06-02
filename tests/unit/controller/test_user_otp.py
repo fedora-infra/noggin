@@ -8,7 +8,8 @@ from pyotp import TOTP
 
 from noggin.app import ipa_admin
 from noggin.representation.otptoken import OTPToken
-from noggin.tests.unit.utilities import (
+
+from ..utilities import (
     assert_form_field_error,
     assert_form_generic_error,
     assert_redirects_with_flash,

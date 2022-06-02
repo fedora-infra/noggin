@@ -10,13 +10,14 @@ from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login
 from noggin.signals import stageuser_created, user_registered
-from noggin.tests.unit.utilities import (
+from noggin.utility.token import Audience, make_token
+from noggin_messages import UserCreateV1
+
+from ..utilities import (
     assert_form_field_error,
     assert_form_generic_error,
     assert_redirects_with_flash,
 )
-from noggin.utility.token import Audience, make_token
-from noggin_messages import UserCreateV1
 
 
 @pytest.fixture
