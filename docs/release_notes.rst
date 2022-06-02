@@ -4,6 +4,23 @@ Release notes
 
 .. towncrier release notes start
 
+v1.6.1
+======
+
+Released on 2022-06-02.
+This is a minor release.
+
+Development Improvements
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The tests have been moved outside of the installed package (:pr:`940`).
+
+Dependency Changes
+^^^^^^^^^^^^^^^^^^
+
+* Update dependencies.
+
+
 v1.6.0
 ======
 
