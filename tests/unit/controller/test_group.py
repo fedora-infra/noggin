@@ -8,8 +8,9 @@ from fedora_messaging import testing as fml_testing
 from flask import Markup
 
 from noggin.app import ipa_admin
-from noggin.tests.unit.utilities import assert_redirects_with_flash
 from noggin_messages import MemberSponsorV1
+
+from ..utilities import assert_redirects_with_flash
 
 
 @pytest.mark.vcr()

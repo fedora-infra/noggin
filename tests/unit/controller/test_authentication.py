@@ -8,7 +8,8 @@ from bs4 import BeautifulSoup
 from flask import current_app, get_flashed_messages, session
 
 from noggin.app import ipa_admin
-from noggin.tests.unit.utilities import (
+
+from ..utilities import (
     assert_form_field_error,
     assert_form_generic_error,
     assert_redirects_with_flash,

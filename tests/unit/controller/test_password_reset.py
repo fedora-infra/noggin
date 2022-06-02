@@ -4,12 +4,13 @@ from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 
 from noggin.app import ipa_admin
-from noggin.tests.unit.utilities import (
+from noggin_messages import UserUpdateV1
+
+from ..utilities import (
     assert_form_field_error,
     assert_form_generic_error,
     assert_redirects_with_flash,
 )
-from noggin_messages import UserUpdateV1
 
 
 def test_password_reset(client):
