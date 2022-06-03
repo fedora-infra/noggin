@@ -1,0 +1,106 @@
+# See the documentation for more information:
+# https://packit.dev/docs/configuration/
+
+specfile_path: noggin.spec
+
+# add or remove files that should be synced
+files_to_sync:
+    - noggin.spec
+    - .packit.yaml
+    - noggin.service
+    - noggin.sysconfig
+    - sources
+
+# name in upstream package repository or registry (e.g. in PyPI)
+upstream_package_name: noggin-aaa
+# downstream (Fedora) RPM package name
+downstream_package_name: noggin
+upstream_tag_template: v{version}
+
+srpm_build_deps:
+    - wget
+
+actions:
+  create-archive:
+    - "poetry build -f sdist"
+    - "sh -c 'echo dist/noggin-aaa-$(poetry version -s).tar.gz'"
+  get-current-version:
+    - "poetry version -s"
+  post-upstream-clone:
+    # fetch specfile, patches, documentation etc. from the downstream
+    - "wget https://src.fedoraproject.org/fork/t0xic0der/rpms/noggin/raw/packit-for-rawhide/f/noggin.spec -O noggin.spec"
+    - "wget https://src.fedoraproject.org/rpms/noggin/raw/main/f/noggin.service -O noggin.service"
+    - "wget https://src.fedoraproject.org/rpms/noggin/raw/main/f/noggin.sysconfig -O noggin.sysconfig"
+    - "wget https://src.fedoraproject.org/rpms/noggin/raw/main/f/sources -O sources"
+    - "sh -c 'wget https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py && python3 install-poetry.py --version 1.1.7 && rm install-poetry.py'"
+
+jobs:
+  # upon upstream PRs, perform COPR builds
+  - job: copr_build
+    trigger: pull_request
+    metadata:
+      targets:
+        - fedora-latest-stable
+        - fedora-development
+
+  # upon upstream PRs, test builds
+  - job: tests
+    trigger: pull_request
+    metadata:
+      targets:
+        - fedora-latest-stable
+        - fedora-development
+
+  # upon upstream releases, perform COPR builds
+  - job: copr_build
+    trigger: release
+    metadata:
+      targets:
+        - fedora-latest-stable
+        - fedora-development
+
+  # upon upstream releases, test builds
+  - job: tests
+    trigger: release
+    metadata:
+      targets:
+        - fedora-latest-stable
+        - fedora-development
+
+  # upon downstream changes, create a PR upstream with sync'd files from above
+  - job: sync_from_downstream
+    trigger: commit
+
+  # land upstream release in fedora dist-git - no builds
+  - job: propose_downstream
+    trigger: release
+    metadata:
+      dist_git_branches:
+        - fedora-latest-stable
+        - fedora-development
+
+  # create an srpm from upstream and submit a scratch build to koji
+  - job: production_build
+    trigger: release
+    metadata:
+      targets:
+        - fedora-latest-stable
+        - fedora-development
+
+  # downstream automation
+
+  # trigger a build in koji for a new dist-git commit
+  - job: koji_build
+    trigger: commit
+    metadata:
+      dist_git_branches:
+        - fedora-latest-stable
+        - fedora-development
+
+  # create a new update in bodhi for a successful koji build. directly related to `koji_build`
+  - job: bodhi_update
+    trigger: commit
+    metadata:
+      dist_git_branches:
+        - fedora-latest-stable
+        - fedora-development
