@@ -27,10 +27,10 @@ from noggin.utility.templates import format_channel, format_nickname
             "matrix:/username",
             {
                 "href": (
-                    "https://matrix.to/#/@username:fedora.im"
-                    "?web-instance[element.io]=chat.fedoraproject.org"
+                    "https://matrix.to/#/@username:matrix.org"
+                    "?web-instance[element.io]=app.element.io"
                 ),
-                "title": "Matrix on fedora.im",
+                "title": "Matrix on matrix.org",
                 "name": "@username",
             },
         ),
@@ -39,7 +39,7 @@ from noggin.utility.templates import format_channel, format_nickname
             {
                 "href": (
                     "https://matrix.to/#/@username:unit.tests"
-                    "?web-instance[element.io]=chat.fedoraproject.org"
+                    "?web-instance[element.io]=app.element.io"
                 ),
                 "title": "Matrix on unit.tests",
                 "name": "@username:unit.tests",
@@ -123,9 +123,9 @@ def test_format_nickname_invalid_with_config(app, request_context, mocker):
         (
             "matrix:/channel",
             {
-                "href": "https://matrix.to/#/#channel:fedora.im",
-                "title": "Matrix on fedora.im",
-                "name": "#channel:fedora.im",
+                "href": "https://matrix.to/#/#channel:matrix.org",
+                "title": "Matrix on matrix.org",
+                "name": "#channel:matrix.org",
             },
         ),
         (

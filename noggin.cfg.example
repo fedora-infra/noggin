@@ -62,7 +62,7 @@ MAIL_DEFAULT_SENDER = "Noggin <noggin@example.com>"
 MAIL_SUPPRESS_SEND = True
 
 # Email domains that a user cannot use to register or change to
-# MAIL_DOMAIN_BLOCKLIST = ['fedoraproject.org']
+# MAIL_DOMAIN_BLOCKLIST = ['example.com', 'example.org']
 
 # Allowed format for usernames
 # ALLOWED_USERNAME_PATTERN = "^[a-z0-9][a-z0-9-]{3,30}[a-z0-9]$"
@@ -91,6 +91,16 @@ MAIL_SUPPRESS_SEND = True
 # Page size when paginating results
 # PAGE_SIZE = 30
 
+# Chat network settings
+CHAT_NETWORKS = {
+    "irc": {"default_server": "irc.libera.chat"},
+    "matrix": {"default_server": "matrix.org"},
+}
+# Link to matrix rooms and usernames using the element.io web client
+# instance at app.element.io. Set this variable to whatever Element instance
+# you use (e.g. chat.fedoraproject.org, chat.opensuse.org, etc.)
+CHAT_MATRIX_TO_ARGS = "web-instance[element.io]=app.element.io"
+
 # IPA role allowed to modify and delete stage users. The stage users admin page
 # will only be accessible to users that have this role.
 # STAGE_USERS_ROLE = "Stage User Managers"
@@ -114,5 +124,5 @@ MAIL_SUPPRESS_SEND = True
 # BASSET_URL = None
 # SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 
-# Set to False to disable Fedora Messaging integration
+# Set to True to enable Fedora Messaging integration
 # FEDORA_MESSAGING_ENABLED = True

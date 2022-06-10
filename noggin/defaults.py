@@ -26,7 +26,7 @@ ALLOWED_USERNAME_MAX_SIZE = 32
 AVATAR_SERVICE_URL = "https://seccdn.libravatar.org/"
 AVATAR_DEFAULT_TYPE = "robohash"
 
-MAIL_DOMAIN_BLOCKLIST = ['fedoraproject.org']
+MAIL_DOMAIN_BLOCKLIST = ['example.com', 'example.org']
 
 HEALTHZ = {
     "live": "noggin.controller.root.liveness",
@@ -37,12 +37,12 @@ PAGE_SIZE = 30
 
 CHAT_NETWORKS = {
     "irc": {"default_server": "irc.libera.chat"},
-    "matrix": {"default_server": "fedora.im"},
+    "matrix": {"default_server": "matrix.org"},
 }
-# Link to matrix rooms and usernames using the element.io web client
-# instance at chat.fedoraproject.org. Set this variable to a falsy
-# value to use element.io.
-CHAT_MATRIX_TO_ARGS = "web-instance[element.io]=chat.fedoraproject.org"
+# Link to matrix rooms and usernames using a element.io web client
+# instance. Set this variable to whatever instance you have.
+# e.g. chat.fedoraproject.org, chat.opensuse.org
+CHAT_MATRIX_TO_ARGS = "web-instance[element.io]=app.element.io"
 
 STAGE_USERS_ROLE = "Stage User Managers"
 
@@ -52,5 +52,5 @@ ACCEPT_IMAGES_FROM = []
 BASSET_URL = None
 SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 
-# Cheat code to disable Fedora Messaging
-FEDORA_MESSAGING_ENABLED = True
+# Cheat code to toggle Fedora Messaging support
+FEDORA_MESSAGING_ENABLED = False
