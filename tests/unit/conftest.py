@@ -36,6 +36,8 @@ def app_config(ipa_cert):
         PASSWORD_POLICY={"min": 6},
         # Don't delete the role we may have in the dev env
         STAGE_USERS_ROLE="Testing Stage Users Admins",
+        # Turn on Fedora Messaging
+        FEDORA_MESSAGING_ENABLED=True,
     )
 
 
