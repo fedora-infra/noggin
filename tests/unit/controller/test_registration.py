@@ -199,6 +199,29 @@ def test_step_1_bad_format(client, post_data_step_1, mocker, username):
     assert len(outbox) == 0
 
 
+@pytest.mark.parametrize(
+    "username,regexp", [("forbidden-value", "^forbidden-.*"), ("nopeuser", "nope.*")]
+)
+def test_step_1_blocked_value(client, post_data_step_1, mocker, username, regexp):
+    """Try to register a user with a blocked username"""
+    mocker.patch.dict(
+        current_app.config, {"USERNAME_BLOCKLIST": [r"^forbidden-.*", r"nope.*"]}
+    )
+    post_data_step_1["register-username"] = username
+    record_signal = mocker.Mock()
+    with mailer.record_messages() as outbox, stageuser_created.connected_to(
+        record_signal
+    ):
+        result = client.post('/', data=post_data_step_1)
+    assert_form_field_error(
+        result,
+        "register-username",
+        f"Field must not match \"{regexp}\".",
+    )
+    record_signal.assert_not_called()
+    assert len(outbox) == 0
+
+
 @pytest.mark.vcr()
 def test_step_1_spamcheck(
     client, post_data_step_1, cleanup_dummy_user, spamcheck_on, mocker
