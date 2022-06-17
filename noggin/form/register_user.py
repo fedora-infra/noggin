@@ -9,7 +9,13 @@ from wtforms.fields import (
 )
 from wtforms.validators import DataRequired, EqualTo, Length, Regexp
 
-from noggin.form.validators import Email, PasswordLength, StopOnError, validator_proxy
+from noggin.form.validators import (
+    BlockedPatterns,
+    Email,
+    PasswordLength,
+    StopOnError,
+    validator_proxy,
+)
 
 from .base import BaseForm, lower, ModestForm, strip, SubmitButtonField
 
@@ -50,6 +56,7 @@ class RegisterUserForm(ModestForm):
                     ),
                 )
             ),
+            BlockedPatterns("USERNAME_BLOCKLIST"),
         ],
         filters=[strip],
     )

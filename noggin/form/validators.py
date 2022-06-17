@@ -1,3 +1,5 @@
+import re
+
 from flask import current_app
 from flask_babel import lazy_gettext as _
 from wtforms.validators import Email as WTFormsEmailValidator
@@ -56,3 +58,19 @@ class StopOnError:
             self.validator(form, field)
         except ValidationError as e:
             raise StopValidation(str(e))
+
+
+class BlockedPatterns(object):
+    """Block values according to a list of patterns in the configuration."""
+
+    message = _('Field must not match "%(pattern)s".')
+
+    def __init__(self, config_key=None):
+        self.config_key = config_key
+
+    def __call__(self, form, field):
+        value = field.data
+        patterns = current_app.config[self.config_key]
+        for pattern in patterns:
+            if re.match(pattern, value):
+                raise ValidationError(self.message % {"pattern": pattern})

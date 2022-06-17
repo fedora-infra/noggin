@@ -22,6 +22,8 @@ ALLOWED_USERNAME_HUMAN = ["a-z", "0-9", "-"]
 # Minimum and maximum username size
 ALLOWED_USERNAME_MIN_SIZE = 5
 ALLOWED_USERNAME_MAX_SIZE = 32
+# Forbidden username patterns
+USERNAME_BLOCKLIST = []
 
 AVATAR_SERVICE_URL = "https://seccdn.libravatar.org/"
 AVATAR_DEFAULT_TYPE = "robohash"
