@@ -24,7 +24,7 @@
                     <i class="fa fa-fw fa-genderless"></i>
                     {{_("Pronouns")}}
                   </strong>
-                  <div class="text-right">
+                  <div class="text-end">
                     {% for pronoun in user.pronouns %}
                     <div class="mb-0 p-1">{{ pronoun }}</div>
                     {% endfor %}
@@ -37,7 +37,7 @@
                     <i class="fa fa-fw fa-globe"></i>
                     {{_("Timezone")}}
                   </strong>
-                  <div class="text-right">
+                  <div class="text-end">
                     <div>{{ user.timezone }}</div>
                   </div>
                 </li>
@@ -46,7 +46,7 @@
                     <i class="fa fa-fw fa-clock-o"></i>
                     {{_("Current Time")}}
                   </strong>
-                  <div class="text-right">
+                  <div class="text-end">
                     <div id="user-time">&nbsp;</div>
                   </div>
                 </li>
@@ -56,7 +56,7 @@
                   <strong title="{{_('Chat')}}">
                     <i class="fa fa-fw fa-comments-o"></i> {{_("Chat")}}
                   </strong>
-                  <div class="text-right">
+                  <div class="text-end">
                     {% for ircnick in user.ircnick %}
                     <div class="mb-0 text-monospace">{{ ircnick|nickname }}</div>
                     {% endfor %}
@@ -118,13 +118,13 @@
       </div>
       <div class="col-md-8">
         <ul class="list-group h-100">
-          <li class="list-group-item text-right bg-light">
+          <li class="list-group-item text-end bg-light">
               <strong>{{_("%(groupcount)s Group(s), %(agreementcount)s Agreement(s)", groupcount=groups|count, agreementcount=user.agreements|count)}}</strong>
           </li>
           {% for agreement in user.agreements %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <div class="media align-items-center">
-                <i class="fa fa-fw fa-check-circle fa-2x text-muted mr-3"></i>
+                <i class="fa fa-fw fa-check-circle fa-2x text-muted me-3"></i>
                 <div class="media-body">
                     <div class="my-0 font-weight-bold">
                       <a href="{{ url_for('.user_settings_agreements', username=user.username) }}">
@@ -142,7 +142,7 @@
           {% for group in groups %}
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="media align-items-center">
-                  <i class="fa fa-fw fa-group fa-2x text-muted mr-3"></i>
+                  <i class="fa fa-fw fa-group fa-2x text-muted me-3"></i>
                   <div class="media-body">
                       <div class="my-0 font-weight-bold">
                         <a href="{{ url_for('.group', groupname=group.name) }}">
@@ -154,7 +154,7 @@
                       {% endif %}
                   </div>
                 </div>
-                <div class="text-info ml-auto px-2 {{ 'invisible' if group not in managed_groups }}">{{ _('sponsor') }}</div>
+                <div class="text-info ms-auto px-2 {{ 'invisible' if group not in managed_groups }}">{{ _('sponsor') }}</div>
                 <div class="text-success px-2 {{ 'invisible' if group not in member_groups }}">{{ _('member') }}</div>
               </li>
           {% else %}

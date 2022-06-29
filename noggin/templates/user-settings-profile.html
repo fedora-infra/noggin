@@ -22,16 +22,17 @@
 <form class="needs-validation" action="{{ url_for('.user_settings_profile', username=user.username) }}" method="post" novalidate>
     {{ form.csrf_token }}
     <div class="card-body">
-      <div class="form-row">
-        <div class="form-group col">{{ macros.with_errors(form.firstname) }}</div>
-        <div class="form-group col">{{ macros.with_errors(form.lastname) }}</div>
+      <div class="row">
+        <div class="mb-3 col">{{ macros.with_errors(form.firstname) }}</div>
+        <div class="mb-3 col">{{ macros.with_errors(form.lastname) }}</div>
       </div>
-      <div class="form-group">{{ macros.with_errors(form.pronouns) }}</div>
-      <div class="form-group">{{ macros.with_errors(form.locale, class="custom-select") }}</div>
-      <div class="form-group">{{ macros.with_errors(form.timezone, class="custom-select") }}</div>
-      <div class="form-group">{{ macros.with_errors(form.website_url) }}</div>
-      <div class="form-group">{{ macros.with_errors(form.rss_url) }}</div>
-      <div class="form-group mb-4">
+      <div class="mb-3">{{ macros.with_errors(form.pronouns) }}</div>
+      <div class="mb-3">{{ macros.with_errors(form.locale, class="form-select") }}</div>
+      <div class="mb-3">{{ macros.with_errors(form.timezone, class="form-select") }}</div>
+      <div class="mb-3">{{ macros.with_errors(form.website_url) }}</div>
+      <div class="mb-3">{{ macros.with_errors(form.rss_url) }}</div>
+
+      <div class="mb-3 mb-4">
         <p class="m-0">{{ form.ircnick.label(class_="mt-2") }}</p>
         <p class="m-0">
           {% trans %}
@@ -49,9 +50,9 @@
         </ul>
         {{ macros.with_errors(form.ircnick, label=False) }}
       </div>
-      <div class="form-group">{{ macros.with_errors(form.github) }}</div>
-      <div class="form-group">{{ macros.with_errors(form.gitlab) }}</div>
-      <div class="form-group form-check">{{ macros.with_errors(form.is_private) }}</div>
+      <div class="mb-3">{{ macros.with_errors(form.github) }}</div>
+      <div class="mb-3">{{ macros.with_errors(form.gitlab) }}</div>
+      <div class="mb-3 form-check">{{ macros.with_errors(form.is_private) }}</div>
     </div>
     <div class="card-footer d-flex justify-content-between">
       <div>{{ macros.non_field_errors(form) }}</div>
@@ -67,6 +68,7 @@
   <script nonce="{{ csp_nonce() }}">
   // Clear buttons
   $('.input-group button[data-action="clear"]').click(function() {
+    alert("pants")
     $(this).parents(".input-group").first().find("input[type='text']").val("");
   })
   // Pronouns

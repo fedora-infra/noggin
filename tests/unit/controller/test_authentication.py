@@ -194,7 +194,7 @@ def test_login_username_created_with_case(client, dummy_user_with_case):
     page = BeautifulSoup(result.data, 'html.parser')
     messages = page.select(".flash-messages .alert-success")
     assert len(messages) == 1
-    assert messages[0].get_text(strip=True) == 'Welcome, dummy!×'
+    assert messages[0].get_text(strip=True) == 'Welcome, dummy!'
     assert session.get("noggin_username") == "dummy"
     assert session.get("noggin_session") is not None
 
