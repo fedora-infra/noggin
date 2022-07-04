@@ -4,6 +4,41 @@ Release notes
 
 .. towncrier release notes start
 
+v1.7.0
+======
+
+Released on 2022-07-04. This is a feature release.
+
+Backwards Incompatible Changes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Noggin no longer assumes it is being deployed in Fedora infrastructure by
+  default (:pr:`949`). This is technically a backwards incompatible change
+  but the only deployment where it could break things is the Fedora install
+  and it has been taken care of.
+
+Dependency Changes
+^^^^^^^^^^^^^^^^^^
+
+* Update dependency versions.
+
+Features
+^^^^^^^^
+
+* Add a blocklist for registering users (:issue:`957`).
+
+Contributors
+^^^^^^^^^^^^
+
+Many thanks to the contributors of bug reports, pull requests, and pull request
+reviews for this release:
+
+* Akashdeep Dhar
+* Aurélien Bompard
+* Neal Gompa
+* Oğuz Ersen
+
+
 v1.6.1
 ======
 
