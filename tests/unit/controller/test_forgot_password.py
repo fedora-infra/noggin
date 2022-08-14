@@ -1,5 +1,6 @@
 import datetime
 import re
+from smtplib import SMTPRecipientsRefused
 
 import pytest
 import python_freeipa
@@ -157,6 +158,27 @@ def test_ask_no_smtp(client, dummy_user, patched_lock, mocker):
         result,
         expected_url="/",
         expected_message="We could not send you an email, please retry later",
+        expected_category="danger",
+    )
+    # Log message
+    logger.error.assert_called_once()
+
+
+@pytest.mark.vcr()
+def test_ask_smtp_rcpt_refused(client, dummy_user, patched_lock, mocker):
+    mailer = mocker.patch("noggin.controller.password.mailer")
+    mailer.send.side_effect = SMTPRecipientsRefused(recipients={})
+    logger = mocker.patch.object(current_app._get_current_object(), "logger")
+    result = client.post('/forgot-password/ask', data={"username": "dummy"})
+    # Email
+    mailer.send.assert_called_once()
+    # Lock untouched
+    patched_lock["store"].assert_not_called()
+    # Error message
+    assert_redirects_with_flash(
+        result,
+        expected_url="/",
+        expected_message="Your email address is rejected by smtp server",
         expected_category="danger",
     )
     # Log message

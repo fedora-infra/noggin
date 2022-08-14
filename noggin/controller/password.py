@@ -1,6 +1,7 @@
 import datetime
 import random
 import string
+from smtplib import SMTPRecipientsRefused
 
 import jwt
 import python_freeipa
@@ -166,6 +167,10 @@ def forgot_password_ask():
                     f"Impossible to send a password reset email: {e}"
                 )
                 flash(_("We could not send you an email, please retry later"), "danger")
+                return redirect(url_for('.root'))
+            except SMTPRecipientsRefused as e:
+                current_app.logger.error(f"Could not send a password reset email: {e}")
+                flash(_("Your email address is rejected by smtp server"), "danger")
                 return redirect(url_for('.root'))
             if current_app.config["DEBUG"]:  # pragma: no cover
                 current_app.logger.debug(email)
