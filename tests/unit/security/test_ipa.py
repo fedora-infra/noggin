@@ -8,6 +8,7 @@ from python_freeipa.exceptions import BadRequest, FreeIPAError
 
 from noggin.app import ipa_admin
 from noggin.security.ipa import (
+    choose_server,
     Client,
     maybe_ipa_login,
     maybe_ipa_session,
@@ -21,6 +22,30 @@ def ipa_call_error():
         'result': 'call-result',
         'failed': {'member': {'user': ["this is an error"], 'group': []}},
     }
+
+
+def test_choose_server(client, mocker):
+    random = mocker.patch("noggin.security.ipa.random")
+    random.choice.side_effect = ["a.example.test", "b.example.test", "c.example.test"]
+    with client.session_transaction() as sess:
+        server = choose_server(current_app, sess)
+    assert server == "a.example.test"
+    with client.session_transaction() as sess:
+        server = choose_server(current_app, sess)
+    # After a second call it is still the first result
+    assert server == "a.example.test"
+    random.choice.assert_called_once()
+
+
+def test_choose_server_no_session(client, mocker):
+    random = mocker.patch("noggin.security.ipa.random")
+    random.choice.side_effect = ["a.example.test", "b.example.test", "c.example.test"]
+    server = choose_server(current_app)
+    assert server == "a.example.test"
+    server = choose_server(current_app)
+    # If we can't store the value in the session, we'll call random.choice again.
+    assert server == "b.example.test"
+    assert random.choice.call_count == 2
 
 
 @pytest.mark.vcr
@@ -74,10 +99,9 @@ def test_ipa_login(client, dummy_user):
 
 def test_ipa_untouched_client(client):
     with client.session_transaction() as sess:
-        ipa = untouched_ipa_client(current_app)
+        ipa = untouched_ipa_client(current_app, sess)
         assert ipa is not None
         assert 'noggin_session' not in sess
-        assert 'noggin_ipa_server_hostname' not in sess
         assert 'noggin_username' not in sess
 
 

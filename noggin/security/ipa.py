@@ -123,12 +123,26 @@ def raise_on_failed(result):
     raise ValidationError(failed)
 
 
+def choose_server(app, session=None):
+    """
+    Choose a server among the configured IPA server and store the result in the session.
+    """
+    server = None
+    if session is not None:
+        server = session.get('noggin_ipa_server_hostname', None)
+    if server is None:
+        server = random.choice(app.config['FREEIPA_SERVERS'])
+    if session is not None:
+        session['noggin_ipa_server_hostname'] = server
+    return server
+
+
 # Construct an IPA client from app config, but don't attempt to log in with it
 # or to form a session of any kind with it. This is useful for one-off cases
 # like password resets where a session isn't actually required.
-def untouched_ipa_client(app):
+def untouched_ipa_client(app, session):
     return Client(
-        random.choice(app.config['FREEIPA_SERVERS']),
+        choose_server(app, session),
         verify_ssl=app.config['FREEIPA_CACERT'],
     )
 
@@ -142,7 +156,7 @@ def untouched_ipa_client(app):
 # It will be None if no session was provided or was provided but invalid.
 def maybe_ipa_session(app, session):
     encrypted_session = session.get('noggin_session', None)
-    server_hostname = session.get('noggin_ipa_server_hostname', None)
+    server_hostname = choose_server(app, session)
     if encrypted_session and server_hostname:
         fernet = Fernet(app.config['FERNET_SECRET'])
         ipa_session = fernet.decrypt(encrypted_session)
@@ -174,8 +188,9 @@ def maybe_ipa_login(app, session, username, userpassword):
     # in the session and just always use that. Flask sessions are signed, so we
     # are safe in later assuming that the server hostname cookie has not been
     # altered.
-    chosen_server = random.choice(app.config['FREEIPA_SERVERS'])
-    client = Client(chosen_server, verify_ssl=app.config['FREEIPA_CACERT'])
+    client = Client(
+        choose_server(app, session), verify_ssl=app.config['FREEIPA_CACERT']
+    )
 
     auth = client.login(username, userpassword)
 
@@ -185,7 +200,6 @@ def maybe_ipa_login(app, session, username, userpassword):
             bytes(client._session.cookies['ipa_session'], 'utf8')
         )
         session['noggin_session'] = encrypted_session
-        session['noggin_ipa_server_hostname'] = chosen_server
         session['noggin_username'] = username
         return client
 

@@ -4,6 +4,7 @@ import tempfile
 
 import pytest
 import python_freeipa
+from flask import session
 from vcr import VCR
 
 from noggin.app import create_app, ipa_admin
@@ -158,7 +159,7 @@ def make_user(ipa_testing_config, app):
             o_loginshell='/bin/bash',
             fascreationtime=f"{now.isoformat()}Z",
         )
-        ipa = untouched_ipa_client(app)
+        ipa = untouched_ipa_client(app, session)
         ipa.change_password(name, password, password)
         created_users.append(name)
 
