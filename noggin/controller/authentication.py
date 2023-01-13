@@ -64,7 +64,7 @@ def otp_sync():
     if form.validate_on_submit():
         with handle_form_errors(form):
             try:
-                ipa = untouched_ipa_client(current_app)
+                ipa = untouched_ipa_client(current_app, session)
                 ipa.otptoken_sync(
                     user=form.username.data,
                     password=form.password.data,

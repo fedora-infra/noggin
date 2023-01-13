@@ -6,7 +6,7 @@ import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
-from flask import current_app
+from flask import current_app, session
 
 from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
@@ -75,7 +75,7 @@ def dummy_user_no_password(ipa_testing_config, app):
         o_loginshell='/bin/bash',
         fascreationtime=f"{now.isoformat()}Z",
     )
-    # ipa = untouched_ipa_client(app)
+    # ipa = untouched_ipa_client(app, session)
     # ipa.change_password(name, password, password)
 
     yield
@@ -278,7 +278,7 @@ def test_change_too_old(client, token_for_dummy_user, patched_lock):
 def test_change_recent_password_change(
     client, dummy_user, dummy_group, token_for_dummy_user, patched_lock_active
 ):
-    ipa = untouched_ipa_client(current_app)
+    ipa = untouched_ipa_client(current_app, session)
     ipa.change_password("dummy", "dummy_password", "dummy_password")
     result = client.get(f'/forgot-password/change?token={token_for_dummy_user}')
     patched_lock_active["delete"].assert_called_once()

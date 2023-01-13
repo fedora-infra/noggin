@@ -38,7 +38,7 @@ from . import blueprint as bp
 
 def _validate_change_pw_form(form, username, ipa=None):
     if ipa is None:
-        ipa = untouched_ipa_client(current_app)
+        ipa = untouched_ipa_client(current_app, session)
 
     current_password = form.current_password.data
     password = form.password.data
@@ -236,7 +236,7 @@ def forgot_password_change():
             # example)
             ipa_admin.user_mod(username, userpassword=temp_password)
             # Change the password as the user, so it's not expired.
-            ipa = untouched_ipa_client(current_app)
+            ipa = untouched_ipa_client(current_app, session)
             ipa.change_password(
                 username,
                 new_password=password,

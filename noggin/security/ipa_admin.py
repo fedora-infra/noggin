@@ -1,9 +1,8 @@
-import random
 from functools import wraps
 
-from flask import current_app
+from flask import current_app, session
 
-from .ipa import Client
+from .ipa import choose_server, Client
 
 
 class IPAAdmin:
@@ -66,7 +65,7 @@ class IPAAdmin:
         username = current_app.extensions["ipa-admin"]["username"]
         password = current_app.extensions["ipa-admin"]["password"]
         client = Client(
-            random.choice(current_app.config['FREEIPA_SERVERS']),
+            choose_server(current_app, session),
             verify_ssl=current_app.config['FREEIPA_CACERT'],
         )
         client.login(username, password)

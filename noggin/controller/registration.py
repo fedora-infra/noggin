@@ -264,7 +264,7 @@ def activate_account():
                 # First, set it as an admin. This will mark it as expired.
                 ipa_admin.user_mod(user.username, userpassword=password)
                 # And now we set it again as the user, so it is not expired any more.
-                ipa = untouched_ipa_client(current_app)
+                ipa = untouched_ipa_client(current_app, session)
                 ipa.change_password(
                     user.username, new_password=password, old_password=password
                 )
