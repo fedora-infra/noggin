@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 import requests
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 from flask import current_app
 from python_freeipa.exceptions import BadRequest, FreeIPAError
 
@@ -41,7 +41,7 @@ def test_ipa_session_invalid(client, logged_in_dummy_user):
     """We should raise an exception when the session can't be decrypted."""
     with client.session_transaction() as sess:
         sess["noggin_session"] = "invalid"
-        with pytest.raises(TypeError):
+        with pytest.raises(InvalidToken):
             maybe_ipa_session(current_app, sess)
 
 
