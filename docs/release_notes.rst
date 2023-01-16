@@ -4,6 +4,43 @@ Release notes
 
 .. towncrier release notes start
 
+v1.7.1
+======
+
+Released on 2023-01-17.
+This is a bugfix release.
+
+Features
+^^^^^^^^
+
+* Add compatibility with Flask 2.2.X by using ``register_error_handler``
+  instead of a plain WSGI wrapper. (:pr:`1008`).
+
+Bug Fixes
+^^^^^^^^^
+
+* ``/forgot-password/ask`` endpoint now handles ``smtplib.SMTPRecipientsRefused``
+  error gracefully. (:issue:`817`).
+* Store the chosen IPA server in the session for both the user client and the
+  admin client. This prevents admin commands from running on a server and user
+  commands running on another. (:issue:`1079`).
+
+Contributors
+^^^^^^^^^^^^
+
+Many thanks to the contributors of bug reports, pull requests, and pull request
+reviews for this release:
+
+* Ettore Atalan
+* Aurélien Bompard
+* Francois Andrieu
+* Erol Keskin
+* Ernedin Zajko
+* Hoppár Zoltán
+* Nathan
+* Robert Klein
+
+
 v1.7.0
 ======
 
