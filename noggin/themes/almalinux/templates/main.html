@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block website %}{{_("AlmaLinux Account Services")}}{% endblock %}
+
+{% block head %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('theme.static', filename='favicon/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('theme.static', filename='favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('theme.static', filename='favicon/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('theme.static', filename='favicon/site.webmanifest') }}">
+    <link rel="mask-icon" href="{{ url_for('theme.static', filename='favicon/safari-pinned-tab.svg') }}">
+    <link rel="shortcut icon" href="{{ url_for('theme.static', filename='favicon/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('theme.static', filename='vendor/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('theme.static', filename='vendor/bootstrap-4.3.1/bootstrap.min.nodata.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('theme.static', filename='fonts/Montserrat.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('theme.static', filename='css/default.css') }}" type="text/css">
+{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark justify-content-between border-bottom">
+        <a class="navbar-brand" href="{{ url_for('root.root') }}"><img src="{{ url_for('theme.static', filename='images/almalinux-account-services.svg') }}" alt="AlmaLinux Accounts" height="40"></a>
+        {% if current_user %}
+        <form><input id="search" type="search" class="typeahead form-control" autocomplete="off" placeholder="{{_('search...')}}"></form>
+        <ul class="navbar-nav align-items-center">
+            <li class="nav-item">
+                <a class="nav-link color-white" href="{{ url_for('.groups') }}">{{_("Groups")}}</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="{{ gravatar(current_user.mail if current_user.mail else 'default', 30) }}" class="bg-white rounded-circle"/>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{{ url_for('.user', username=current_user.username) }}">{{_("Profile")}}</a>
+                    <a class="dropdown-item" href="{{ url_for('.user_settings_profile', username=current_user.username) }}">{{_("Settings")}}</a>
+                    {% if config["STAGE_USERS_ROLE"] in current_user.roles %}
+                    <a class="dropdown-item" href="{{ url_for('.registering_users') }}">{{_("Registering Users")}}</a>
+                    {% endif %}
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="https://docs.fedoraproject.org/en-US/fedora-accounts/user/" target="_blank" rel="noopener noreferrer">{{_("Help")}}</a>
+                    <a class="dropdown-item" href="{{ url_for('.logout') }}">{{_("Log Out")}}</a>
+                </div>
+            </li>
+        </ul>
+        {% endif %}
+    </nav>
+    {% with flashes = get_flashed_messages(with_categories=True) %}
+        {% if flashes %}
+        <div class="container flash-messages mt-4">
+            {% for category, flash in flashes %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                {{ flash }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+{% endblock %}
+
+{% block bodycontent %}
+    <div class="mb-auto">
+        {% block content %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <footer class="bg-light border-top py-4 mt-4">
+        <div class="container h6 text-center">
+            {% set noggin_link %}
+                <a href="https://github.com/fedora-infra/noggin">noggin</a>
+            {% endset %}
+            <div><small>{{_("Powered by %(noggin_link)s", noggin_link=noggin_link)}} v{{ noggin_version }}</small></div>
+            <div class="text-muted"><small>{{ ipa.ipa_version|default('') }}</small></div>
+        </div>
+    </footer>
+{% endblock %}
+
+{% block scripts %}
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/jquery/jquery-3.3.1.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/popper-1.14.7/popper.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/bootstrap-4.3.1/bootstrap.min.js') }}"></script>
+    {{ super() }}
+{% endblock %}
+
+
+{# a required macro defining text to show on the unlogged in index page #}
+{% macro front_page_blurb() %}
+<h2 class="display-4">{{_("AlmaLinux Accounts")}}</h2>
+<p class="lead">
+    {{_("AlmaLinux Accounts provides the ability to create and manage your account across AlmaLinux's entire infrastructure.")}}
+</p>
+{% endmacro %}
+
+
+
+{# an optional macro defining an element to show for editing group details #}
+{# typically, it used to link to a ticket tracker for an admin to edit a group #}
+{#
+{% macro edit_group_details() %}
+{% endmacro %}
+#}
+
+{# an optional macro defining an element to show for account disable #}
+{# typically, it used to link to a ticket tracker for an admin to perform the disable #}
+{#
+{% macro request_disable_account() %}
+{% endmacro %}
+#}
+
+{# an optional macro defining an element to show for lost OTP tokens #}
+{#
+{% macro lost_otp_token() %}
+{% endmacro %}
+#}
+
+{# an optional macro to show a note that when applied it also applies to kinit / krb5 / kerberos #}
+{#{% macro otp_notice() %}#}
+{#<div class="card-body">#}
+{#    <div class="alert alert-info text-center my-3">#}
+{#        <div><strong>{{_("Additional configuration is required when using Kerberos tickets when OTP is enabled")}}</strong></div>#}
+{#        <div>{{_("Read the <a href='https://docs.fedoraproject.org/en-US/fedora-accounts/user/#pkinit'>documentation</a> for details on configuring your system")}}</div>#}
+{#    </div>#}
+{#</div>#}
+{#{% endmacro %}#}
+
+
+{# an optional macro to show a note above the login form #}
+{% macro login_note() %}
+{% endmacro %}
