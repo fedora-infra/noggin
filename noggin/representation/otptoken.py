@@ -2,7 +2,6 @@ from .base import Representation
 
 
 class OTPToken(Representation):
-
     attr_names = {
         "uniqueid": "ipatokenuniqueid",
         "description": "description",

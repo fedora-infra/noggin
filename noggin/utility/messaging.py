@@ -31,7 +31,7 @@ def publish(message):
         return
     try:
         _publish(message)
-    except (fml_exceptions.BaseException):
+    except fml_exceptions.BaseException:
         current_app.logger.error(
             f"Publishing message failed. Giving up. {traceback.format_tb(sys.exc_info()[2])}"
         )

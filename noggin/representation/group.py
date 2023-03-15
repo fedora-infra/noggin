@@ -2,7 +2,6 @@ from .base import Representation
 
 
 class Group(Representation):
-
     attr_names = {
         "name": "cn",
         "description": "description",

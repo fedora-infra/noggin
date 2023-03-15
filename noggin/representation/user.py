@@ -2,7 +2,6 @@ from .base import CONVERTERS, Representation
 
 
 class User(Representation):
-
     attr_names = {
         "username": "uid",
         "firstname": "givenname",
