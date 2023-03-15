@@ -43,7 +43,9 @@ repos:
     rev: v6.1.2
     hooks:
       - id: rstcheck
-        args: ["-r", "docs"]
+        # Use ignore-messages here until we can put it in the release_notes directly
+        # https://github.com/rstcheck/rstcheck/issues/167
+        args: ["-r", "docs", "--ignore-messages=Duplicate implicit target name"]
         additional_dependencies: [sphinx]
 
   - repo: local
