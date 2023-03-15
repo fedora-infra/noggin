@@ -48,11 +48,9 @@ repos:
         args: ["-r", "docs", "--ignore-messages=Duplicate implicit target name"]
         additional_dependencies: [sphinx]
 
-  - repo: local
+  - repo: https://github.com/dhatim/python-license-check
+    rev: master
     hooks:
       - id: liccheck
-        name: liccheck
         entry: ./devel/run-liccheck.sh
         files: "(pyproject.toml|poetry.lock)"
-        pass_filenames: false
-        language: script
