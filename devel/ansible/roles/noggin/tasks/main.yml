@@ -8,7 +8,6 @@
       - git
       - ipa-client
       - libffi-devel
-      - poetry
       - python3-cryptography
       - python3-devel
       - python3-flask
@@ -29,6 +28,10 @@
       --unattended \
       --no-ntp \
       --force-join
+
+- name: Install poetry Python package
+  become_user: root
+  command: pip install poetry
 
 - name: install python deps with poetry
   become_user: vagrant
