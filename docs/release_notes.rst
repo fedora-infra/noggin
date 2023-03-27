@@ -2,6 +2,8 @@
 Release notes
 =============
 
+.. rstcheck: ignore_messages=Duplicate implicit target name
+
 .. towncrier release notes start
 
 v1.7.1

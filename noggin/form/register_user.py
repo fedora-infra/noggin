@@ -87,7 +87,6 @@ class ResendValidationEmailForm(BaseForm):
 
 
 class PasswordSetForm(BaseForm):
-
     password = PasswordField(
         _('Password'),
         validators=[
