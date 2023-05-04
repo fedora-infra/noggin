@@ -33,7 +33,6 @@ CONVERTERS = {
 
 
 class Representation:
-
     attr_names = {}
     attr_types = {}
     attr_options = {}

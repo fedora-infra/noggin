@@ -7,7 +7,6 @@ NOT_ASCII_RE = re.compile(r"\W")
 
 
 class Agreement(Representation):
-
     attr_names = {
         "name": "cn",
         "enabled": "ipaenabledflag",
