@@ -93,9 +93,9 @@ html_static_path = ['_static']
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 extlinks = {
-    "commit": ("https://github.com/fedora-infra/noggin/commit/%s", ""),
-    "issue": ("https://github.com/fedora-infra/noggin/issues/%s", "#"),
-    "pr": ("https://github.com/fedora-infra/noggin/pull/%s", "PR#"),
+    "commit": ("https://github.com/fedora-infra/noggin/commit/%s", "%s"),
+    "issue": ("https://github.com/fedora-infra/noggin/issues/%s", "#%s"),
+    "pr": ("https://github.com/fedora-infra/noggin/pull/%s", "PR#%s"),
 }
 
 # -- Misc -----
