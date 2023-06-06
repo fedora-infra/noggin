@@ -802,7 +802,7 @@ def test_spamcheck_invalid_token(client, dummy_user, mocker, spamcheck_on):
         json={"token": token, "status": "active"},
     )
     assert response.status_code == 400
-    assert response.json["error"] == "Invalid token: Invalid audience"
+    assert response.json["error"] == "Invalid token: Audience doesn't match"
 
 
 @pytest.mark.vcr()
