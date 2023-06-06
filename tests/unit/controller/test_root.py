@@ -166,7 +166,7 @@ def test_version(client):
     page = BeautifulSoup(result.data, 'html.parser')
     powered_by = page.select_one("footer div div small")
     assert (
-        powered_by.prettify()
+        powered_by.prettify().strip()
         == """
 <small>
  Powered by
@@ -195,7 +195,7 @@ def test_version_openshift(mocker, client):
     page = BeautifulSoup(result.data, 'html.parser')
     powered_by = page.select_one("footer div div small")
     assert (
-        powered_by.prettify()
+        powered_by.prettify().strip()
         == """
 <small>
  Powered by
