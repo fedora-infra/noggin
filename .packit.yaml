@@ -35,14 +35,6 @@ actions:
     - "sh -c 'wget https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py && python3 install-poetry.py --version 1.1.7 && rm install-poetry.py'"
 
 jobs:
-  # upon upstream PRs, perform COPR builds
-  - job: copr_build
-    trigger: pull_request
-    metadata:
-      targets:
-        - fedora-latest-stable
-        - fedora-development
-
   # upon upstream PRs, test builds
   - job: tests
     trigger: pull_request
@@ -53,14 +45,6 @@ jobs:
 
   # upon upstream releases, perform COPR builds
   - job: copr_build
-    trigger: release
-    metadata:
-      targets:
-        - fedora-latest-stable
-        - fedora-development
-
-  # upon upstream releases, test builds
-  - job: tests
     trigger: release
     metadata:
       targets:
