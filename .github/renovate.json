@@ -1,37 +1,4 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base",
-    "group:allNonMajor",
-    "schedule:weekdays",
-    ":maintainLockFilesWeekly",
-    ":separateMultipleMajorReleases",
-    ":automergeMinor",
-    ":gitSignOff",
-    ":enablePreCommit",
-    ":enableVulnerabilityAlertsWithLabel(security)"
-  ],
-  "lockFileMaintenance": {
-    "extends": [
-      "group:allNonMajor"
-    ],
-    "commitMessageAction": "Update dependencies in lockfile"
-  },
-  "automergeStrategy": "rebase",
-  "rangeStrategy": "widen",
-  "stabilityDays": 3,
-  "labels": ["dependencies"],
-  "packageRules": [
-    {
-      "matchDepTypes": ["devDependencies"],
-      "automerge": true,
-      "groupName": "dev dependencies"
-    },
-    {
-      "matchPackageNames": [
-        "certifi"
-      ],
-      "automerge": true
-    }
-  ]
+  "extends": ["local>fedora-infra/shared:renovate-config"]
 }
