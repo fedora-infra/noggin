@@ -145,7 +145,10 @@ def test_login_no_username(client):
     """Test not giving a username"""
     result = client.post(
         '/',
-        data={"login-password": "n:nPv{P].9}]!q$RE%w<38@", "login-submit": "1"},
+        data={
+            "login-password": "n:nPv{P].9}]!q$RE%w<38@",
+            "login-submit": "1",
+        },  # gitleaks:allow
         follow_redirects=True,
     )
     assert_form_field_error(
