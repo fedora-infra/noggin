@@ -44,3 +44,13 @@ def test_pkey_missing_map():
 
     with pytest.raises(NotImplementedError):
         Dummy.get_ipa_pkey()
+
+
+@pytest.mark.parametrize("value", [True, "TRUE"])
+def test_bool(value):
+    class Dummy(Representation):
+        attr_names = {"boolean_attr": "boolean_attr"}
+        attr_types = {"boolean_attr": "bool"}
+
+    obj = Dummy({"boolean_attr": [value]})
+    assert obj.boolean_attr is True

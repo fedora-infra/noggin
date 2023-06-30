@@ -14,7 +14,7 @@ def attr_to_list(value):
 def attr_to_bool(value):
     if not value:
         return False
-    return value[0] == "TRUE"
+    return value[0] in (True, "TRUE")
 
 
 def attr_to_date(value):
