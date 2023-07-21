@@ -70,6 +70,15 @@ def test_user_unauthed(client):
 
 
 @pytest.mark.vcr()
+def test_user_locked(client, logged_in_dummy_user, make_user):
+    """Test the user detail page on a locked account"""
+    make_user("dummy-locked")
+    ipa_admin.user_mod("dummy-locked", o_nsaccountlock=True)
+    result = client.get('/user/dummy-locked/')
+    assert result.status_code == 404
+
+
+@pytest.mark.vcr()
 def test_user_edit(client, logged_in_dummy_user):
     """Test getting the user edit page: /user/<username>/settings/profile/"""
     result = client.get('/user/dummy/settings/profile/')
