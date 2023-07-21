@@ -32,12 +32,13 @@ jobs:
 
   unit_test:
     name: Unit tests
+    container: fedorapython/fedora-python-tox:latest
     steps:
       - uses: actions/checkout@v3
+      - name: Mark the directory as safe for git
+        run: git config --global --add safe.directory $PWD
       - name: Run tests
-        uses: fedora-python/tox-github-action@main
-        with:
-          tox_env: ${{ matrix.tox_env }}
+        run: tox -e ${{ matrix.tox_env }}
     strategy:
       matrix:
         tox_env:
