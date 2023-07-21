@@ -26,11 +26,8 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.define "noggin" do |noggin|
-    noggin.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/34/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-34-1.2.x86_64.vagrant-libvirt.box"
-    noggin.vm.box = "f34-cloud-libvirt"
-    # We can't use F35 yet because of https://bugzilla.redhat.com/show_bug.cgi?id=2020278
-    #noggin.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/35/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-35-1.2.x86_64.vagrant-libvirt.box"
-    #noggin.vm.box = "f35-cloud-libvirt"
+    noggin.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/38/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-38-1.6.x86_64.vagrant-libvirt.box"
+    noggin.vm.box = "f38-cloud-libvirt"
     noggin.vm.hostname = "noggin.noggin.test"
 
     noggin.vm.synced_folder '.', '/vagrant', disabled: true
