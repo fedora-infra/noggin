@@ -60,6 +60,9 @@ def group_or_404(ipa, groupname):
 
 def user_or_404(ipa, username):
     try:
-        return ipa.user_show(a_uid=username)['result']
+        user = ipa.user_show(a_uid=username)['result']
     except python_freeipa.exceptions.NotFound:
         abort(404)
+    if User(user).locked:
+        abort(404)
+    return user

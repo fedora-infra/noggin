@@ -112,6 +112,16 @@ def test_search_json_group_nonfas(client, logged_in_dummy_user, nonfas_group):
 
 
 @pytest.mark.vcr()
+def test_search_json_locked(client, logged_in_dummy_user, make_user):
+    """Test that the /search/json endpoint does not return locked accounts"""
+    make_user("dummy-locked")
+    ipa_admin.user_mod("dummy-locked", o_nsaccountlock=True)
+    result = client.get('/search/json?username=dummy-locked')
+    assert result.status_code == 200
+    assert result.json == []
+
+
+@pytest.mark.vcr()
 def test_healthz_liveness(client):
     """Test the /healthz/live check endpoint"""
     result = client.get('/healthz/live')
