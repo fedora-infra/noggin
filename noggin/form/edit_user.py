@@ -126,6 +126,11 @@ class UserSettingsProfileForm(BaseForm):
         validators=[Optional(), URL(message=_('Valid URL required'))],
     )
 
+    rss_url = URLField(
+        _('RSS URL'),
+        validators=[Optional(), URL(message=_('Valid URL required'))],
+    )
+
     is_private = BooleanField(
         _('Private'),
         description=_(
