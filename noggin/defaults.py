@@ -56,3 +56,15 @@ SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 
 # Cheat code to toggle Fedora Messaging support
 FEDORA_MESSAGING_ENABLED = False
+
+# Captcha 
+CAPTCHA_CONFIG = {
+    'SECRET_CAPTCHA_KEY': 'LONG_KEY', # Used for JWT encoding/
+    'CAPTCHA_LENGTH': 6, # CAPTCHA text length
+    'CAPTCHA_DIGITS': False, # Include digits in the character pool?
+    'EXPIRE_SECONDS': 600, # CAPTCHA expiration time in seconds
+    # 'EXPIRE_MINUTES': 10 # Also supported for backwards compatibility
+    # 'EXCLUDE_VISUALLY_SIMILAR': True # Optional exclude visually similar characters like 0OIl
+    # 'ONLY_UPPERCASE': True # Optional only use uppercase characters
+    # 'CHARACTER_POOL': 'AaBbCc123' # Optional specify character pool
+}

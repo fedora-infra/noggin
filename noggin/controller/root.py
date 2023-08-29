@@ -12,7 +12,7 @@ from flask import (
 from flask_babel import _
 from flask_healthz import HealthError
 
-from noggin.app import ipa_admin
+from noggin.app import SIMPLE_CAPTCHA, ipa_admin
 from noggin.form.login_user import LoginUserForm
 from noggin.form.register_user import RegisterUserForm
 from noggin.representation.group import Group
@@ -50,12 +50,23 @@ def root():
             return redirect(url_for('.root'))
         with handle_form_errors(register_form):
             return handle_register_form(register_form)
+        
+    new_captcha_dict = SIMPLE_CAPTCHA.create()
 
+    if request.method == 'POST':
+        c_hash = request.form.get('captcha-hash')
+        c_text = request.form.get('captcha-text')
+        if SIMPLE_CAPTCHA.verify(c_text, c_hash):
+            return 'success'
+        else:
+            return 'failed captcha'
+        
     return render_template(
         'index.html',
         register_form=register_form,
         login_form=login_form,
         activetab=activetab,
+        captcha=new_captcha_dict,
     )
 
 

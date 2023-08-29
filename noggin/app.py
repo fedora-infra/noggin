@@ -6,6 +6,7 @@ import jinja2
 from flask import Flask
 from flask_healthz import healthz
 from flask_mail import Mail
+from flask_simple_captcha import CAPTCHA
 from flask_wtf.csrf import CSRFProtect
 from whitenoise import WhiteNoise
 
@@ -21,6 +22,15 @@ from noggin.utility.templates import format_channel, format_nickname
 # Forms
 csrf = CSRFProtect()
 
+# CAPTCHA
+CAPTCHA_CONFIG = {
+    'SECRET_CAPTCHA_KEY': 'LONG_KEY',
+    'CAPTCHA_LENGTH': 6,
+    'CAPTCHA_DIGITS': False,
+    'EXPIRE_SECONDS': 600,
+}
+SIMPLE_CAPTCHA = CAPTCHA(config=CAPTCHA_CONFIG)
+
 # IPA admin account
 ipa_admin = IPAAdmin()
 
@@ -35,7 +45,6 @@ ipa_error_handler = IPAErrorHandler()
 
 # Security headers
 talisman = flask_talisman.Talisman()
-
 
 def create_app(config=None):
     """See https://flask.palletsprojects.com/en/1.1.x/patterns/appfactories/"""
@@ -77,6 +86,7 @@ def create_app(config=None):
     # Extensions
     l10n.babel.init_app(app, locale_selector=l10n.get_locale)
     app.jinja_env.add_extension("jinja2.ext.i18n")
+    SIMPLE_CAPTCHA.init_app(app)
     csrf.init_app(app)
     ipa_admin.init_app(app)
     mailer.init_app(app)
