@@ -7,28 +7,10 @@ Vagrant.configure(2) do |config|
   config.hostmanager.manage_host = true
   config.hostmanager.manage_guest = true
 
-  config.vm.define "freeipa" do |freeipa|
-    freeipa.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/35/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-35-1.2.x86_64.vagrant-libvirt.box"
-    freeipa.vm.box = "f35-cloud-libvirt"
-    freeipa.vm.hostname = "ipa.noggin.test"
-    freeipa.hostmanager.aliases = ("kerberos.noggin.test")
-    freeipa.vm.synced_folder '.', '/vagrant', disabled: true
-    freeipa.vm.synced_folder ".", "/home/vagrant/noggin", type: "sshfs"
-
-    freeipa.vm.provider :libvirt do |libvirt|
-      libvirt.cpus = 2
-      libvirt.memory = 2048
-    end
-
-    freeipa.vm.provision "ansible" do |ansible|
-      ansible.playbook = "devel/ansible/freeipa.yml"
-    end
-  end
-
   config.vm.define "noggin" do |noggin|
     noggin.vm.box_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/38/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-38-1.6.x86_64.vagrant-libvirt.box"
     noggin.vm.box = "f38-cloud-libvirt"
-    noggin.vm.hostname = "noggin.noggin.test"
+    noggin.vm.hostname = "noggin-dev.tinystage.test"
 
     noggin.vm.synced_folder '.', '/vagrant', disabled: true
     noggin.vm.synced_folder ".", "/home/vagrant/noggin", type: "sshfs"
