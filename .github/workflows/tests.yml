@@ -17,7 +17,7 @@ jobs:
       image: fedorapython/fedora-python-tox
       options: --user 1001:1001
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run tests
         run: tox -e ${{ matrix.tox_env }}
     strategy:
@@ -34,7 +34,7 @@ jobs:
     name: Unit tests
     container: fedorapython/fedora-python-tox:latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Mark the directory as safe for git
         run: git config --global --add safe.directory $PWD
       - name: Run tests
@@ -49,7 +49,7 @@ jobs:
   integration_test:
     name: Integration tests
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install RabbitMQ
         uses: mer-team/rabbitmq-mng-action@v1.2
         with:
