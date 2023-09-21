@@ -6,6 +6,39 @@ Release notes
 
 .. towncrier release notes start
 
+v1.8.0
+======
+
+Released on 2023-09-21.
+This is a feature release that adds a RSS URL to the user profile.
+
+Features
+^^^^^^^^
+
+* Add the RSS URL to the user profile (:issue:`1216`).
+
+Bug Fixes
+^^^^^^^^^
+
+* Fix the boolean values (checkboxes) not showing up in the profile page
+  (:issue:`1202`).
+* Don't show disabled (locked) users in Noggin (:issue:`1210`).
+
+Contributors
+^^^^^^^^^^^^
+
+Many thanks to the contributors of bug reports, pull requests, and pull request
+reviews for this release:
+
+* Jonathan Wright
+* Aurélien Bompard
+* grimst
+* Lenka Segura
+* Nils Philippsen
+* Pedro Moura
+* Ryan Lerch
+
+
 v1.7.1
 ======
 
