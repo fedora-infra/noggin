@@ -18,21 +18,22 @@ downstream_package_name: noggin
 upstream_tag_template: v{version}
 
 srpm_build_deps:
-    - wget
+    - curl
 
 actions:
-  create-archive:
-    - "poetry build -f sdist"
-    - "sh -c 'echo dist/noggin-aaa-$(poetry version -s).tar.gz'"
-  get-current-version:
-    - "poetry version -s"
   post-upstream-clone:
     # fetch specfile, patches, documentation etc. from the downstream
-    - "wget https://src.fedoraproject.org/rpms/noggin/raw/rawhide/f/noggin.spec -O noggin.spec"
-    - "wget https://src.fedoraproject.org/rpms/noggin/raw/main/f/noggin.service -O noggin.service"
-    - "wget https://src.fedoraproject.org/rpms/noggin/raw/main/f/noggin.sysconfig -O noggin.sysconfig"
-    - "wget https://src.fedoraproject.org/rpms/noggin/raw/main/f/sources -O sources"
-    - "sh -c 'wget https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py && python3 install-poetry.py --version 1.1.7 && rm install-poetry.py'"
+    - "curl https://src.fedoraproject.org/rpms/noggin/raw/rawhide/f/noggin.spec -o noggin.spec"
+    - "curl https://src.fedoraproject.org/rpms/noggin/raw/main/f/noggin.service -o noggin.service"
+    - "curl https://src.fedoraproject.org/rpms/noggin/raw/main/f/noggin.sysconfig -o noggin.sysconfig"
+    - "curl https://src.fedoraproject.org/rpms/noggin/raw/main/f/sources -o sources"
+    - "sh -c 'curl -sSL https://install.python-poetry.org | python3 -'"
+    - "/builddir/.local/bin/poetry --version"
+  create-archive:
+    - "/builddir/.local/bin/poetry build -f sdist"
+    - "sh -c 'echo dist/noggin_aaa-$(poetry version -s).tar.gz'"
+  get-current-version:
+    - "/builddir/.local/bin/poetry version -s"
 
 jobs:
   # upon upstream PRs, test builds
