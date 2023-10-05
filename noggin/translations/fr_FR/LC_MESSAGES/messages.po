@@ -11,11 +11,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-04-08 15:35+0000\n"
+"POT-Creation-Date: 2023-03-02 13:32-0600\n"
 "PO-Revision-Date: 2023-03-17 12:20+0000\n"
 "Last-Translator: grimst <grimaitres@gmail.com>\n"
-"Language-Team: French <https://translate.fedoraproject.org/projects/"
-"fedora-infra/noggin/fr/>\n"
+"Language-Team: French <https://translate.fedoraproject.org/projects/fedora-"
+"infra/noggin/fr/>\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -53,6 +53,11 @@ msgstr "Vous avez réussi ! %(username)s a été ajouté à %(groupname)s."
 msgid "You got it! %(username)s has been removed from %(groupname)s."
 msgstr "Vous avez réussi ! %(username)s a été retiré de %(groupname)s."
 
+#, fuzzy, python-format
+#| msgid "You got it! %(username)s has been removed from %(groupname)s."
+msgid "You got it! %(username)s is no longer a sponsor of %(groupname)s."
+msgstr "Vous avez réussi ! %(username)s a été retiré de %(groupname)s."
+
 msgid "The old password or username is not correct"
 msgstr "L’ancien mot de passe ou nom d’utilisateur n’est pas correct"
 
@@ -78,6 +83,9 @@ msgstr "L’utilisateur %(username)s n’existe pas"
 msgid "We could not send you an email, please retry later"
 msgstr ""
 "Nous n’avons pas pu vous envoyer de courriel, veuillez réessayer plus tard"
+
+msgid "Your email address is rejected by smtp server"
+msgstr ""
 
 msgid ""
 "An email has been sent to your address with instructions on how to reset "
@@ -118,7 +126,60 @@ msgstr "Impossible de modifier le mot de passe, veuillez réessayer."
 msgid "Your password has been changed."
 msgstr "Votre mot de passe a été modifié."
 
+msgid "Verify your email address"
+msgstr ""
+
+#, fuzzy
+#| msgid "We could not send you an email, please retry later"
+msgid "We could not send you the address validation email, please retry later"
+msgstr ""
+"Nous n’avons pas pu vous envoyer de courriel, veuillez réessayer plus tard"
+
+#, python-format
+msgid ""
+"The username '%(username)s' or the email address '%(email)s' are already "
+"taken."
+msgstr ""
+
 msgid "An error occurred while creating the account, please try again."
+msgstr ""
+"Une erreur s'est produite lors de la création du compte, veuillez réessayer."
+
+msgid "The registration seems to have failed, please try again."
+msgstr ""
+
+msgid ""
+"The address validation email has be sent again. Make sure it did not land in "
+"your spam folder"
+msgstr ""
+
+msgid "No token provided, please check your email validation link."
+msgstr ""
+
+#, fuzzy
+#| msgid "The token is invalid, please request a new one."
+msgid "The token is invalid, please register again."
+msgstr "Le jeton n’est pas valide, veuillez en demander un nouveau."
+
+#, fuzzy
+#| msgid "The token is invalid, please request a new one."
+msgid "This token is no longer valid, please register again."
+msgstr "Le jeton n’est pas valide, veuillez en demander un nouveau."
+
+#, fuzzy
+#| msgid "Could not change password, please try again."
+msgid "This user cannot be found, please register again."
+msgstr "Impossible de modifier le mot de passe, veuillez réessayer."
+
+msgid ""
+"The username and the email address don't match the token you used, please "
+"register again."
+msgstr ""
+
+#, fuzzy
+#| msgid "An error occurred while creating the account, please try again."
+msgid ""
+"Something went wrong while creating your account, please try again later."
 msgstr ""
 "Une erreur s'est produite lors de la création du compte, veuillez réessayer."
 
@@ -141,16 +202,73 @@ msgstr ""
 "définition de votre mot de passe (%(message)s). Vous devrez peut-être le "
 "modifier après vous être connecté."
 
+#, python-format
+msgid "Congratulations, your account has been created! Welcome, %(name)s."
+msgstr ""
+
+#, fuzzy
+#| msgid ""
+#| "Congratulations, you now have an account! Go ahead and sign in to proceed."
 msgid ""
-"Congratulations, you now have an account! Go ahead and sign in to proceed."
+"Congratulations, your account has been created! Go ahead and sign in to "
+"proceed."
 msgstr ""
 "Félicitations, vous avez maintenant un compte ! Allez-y et connectez-vous "
 "pour continuer."
+
+msgid "All"
+msgstr ""
+
+msgid "Unknown"
+msgstr ""
+
+msgid "Not Spam"
+msgstr ""
+
+msgid "Spam"
+msgstr ""
+
+msgid "Awaiting"
+msgstr ""
+
+msgid "Registration is closed at the moment."
+msgstr ""
+
+#, python-format
+msgid ""
+"The email address %(mail)s needs to be validated. Please check your inbox "
+"and click on the link to proceed. If you can't find the email in a couple "
+"minutes, check your spam folder."
+msgstr ""
+
+msgid "No modifications."
+msgstr ""
+
+#, fuzzy
+#| msgid "The token is invalid, please request a new one."
+msgid "The token is invalid, please set the email again."
+msgstr "Le jeton n’est pas valide, veuillez en demander un nouveau."
+
+#, fuzzy
+#| msgid "The token is invalid, please request a new one."
+msgid "This token is no longer valid, please set the email again."
+msgstr "Le jeton n’est pas valide, veuillez en demander un nouveau."
+
+msgid "This token does not belong to you."
+msgstr ""
 
 msgid "Incorrect password"
 msgstr "Mot de passe incorrect"
 
 msgid "Cannot create the token."
+msgstr "Impossible de créer le jeton."
+
+msgid "The token has been created."
+msgstr ""
+
+#, fuzzy
+#| msgid "Cannot create the token."
+msgid "Cannot rename the token."
 msgstr "Impossible de créer le jeton."
 
 msgid "Sorry, You cannot disable your last active token."
@@ -159,14 +277,34 @@ msgstr "Désolé, vous ne pouvez pas désactiver votre dernier jeton actif."
 msgid "Cannot disable the token."
 msgstr "Impossible de désactiver le jeton."
 
+#, fuzzy, python-format
+#| msgid "Cannot disable the token."
+msgid "Cannot enable the token. %(errormessage)s"
+msgstr "Impossible de désactiver le jeton."
+
 msgid "Sorry, You cannot delete your last active token."
 msgstr "Désolé, vous ne pouvez pas désactiver votre dernier jeton actif."
 
 msgid "Cannot delete the token."
 msgstr "Impossible de supprimer le jeton."
 
-msgid "New member username must not be empty"
-msgstr "Le nom d'utilisateur du nouveau membre ne doit pas être vide"
+#, python-format
+msgid "Unknown agreement: %(name)s."
+msgstr ""
+
+#, python-format
+msgid "Cannot sign the agreement \"%(name)s\": %(error)s"
+msgstr ""
+
+#, python-format
+msgid "You signed the \"%(name)s\" agreement."
+msgstr ""
+
+msgid "This does not look like a valid nickname."
+msgstr ""
+
+msgid "This does not look like a valid server name."
+msgstr ""
 
 msgid "First Name"
 msgstr "Prénom"
@@ -180,15 +318,6 @@ msgstr "Nom"
 msgid "Last name must not be empty"
 msgstr "Le nom de famille ne doit pas être vide"
 
-msgid "E-mail Address"
-msgstr "Adresse de courriel"
-
-msgid "Email must not be empty"
-msgstr "L'adresse de courriel ne doit pas être vide"
-
-msgid "Email must be valid"
-msgstr "L'adresse électronique doit être valide"
-
 msgid "Locale"
 msgstr "Paramètre linguistique"
 
@@ -198,7 +327,9 @@ msgstr "Le paramètre linguistique ne doit pas être vide"
 msgid "Locale must be a valid locale short-code"
 msgstr "Le paramètre linguistique doit être un code court et valide"
 
-msgid "IRC Nickname"
+#, fuzzy
+#| msgid "IRC Nickname"
+msgid "Chat Nicknames"
 msgstr "Pseudo IRC"
 
 msgid "Timezone"
@@ -216,6 +347,30 @@ msgstr "Nom d'utilisateur GitHub"
 msgid "GitLab Username"
 msgstr "Nom d'utilisateur GitLab"
 
+msgid "Website or Blog URL"
+msgstr ""
+
+msgid "Valid URL required"
+msgstr ""
+
+msgid "Private"
+msgstr ""
+
+msgid "Hide information from other users, see the Privacy Policy for details."
+msgstr ""
+
+msgid "Pronouns"
+msgstr ""
+
+msgid "E-mail Address"
+msgstr "Adresse de courriel"
+
+msgid "Email must not be empty"
+msgstr "L'adresse de courriel ne doit pas être vide"
+
+msgid "Email must be valid"
+msgstr "L'adresse électronique doit être valide"
+
 msgid "Red Hat Bugzilla Email"
 msgstr "E-mail de Red Hat Bugzilla"
 
@@ -225,11 +380,13 @@ msgstr "Clés SSH"
 msgid "GPG Keys"
 msgstr "Clés GPG"
 
-msgid "Token description"
-msgstr "Description du jeton"
+#, fuzzy
+#| msgid "Token ID"
+msgid "Token name"
+msgstr "ID du jeton"
 
-msgid "Description must not be empty"
-msgstr "la description ne devrait pas être vide"
+msgid "Add an optional name to help you identify this token"
+msgstr ""
 
 msgid "Enter your current password"
 msgstr "Saisissez votre mot de passe actuel"
@@ -237,11 +394,63 @@ msgstr "Saisissez votre mot de passe actuel"
 msgid "You must provide a password"
 msgstr "Vous devez fournir un mot de passe"
 
-msgid "token must not be empty"
+msgid "please reauthenticate so we know it is you"
+msgstr ""
+
+#, fuzzy
+#| msgid "Confirm Password"
+msgid "One-Time Password"
+msgstr "Confirmer le mot de passe"
+
+#, fuzzy
+#| msgid "Enter your current password"
+msgid "Enter your One-Time Password"
+msgstr "Saisissez votre mot de passe actuel"
+
+#, fuzzy
+#| msgid "Sync OTP Token"
+msgid "Generate OTP Token"
+msgstr "Synchroniser le jeton OTP"
+
+#, fuzzy
+#| msgid "Could not log in to the IPA server."
+msgid "Could not find the token secret"
+msgstr "Impossible de se connecter au serveur IPA."
+
+msgid "Verification Code"
+msgstr ""
+
+#, fuzzy
+#| msgid "You must provide a second code"
+msgid "You must provide a verification code"
+msgstr "Vous devez fournir un deuxième code"
+
+msgid "Verify and Enable OTP Token"
+msgstr ""
+
+#, fuzzy
+#| msgid "Could not change password, please try again."
+msgid "The code is wrong, please try again."
+msgstr "Impossible de modifier le mot de passe, veuillez réessayer."
+
+#, fuzzy
+#| msgid "token must not be empty"
+msgid "Token must not be empty"
 msgstr "le jeton ne doit pas être vide"
+
+#, fuzzy
+#| msgid "token must not be empty"
+msgid "Agreement must not be empty"
+msgstr "le jeton ne doit pas être vide"
+
+msgid "New member username must not be empty"
+msgstr "Le nom d'utilisateur du nouveau membre ne doit pas être vide"
 
 msgid "Username"
 msgstr "Nom d’utilisateur"
+
+msgid "Username must not be empty"
+msgstr "Le nom d’utilisateur ne doit pas être vide"
 
 msgid "You must provide a user name"
 msgstr "Vous devez fournir un nom d'utilisateur"
@@ -264,11 +473,9 @@ msgstr "Les mots de passe doivent correspondre"
 msgid "Confirm New Password"
 msgstr "Confirmer le nouveau mot de passe"
 
-msgid "OTP Token"
-msgstr "Jeton OTP"
-
-msgid "Enter your OTP token if you have enrolled one"
-msgstr "Saisissez votre jeton OTP si vous en avez enregistré un"
+msgid ""
+"One-Time Password (if your account has Two-Factor Authentication enabled)"
+msgstr ""
 
 msgid "Current Password"
 msgstr "Mot de passe actuel"
@@ -276,14 +483,27 @@ msgstr "Mot de passe actuel"
 msgid "Current password must not be empty"
 msgstr "Le mot de passe actuel ne doit pas être vide"
 
-msgid "Just the password, don't add the OTP token if you have one"
-msgstr "Juste le mot de passe, n'ajoutez pas le jeton OTP si vous en avez un"
-
 msgid "User name must not be empty"
 msgstr "Le nom d’utilisateur ne doit pas être vide"
 
 msgid "Enter your username to reset your password"
 msgstr "Entrez votre nom d'utilisateur pour réinitialiser votre mot de passe"
+
+#, python-format
+msgid "Only these characters are allowed: \"%(chars)s\"."
+msgstr ""
+
+msgid "I am over 16 years old"
+msgstr ""
+
+msgid "You must be over 16 years old to create an account"
+msgstr ""
+
+msgid "Register"
+msgstr "Enregistrer"
+
+msgid "Resend email"
+msgstr ""
 
 msgid "Please choose a strong password"
 msgstr "Choisissez un mot de passe fort"
@@ -291,11 +511,8 @@ msgstr "Choisissez un mot de passe fort"
 msgid "Confirm Password"
 msgstr "Confirmer le mot de passe"
 
-msgid "Register"
-msgstr "Enregistrer"
-
-msgid "Username must not be empty"
-msgstr "Le nom d’utilisateur ne doit pas être vide"
+msgid "Activate"
+msgstr ""
 
 msgid "First OTP"
 msgstr "Premier OTP"
@@ -312,20 +529,51 @@ msgstr "Vous devez fournir un deuxième code"
 msgid "Token ID"
 msgstr "ID du jeton"
 
+msgid "Email addresses from that domain are not allowed"
+msgstr ""
+
+msgid "Mixed case is not allowed, try lower case."
+msgstr ""
+
+#, python-format
+msgid "Field must not match \"%(pattern)s\"."
+msgstr ""
+
 msgid "You've ruined everything."
 msgstr "Vous avez tout gâché."
 
 msgid "That page wasn't found. You've gone and ruined everything."
 msgstr "Cette page n'a pas été trouvée. Et voilà, tu as tout gâché."
 
-msgid "Forgot password?"
+#, fuzzy
+#| msgid "Forgot password?"
+msgid "Forgot Password?"
 msgstr "Mot de passe oublié ?"
 
-msgid "Forgotten password or lost OTP token?"
-msgstr "Mot de passe oublié ou jeton OTP perdu ?"
+#, fuzzy
+#| msgid "Forgot password?"
+msgid "Forgot Password or OTP?"
+msgstr "Mot de passe oublié ?"
 
 msgid "Sync Token"
 msgstr "Synchroniser un jeton"
+
+msgid "Previous"
+msgstr ""
+
+msgid "current"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "Groups"
+msgstr "Groupes"
+
+#, fuzzy
+#| msgid "Username"
+msgid "Users"
+msgstr "Nom d’utilisateur"
 
 msgid "Password Recovery"
 msgstr "Récupération de mot de passe"
@@ -354,6 +602,11 @@ msgstr "Réinitialisation du mot de passe pour %(username)s"
 msgid "%(groupname)s Group"
 msgstr "Groupe %(groupname)s"
 
+msgid ""
+"You are a sponsor of this group, but not a member. Add yourself if you want "
+"to be a member."
+msgstr ""
+
 msgid "To join this group, contact a group sponsor."
 msgstr "Pour rejoindre ce groupe, contactez un parrain de groupe."
 
@@ -369,6 +622,9 @@ msgstr "Membres"
 msgid "add user..."
 msgstr "Ajouter un utilisateur..."
 
+msgid "Leave group"
+msgstr ""
+
 msgid "No members yet."
 msgstr "Pas encore de membres."
 
@@ -379,8 +635,25 @@ msgstr "Liste des groupes"
 msgid "%(member_count)s members"
 msgstr "%(member_count)s membres"
 
+#, fuzzy
+#| msgid "Groups"
+msgid "No groups."
+msgstr "Groupes"
+
 msgid "Login"
 msgstr "S’identifier"
+
+msgid "IPA Error"
+msgstr ""
+
+msgid "There was a problem with the IPA backend, please try again later."
+msgstr ""
+
+#, python-format
+msgid ""
+"You can also <a href=\"%(url)s\">log out</a> and log back in if the problem "
+"persists."
+msgstr ""
 
 msgid "Expired Password Reset"
 msgstr "Réinitialisation du mot de passe expiré"
@@ -392,8 +665,132 @@ msgstr "Réinitialisation du mot de passe expiré pour %(username)s"
 msgid "Change Password"
 msgstr "Modifier le mot de passe"
 
-msgid "Registration"
-msgstr "Enregistrement"
+#, fuzzy
+#| msgid "Register"
+msgid "Registering Users"
+msgstr "Enregistrer"
+
+msgid "Name:"
+msgstr ""
+
+msgid "Email:"
+msgstr ""
+
+#, fuzzy
+#| msgid "Register"
+msgid "Registered:"
+msgstr "Enregistrer"
+
+msgid "Status:"
+msgstr ""
+
+msgid "Waiting for spam check"
+msgstr ""
+
+msgid "Not flagged as spam"
+msgstr ""
+
+msgid "Flagged as spam"
+msgstr ""
+
+msgid "Spam status unknown"
+msgstr ""
+
+msgid "Accept"
+msgstr ""
+
+msgid "Flag as spam"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid ""
+"Clicking on Accept will send the validation email to this user. Other "
+"buttons will not send anything."
+msgstr ""
+
+msgid "No registering users in this state at the moment."
+msgstr ""
+
+msgid "No registering users at the moment."
+msgstr ""
+
+msgid "Activate your account"
+msgstr ""
+
+msgid "Account creation, step 3/3"
+msgstr ""
+
+#, python-format
+msgid "Hello %(name)s. To activate your account, please choose a password."
+msgstr ""
+
+msgid "Validate your email address"
+msgstr ""
+
+msgid "Account creation, step 2/3"
+msgstr ""
+
+#, fuzzy, python-format
+#| msgid ""
+#| "Congratulations, you now have an account! Go ahead and sign in to proceed."
+msgid "Congratulations %(name)s, your account has been created!"
+msgstr ""
+"Félicitations, vous avez maintenant un compte ! Allez-y et connectez-vous "
+"pour continuer."
+
+#, python-format
+msgid ""
+"Before you can log in, your email address: %(mail)s needs to be validated. "
+"Please check your inbox and click on the link to proceed."
+msgstr ""
+
+msgid ""
+"If you can't find the email in a couple minutes, check your spam folder. If "
+"it's not there, you can ask for another validation email by clicking on the "
+"button below."
+msgstr ""
+
+msgid "Spam check in progress"
+msgstr ""
+
+#, fuzzy
+#| msgid "Your password has been changed"
+msgid "Your account is being checked"
+msgstr "Votre mot de passe a été modifié"
+
+msgid ""
+"Before you can log in, your account needs to be check for spam likelihood. "
+"It should only take a few seconds, please wait..."
+msgstr ""
+
+msgid "Your account requires admin approval"
+msgstr ""
+
+msgid "Your account needs to be approved by an administrator."
+msgstr ""
+
+msgid "You will receive an email when the decision has been taken."
+msgstr ""
+
+msgid "Thank you for your patience."
+msgstr ""
+
+msgid "Your account is blocked"
+msgstr ""
+
+#, fuzzy
+#| msgid "Your password has been changed."
+msgid "Your account has been flagged as spam."
+msgstr "Votre mot de passe a été modifié."
+
+msgid "Something went wrong"
+msgstr ""
+
+#, python-format
+msgid "Unsupported spam status: %s, please contact the administrators"
+msgstr ""
 
 msgid "Sync OTP Token"
 msgstr "Synchroniser le jeton OTP"
@@ -404,14 +801,36 @@ msgstr "Synchroniser un jeton OTP"
 msgid "Sync"
 msgstr "Synchronisation"
 
+msgid "View agreement"
+msgstr ""
+
+msgid "Sign"
+msgstr ""
+
+msgid "Sign User Agreement"
+msgstr ""
+
+msgid "Validate your email"
+msgstr ""
+
+#, python-format
+msgid "Hello %(user_name)s. Do you want to set your %(attr_name)s to %(mail)s?"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Do it"
+msgstr ""
+
+msgid "Save"
+msgstr "Enregistrer"
+
 msgid "GPG Key ID"
 msgstr "ID de clé GPG"
 
 msgid "SSH Public Key"
 msgstr "Clé publique SSH"
-
-msgid "Save"
-msgstr "Enregistrer"
 
 msgid "Scan your new token"
 msgstr "Scannez votre nouveau jeton"
@@ -433,32 +852,63 @@ msgstr ""
 "code QR :"
 
 msgid ""
-"This will never be shown to you again, don't close this window until your "
-"token is saved."
+"After enrolling the token in your application, verify it by generating your "
+"first code and entering it below:"
 msgstr ""
-"Cela ne vous sera plus jamais montré à nouveau, ne fermez pas cette fenêtre "
-"tant que votre jeton n'est pas enregistré."
-
-msgid "OTP Tokens"
-msgstr "Jetons OTP"
 
 msgid "Add OTP Token"
 msgstr "Ajouter un jeton OTP"
 
-msgid "Password or Password + One-Time-Password"
-msgstr "Mot de passe ou Mot de passe + OTP"
+msgid ""
+"Creating your first OTP token enables two-factor authentication using OTP."
+msgstr ""
 
-msgid "Generate"
-msgstr "Générer"
+msgid "Once enabled, two-factor authentication cannot be disabled."
+msgstr ""
+
+msgid "OTP Tokens"
+msgstr "Jetons OTP"
+
+msgid "(no name)"
+msgstr ""
+
+#, fuzzy
+#| msgid "Username"
+msgid "Rename"
+msgstr "Nom d’utilisateur"
 
 msgid "Disable"
 msgstr "Désactiver"
 
-msgid "Disabled"
-msgstr "Désactivé"
+#, fuzzy
+#| msgid "Disable"
+msgid "Enable"
+msgstr "Désactiver"
 
 msgid "You have no OTP tokens"
 msgstr "Vous n'avez pas de jetons OTP"
+
+msgid "Add an OTP token to enable two-factor authentication on your account."
+msgstr ""
+
+#, fuzzy
+#| msgid "Change Password"
+msgid "Change Avatar"
+msgstr "Modifier le mot de passe"
+
+msgid ""
+"\n"
+"            The format is either <code>username</code> or <code>username:"
+"server.name</code> if you're not using the default servers:\n"
+"          "
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"              For %(title)s: <code>%(server)s</code>\n"
+"            "
+msgstr ""
 
 #, python-format
 msgid "Settings for %(username)s"
@@ -467,24 +917,47 @@ msgstr "Paramètres pour %(username)s"
 msgid "Profile"
 msgstr "Profil"
 
+#, fuzzy
+#| msgid "E-mail Address"
+msgid "Emails"
+msgstr "Adresse de courriel"
+
 msgid "SSH &amp; GPG Keys"
 msgstr "Clés SSH et GPG"
 
 msgid "OTP"
 msgstr "OTP"
 
+msgid "Agreements"
+msgstr ""
+
 #, python-format
 msgid "Profile for %(username)s"
 msgstr "Profil pour %(username)s"
 
-msgid "Groups"
-msgstr "Groupes"
+#, fuzzy
+#| msgid "Profile"
+msgid "Edit Profile"
+msgstr "Profil"
 
-msgid "RHBZ E-Mail"
-msgstr "E-mail RHBZ"
+msgid "Current Time"
+msgstr ""
 
-msgid "Settings"
-msgstr "Paramètres"
+msgid "Chat"
+msgstr ""
+
+msgid "Website"
+msgstr ""
+
+msgid "RHBZ"
+msgstr ""
+
+#, python-format
+msgid "%(groupcount)s Group(s), %(agreementcount)s Agreement(s)"
+msgstr ""
+
+msgid "signed"
+msgstr ""
 
 msgid "sponsor"
 msgstr "Parrain"
@@ -492,20 +965,59 @@ msgstr "Parrain"
 msgid "member"
 msgstr "Membre"
 
-msgid "To reset your password, click on the link below:"
-msgstr "Pour réinitialiser votre mot de passe, cliquez sur le lien ci-dessous :"
+#, fuzzy, python-format
+#| msgid "Welcome, %(username)s!"
+msgid "Hello %(name)s,"
+msgstr "Bienvenue, %(username)s !"
 
+#, fuzzy, python-format
+#| msgid "To reset your password, click on the link below:"
 msgid ""
-"If you did not request your password to be reset, you can ignore this email."
+"To activate your account with username %(username)s, click on the link below:"
+msgstr ""
+"Pour réinitialiser votre mot de passe, cliquez sur le lien ci-dessous :"
+
+#, fuzzy, python-format
+#| msgid ""
+#| "If you did not request your password to be reset, you can ignore this "
+#| "email."
+msgid ""
+"If you did not create an account for username %(username)s, you can ignore "
+"this email."
 msgstr ""
 "Si vous n'avez pas demandé la réinitialisation de votre mot de passe, vous "
 "pouvez ignorer cet e-mail."
 
-msgid "The Noggin team"
+#, fuzzy
+#| msgid "The Noggin team"
+msgid "The AlmaLinux Team"
 msgstr "L'équipe Noggin"
+
+msgid "Hi,"
+msgstr ""
+
+#, fuzzy
+#| msgid ""
+#| "If you did not request your password to be reset, you can ignore this "
+#| "email."
+msgid ""
+"Click the link below to reset your password. If you did not request a "
+"password reset, please ignore this email."
+msgstr ""
+"Si vous n'avez pas demandé la réinitialisation de votre mot de passe, vous "
+"pouvez ignorer cet e-mail."
+
+msgid "AlmaLinux Account Services"
+msgstr ""
 
 msgid "search..."
 msgstr "Rechercher..."
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Help"
+msgstr ""
 
 msgid "Log Out"
 msgstr "Déconnexion"
@@ -513,6 +1025,52 @@ msgstr "Déconnexion"
 #, python-format
 msgid "Powered by %(noggin_link)s"
 msgstr "Fonctionne avec %(noggin_link)s"
+
+#, fuzzy
+#| msgid "Fedora Accounts"
+msgid "AlmaLinux Accounts"
+msgstr "Comptes Fedora"
+
+#, fuzzy
+#| msgid ""
+#| "Fedora Accounts allows you to create and manage an account for Fedora "
+#| "Tools and Infrastructure."
+msgid ""
+"AlmaLinux Accounts provides the ability to create and manage your account "
+"across AlmaLinux's entire infrastructure."
+msgstr ""
+"Comptes Fedora vous permet de créer et de gérer un compte pour les outils et "
+"l'infrastructure Fedora."
+
+msgid ""
+"Additional configuration is required when using Kerberos tickets when OTP is "
+"enabled"
+msgstr ""
+
+msgid ""
+"Read the <a href='https://docs.fedoraproject.org/en-US/fedora-accounts/user/"
+"#pkinit'>documentation</a> for details on configuring your system"
+msgstr ""
+
+#, fuzzy, python-format
+#| msgid "To reset your password, click on the link below:"
+msgid "To validate the email address %(address)s, click on the link below:"
+msgstr ""
+"Pour réinitialiser votre mot de passe, cliquez sur le lien ci-dessous :"
+
+#, fuzzy, python-format
+#| msgid ""
+#| "If you did not request your password to be reset, you can ignore this "
+#| "email."
+msgid ""
+"If you did not set the email address %(address)s in your account "
+"%(username)s, you can ignore this email."
+msgstr ""
+"Si vous n'avez pas demandé la réinitialisation de votre mot de passe, vous "
+"pouvez ignorer cet e-mail."
+
+msgid "The Noggin team"
+msgstr "L'équipe Noggin"
 
 msgid "Welcome to noggin!"
 msgstr "Bienvenue sur noggin !"
@@ -526,8 +1084,32 @@ msgstr ""
 "Il vous permet de faire des choses comme créer un compte, changer votre mot "
 "de passe, gérer l'appartenance à un groupe, etc."
 
+msgid "You can also use your Fedora account to login here."
+msgstr ""
+
+#, python-format
+msgid ""
+"This link will be valid for %(ttl)s minutes (until %(valid_until)s UTC)."
+msgstr ""
+
+#, fuzzy
+#| msgid "The token has expired, please request a new one."
+msgid "If the link has expired, you can request a new one here: "
+msgstr "Le jeton a expiré, veuillez en demander un nouveau."
+
+#, fuzzy
+#| msgid "Fedora Accounts"
+msgid "Fedora Accounts System"
+msgstr "Comptes Fedora"
+
 msgid "Fedora Accounts"
 msgstr "Comptes Fedora"
+
+msgid "Wiki"
+msgstr ""
+
+msgid "Fedora People"
+msgstr ""
 
 msgid ""
 "Fedora Accounts allows you to create and manage an account for Fedora Tools "
@@ -536,14 +1118,13 @@ msgstr ""
 "Comptes Fedora vous permet de créer et de gérer un compte pour les outils et "
 "l'infrastructure Fedora."
 
-msgid ""
-"file a Fedora Infra ticket to change the details or sponsors of this group"
-msgstr ""
-"Soumettez un ticket Fedora infrastructure pour modifier les détails ou les "
-"sponsors de ce groupe"
+#, fuzzy
+#| msgid "Groups"
+msgid "Edit Group"
+msgstr "Groupes"
 
-msgid "Request Change of Details"
-msgstr "Demande de modification de détails"
+msgid "To change group details or add sponsors, file a ticket with"
+msgstr ""
 
 msgid "Create a PDR request to disable your account"
 msgstr "Créez une demande PDR pour désactiver votre compte"
@@ -551,12 +1132,19 @@ msgstr "Créez une demande PDR pour désactiver votre compte"
 msgid "Request account deletion"
 msgstr "Demander la suppression du compte"
 
-msgid "Did you lose your OTP token?"
+#, fuzzy
+#| msgid "Did you lose your OTP token?"
+msgid "Did you lose your last OTP token?"
 msgstr "Avez-vous perdu votre jeton OTP ?"
 
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "If you have lost your OTP token you need to send an email to "
+#| "%(admin_email)s. Please sign this email using the GPG key associated with "
+#| "your account if possible, so that the administrator can verify your "
+#| "identity."
 msgid ""
-"If you have lost your OTP token you need to send an email to "
+"If you have lost your last OTP token you need to send an email to "
 "%(admin_email)s. Please sign this email using the GPG key associated with "
 "your account if possible, so that the administrator can verify your identity."
 msgstr ""
@@ -565,6 +1153,96 @@ msgstr ""
 "GPG associée à votre compte, afin que l'administrateur puisse vérifier votre "
 "identité."
 
+msgid ""
+"If you had multiple tokens and lost one, you can use another to login and "
+"delete the lost token from your account."
+msgstr ""
+
+msgid ""
+"If you haven't enrolled a OTP token, you don't have one and this doesn't "
+"apply to you."
+msgstr ""
+
+#, python-format
+msgid ""
+"To let admins know that you're not a spammer, please send an email to "
+"%(email_link)s and explain the situation."
+msgstr ""
+
+msgid ""
+"By using a Fedora account, you agree to follow the <a href='https://docs."
+"fedoraproject.org/en-US/project/code-of-conduct/'>Fedora&nbsp;Code&nbsp;"
+"of&nbsp;Conduct</a>."
+msgstr ""
+
+msgid "You can also use your CentOS account to login here."
+msgstr ""
+
+#, fuzzy
+#| msgid "Fedora Accounts"
+msgid "openSUSE Accounts"
+msgstr "Comptes Fedora"
+
+msgid "openSUSE Admins"
+msgstr ""
+
 #, python-format
 msgid "Group %(groupname)s could not be found."
 msgstr "Groupe %(groupname)s introuvable."
+
+msgid "Undo"
+msgstr ""
+
+#, python-format
+msgid "%(protocol)s on %(server)s"
+msgstr ""
+
+#~ msgid "Token description"
+#~ msgstr "Description du jeton"
+
+#~ msgid "Description must not be empty"
+#~ msgstr "la description ne devrait pas être vide"
+
+#~ msgid "OTP Token"
+#~ msgstr "Jeton OTP"
+
+#~ msgid "Enter your OTP token if you have enrolled one"
+#~ msgstr "Saisissez votre jeton OTP si vous en avez enregistré un"
+
+#~ msgid "Just the password, don't add the OTP token if you have one"
+#~ msgstr ""
+#~ "Juste le mot de passe, n'ajoutez pas le jeton OTP si vous en avez un"
+
+#~ msgid "Forgotten password or lost OTP token?"
+#~ msgstr "Mot de passe oublié ou jeton OTP perdu ?"
+
+#~ msgid "Registration"
+#~ msgstr "Enregistrement"
+
+#~ msgid ""
+#~ "This will never be shown to you again, don't close this window until your "
+#~ "token is saved."
+#~ msgstr ""
+#~ "Cela ne vous sera plus jamais montré à nouveau, ne fermez pas cette "
+#~ "fenêtre tant que votre jeton n'est pas enregistré."
+
+#~ msgid "Password or Password + One-Time-Password"
+#~ msgstr "Mot de passe ou Mot de passe + OTP"
+
+#~ msgid "Generate"
+#~ msgstr "Générer"
+
+#~ msgid "Disabled"
+#~ msgstr "Désactivé"
+
+#~ msgid "RHBZ E-Mail"
+#~ msgstr "E-mail RHBZ"
+
+#~ msgid ""
+#~ "file a Fedora Infra ticket to change the details or sponsors of this group"
+#~ msgstr ""
+#~ "Soumettez un ticket Fedora infrastructure pour modifier les détails ou "
+#~ "les sponsors de ce groupe"
+
+#~ msgid "Request Change of Details"
+#~ msgstr "Demande de modification de détails"

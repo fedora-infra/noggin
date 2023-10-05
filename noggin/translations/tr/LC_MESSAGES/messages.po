@@ -8,11 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-04-08 15:35+0000\n"
+"POT-Creation-Date: 2023-03-02 13:32-0600\n"
 "PO-Revision-Date: 2022-06-06 13:18+0000\n"
 "Last-Translator: Oğuz Ersen <oguz@ersen.moe>\n"
-"Language-Team: Turkish <https://translate.fedoraproject.org/projects/"
-"fedora-infra/noggin/tr/>\n"
+"Language-Team: Turkish <https://translate.fedoraproject.org/projects/fedora-"
+"infra/noggin/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -50,6 +50,11 @@ msgstr "İşe yaradı! %(username)s, %(groupname)s grubuna eklendi."
 msgid "You got it! %(username)s has been removed from %(groupname)s."
 msgstr "İşe yaradı! %(username)s, %(groupname)s grubundan kaldırıldı."
 
+#, fuzzy, python-format
+#| msgid "You got it! %(username)s has been removed from %(groupname)s."
+msgid "You got it! %(username)s is no longer a sponsor of %(groupname)s."
+msgstr "İşe yaradı! %(username)s, %(groupname)s grubundan kaldırıldı."
+
 msgid "The old password or username is not correct"
 msgstr "Eski parola veya kullanıcı adı doğru değil"
 
@@ -73,6 +78,9 @@ msgstr "%(username)s kullanıcısı mevcut değil"
 
 msgid "We could not send you an email, please retry later"
 msgstr "Size e-posta gönderemedik, lütfen daha sonra tekrar deneyin"
+
+msgid "Your email address is rejected by smtp server"
+msgstr ""
 
 msgid ""
 "An email has been sent to your address with instructions on how to reset "
@@ -113,7 +121,58 @@ msgstr "Parola değiştirilemedi, lütfen tekrar deneyin."
 msgid "Your password has been changed."
 msgstr "Parolanız değiştirildi."
 
+msgid "Verify your email address"
+msgstr ""
+
+#, fuzzy
+#| msgid "We could not send you an email, please retry later"
+msgid "We could not send you the address validation email, please retry later"
+msgstr "Size e-posta gönderemedik, lütfen daha sonra tekrar deneyin"
+
+#, python-format
+msgid ""
+"The username '%(username)s' or the email address '%(email)s' are already "
+"taken."
+msgstr ""
+
 msgid "An error occurred while creating the account, please try again."
+msgstr "Hesap oluşturulurken bir hata oluştu, lütfen tekrar deneyin."
+
+msgid "The registration seems to have failed, please try again."
+msgstr ""
+
+msgid ""
+"The address validation email has be sent again. Make sure it did not land in "
+"your spam folder"
+msgstr ""
+
+msgid "No token provided, please check your email validation link."
+msgstr ""
+
+#, fuzzy
+#| msgid "The token is invalid, please request a new one."
+msgid "The token is invalid, please register again."
+msgstr "Belirteç geçersiz, lütfen yeni bir tane isteyin."
+
+#, fuzzy
+#| msgid "The token is invalid, please request a new one."
+msgid "This token is no longer valid, please register again."
+msgstr "Belirteç geçersiz, lütfen yeni bir tane isteyin."
+
+#, fuzzy
+#| msgid "Could not change password, please try again."
+msgid "This user cannot be found, please register again."
+msgstr "Parola değiştirilemedi, lütfen tekrar deneyin."
+
+msgid ""
+"The username and the email address don't match the token you used, please "
+"register again."
+msgstr ""
+
+#, fuzzy
+#| msgid "An error occurred while creating the account, please try again."
+msgid ""
+"Something went wrong while creating your account, please try again later."
 msgstr "Hesap oluşturulurken bir hata oluştu, lütfen tekrar deneyin."
 
 #, python-format
@@ -134,14 +193,71 @@ msgstr ""
 "Hesabınız oluşturuldu, ancak parolanız belirlenirken bir hata oluştu "
 "(%(message)s). Oturum açtıktan sonra değiştirmeniz gerekebilir."
 
+#, python-format
+msgid "Congratulations, your account has been created! Welcome, %(name)s."
+msgstr ""
+
+#, fuzzy
+#| msgid ""
+#| "Congratulations, you now have an account! Go ahead and sign in to proceed."
 msgid ""
-"Congratulations, you now have an account! Go ahead and sign in to proceed."
+"Congratulations, your account has been created! Go ahead and sign in to "
+"proceed."
 msgstr "Tebrikler, artık bir hesabınız var! Devam etmek için oturum açın."
+
+msgid "All"
+msgstr ""
+
+msgid "Unknown"
+msgstr ""
+
+msgid "Not Spam"
+msgstr ""
+
+msgid "Spam"
+msgstr ""
+
+msgid "Awaiting"
+msgstr ""
+
+msgid "Registration is closed at the moment."
+msgstr ""
+
+#, python-format
+msgid ""
+"The email address %(mail)s needs to be validated. Please check your inbox "
+"and click on the link to proceed. If you can't find the email in a couple "
+"minutes, check your spam folder."
+msgstr ""
+
+msgid "No modifications."
+msgstr ""
+
+#, fuzzy
+#| msgid "The token is invalid, please request a new one."
+msgid "The token is invalid, please set the email again."
+msgstr "Belirteç geçersiz, lütfen yeni bir tane isteyin."
+
+#, fuzzy
+#| msgid "The token is invalid, please request a new one."
+msgid "This token is no longer valid, please set the email again."
+msgstr "Belirteç geçersiz, lütfen yeni bir tane isteyin."
+
+msgid "This token does not belong to you."
+msgstr ""
 
 msgid "Incorrect password"
 msgstr "Yanlış parola"
 
 msgid "Cannot create the token."
+msgstr "Belirteç oluşturulamıyor."
+
+msgid "The token has been created."
+msgstr ""
+
+#, fuzzy
+#| msgid "Cannot create the token."
+msgid "Cannot rename the token."
 msgstr "Belirteç oluşturulamıyor."
 
 msgid "Sorry, You cannot disable your last active token."
@@ -150,14 +266,34 @@ msgstr "Maalesef, son etkin belirtecinizi devre dışı bırakamazsınız."
 msgid "Cannot disable the token."
 msgstr "Belirteç devre dışı bırakılamıyor."
 
+#, fuzzy, python-format
+#| msgid "Cannot disable the token."
+msgid "Cannot enable the token. %(errormessage)s"
+msgstr "Belirteç devre dışı bırakılamıyor."
+
 msgid "Sorry, You cannot delete your last active token."
 msgstr "Maalesef, son etkin belirtecinizi silemezsiniz."
 
 msgid "Cannot delete the token."
 msgstr "Belirteç silinemiyor."
 
-msgid "New member username must not be empty"
-msgstr "Yeni üye kullanıcı adı boş bırakılamaz"
+#, python-format
+msgid "Unknown agreement: %(name)s."
+msgstr ""
+
+#, python-format
+msgid "Cannot sign the agreement \"%(name)s\": %(error)s"
+msgstr ""
+
+#, python-format
+msgid "You signed the \"%(name)s\" agreement."
+msgstr ""
+
+msgid "This does not look like a valid nickname."
+msgstr ""
+
+msgid "This does not look like a valid server name."
+msgstr ""
 
 msgid "First Name"
 msgstr "Ad"
@@ -171,15 +307,6 @@ msgstr "Soyadı"
 msgid "Last name must not be empty"
 msgstr "Soyadı boş bırakılamaz"
 
-msgid "E-mail Address"
-msgstr "E-posta Adresi"
-
-msgid "Email must not be empty"
-msgstr "E-posta adresi boş bırakılamaz"
-
-msgid "Email must be valid"
-msgstr "E-posta adresi, geçerli bir adres olmalıdır"
-
 msgid "Locale"
 msgstr "Yerel Ayarı"
 
@@ -189,7 +316,9 @@ msgstr "Yerel ayarı boş bırakılamaz"
 msgid "Locale must be a valid locale short-code"
 msgstr "Yerel ayarı, geçerli bir yerel ayar kısa kodu olmalıdır"
 
-msgid "IRC Nickname"
+#, fuzzy
+#| msgid "IRC Nickname"
+msgid "Chat Nicknames"
 msgstr "IRC Kullanıcı Adı"
 
 msgid "Timezone"
@@ -207,6 +336,30 @@ msgstr "GitHub Kullanıcı Adı"
 msgid "GitLab Username"
 msgstr "GitLab Kullanıcı Adı"
 
+msgid "Website or Blog URL"
+msgstr ""
+
+msgid "Valid URL required"
+msgstr ""
+
+msgid "Private"
+msgstr ""
+
+msgid "Hide information from other users, see the Privacy Policy for details."
+msgstr ""
+
+msgid "Pronouns"
+msgstr ""
+
+msgid "E-mail Address"
+msgstr "E-posta Adresi"
+
+msgid "Email must not be empty"
+msgstr "E-posta adresi boş bırakılamaz"
+
+msgid "Email must be valid"
+msgstr "E-posta adresi, geçerli bir adres olmalıdır"
+
 msgid "Red Hat Bugzilla Email"
 msgstr "Red Hat Bugzilla E-posta Adresi"
 
@@ -216,11 +369,13 @@ msgstr "SSH Anahtarları"
 msgid "GPG Keys"
 msgstr "GPG Anahtarları"
 
-msgid "Token description"
-msgstr "Belirteç açıklaması"
+#, fuzzy
+#| msgid "Token ID"
+msgid "Token name"
+msgstr "Belirteç Kimliği"
 
-msgid "Description must not be empty"
-msgstr "Açıklama boş bırakılamaz"
+msgid "Add an optional name to help you identify this token"
+msgstr ""
 
 msgid "Enter your current password"
 msgstr "Geçerli parolanızı girin"
@@ -228,11 +383,63 @@ msgstr "Geçerli parolanızı girin"
 msgid "You must provide a password"
 msgstr "Bir parola girmelisiniz"
 
-msgid "token must not be empty"
+msgid "please reauthenticate so we know it is you"
+msgstr ""
+
+#, fuzzy
+#| msgid "Confirm Password"
+msgid "One-Time Password"
+msgstr "Parolayı Onayla"
+
+#, fuzzy
+#| msgid "Enter your current password"
+msgid "Enter your One-Time Password"
+msgstr "Geçerli parolanızı girin"
+
+#, fuzzy
+#| msgid "Sync OTP Token"
+msgid "Generate OTP Token"
+msgstr "OTP Belirtecini Eşzamanla"
+
+#, fuzzy
+#| msgid "Could not log in to the IPA server."
+msgid "Could not find the token secret"
+msgstr "IPA sunucusunda oturum açılamadı."
+
+msgid "Verification Code"
+msgstr ""
+
+#, fuzzy
+#| msgid "You must provide a second code"
+msgid "You must provide a verification code"
+msgstr "İkinci bir kod girmelisiniz"
+
+msgid "Verify and Enable OTP Token"
+msgstr ""
+
+#, fuzzy
+#| msgid "Could not change password, please try again."
+msgid "The code is wrong, please try again."
+msgstr "Parola değiştirilemedi, lütfen tekrar deneyin."
+
+#, fuzzy
+#| msgid "token must not be empty"
+msgid "Token must not be empty"
 msgstr "belirteç boş bırakılamaz"
+
+#, fuzzy
+#| msgid "token must not be empty"
+msgid "Agreement must not be empty"
+msgstr "belirteç boş bırakılamaz"
+
+msgid "New member username must not be empty"
+msgstr "Yeni üye kullanıcı adı boş bırakılamaz"
 
 msgid "Username"
 msgstr "Kullanıcı Adı"
+
+msgid "Username must not be empty"
+msgstr "Kullanıcı adı boş bırakılamaz"
 
 msgid "You must provide a user name"
 msgstr "Bir kullanıcı adı girmelisiniz"
@@ -255,11 +462,9 @@ msgstr "Parolalar eşleşmelidir"
 msgid "Confirm New Password"
 msgstr "Yeni Parolayı Onayla"
 
-msgid "OTP Token"
-msgstr "OTP Belirteci"
-
-msgid "Enter your OTP token if you have enrolled one"
-msgstr "Eğer kaydettiyseniz, OTP belirtecinizi girin"
+msgid ""
+"One-Time Password (if your account has Two-Factor Authentication enabled)"
+msgstr ""
 
 msgid "Current Password"
 msgstr "Geçerli Parola"
@@ -267,14 +472,27 @@ msgstr "Geçerli Parola"
 msgid "Current password must not be empty"
 msgstr "Geçerli parola boş bırakılamaz"
 
-msgid "Just the password, don't add the OTP token if you have one"
-msgstr "Sadece parolayı girin, eğer varsa OTP belirtecini eklemeyin"
-
 msgid "User name must not be empty"
 msgstr "Kullanıcı adı boş bırakılamaz"
 
 msgid "Enter your username to reset your password"
 msgstr "Parolanızı sıfırlamak için kullanıcı adınızı girin"
+
+#, python-format
+msgid "Only these characters are allowed: \"%(chars)s\"."
+msgstr ""
+
+msgid "I am over 16 years old"
+msgstr ""
+
+msgid "You must be over 16 years old to create an account"
+msgstr ""
+
+msgid "Register"
+msgstr "Kaydol"
+
+msgid "Resend email"
+msgstr ""
 
 msgid "Please choose a strong password"
 msgstr "Lütfen sağlam bir parola seçin"
@@ -282,11 +500,8 @@ msgstr "Lütfen sağlam bir parola seçin"
 msgid "Confirm Password"
 msgstr "Parolayı Onayla"
 
-msgid "Register"
-msgstr "Kaydol"
-
-msgid "Username must not be empty"
-msgstr "Kullanıcı adı boş bırakılamaz"
+msgid "Activate"
+msgstr ""
 
 msgid "First OTP"
 msgstr "İlk OTP"
@@ -303,20 +518,51 @@ msgstr "İkinci bir kod girmelisiniz"
 msgid "Token ID"
 msgstr "Belirteç Kimliği"
 
+msgid "Email addresses from that domain are not allowed"
+msgstr ""
+
+msgid "Mixed case is not allowed, try lower case."
+msgstr ""
+
+#, python-format
+msgid "Field must not match \"%(pattern)s\"."
+msgstr ""
+
 msgid "You've ruined everything."
 msgstr "Her şeyi mahvettiniz."
 
 msgid "That page wasn't found. You've gone and ruined everything."
 msgstr "Bu sayfa bulunamadı. Gittiniz ve her şeyi mahvettiniz."
 
-msgid "Forgot password?"
+#, fuzzy
+#| msgid "Forgot password?"
+msgid "Forgot Password?"
 msgstr "Parolanızı mı unuttunuz?"
 
-msgid "Forgotten password or lost OTP token?"
-msgstr "Parolanızı mı unuttunuz veya OTP belirtecinizi mi kaybettiniz?"
+#, fuzzy
+#| msgid "Forgot password?"
+msgid "Forgot Password or OTP?"
+msgstr "Parolanızı mı unuttunuz?"
 
 msgid "Sync Token"
 msgstr "Belirteci Eşzamanla"
+
+msgid "Previous"
+msgstr ""
+
+msgid "current"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "Groups"
+msgstr "Gruplar"
+
+#, fuzzy
+#| msgid "Username"
+msgid "Users"
+msgstr "Kullanıcı Adı"
 
 msgid "Password Recovery"
 msgstr "Parola Kurtarma"
@@ -345,6 +591,11 @@ msgstr "%(username)s için Parola Sıfırlama"
 msgid "%(groupname)s Group"
 msgstr "%(groupname)s Grubu"
 
+msgid ""
+"You are a sponsor of this group, but not a member. Add yourself if you want "
+"to be a member."
+msgstr ""
+
 msgid "To join this group, contact a group sponsor."
 msgstr "Bu gruba katılmak için bir grup sponsoruyla irtibata geçin."
 
@@ -360,6 +611,9 @@ msgstr "Üyeler"
 msgid "add user..."
 msgstr "kullanıcı ekle..."
 
+msgid "Leave group"
+msgstr ""
+
 msgid "No members yet."
 msgstr "Henüz üye yok."
 
@@ -370,8 +624,25 @@ msgstr "Grup Listesi"
 msgid "%(member_count)s members"
 msgstr "%(member_count)s üye"
 
+#, fuzzy
+#| msgid "Groups"
+msgid "No groups."
+msgstr "Gruplar"
+
 msgid "Login"
 msgstr "Oturum Aç"
+
+msgid "IPA Error"
+msgstr ""
+
+msgid "There was a problem with the IPA backend, please try again later."
+msgstr ""
+
+#, python-format
+msgid ""
+"You can also <a href=\"%(url)s\">log out</a> and log back in if the problem "
+"persists."
+msgstr ""
 
 msgid "Expired Password Reset"
 msgstr "Süresi Dolmuş Parola Sıfırlama"
@@ -383,8 +654,130 @@ msgstr "%(username)s için Süresi Dolmuş Parola Sıfırlama"
 msgid "Change Password"
 msgstr "Parola Değiştir"
 
-msgid "Registration"
-msgstr "Kayıt"
+#, fuzzy
+#| msgid "Register"
+msgid "Registering Users"
+msgstr "Kaydol"
+
+msgid "Name:"
+msgstr ""
+
+msgid "Email:"
+msgstr ""
+
+#, fuzzy
+#| msgid "Register"
+msgid "Registered:"
+msgstr "Kaydol"
+
+msgid "Status:"
+msgstr ""
+
+msgid "Waiting for spam check"
+msgstr ""
+
+msgid "Not flagged as spam"
+msgstr ""
+
+msgid "Flagged as spam"
+msgstr ""
+
+msgid "Spam status unknown"
+msgstr ""
+
+msgid "Accept"
+msgstr ""
+
+msgid "Flag as spam"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid ""
+"Clicking on Accept will send the validation email to this user. Other "
+"buttons will not send anything."
+msgstr ""
+
+msgid "No registering users in this state at the moment."
+msgstr ""
+
+msgid "No registering users at the moment."
+msgstr ""
+
+msgid "Activate your account"
+msgstr ""
+
+msgid "Account creation, step 3/3"
+msgstr ""
+
+#, python-format
+msgid "Hello %(name)s. To activate your account, please choose a password."
+msgstr ""
+
+msgid "Validate your email address"
+msgstr ""
+
+msgid "Account creation, step 2/3"
+msgstr ""
+
+#, fuzzy, python-format
+#| msgid ""
+#| "Congratulations, you now have an account! Go ahead and sign in to proceed."
+msgid "Congratulations %(name)s, your account has been created!"
+msgstr "Tebrikler, artık bir hesabınız var! Devam etmek için oturum açın."
+
+#, python-format
+msgid ""
+"Before you can log in, your email address: %(mail)s needs to be validated. "
+"Please check your inbox and click on the link to proceed."
+msgstr ""
+
+msgid ""
+"If you can't find the email in a couple minutes, check your spam folder. If "
+"it's not there, you can ask for another validation email by clicking on the "
+"button below."
+msgstr ""
+
+msgid "Spam check in progress"
+msgstr ""
+
+#, fuzzy
+#| msgid "Your password has been changed"
+msgid "Your account is being checked"
+msgstr "Parolanız değiştirildi"
+
+msgid ""
+"Before you can log in, your account needs to be check for spam likelihood. "
+"It should only take a few seconds, please wait..."
+msgstr ""
+
+msgid "Your account requires admin approval"
+msgstr ""
+
+msgid "Your account needs to be approved by an administrator."
+msgstr ""
+
+msgid "You will receive an email when the decision has been taken."
+msgstr ""
+
+msgid "Thank you for your patience."
+msgstr ""
+
+msgid "Your account is blocked"
+msgstr ""
+
+#, fuzzy
+#| msgid "Your password has been changed."
+msgid "Your account has been flagged as spam."
+msgstr "Parolanız değiştirildi."
+
+msgid "Something went wrong"
+msgstr ""
+
+#, python-format
+msgid "Unsupported spam status: %s, please contact the administrators"
+msgstr ""
 
 msgid "Sync OTP Token"
 msgstr "OTP Belirtecini Eşzamanla"
@@ -395,14 +788,36 @@ msgstr "OTP Belirtecini Eşzamanla"
 msgid "Sync"
 msgstr "Eşzamanla"
 
+msgid "View agreement"
+msgstr ""
+
+msgid "Sign"
+msgstr ""
+
+msgid "Sign User Agreement"
+msgstr ""
+
+msgid "Validate your email"
+msgstr ""
+
+#, python-format
+msgid "Hello %(user_name)s. Do you want to set your %(attr_name)s to %(mail)s?"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Do it"
+msgstr ""
+
+msgid "Save"
+msgstr "Kaydet"
+
 msgid "GPG Key ID"
 msgstr "GPG Anahtarı Kimliği"
 
 msgid "SSH Public Key"
 msgstr "SSH Genel Anahtarı"
-
-msgid "Save"
-msgstr "Kaydet"
 
 msgid "Scan your new token"
 msgstr "Yeni belirtecinizi tarayın"
@@ -424,32 +839,63 @@ msgstr ""
 "yapıştırın:"
 
 msgid ""
-"This will never be shown to you again, don't close this window until your "
-"token is saved."
+"After enrolling the token in your application, verify it by generating your "
+"first code and entering it below:"
 msgstr ""
-"Bu size bir daha asla gösterilmeyecek, belirteciniz kaydedilene kadar bu "
-"pencereyi kapatmayın."
-
-msgid "OTP Tokens"
-msgstr "OTP Belirteçleri"
 
 msgid "Add OTP Token"
 msgstr "OTP Belirteci Ekle"
 
-msgid "Password or Password + One-Time-Password"
-msgstr "Parola veya Parola + Bir-Defalık-Parola (OTP)"
+msgid ""
+"Creating your first OTP token enables two-factor authentication using OTP."
+msgstr ""
 
-msgid "Generate"
-msgstr "Oluştur"
+msgid "Once enabled, two-factor authentication cannot be disabled."
+msgstr ""
+
+msgid "OTP Tokens"
+msgstr "OTP Belirteçleri"
+
+msgid "(no name)"
+msgstr ""
+
+#, fuzzy
+#| msgid "Username"
+msgid "Rename"
+msgstr "Kullanıcı Adı"
 
 msgid "Disable"
 msgstr "Devre Dışı Bırak"
 
-msgid "Disabled"
-msgstr "Devre Dışı"
+#, fuzzy
+#| msgid "Disable"
+msgid "Enable"
+msgstr "Devre Dışı Bırak"
 
 msgid "You have no OTP tokens"
 msgstr "OTP belirteciniz yok"
+
+msgid "Add an OTP token to enable two-factor authentication on your account."
+msgstr ""
+
+#, fuzzy
+#| msgid "Change Password"
+msgid "Change Avatar"
+msgstr "Parola Değiştir"
+
+msgid ""
+"\n"
+"            The format is either <code>username</code> or <code>username:"
+"server.name</code> if you're not using the default servers:\n"
+"          "
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"              For %(title)s: <code>%(server)s</code>\n"
+"            "
+msgstr ""
 
 #, python-format
 msgid "Settings for %(username)s"
@@ -458,24 +904,47 @@ msgstr "%(username)s için Ayarlar"
 msgid "Profile"
 msgstr "Profil"
 
+#, fuzzy
+#| msgid "E-mail Address"
+msgid "Emails"
+msgstr "E-posta Adresi"
+
 msgid "SSH &amp; GPG Keys"
 msgstr "SSH &amp; GPG Anahtarları"
 
 msgid "OTP"
 msgstr "OTP"
 
+msgid "Agreements"
+msgstr ""
+
 #, python-format
 msgid "Profile for %(username)s"
 msgstr "%(username)s Profili"
 
-msgid "Groups"
-msgstr "Gruplar"
+#, fuzzy
+#| msgid "Profile"
+msgid "Edit Profile"
+msgstr "Profil"
 
-msgid "RHBZ E-Mail"
-msgstr "RHBZ E-posta Adresi"
+msgid "Current Time"
+msgstr ""
 
-msgid "Settings"
-msgstr "Ayarlar"
+msgid "Chat"
+msgstr ""
+
+msgid "Website"
+msgstr ""
+
+msgid "RHBZ"
+msgstr ""
+
+#, python-format
+msgid "%(groupcount)s Group(s), %(agreementcount)s Agreement(s)"
+msgstr ""
+
+msgid "signed"
+msgstr ""
 
 msgid "sponsor"
 msgstr "sponsor"
@@ -483,20 +952,58 @@ msgstr "sponsor"
 msgid "member"
 msgstr "üye"
 
-msgid "To reset your password, click on the link below:"
+#, fuzzy, python-format
+#| msgid "Welcome, %(username)s!"
+msgid "Hello %(name)s,"
+msgstr "Hoş geldin, %(username)s!"
+
+#, fuzzy, python-format
+#| msgid "To reset your password, click on the link below:"
+msgid ""
+"To activate your account with username %(username)s, click on the link below:"
 msgstr "Parolanızı sıfırlamak için aşağıdaki bağlantıya tıklayın:"
 
+#, fuzzy, python-format
+#| msgid ""
+#| "If you did not request your password to be reset, you can ignore this "
+#| "email."
 msgid ""
-"If you did not request your password to be reset, you can ignore this email."
+"If you did not create an account for username %(username)s, you can ignore "
+"this email."
 msgstr ""
 "Parolanızın sıfırlanmasını istemediyseniz, bu e-postayı görmezden "
 "gelebilirsiniz."
 
-msgid "The Noggin team"
+#, fuzzy
+#| msgid "The Noggin team"
+msgid "The AlmaLinux Team"
 msgstr "Noggin takımı"
+
+msgid "Hi,"
+msgstr ""
+
+#, fuzzy
+#| msgid ""
+#| "If you did not request your password to be reset, you can ignore this "
+#| "email."
+msgid ""
+"Click the link below to reset your password. If you did not request a "
+"password reset, please ignore this email."
+msgstr ""
+"Parolanızın sıfırlanmasını istemediyseniz, bu e-postayı görmezden "
+"gelebilirsiniz."
+
+msgid "AlmaLinux Account Services"
+msgstr ""
 
 msgid "search..."
 msgstr "ara..."
+
+msgid "Settings"
+msgstr "Ayarlar"
+
+msgid "Help"
+msgstr ""
 
 msgid "Log Out"
 msgstr "Oturumu Kapat"
@@ -504,6 +1011,51 @@ msgstr "Oturumu Kapat"
 #, python-format
 msgid "Powered by %(noggin_link)s"
 msgstr "%(noggin_link)s ile geliştirildi"
+
+#, fuzzy
+#| msgid "Fedora Accounts"
+msgid "AlmaLinux Accounts"
+msgstr "Fedora Hesapları"
+
+#, fuzzy
+#| msgid ""
+#| "Fedora Accounts allows you to create and manage an account for Fedora "
+#| "Tools and Infrastructure."
+msgid ""
+"AlmaLinux Accounts provides the ability to create and manage your account "
+"across AlmaLinux's entire infrastructure."
+msgstr ""
+"Fedora Hesapları, Fedora Araçları ve Altyapısı için bir hesap oluşturmanıza "
+"ve yönetmenize olanak tanır."
+
+msgid ""
+"Additional configuration is required when using Kerberos tickets when OTP is "
+"enabled"
+msgstr ""
+
+msgid ""
+"Read the <a href='https://docs.fedoraproject.org/en-US/fedora-accounts/user/"
+"#pkinit'>documentation</a> for details on configuring your system"
+msgstr ""
+
+#, fuzzy, python-format
+#| msgid "To reset your password, click on the link below:"
+msgid "To validate the email address %(address)s, click on the link below:"
+msgstr "Parolanızı sıfırlamak için aşağıdaki bağlantıya tıklayın:"
+
+#, fuzzy, python-format
+#| msgid ""
+#| "If you did not request your password to be reset, you can ignore this "
+#| "email."
+msgid ""
+"If you did not set the email address %(address)s in your account "
+"%(username)s, you can ignore this email."
+msgstr ""
+"Parolanızın sıfırlanmasını istemediyseniz, bu e-postayı görmezden "
+"gelebilirsiniz."
+
+msgid "The Noggin team"
+msgstr "Noggin takımı"
 
 msgid "Welcome to noggin!"
 msgstr "Noggin'e hoş geldiniz!"
@@ -517,8 +1069,32 @@ msgstr ""
 "oluşturmak, şifrenizi değiştirmek, grup üyeliklerini yönetmek ve daha pek "
 "çok şey için kullanılabilir."
 
+msgid "You can also use your Fedora account to login here."
+msgstr ""
+
+#, python-format
+msgid ""
+"This link will be valid for %(ttl)s minutes (until %(valid_until)s UTC)."
+msgstr ""
+
+#, fuzzy
+#| msgid "The token has expired, please request a new one."
+msgid "If the link has expired, you can request a new one here: "
+msgstr "Belirtecin süresi doldu, lütfen yeni bir tane isteyin."
+
+#, fuzzy
+#| msgid "Fedora Accounts"
+msgid "Fedora Accounts System"
+msgstr "Fedora Hesapları"
+
 msgid "Fedora Accounts"
 msgstr "Fedora Hesapları"
+
+msgid "Wiki"
+msgstr ""
+
+msgid "Fedora People"
+msgstr ""
 
 msgid ""
 "Fedora Accounts allows you to create and manage an account for Fedora Tools "
@@ -527,14 +1103,13 @@ msgstr ""
 "Fedora Hesapları, Fedora Araçları ve Altyapısı için bir hesap oluşturmanıza "
 "ve yönetmenize olanak tanır."
 
-msgid ""
-"file a Fedora Infra ticket to change the details or sponsors of this group"
-msgstr ""
-"bu grubun ayrıntılarını veya sponsorlarını değiştirmek için bir Fedora Infra "
-"bileti oluşturun"
+#, fuzzy
+#| msgid "Groups"
+msgid "Edit Group"
+msgstr "Gruplar"
 
-msgid "Request Change of Details"
-msgstr "Ayrıntı Değişikliği İste"
+msgid "To change group details or add sponsors, file a ticket with"
+msgstr ""
 
 msgid "Create a PDR request to disable your account"
 msgstr "Hesabınızı devre dışı bırakmak için bir PDR isteği oluşturun"
@@ -542,12 +1117,19 @@ msgstr "Hesabınızı devre dışı bırakmak için bir PDR isteği oluşturun"
 msgid "Request account deletion"
 msgstr "Hesabın silinmesini iste"
 
-msgid "Did you lose your OTP token?"
+#, fuzzy
+#| msgid "Did you lose your OTP token?"
+msgid "Did you lose your last OTP token?"
 msgstr "OTP belirtecinizi mi kaybettiniz?"
 
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "If you have lost your OTP token you need to send an email to "
+#| "%(admin_email)s. Please sign this email using the GPG key associated with "
+#| "your account if possible, so that the administrator can verify your "
+#| "identity."
 msgid ""
-"If you have lost your OTP token you need to send an email to "
+"If you have lost your last OTP token you need to send an email to "
 "%(admin_email)s. Please sign this email using the GPG key associated with "
 "your account if possible, so that the administrator can verify your identity."
 msgstr ""
@@ -556,6 +1138,95 @@ msgstr ""
 "lütfen bu e-postayı mümkünse hesabınızla ilişkili GPG anahtarını kullanarak "
 "imzalayın."
 
+msgid ""
+"If you had multiple tokens and lost one, you can use another to login and "
+"delete the lost token from your account."
+msgstr ""
+
+msgid ""
+"If you haven't enrolled a OTP token, you don't have one and this doesn't "
+"apply to you."
+msgstr ""
+
+#, python-format
+msgid ""
+"To let admins know that you're not a spammer, please send an email to "
+"%(email_link)s and explain the situation."
+msgstr ""
+
+msgid ""
+"By using a Fedora account, you agree to follow the <a href='https://docs."
+"fedoraproject.org/en-US/project/code-of-conduct/'>Fedora&nbsp;Code&nbsp;"
+"of&nbsp;Conduct</a>."
+msgstr ""
+
+msgid "You can also use your CentOS account to login here."
+msgstr ""
+
+#, fuzzy
+#| msgid "Fedora Accounts"
+msgid "openSUSE Accounts"
+msgstr "Fedora Hesapları"
+
+msgid "openSUSE Admins"
+msgstr ""
+
 #, python-format
 msgid "Group %(groupname)s could not be found."
 msgstr "%(groupname)s grubu bulunamadı."
+
+msgid "Undo"
+msgstr ""
+
+#, python-format
+msgid "%(protocol)s on %(server)s"
+msgstr ""
+
+#~ msgid "Token description"
+#~ msgstr "Belirteç açıklaması"
+
+#~ msgid "Description must not be empty"
+#~ msgstr "Açıklama boş bırakılamaz"
+
+#~ msgid "OTP Token"
+#~ msgstr "OTP Belirteci"
+
+#~ msgid "Enter your OTP token if you have enrolled one"
+#~ msgstr "Eğer kaydettiyseniz, OTP belirtecinizi girin"
+
+#~ msgid "Just the password, don't add the OTP token if you have one"
+#~ msgstr "Sadece parolayı girin, eğer varsa OTP belirtecini eklemeyin"
+
+#~ msgid "Forgotten password or lost OTP token?"
+#~ msgstr "Parolanızı mı unuttunuz veya OTP belirtecinizi mi kaybettiniz?"
+
+#~ msgid "Registration"
+#~ msgstr "Kayıt"
+
+#~ msgid ""
+#~ "This will never be shown to you again, don't close this window until your "
+#~ "token is saved."
+#~ msgstr ""
+#~ "Bu size bir daha asla gösterilmeyecek, belirteciniz kaydedilene kadar bu "
+#~ "pencereyi kapatmayın."
+
+#~ msgid "Password or Password + One-Time-Password"
+#~ msgstr "Parola veya Parola + Bir-Defalık-Parola (OTP)"
+
+#~ msgid "Generate"
+#~ msgstr "Oluştur"
+
+#~ msgid "Disabled"
+#~ msgstr "Devre Dışı"
+
+#~ msgid "RHBZ E-Mail"
+#~ msgstr "RHBZ E-posta Adresi"
+
+#~ msgid ""
+#~ "file a Fedora Infra ticket to change the details or sponsors of this group"
+#~ msgstr ""
+#~ "bu grubun ayrıntılarını veya sponsorlarını değiştirmek için bir Fedora "
+#~ "Infra bileti oluşturun"
+
+#~ msgid "Request Change of Details"
+#~ msgstr "Ayrıntı Değişikliği İste"
