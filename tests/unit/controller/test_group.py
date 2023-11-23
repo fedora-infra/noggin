@@ -5,7 +5,7 @@ import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
-from flask import Markup
+from markupsafe import Markup
 
 from noggin.app import ipa_admin
 from noggin_messages import MemberSponsorV1

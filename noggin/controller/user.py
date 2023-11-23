@@ -7,7 +7,6 @@ from flask import (
     current_app,
     flash,
     g,
-    Markup,
     redirect,
     render_template,
     request,
@@ -16,6 +15,7 @@ from flask import (
 )
 from flask_babel import _
 from flask_mail import Message
+from markupsafe import Markup
 from pyotp import TOTP
 from werkzeug.datastructures import MultiDict
 

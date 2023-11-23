@@ -4,19 +4,18 @@ from flask_babel import Babel
 
 SUPPORTED_LANGUAGES = ["en_US", "fr_FR"]
 
-babel = Babel()
 
-
-@babel.localeselector
 def get_locale():
     return request.accept_languages.best_match(SUPPORTED_LANGUAGES)
 
 
-# @babel.timezoneselector
 # def get_timezone():
 #     user = getattr(g, "user", None)
 #     if user is not None:
 #         return user.timezone
+
+
+babel = Babel()
 
 
 def guess_locale():
