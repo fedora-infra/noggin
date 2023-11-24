@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask import current_app, session
 
-from .ipa import choose_server, Client
+from .ipa import Client, choose_server
 
 
 class IPAAdmin:
