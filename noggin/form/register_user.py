@@ -14,10 +14,11 @@ from noggin.form.validators import (
     Email,
     PasswordLength,
     StopOnError,
+    no_mixed_case,
     validator_proxy,
 )
 
-from .base import BaseForm, lower, ModestForm, strip, SubmitButtonField
+from .base import BaseForm, ModestForm, SubmitButtonField, lower, strip
 
 
 class RegisterUserForm(ModestForm):
@@ -45,6 +46,7 @@ class RegisterUserForm(ModestForm):
                     )
                 )
             ),
+            StopOnError(no_mixed_case),
             validator_proxy(
                 lambda: Regexp(
                     current_app.config["ALLOWED_USERNAME_PATTERN"],

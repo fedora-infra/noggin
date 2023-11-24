@@ -179,6 +179,23 @@ def test_step_1_bad_length(client, post_data_step_1, mocker, username):
     assert len(outbox) == 0
 
 
+def test_step1_mixed_case(client, post_data_step_1, mocker):
+    """Test giving username uppercase letters"""
+    post_data_step_1["register-username"] = "DummyUser"
+    record_signal = mocker.Mock()
+    with mailer.record_messages() as outbox, stageuser_created.connected_to(
+        record_signal
+    ):
+        result = client.post('/', data=post_data_step_1)
+    assert_form_field_error(
+        result,
+        "register-username",
+        "Mixed case is not allowed, try lower case.",
+    )
+    record_signal.assert_not_called()
+    assert len(outbox) == 0
+
+
 @pytest.mark.parametrize(
     "username", ["dummy_user", "dummy.user", "dummy user", "_dummy", ".dummy", "dummy-"]
 )
