@@ -8,8 +8,8 @@ from python_freeipa.exceptions import BadRequest, FreeIPAError
 
 from noggin.app import ipa_admin
 from noggin.security.ipa import (
-    choose_server,
     Client,
+    choose_server,
     maybe_ipa_login,
     maybe_ipa_session,
     untouched_ipa_client,

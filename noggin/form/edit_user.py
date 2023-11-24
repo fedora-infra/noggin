@@ -15,11 +15,11 @@ from wtforms.fields import (
     URLField,
 )
 from wtforms.validators import (
+    URL,
     AnyOf,
     DataRequired,
     Length,
     Optional,
-    URL,
     ValidationError,
 )
 
@@ -32,11 +32,11 @@ from .base import (
     CSVListField,
     ModestForm,
     NonEmptyFieldList,
+    SubmitButtonField,
+    TypeAndStringField,
     replace,
     strip,
     strip_at,
-    SubmitButtonField,
-    TypeAndStringField,
 )
 
 
