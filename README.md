@@ -2,8 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/noggin-aaa.svg)](https://pypi.org/project/noggin-aaa/)
 [![Supported Python versions](https://img.shields.io/pypi/pyversions/noggin-aaa.svg)](https://pypi.org/project/noggin-aaa/)
-![Tests status](https://github.com/fedora-infra/noggin/actions/workflows/tests.yml/badge.svg?branch=dev)
-[![Documentation](https://readthedocs.org/projects/noggin-aaa/badge/?version=latest)](https://noggin-aaa.readthedocs.ui/en/latest/)
+![Tests status](https://github.com/fedora-infra/noggin/actions/workflows/main.yml/badge.svg?branch=dev)
+[![Documentation](https://readthedocs.org/projects/noggin-aaa/badge/?version=latest)](https://noggin-aaa.readthedocs.io/en/latest/)
 
 *noggin* is a self-service portal for FreeIPA.
 The primary purpose of the portal is to allow users to sign up and manage their
