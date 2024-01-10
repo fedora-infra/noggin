@@ -54,8 +54,7 @@ No significant changes.
 {% if sections[section]["author"] -%}
 ### {{definitions['author']["name"]}}
 
-Many thanks to the contributors of bug reports, pull requests, and pull request
-reviews for this release:
+Many thanks to the contributors of bug reports, pull requests, and pull request reviews for this release:
 
 {% for text, values in sections[section]["author"].items() -%}
 - {{ text }}

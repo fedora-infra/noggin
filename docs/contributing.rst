@@ -206,8 +206,8 @@ When cutting a new release, follow these steps:
 #. Run the checks one last time to be sure: ``tox -r``,
 #. Tag the commit with ``-s`` to generate a signed tag
 #. Push the commit to the upstream Github repository with ``git push``,
-   and the new tag with ``git push --tags``
-#. The tarball will be automatically published to PyPI, and a Github release will be created.
+   and the new tag with ``git push --tags``.
+   The tarball will be automatically published to PyPI, and a Github release will be created.
 #. Deploy and announce.
 
 
