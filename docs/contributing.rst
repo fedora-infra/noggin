@@ -192,11 +192,13 @@ Releasing
 
 When cutting a new release, follow these steps:
 
-#. Update the version in ``pyproject.toml``
+#. Update the version in ``pyproject.toml`` by running ``poetry version major|minor|patch``
+   depending on the contents of the release.
+#. Run ``poetry install`` to update the package's metadata.
 #. Add missing authors to the release notes fragments by changing to the ``news`` directory and
    running the ``get-authors.py`` script, but check for duplicates and errors
-#. Generate the release notes by running ``poetry run towncrier`` (in the base directory)
-#. Adjust the release notes in ``docs/release_notes.rst``.
+#. Generate the release notes by running ``poetry run towncrier build`` (in the base directory)
+#. Adjust the release notes in ``docs/release_notes.md``.
 #. Generate the docs with ``tox -r -e docs`` and check them in ``docs/_build/html``.
 #. Commit the changes
 #. Push the commit to the upstream Github repository (via a PR or not).
@@ -205,9 +207,7 @@ When cutting a new release, follow these steps:
 #. Tag the commit with ``-s`` to generate a signed tag
 #. Push the commit to the upstream Github repository with ``git push``,
    and the new tag with ``git push --tags``
-#. Generate a tarball and push to PyPI with the command ``poetry publish --build``
-#. Create `the release on GitHub <https://github.com/fedora-infra/noggin/tags>`_ and copy the
-   release notes in there,
+#. The tarball will be automatically published to PyPI, and a Github release will be created.
 #. Deploy and announce.
 
 

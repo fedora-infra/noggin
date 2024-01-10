@@ -60,7 +60,7 @@ reviews for this release:
 {% for text, values in sections[section]["author"].items() -%}
 - {{ text }}
 {% endfor -%}
-{%- endif -%}
+{%- endif %}
 
 {% else -%}
 No significant changes.
