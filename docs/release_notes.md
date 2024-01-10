@@ -2,6 +2,41 @@
 
 <!-- towncrier release notes start -->
 
+## v1.9.0
+
+Released on 2024-01-10.
+
+### Features
+
+- Add validation for the OTP field on the login page (#1152)
+- Add the RSS URL to the user profile (#1216)
+- Give a clearer error message to registering users who use a mixed case username (#1327)
+
+### Bug Fixes
+
+- Fix the boolean values (checkboxes) not showing up in the profile page (#1202)
+- Don't show disabled (locked) users in Noggin (#1210)
+
+### Contributors
+
+Many thanks to the contributors of bug reports, pull requests, and pull request
+reviews for this release:
+
+- Andika Triwidada
+- Ettore Atalan
+- Aurélien Bompard
+- Luna Jernberg
+- Borys Dikovets
+- Jan Kuparinen
+- Frank Dana
+- Hoppár Zoltán
+- josep constantí
+- Linus Virtanen
+- Maksim Kliazovich
+- 김인수
+- Tao Mon Lae
+- Yuri Chornoivan
+
 ## v1.8.0
 
 Released on 2023-09-21.
