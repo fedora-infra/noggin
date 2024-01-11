@@ -27,13 +27,13 @@ actions:
     - "curl https://src.fedoraproject.org/rpms/noggin/raw/main/f/noggin.service -o noggin.service"
     - "curl https://src.fedoraproject.org/rpms/noggin/raw/main/f/noggin.sysconfig -o noggin.sysconfig"
     - "curl https://src.fedoraproject.org/rpms/noggin/raw/main/f/sources -o sources"
-    - "sh -c 'curl -sSL https://install.python-poetry.org | python3 -'"
-    - "/builddir/.local/bin/poetry --version"
+    - "sh -c 'which poetry || curl -sSL https://install.python-poetry.org | python3 -'"
+    - "poetry --version"
   create-archive:
-    - "/builddir/.local/bin/poetry build -f sdist"
+    - "poetry build -f sdist"
     - "sh -c 'echo dist/noggin_aaa-$(poetry version -s).tar.gz'"
   get-current-version:
-    - "/builddir/.local/bin/poetry version -s"
+    - "poetry version -s"
 
 jobs:
   # upon upstream PRs, test builds
