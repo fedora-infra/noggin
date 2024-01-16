@@ -64,6 +64,13 @@ for information on migrating applications to the new API.
 
    installation
 
+.. Installation
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Installation
+
+   installation/01-freeipa-server.rst
 
 .. Contributor's Guide
 
