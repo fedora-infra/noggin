@@ -71,6 +71,7 @@ for information on migrating applications to the new API.
    :caption: Installation
 
    installation/01-freeipa-server.rst
+   installation/02-freeipa-client.rst
 
 .. Contributor's Guide
 
