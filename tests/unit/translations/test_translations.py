@@ -43,7 +43,4 @@ def test_translation_in_template_french(client, compile_catalogs):
     assert result.status_code == 404
     page = BeautifulSoup(result.data, 'html.parser')
     message = page.select_one(".alert.alert-danger")
-    assert (
-        message.get_text(strip=True)
-        == "404Cette page n'a pas été trouvée. Et voilà, tu as tout gâché."
-    )
+    assert message.get_text(strip=True) == "404Cette page n'a pas été trouvée."
