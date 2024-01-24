@@ -48,6 +48,16 @@ def test_choose_server_no_session(client, mocker):
     assert random.choice.call_count == 2
 
 
+def test_choose_server_not_in_config(client, mocker):
+    mocker.patch.dict(current_app.config, {"FREEIPA_SERVERS": ["a.example.test"]})
+    with client.session_transaction() as sess:
+        sess['noggin_ipa_server_hostname'] = "b.example.test"
+    with client.session_transaction() as sess:
+        server = choose_server(current_app, sess)
+    # It should be the one from the config
+    assert server == "a.example.test"
+
+
 @pytest.mark.vcr
 def test_ipa_session_authed(client, logged_in_dummy_user):
     """Check maybe_ipa_session() when a user is logged in"""
