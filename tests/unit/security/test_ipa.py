@@ -25,6 +25,9 @@ def ipa_call_error():
 
 
 def test_choose_server(client, mocker):
+    mocker.patch.dict(
+        current_app.config, {"FREEIPA_SERVERS": ["a.example.test", "b.example.com"]}
+    )
     random = mocker.patch("noggin.security.ipa.random")
     random.choice.side_effect = ["a.example.test", "b.example.test", "c.example.test"]
     with client.session_transaction() as sess:
