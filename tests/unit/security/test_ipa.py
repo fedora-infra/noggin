@@ -25,6 +25,9 @@ def ipa_call_error():
 
 
 def test_choose_server(client, mocker):
+    mocker.patch.dict(
+        current_app.config, {"FREEIPA_SERVERS": ["a.example.test", "b.example.com"]}
+    )
     random = mocker.patch("noggin.security.ipa.random")
     random.choice.side_effect = ["a.example.test", "b.example.test", "c.example.test"]
     with client.session_transaction() as sess:
@@ -46,6 +49,16 @@ def test_choose_server_no_session(client, mocker):
     # If we can't store the value in the session, we'll call random.choice again.
     assert server == "b.example.test"
     assert random.choice.call_count == 2
+
+
+def test_choose_server_not_in_config(client, mocker):
+    mocker.patch.dict(current_app.config, {"FREEIPA_SERVERS": ["a.example.test"]})
+    with client.session_transaction() as sess:
+        sess['noggin_ipa_server_hostname'] = "b.example.test"
+    with client.session_transaction() as sess:
+        server = choose_server(current_app, sess)
+    # It should be the one from the config
+    assert server == "a.example.test"
 
 
 @pytest.mark.vcr
