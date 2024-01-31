@@ -130,8 +130,9 @@ def choose_server(app, session=None):
     server = None
     if session is not None:
         server = session.get('noggin_ipa_server_hostname', None)
-    if server is None:
-        server = random.choice(app.config['FREEIPA_SERVERS'])
+    available_servers = app.config['FREEIPA_SERVERS']
+    if server is None or server not in available_servers:
+        server = random.choice(available_servers)
     if session is not None:
         session['noggin_ipa_server_hostname'] = server
     return server
