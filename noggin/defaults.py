@@ -1,8 +1,11 @@
 # This file contains the default configuration values
+import socket
+
 
 TEMPLATES_AUTO_RELOAD = False
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True
+FREEIPA_DOMAIN = ".".join(socket.getfqdn().split('.')[1:])
 USER_DEFAULTS = {
     "locale": "en-US",
     "timezone": "UTC",
