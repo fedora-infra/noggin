@@ -4,6 +4,7 @@ from urllib import parse
 import pyotp
 from bs4 import BeautifulSoup
 from flask import get_flashed_messages, template_rendered
+from srvlookup import SRV
 
 
 def assert_redirects_with_flash(
@@ -81,3 +82,7 @@ def captured_templates(app):
         yield recorded
     finally:
         template_rendered.disconnect(record, app)
+
+
+def make_srv(name):
+    return SRV(hostname=name, host="127.0.0.1", port=42, priority=0, weight=0)

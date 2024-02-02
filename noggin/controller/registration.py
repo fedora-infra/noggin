@@ -27,7 +27,7 @@ from noggin.form.register_user import (
 )
 from noggin.l10n import guess_locale
 from noggin.representation.user import User
-from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
+from noggin.security.ipa import NoIPAServer, maybe_ipa_login, untouched_ipa_client
 from noggin.signals import stageuser_created, user_registered
 from noggin.utility.controllers import with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
@@ -300,6 +300,8 @@ def activate_account():
                     'warning',
                 )
                 return redirect(url_for(".root"))
+            except NoIPAServer:
+                raise FormError("non_field_errors", _("No IPA server available"))
 
             # Try to log them in directly, so they don't have to type their password again.
             try:

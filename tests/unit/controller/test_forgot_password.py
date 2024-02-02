@@ -10,7 +10,7 @@ from flask import current_app, session
 
 from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
-from noggin.security.ipa import untouched_ipa_client
+from noggin.security.ipa import NoIPAServer, untouched_ipa_client
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import (
     Audience,
@@ -390,6 +390,22 @@ def test_change_post_generic_error(
     assert_form_generic_error(result, 'Could not change password, please try again.')
     patched_lock_active["delete"].assert_not_called()
     logger.error.assert_called_once()
+
+
+@pytest.mark.vcr()
+def test_change_post_no_ipa_server(
+    client, dummy_user, token_for_dummy_user, patched_lock_active, mocker
+):
+    ipa_admin_mock = mocker.patch("noggin.controller.password.ipa_admin")
+    # We need user_show to work, but make user_mod raise an exception.
+    ipa_admin_mock.user_show.side_effect = ipa_admin.user_show
+    ipa_admin_mock.user_mod.side_effect = NoIPAServer()
+    result = client.post(
+        f'/forgot-password/change?token={token_for_dummy_user}',
+        data={"password": "newpassword", "password_confirm": "newpassword"},
+    )
+    assert_form_generic_error(result, 'No IPA server available')
+    patched_lock_active["delete"].assert_not_called()
 
 
 @pytest.mark.vcr()

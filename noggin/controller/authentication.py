@@ -11,7 +11,7 @@ from flask import (
 from flask_babel import _
 
 from noggin.form.sync_token import SyncTokenForm
-from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
+from noggin.security.ipa import NoIPAServer, maybe_ipa_login, untouched_ipa_client
 from noggin.utility.forms import FormError, handle_form_errors
 
 from . import blueprint as bp
@@ -82,5 +82,7 @@ def otp_sync():
                     f'{form.username}: {e}'
                 )
                 raise FormError("non_field_errors", e.message)
+            except NoIPAServer:
+                raise FormError("non_field_errors", _("No IPA server available"))
 
     return render_template('sync-token.html', sync_form=form)

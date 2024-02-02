@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from flask import current_app, get_flashed_messages, session
 
 from noggin.app import ipa_admin
+from noggin.security.ipa import NoIPAServer
 
 from ..utilities import (
     assert_form_field_error,
@@ -382,25 +383,58 @@ def test_otp_sync_invalid_codes(client, logged_in_dummy_user_with_otp):
 
 
 @pytest.mark.vcr()
-def test_otp_sync_http_error(client, logged_in_dummy_user_with_otp, mocker):
+def test_otp_sync_http_error(
+    client, logged_in_dummy_user, logged_in_dummy_user_with_otp, mocker
+):
     """Test synchronising OTP token with mocked http error"""
     logger = mocker.patch.object(current_app._get_current_object(), "logger")
-    method = mocker.patch("requests.sessions.Session.post")
-    method.side_effect = requests.exceptions.RequestException
-
-    result = client.post(
-        '/otp/sync/',
-        data={
-            "username": "dummy",
-            "password": "dummy_password",
-            "first_code": "123456",
-            "second_code": "234567",
-        },
-        follow_redirects=False,
+    mocker.patch(
+        "noggin.controller.authentication.untouched_ipa_client",
+        return_value=logged_in_dummy_user,
     )
+
+    with mock.patch("requests.sessions.Session.post") as method:
+        method.side_effect = requests.exceptions.RequestException
+
+        result = client.post(
+            '/otp/sync/',
+            data={
+                "username": "dummy",
+                "password": "dummy_password",
+                "first_code": "123456",
+                "second_code": "234567",
+            },
+            follow_redirects=False,
+        )
 
     logger.error.assert_called_once()
     assert_form_generic_error(result, "Something went wrong trying to sync OTP token.")
+
+
+@pytest.mark.vcr()
+def test_otp_sync_no_ipa_server(
+    client, logged_in_dummy_user, logged_in_dummy_user_with_otp, mocker
+):
+    """Test synchronising OTP token with no IPA server available"""
+    mocker.patch(
+        "noggin.controller.authentication.untouched_ipa_client",
+        return_value=logged_in_dummy_user,
+    )
+
+    with mock.patch.object(logged_in_dummy_user, "otptoken_sync") as method:
+        method.side_effect = NoIPAServer()
+
+        result = client.post(
+            '/otp/sync/',
+            data={
+                "username": "dummy",
+                "password": "dummy_password",
+                "first_code": "123456",
+                "second_code": "234567",
+            },
+            follow_redirects=False,
+        )
+    assert_form_generic_error(result, "No IPA server available")
 
 
 @pytest.mark.vcr()

@@ -1,6 +1,5 @@
-import random
-
 import python_freeipa
+import srvlookup
 from cryptography.fernet import Fernet
 from python_freeipa.client_meta import ClientMeta as IPAClient
 from python_freeipa.exceptions import BadRequest, ValidationError
@@ -112,6 +111,12 @@ class Client(IPAClient):
         self._request('fasagreement_disable', agreement, kwargs)
 
 
+class NoIPAServer(Exception):
+    """No IPA server available."""
+
+    pass
+
+
 def raise_on_failed(result):
     failed = result.get("failed", {})
     num_failed = sum(
@@ -130,9 +135,22 @@ def choose_server(app, session=None):
     server = None
     if session is not None:
         server = session.get('noggin_ipa_server_hostname', None)
-    available_servers = app.config['FREEIPA_SERVERS']
+    try:
+        available_servers = [
+            record.hostname
+            for record in srvlookup.lookup('ldap', domain=app.config["FREEIPA_DOMAIN"])
+        ]
+    except srvlookup.SRVQueryFailure:
+        available_servers = []
     if server is None or server not in available_servers:
-        server = random.choice(available_servers)
+        try:
+            server = available_servers[0]
+        except IndexError:
+            app.logger.warning(
+                "IPA server not found. Available servers: %s",
+                ", ".join(available_servers),
+            )
+            raise NoIPAServer
     if session is not None:
         session['noggin_ipa_server_hostname'] = server
     return server
@@ -157,7 +175,10 @@ def untouched_ipa_client(app, session):
 # It will be None if no session was provided or was provided but invalid.
 def maybe_ipa_session(app, session):
     encrypted_session = session.get('noggin_session', None)
-    server_hostname = choose_server(app, session)
+    try:
+        server_hostname = choose_server(app, session)
+    except NoIPAServer:
+        return None
     if encrypted_session and server_hostname:
         fernet = Fernet(app.config['FERNET_SECRET'])
         ipa_session = fernet.decrypt(encrypted_session)
@@ -189,9 +210,12 @@ def maybe_ipa_login(app, session, username, userpassword):
     # in the session and just always use that. Flask sessions are signed, so we
     # are safe in later assuming that the server hostname cookie has not been
     # altered.
-    client = Client(
-        choose_server(app, session), verify_ssl=app.config['FREEIPA_CACERT']
-    )
+    try:
+        client = Client(
+            choose_server(app, session), verify_ssl=app.config['FREEIPA_CACERT']
+        )
+    except NoIPAServer:
+        return None
 
     auth = client.login(username, userpassword)
 
