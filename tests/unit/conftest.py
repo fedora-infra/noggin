@@ -20,7 +20,7 @@ def app_config(ipa_cert):
         DEBUG=True,
         WTF_CSRF_ENABLED=False,
         # IPA settings
-        FREEIPA_SERVERS=['ipa.noggin.test'],
+        FREEIPA_SERVERS=['ipa.tinystage.test'],
         FREEIPA_CACERT=ipa_cert,
         # Any user with admin privileges
         FREEIPA_ADMIN_USER='admin',

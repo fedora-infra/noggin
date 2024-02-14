@@ -267,10 +267,10 @@ def test_user_settings_otp_check_description_escaping(
     # Not sure we need all of these checked
     assert parsed_otp_uri.scheme == "otpauth"
     assert parsed_otp_uri.netloc == "totp"
-    assert parsed_otp_uri.path == "/dummy%40NOGGIN.TEST:pants%20token"
+    assert parsed_otp_uri.path == "/dummy%40TINYSTAGE.TEST:pants%20token"
 
     parsed_query = parse_qs(parsed_otp_uri.query)
-    assert parsed_query["issuer"] == ["dummy@NOGGIN.TEST"]
+    assert parsed_query["issuer"] == ["dummy@TINYSTAGE.TEST"]
 
 
 @pytest.mark.vcr()
