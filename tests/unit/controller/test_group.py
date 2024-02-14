@@ -448,7 +448,7 @@ def test_group_remove_sponsor_unknown(
     expected_message = (
         "Unable to remove user dummy: Insufficient access: Insufficient "
         "'write' privilege to the 'memberManager' attribute of entry "
-        "'cn=dummy-group,cn=groups,cn=accounts,dc=noggin,dc=test'."
+        "'cn=dummy-group,cn=groups,cn=accounts,dc=tinystage,dc=test'."
     )
     assert_redirects_with_flash(
         result,

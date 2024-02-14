@@ -66,6 +66,7 @@ def dummy_stageuser(ipa_testing_config):
         o_mail="dummy@unit.tests",
         o_loginshell='/bin/bash',
         fascreationtime=f"{now.isoformat()}Z",
+        fasstatusnote="spamcheck_awaiting",
     )['result']
     yield User(user)
     try:
@@ -269,13 +270,15 @@ def test_step_1_spamcheck(
 
 
 @pytest.mark.parametrize(
-    "spamcheck_status", ["spamcheck_awaiting", "spamcheck_denied", "spamcheck_manual"]
+    "spamcheck_status", ["active", "spamcheck_denied", "spamcheck_manual"]
 )
 @pytest.mark.vcr()
 def test_spamcheck_wait(client, dummy_stageuser, spamcheck_status):
     """Test the spamcheck_wait endpoint"""
     ipa_admin.stageuser_mod(a_uid="dummy", fasstatusnote=spamcheck_status)
-    result = client.get('/register/spamcheck-wait?username=dummy')
+    result = client.get(
+        '/register/spamcheck-wait?username=dummy', follow_redirects=True
+    )
     assert result.status_code == 200
 
 

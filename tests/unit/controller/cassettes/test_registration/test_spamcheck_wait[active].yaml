@@ -36,13 +36,13 @@ interactions:
       Content-Type:
       - text/plain; charset=UTF-8
       Date:
-      - Wed, 14 Feb 2024 08:44:55 GMT
+      - Wed, 14 Feb 2024 08:40:41 GMT
       Keep-Alive:
       - timeout=30, max=100
       Server:
       - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
       Set-Cookie:
-      - ipa_session=MagBearerToken=eD1zDGpd%2fl9h4v6nVxwql7WONCpztksjjOG4jVHKD%2bph7mbgSE0IZ%2bdJ7IC9nYoAEmAHj8krqYW32jTrQOvSsUi%2fib%2frcjXK2B9p42BeL7gNPmgM4nbtywOwDOGsh5qoTSHPEOTSQLaqv5WslpY91P%2fpOoZLGi3I879kVUFjDp6Fh6pHx2642gmKi%2fNLx5dZLosq8EU6z1U9fBexl5qrpg%3d%3d;path=/ipa;httponly;secure;
+      - ipa_session=MagBearerToken=p53tWtt34Dfc1NTZd2EGtoxb3NyKBA%2fuBNB1NwNulP7s48hu8o0zx0SxC4k9%2f3VVX%2fRff248%2feKD2BY43Vw7tllbA2wDQAnrIol2Sw9F5rH1KS8FCMirZcgNiapF9lqFgBdofqidEvAJSdU7tXdVrbXFLSipNP4Vlcrun2%2f%2bFI2XsHm%2b9gzSCNVUq4fw9JXG8CGHiq6pdKDB5fJPBgF%2fXg%3d%3d;path=/ipa;httponly;secure;
       Vary:
       - Accept-Encoding
       X-Frame-Options:
@@ -64,7 +64,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=eD1zDGpd%2fl9h4v6nVxwql7WONCpztksjjOG4jVHKD%2bph7mbgSE0IZ%2bdJ7IC9nYoAEmAHj8krqYW32jTrQOvSsUi%2fib%2frcjXK2B9p42BeL7gNPmgM4nbtywOwDOGsh5qoTSHPEOTSQLaqv5WslpY91P%2fpOoZLGi3I879kVUFjDp6Fh6pHx2642gmKi%2fNLx5dZLosq8EU6z1U9fBexl5qrpg%3d%3d
+      - ipa_session=MagBearerToken=p53tWtt34Dfc1NTZd2EGtoxb3NyKBA%2fuBNB1NwNulP7s48hu8o0zx0SxC4k9%2f3VVX%2fRff248%2feKD2BY43Vw7tllbA2wDQAnrIol2Sw9F5rH1KS8FCMirZcgNiapF9lqFgBdofqidEvAJSdU7tXdVrbXFLSipNP4Vlcrun2%2f%2bFI2XsHm%2b9gzSCNVUq4fw9JXG8CGHiq6pdKDB5fJPBgF%2fXg%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -89,7 +89,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:55 GMT
+      - Wed, 14 Feb 2024 08:40:41 GMT
       Keep-Alive:
       - timeout=30, max=99
       Server:
@@ -104,10 +104,229 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "user_add", "params": [["dummy"], {"givenname": "Dummy", "sn":
-      "User", "cn": "Dummy User", "loginshell": "/bin/bash", "mail": "dummy@unit.tests",
-      "userpassword": "dummy_password", "random": false, "noprivate": false, "all":
-      true, "raw": false, "no_members": false, "fascreationtime": "2024-02-14T08:44:55Z",
+    body: '{"method": "stageuser_add", "params": [["dummy"], {"givenname": "Dummy",
+      "sn": "User", "cn": "Dummy User", "loginshell": "/bin/bash", "mail": "dummy@unit.tests",
+      "random": false, "all": true, "raw": false, "no_members": false, "fascreationtime":
+      "2024-02-14T08:40:41Z", "fasstatusnote": "spamcheck_awaiting", "version": "2.235"}]}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '330'
+      Content-Type:
+      - application/json
+      Cookie:
+      - ipa_session=MagBearerToken=p53tWtt34Dfc1NTZd2EGtoxb3NyKBA%2fuBNB1NwNulP7s48hu8o0zx0SxC4k9%2f3VVX%2fRff248%2feKD2BY43Vw7tllbA2wDQAnrIol2Sw9F5rH1KS8FCMirZcgNiapF9lqFgBdofqidEvAJSdU7tXdVrbXFLSipNP4Vlcrun2%2f%2bFI2XsHm%2b9gzSCNVUq4fw9JXG8CGHiq6pdKDB5fJPBgF%2fXg%3d%3d
+      Referer:
+      - https://ipa.tinystage.test/ipa
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://ipa.tinystage.test/ipa/session/json
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA4RS22obMRD9FaNn17f6oQQMDTSEUmgLdh7apiyz2vGuaq201UhOtsH/3pG0vqQY
+        +qTRmduZM/MiHFLQXtyMXi5Nafj5IT6Etu1HD4RO/ByPRKWo09AbaPGaWxnlFWjKvoeE1SgtXQu2
+        5S+UXmqg7Pa2Ewx36MiaaFlXg1F/wCtrQJ9xZdCz7zUQYtmYbkk9g5Q2GB//O1d2ThmpOtAQngfI
+        K7lD31mtZD+gHJAZDR+i5lhzC3Q02bGm5t7Z0H3Zfg3lJ+wpj95BMOp3QFWlaSB4W6NBBx6zdEjS
+        qS4OkwKKwtgidHVRJDeTkmCsURL0Sd4qKvZ+8/Hzt/Xm9v5usrlbb1J0GLqkgIQwR+kwaeVVTn/h
+        HhW3j3/ucjMSi9liOVvMl7N3y9ly/l0chlomtCXPFyu+mR/pnGT7P53Gtlgpx+JZ16fQaYSmZ3qU
+        hz4t39CwI23ljl3eBWS4BaUvWrGifuKRPB1nJA+8amN9ZkQdtLJBuSvgCfj2TJ1vTu3RvD7ShGtb
+        K0MN6txkWiozLYGaIemKDg1QEW/hybqo+JaPGwd4h72H8gKs4oxRzlViP5ZmxXRrrEbxeij+h6GT
+        3Tm7V8T7YtbjSq6YfZ/i04eHFgcuugcd4hjDqqOUbECSWdxWFVdPSanH6DGHPYqUi87ZOI0JWscT
+        rc72abmxDFStMv/uNfZm1vlcxXIyn03eisNfAAAA//8DAL2imWsvBAAA
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 14 Feb 2024 08:40:41 GMT
+      Keep-Alive:
+      - timeout=30, max=98
+      Server:
+      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: Success
+- request:
+    body: '{"method": "session_logout", "params": [[], {"version": "2.235"}]}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '66'
+      Content-Type:
+      - application/json
+      Cookie:
+      - ipa_session=MagBearerToken=p53tWtt34Dfc1NTZd2EGtoxb3NyKBA%2fuBNB1NwNulP7s48hu8o0zx0SxC4k9%2f3VVX%2fRff248%2feKD2BY43Vw7tllbA2wDQAnrIol2Sw9F5rH1KS8FCMirZcgNiapF9lqFgBdofqidEvAJSdU7tXdVrbXFLSipNP4Vlcrun2%2f%2bFI2XsHm%2b9gzSCNVUq4fw9JXG8CGHiq6pdKDB5fJPBgF%2fXg%3d%3d
+      Referer:
+      - https://ipa.tinystage.test/ipa
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://ipa.tinystage.test/ipa/session/json
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqEYw80pzcmp1FJRSi4ryi6B8IDczBcEuKMrMS84sSMwBCikl
+        puRm5jmEePpFBoc4urvqhbgGhygBFZWlFhVn5ueBlJjoGRroGSvVAgAAAP//AwBhPAFlcQAAAA==
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 14 Feb 2024 08:40:41 GMT
+      Keep-Alive:
+      - timeout=30, max=97
+      Server:
+      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
+      Set-Cookie:
+      - ipa_session=;Max-Age=0;path=/ipa;httponly;secure;
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: Success
+- request:
+    body: user=admin&password=password
+    headers:
+      Accept:
+      - text/plain
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '28'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Referer:
+      - https://ipa.tinystage.test/ipa/session/login_password
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://ipa.tinystage.test/ipa/session/login_password
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwMAAAAAAAAAAAA=
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '20'
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - text/plain; charset=UTF-8
+      Date:
+      - Wed, 14 Feb 2024 08:40:41 GMT
+      Keep-Alive:
+      - timeout=30, max=100
+      Server:
+      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
+      Set-Cookie:
+      - ipa_session=MagBearerToken=fcScGV%2frzoyCRB%2bbERaKkX1d1suCJNj%2bKl9t3xTWts68JaN%2fOcXkiyeXkvOg7DH0UWrSCo2VojBcyNnHKL%2bK%2fs1KORJ6RSrMZ%2bd3qr%2fk%2fV7x5Yl7Vf%2fwhAqnLvIfXzw5FZuEA5wIpDoKCRJaFXcg28B2pQkivDPC4%2f9nXslDQ4O1uooZWG69zSreuVfDCpWQLWfpYfjZbZHtmEm1NRvs3A%3d%3d;path=/ipa;httponly;secure;
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: Success
+- request:
+    body: '{"method": "ping", "params": [[], {"version": "2.235"}]}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Cookie:
+      - ipa_session=MagBearerToken=fcScGV%2frzoyCRB%2bbERaKkX1d1suCJNj%2bKl9t3xTWts68JaN%2fOcXkiyeXkvOg7DH0UWrSCo2VojBcyNnHKL%2bK%2fs1KORJ6RSrMZ%2bd3qr%2fk%2fV7x5Yl7Vf%2fwhAqnLvIfXzw5FZuEA5wIpDoKCRJaFXcg28B2pQkivDPC4%2f9nXslDQ4O1uooZWG69zSreuVfDCpWQLWfpYfjZbZHtmEm1NRvs3A%3d%3d
+      Referer:
+      - https://ipa.tinystage.test/ipa
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://ipa.tinystage.test/ipa/session/json
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqFYqLs3NTSyqBLKVPAMcFYpTi8pSixSAuDgzP0/BRM/QQM9Y
+        T8ExwBMuZqRnZGqkVKujoJRaVJRfBNSZV5qTA+RmpiDYBUWZecmZBYk5IIMTU3Iz8xxCPP0ig0Mc
+        3V31QlyDQ5SAiqAmgpRALFKqBQAAAP//AwD86eRsnAAAAA==
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 14 Feb 2024 08:40:41 GMT
+      Keep-Alive:
+      - timeout=30, max=99
+      Server:
+      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: Success
+- request:
+    body: '{"method": "stageuser_mod", "params": [["dummy"], {"random": false, "rights":
+      false, "all": true, "raw": false, "no_members": false, "fasstatusnote": "active",
       "version": "2.235"}]}'
     headers:
       Accept:
@@ -117,11 +336,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '340'
+      - '181'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=eD1zDGpd%2fl9h4v6nVxwql7WONCpztksjjOG4jVHKD%2bph7mbgSE0IZ%2bdJ7IC9nYoAEmAHj8krqYW32jTrQOvSsUi%2fib%2frcjXK2B9p42BeL7gNPmgM4nbtywOwDOGsh5qoTSHPEOTSQLaqv5WslpY91P%2fpOoZLGi3I879kVUFjDp6Fh6pHx2642gmKi%2fNLx5dZLosq8EU6z1U9fBexl5qrpg%3d%3d
+      - ipa_session=MagBearerToken=fcScGV%2frzoyCRB%2bbERaKkX1d1suCJNj%2bKl9t3xTWts68JaN%2fOcXkiyeXkvOg7DH0UWrSCo2VojBcyNnHKL%2bK%2fs1KORJ6RSrMZ%2bd3qr%2fk%2fV7x5Yl7Vf%2fwhAqnLvIfXzw5FZuEA5wIpDoKCRJaFXcg28B2pQkivDPC4%2f9nXslDQ4O1uooZWG69zSreuVfDCpWQLWfpYfjZbZHtmEm1NRvs3A%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -131,18 +350,16 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA5RU72/aMBD9V1A+F0hC0tJJlUY3hKZK61Sg0rpO6GIf4OHYmX9Q0qr/+2wnwDpV
-        6/aJy7t75/N7Z54ihdpyE73rPP0eEuF+vkUfbVnWnblGFX0/6USU6YpDLaDE19JMMMOA6yY3D9gK
-        idSvFcviBxJDOOgmbWQVObhCpaXwkVQrEOwRDJMC+BFnAo3LvQSsb+vpUrMdECKtMP57o4pKMUFY
-        BRzsroUMIxs0leSM1C3qCpqJ2g+t1/ueS9D70CWmej1R0lbXyy+2uMJae7zE6lqxFRNjYVTdVoow
-        FRijdCNPBVawnxYZDTfOB7QYpsO0S4ok7yYJYhfgFLp5mmdxTAZ4NoBA9JdwAz1IRXFXMRUk8S2e
-        osWCgkHDSlwsHBKlcZrFaZLFwyzLs7voueU7mU31QMkaxAr/j4o7o8CVwp5WgMbTrCGNRleTJdlx
-        Up5v6Yfz9d0kqYrN5Xw6z+/myc3lTTy3t+Pb2e1odNF0dFKVIGCFFINWXgkiLqjfjhMXrLy42ket
-        jfqEkgvDRK2NY4UP1KZZLrZF8XIbA24ZFbYsnGceT7J0GMeDYX4Wklw6n/QaOQ/ZfsFE311p3Xb8
-        C1M3j+KwwiWwpkcY/r0z1/T8bHrvGgEhBSPADzM2lbNPn79OZ6PJuDcbT2eh2i0ZURic9Zb8g0X5
-        0aLDir99jm2Xjx7EWssSKVNu9WVrR99D/WNF5f4YUG3RM5fufaNngV7sl9LBRtk9usHaQHHESvR6
-        yuUiOBsO8C/BdWx0ol5VP9dxB0Ly7RV4duwtcOuv3F7Iu+QCCDeJRpQi7fhunfum4D4KLFRKeouF
-        5dy/THqMD1r6BkBLJv6U0Z/q5mveYJT1krg3iJ5/AQAA//8DAP2XJt9KBQAA
+        H4sIAAAAAAAAA4RSyYobMRD9FaOz4y0+hAFDAhmGELKAPYckMzTVarm7YnWpo2UyHeN/T0lqLxMM
+        Oan0an2vai+sckF7cTPaX5qS+Pkh3oe27Uf3TlnxOB6JCl2noSdo1TU3EnoE7bLvPmG1ksZdCzbl
+        TyW91OCy25tOMNwp6wxFy9gaCP+AR0OgzziS8ux7CYRYNqYbh88gpQnk439ny84iSexAQ3geII9y
+        p3xnNMp+QDkgTzR8nGuONbfgjiY71q65syZ0X7ZfQ/lR9S5T7yAQ/goKq8QGgje1ImXBqyydctJi
+        F8mkgKIgU4SuLork5qEkkCGUoE/yVlGxt5sPn7+tN+/ubieb2/UmRYehSwpICM8orUpaeczpe+5R
+        cfv45y43I7GYLZazxXw5e7OcLeffxWGoRaEtmV+s+Gp+HOck2//HaUyrKrQsnrF9Cp1GaHoez2XS
+        p+W3gPqiJkvnJ145745knAfeKRmfW4P0+JSFrNmglxeYcG1qJNconQtPS6RpCa4Zkq6QbMAVcdG/
+        jY1ybvly1QDvVO+hvACrSCBqtUoTjyWteMRaVaN4Gi7+h6tLdmfNEzpeBlI9ruTKI/UpPn2YqDhw
+        0SfQIdIY9hh1YgOShuKTqXCL3CDlpTajhxz5IFK6stZEQhS0jidYne3T8mIlqFqkf/cW2/Pg+RzF
+        cjKfTV6Lw18AAAD//wMALy1vtA8EAAA=
     headers:
       Cache-Control:
       - no-cache, private
@@ -155,7 +372,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:55 GMT
+      - Wed, 14 Feb 2024 08:40:41 GMT
       Keep-Alive:
       - timeout=30, max=98
       Server:
@@ -183,7 +400,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=eD1zDGpd%2fl9h4v6nVxwql7WONCpztksjjOG4jVHKD%2bph7mbgSE0IZ%2bdJ7IC9nYoAEmAHj8krqYW32jTrQOvSsUi%2fib%2frcjXK2B9p42BeL7gNPmgM4nbtywOwDOGsh5qoTSHPEOTSQLaqv5WslpY91P%2fpOoZLGi3I879kVUFjDp6Fh6pHx2642gmKi%2fNLx5dZLosq8EU6z1U9fBexl5qrpg%3d%3d
+      - ipa_session=MagBearerToken=fcScGV%2frzoyCRB%2bbERaKkX1d1suCJNj%2bKl9t3xTWts68JaN%2fOcXkiyeXkvOg7DH0UWrSCo2VojBcyNnHKL%2bK%2fs1KORJ6RSrMZ%2bd3qr%2fk%2fV7x5Yl7Vf%2fwhAqnLvIfXzw5FZuEA5wIpDoKCRJaFXcg28B2pQkivDPC4%2f9nXslDQ4O1uooZWG69zSreuVfDCpWQLWfpYfjZbZHtmEm1NRvs3A%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -207,564 +424,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:55 GMT
-      Keep-Alive:
-      - timeout=30, max=97
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Set-Cookie:
-      - ipa_session=;Max-Age=0;path=/ipa;httponly;secure;
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: Success
-- request:
-    body: user=dummy&new_password=dummy_password&old_password=dummy_password
-    headers:
-      Accept:
-      - text/plain
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '66'
-      Content-Type:
-      - application/x-www-form-urlencoded
-      Referer:
-      - https://ipa.tinystage.test/ipa/session/change_password
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/change_password
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA0TOUQqAIAwG4PdO4Qma9Tw8Q9AJTC0D02hGdPtmCT2MwfbtZ+jzFlSD3mnLLa85
-        ONVLKcbTGEeE8I0ahEqmZO9y0KlBE13psMJ4HRcn6DuZz8C4Y7NzUT5SXH57aaretgh1y+nFQs2G
-        96kHAAD//wMAiLUc4ZsAAAA=
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - text/html; charset=utf-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:55 GMT
-      Keep-Alive:
-      - timeout=30, max=100
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-      X-IPA-Pwchange-Result:
-      - ok
-    status:
-      code: 200
-      message: Success
-- request:
-    body: user=dummy&password=dummy_password
-    headers:
-      Accept:
-      - text/plain
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '34'
-      Content-Type:
-      - application/x-www-form-urlencoded
-      Referer:
-      - https://ipa.tinystage.test/ipa/session/login_password
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/login_password
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAAwAAAP//AwAAAAAAAAAAAA==
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - text/plain; charset=UTF-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
-      Keep-Alive:
-      - timeout=30, max=100
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Set-Cookie:
-      - ipa_session=MagBearerToken=diEcdZAN9dlKgIGs7SNd3SACnailLaYxL%2bR3GWGriU6vOdcBwkX4zFXaAKdnwdXIwnCISya5L8Qxv3cIRKI7QqQAuqLxdJahSujpI5KmWDzK7ZfqXQCLUR6mvkyC3sNvbaMMigl0E%2bedzXKa3%2flFMoeCB8mFSskVhSfYXU4aA4V7WdAKRMLEIgisddFR2U%2b3ZpbsTcJGKYAVbdIWII6KYw%3d%3d;path=/ipa;httponly;secure;
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: Success
-- request:
-    body: '{"method": "otptoken_add", "params": [[null], {"type": "totp", "description":
-      "dummy''s token", "ipatokenowner": "dummy", "ipatokenotpalgorithm": "sha1",
-      "ipatokenotpdigits": 6, "ipatokentotpclockoffset": 0, "ipatokentotptimestep":
-      30, "ipatokenhotpcounter": 0, "qrcode": false, "no_qrcode": false, "all": true,
-      "raw": false, "no_members": false, "version": "2.235"}]}'
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '367'
-      Content-Type:
-      - application/json
-      Cookie:
-      - ipa_session=MagBearerToken=diEcdZAN9dlKgIGs7SNd3SACnailLaYxL%2bR3GWGriU6vOdcBwkX4zFXaAKdnwdXIwnCISya5L8Qxv3cIRKI7QqQAuqLxdJahSujpI5KmWDzK7ZfqXQCLUR6mvkyC3sNvbaMMigl0E%2bedzXKa3%2flFMoeCB8mFSskVhSfYXU4aA4V7WdAKRMLEIgisddFR2U%2b3ZpbsTcJGKYAVbdIWII6KYw%3d%3d
-      Referer:
-      - https://ipa.tinystage.test/ipa
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/json
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA4xS207jMBD9lcgS5aWXNEkbtlIEqVRBV6L04nJHyLFNazZxgi+sIsS/r+3sLhR4
-        4M3jM2fmzJx5AYJKnSsw8l7eP1mFVPmL8lJVKN+UgqltYYAbILeoD+7a3vsMwjZMSQcPdzBlQMUK
-        KhWtHBz6Di+zR4oVzpFsWP/ywQeujVVZ7dTUnD1pykjTLguycBDiThzEcSfy4x8ddDDIOlkY4aFP
-        HiKSHTg2oRILZsSU3BGJLop6X3pN2515fnMq3nIcpgUzP8AuQ6vtqNez4noOP4LT2dUKpseTLpys
-        4Og7ig6ZlJqKxBXYi/zdEi1JsaAqWV8NFvHJJYRwCYP1eLZIj1dn0/XFeD1Y/oQwSMfDYD45T8fn
-        1zCFy9npYjqHk/C61diRDFv/nUtWJ2m/VVHBSpIYD+xa64rameAZnNu4QBxtKMnqey0/zU/s0j45
-        kHxn1jbmiVlWm+BEMV5LZbq4wBwFeDW1n1GurRKu89yE0jRForb9UkIo8Yy+xiXvFtwCR6FClOKN
-        4m7h77sSjGMjNLcFvjLIzvpMhWwOAUTdvt8NwesfAAAA//8DAHjEh8kIAwAA
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
-      Keep-Alive:
-      - timeout=30, max=99
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: Success
-- request:
-    body: '{"method": "otptoken_add", "params": [[null], {"type": "totp", "description":
-      "dummy''s other token", "ipatokenowner": "dummy", "ipatokenotpalgorithm": "sha1",
-      "ipatokenotpdigits": 6, "ipatokentotpclockoffset": 0, "ipatokentotptimestep":
-      30, "ipatokenhotpcounter": 0, "qrcode": false, "no_qrcode": false, "all": true,
-      "raw": false, "no_members": false, "version": "2.235"}]}'
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '373'
-      Content-Type:
-      - application/json
-      Cookie:
-      - ipa_session=MagBearerToken=diEcdZAN9dlKgIGs7SNd3SACnailLaYxL%2bR3GWGriU6vOdcBwkX4zFXaAKdnwdXIwnCISya5L8Qxv3cIRKI7QqQAuqLxdJahSujpI5KmWDzK7ZfqXQCLUR6mvkyC3sNvbaMMigl0E%2bedzXKa3%2flFMoeCB8mFSskVhSfYXU4aA4V7WdAKRMLEIgisddFR2U%2b3ZpbsTcJGKYAVbdIWII6KYw%3d%3d
-      Referer:
-      - https://ipa.tinystage.test/ipa
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/json
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA4xS227bMAz9FUPAspdcbTc3wOjSwlmXNe6aGE2HdRhkiUu02ZKnSwuj6L9PUra1
-        WfvQN1GHPOTh4T2SoEyp0TS4f/pkNdbiJ3Cha1xuhWR6V1ngC1I7PEBf28HTDMq2TCsPDw8wbUHN
-        KlAaag9H/QPccPbLAKMeC7/jCUwwdICQUSce4XEHD2DcKQoo4nEfyHg08dUUFJHMEgvuC6mpquat
-        CoTegQw8sc8TxQ8gmpRY7Wf72xX9N6GLtagPVd1xkI/sHjOS2R/kVmL0btrrueKex9/lH7LP63z2
-        Pu3m6TqfvkbLMVPKgEw8wZu4f0jRUkAk6CRcDNPrLFplm+X58HSeXZ1ky9X1xzA+W2WXR1k4jy+W
-        86MwXVyGo83V6WYexYsoTE9ae1OSYeuff8n6bDZo1SCZoIl1wsluanCa8ov8k4srzPEWaNF8M+qZ
-        furW/cy75DVa24QndlltShLNeKO07eIDexrowXLf4tK4SbgpSxsq2xTLxvWbUQo0sPPtnQ1u0A3y
-        JSClkI8l/or+vGvJOLGDlo7gJYOc1luQan9CKO4O+t0IPfwGAAD//wMATj8nJg4DAAA=
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
-      Keep-Alive:
-      - timeout=30, max=98
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: Success
-- request:
-    body: '{"method": "ping", "params": [[], {"version": "2.235"}]}'
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '56'
-      Content-Type:
-      - application/json
-      Cookie:
-      - ipa_session=MagBearerToken=diEcdZAN9dlKgIGs7SNd3SACnailLaYxL%2bR3GWGriU6vOdcBwkX4zFXaAKdnwdXIwnCISya5L8Qxv3cIRKI7QqQAuqLxdJahSujpI5KmWDzK7ZfqXQCLUR6mvkyC3sNvbaMMigl0E%2bedzXKa3%2flFMoeCB8mFSskVhSfYXU4aA4V7WdAKRMLEIgisddFR2U%2b3ZpbsTcJGKYAVbdIWII6KYw%3d%3d
-      Referer:
-      - https://ipa.tinystage.test/ipa
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/json
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA6pWKkotLs0pUbJSqFYqLs3NTSyqBLKVPAMcFYpTi8pSixSAuDgzP0/BRM/QQM9Y
-        T8ExwBMuZqRnZGqkVKujoJRaVJRfBNSZV5qTA+RmpiDYBUWZecmZBYk5IINTgHZUOoR4+kUGhzi6
-        u+qFuAaHKAEVQU0EKYFYpFQLAAAA//8DAP33P4+cAAAA
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
-      Keep-Alive:
-      - timeout=30, max=100
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: Success
-- request:
-    body: '{"method": "user_find", "params": [[null], {"whoami": true, "all": true,
-      "raw": false, "no_members": true, "pkey_only": false, "version": "2.235"}]}'
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '148'
-      Content-Type:
-      - application/json
-      Cookie:
-      - ipa_session=MagBearerToken=diEcdZAN9dlKgIGs7SNd3SACnailLaYxL%2bR3GWGriU6vOdcBwkX4zFXaAKdnwdXIwnCISya5L8Qxv3cIRKI7QqQAuqLxdJahSujpI5KmWDzK7ZfqXQCLUR6mvkyC3sNvbaMMigl0E%2bedzXKa3%2flFMoeCB8mFSskVhSfYXU4aA4V7WdAKRMLEIgisddFR2U%2b3ZpbsTcJGKYAVbdIWII6KYw%3d%3d
-      Referer:
-      - https://ipa.tinystage.test/ipa
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/json
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA5RTbWvbMBD+K8Gf68TyS+wVChuslDFYB0k/bGMEWbrYWm3J00vbLPS/9yQ7STtK
-        xz7p9NyL7p57tI80GNfZ6Hy2P5k/9hGT/ow+ur7fzW4M6Ojn2Sziwgwd3Unaw2tuIYUVtDOj7yZg
-        DTBlXgveUsM0UCuUtGKst482G04t+Ptmg0iUJmmepCRPqjwviu/Ro89U9S9glnXUjIWtGiKEB9BG
-        SW8p3VAp/oTatDvhQoJF30vA+YZ8ujLigTKmnLT+fqvrQQvJxEA76h4myAp2C3ZQnWC7CcWAsaPp
-        Ykx7qIkzHkx0rEx7pZUbrrdfXf0ZdsbjPQzXWjRCXkqrd1OkDF1Ra7UZiR2ok+K3A8HDxEXG6yqt
-        0pjVpIgJAYgpXdK4SIs8SVgGZUZDoh8CG7pXmsPDIHSg5A2qi7+oxnyk2Q73nLVUNv+zpTCGAea0
-        sDvBAbe8FciF738Vk7iIUxKnZVFmxfIdyWJSllWyJBXJ4+WyzMuqSvM4r4oyDOIEl66vp3ySp1WS
-        ZAdnI+5AvhRlwHsqugBxD71HCu3cgrFmynqjZKt64ELjVhVuxQcsPLTgx+Ju2sUJ6RSu0bTQjY8u
-        aiEXNTVtcJrxQx3lj8wyKpUUjHbH1sc+15++fFutP1xdzteXq/Vxjwcx/jtamknHnWK3GLrFPwle
-        4vjDQd8Bf4b14ClQ203jpRnqerVh3MgS9337YS/Cc2dMXgSnN6ZXzBlnF1bInbG0gXBBkkcVjN/p
-        fEbQttpJhsJ5/rzBojQwHJGZLzzrqWUtxjyiF7RWfj3SdZ2XFD/ZRzp86qtMYNAdNjoKPsrnJJln
-        0eMTAAAA//8DACK1UAzyBAAA
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
-      Keep-Alive:
-      - timeout=30, max=99
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: Success
-- request:
-    body: user=admin&password=password
-    headers:
-      Accept:
-      - text/plain
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '28'
-      Content-Type:
-      - application/x-www-form-urlencoded
-      Referer:
-      - https://ipa.tinystage.test/ipa/session/login_password
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/login_password
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAAwAAAP//AwAAAAAAAAAAAA==
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - text/plain; charset=UTF-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
-      Keep-Alive:
-      - timeout=30, max=100
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Set-Cookie:
-      - ipa_session=MagBearerToken=8udUoWNBm6oz6YZR0ypx1J6TKKQMPV%2fR7HRgCn1ZpJXG3IOgg%2fbCZeer9LdmY191TeD6Y5fDZf4NlIGJmPNCiGacSkkjzqftRjXXU7GiEml7iiby4T%2b8UFn9%2f6bcwzk3%2fduj%2fNZlHObOQ1JMDdnDUKsNBtTjA9Qn20SqMrEPdL%2bn%2botyyu%2bOkjImSty241dwA0zVXiqegKERk6EbK6NeuQ%3d%3d;path=/ipa;httponly;secure;
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: Success
-- request:
-    body: '{"method": "ping", "params": [[], {"version": "2.235"}]}'
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '56'
-      Content-Type:
-      - application/json
-      Cookie:
-      - ipa_session=MagBearerToken=8udUoWNBm6oz6YZR0ypx1J6TKKQMPV%2fR7HRgCn1ZpJXG3IOgg%2fbCZeer9LdmY191TeD6Y5fDZf4NlIGJmPNCiGacSkkjzqftRjXXU7GiEml7iiby4T%2b8UFn9%2f6bcwzk3%2fduj%2fNZlHObOQ1JMDdnDUKsNBtTjA9Qn20SqMrEPdL%2bn%2botyyu%2bOkjImSty241dwA0zVXiqegKERk6EbK6NeuQ%3d%3d
-      Referer:
-      - https://ipa.tinystage.test/ipa
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/json
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA6pWKkotLs0pUbJSqFYqLs3NTSyqBLKVPAMcFYpTi8pSixSAuDgzP0/BRM/QQM9Y
-        T8ExwBMuZqRnZGqkVKujoJRaVJRfBNSZV5qTA+RmpiDYBUWZecmZBYk5IIMTU3Iz8xxCPP0ig0Mc
-        3V31QlyDQ5SAiqAmgpRALFKqBQAAAP//AwD86eRsnAAAAA==
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
-      Keep-Alive:
-      - timeout=30, max=99
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: Success
-- request:
-    body: '{"method": "otptoken_del", "params": [["2fa9e9ae-ecc7-47a8-a1e8-bbeb480ec879"],
-      {"continue": false, "version": "2.235"}]}'
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '121'
-      Content-Type:
-      - application/json
-      Cookie:
-      - ipa_session=MagBearerToken=8udUoWNBm6oz6YZR0ypx1J6TKKQMPV%2fR7HRgCn1ZpJXG3IOgg%2fbCZeer9LdmY191TeD6Y5fDZf4NlIGJmPNCiGacSkkjzqftRjXXU7GiEml7iiby4T%2b8UFn9%2f6bcwzk3%2fduj%2fNZlHObOQ1JMDdnDUKsNBtTjA9Qn20SqMrEPdL%2bn%2botyyu%2bOkjImSty241dwA0zVXiqegKERk6EbK6NeuQ%3d%3d
-      Referer:
-      - https://ipa.tinystage.test/ipa
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/json
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA4yOTwuCMBjGv8p4z02sBGengiS6VOAukR5e9RVGc8rUIMTv3naqY7ffA8+/GSwN
-        kx5hx+ZfbFBpqh0+imXF4IV6Iq9g02BCCRKnqop5FKPguCbBy5LKSIRUiTiBwkWGqW3Rvl0IjqRp
-        pJpd5Y2N3ZMMy//qyQH8OFnbWddjJq2dVPWXe6tMpXrUfgbrVpm9PF/umTyc0kCmmQR/nuygOuMt
-        UbAOgy0sHwAAAP//AwDzyhXy9wAAAA==
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
-      Keep-Alive:
-      - timeout=30, max=98
-      Server:
-      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
-      Transfer-Encoding:
-      - chunked
-      Vary:
-      - Accept-Encoding
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: Success
-- request:
-    body: '{"method": "session_logout", "params": [[], {"version": "2.235"}]}'
-    headers:
-      Accept:
-      - application/json
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '66'
-      Content-Type:
-      - application/json
-      Cookie:
-      - ipa_session=MagBearerToken=8udUoWNBm6oz6YZR0ypx1J6TKKQMPV%2fR7HRgCn1ZpJXG3IOgg%2fbCZeer9LdmY191TeD6Y5fDZf4NlIGJmPNCiGacSkkjzqftRjXXU7GiEml7iiby4T%2b8UFn9%2f6bcwzk3%2fduj%2fNZlHObOQ1JMDdnDUKsNBtTjA9Qn20SqMrEPdL%2bn%2botyyu%2bOkjImSty241dwA0zVXiqegKERk6EbK6NeuQ%3d%3d
-      Referer:
-      - https://ipa.tinystage.test/ipa
-      User-Agent:
-      - python-requests/2.31.0
-    method: POST
-    uri: https://ipa.tinystage.test/ipa/session/json
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA6pWKkotLs0pUbJSqEYw80pzcmp1FJRSi4ryi6B8IDczBcEuKMrMS84sSMwBCikl
-        puRm5jmEePpFBoc4urvqhbgGhygBFZWlFhVn5ueBlJjoGRroGSvVAgAAAP//AwBhPAFlcQAAAA==
-    headers:
-      Cache-Control:
-      - no-cache, private
-      Connection:
-      - Keep-Alive
-      Content-Encoding:
-      - gzip
-      Content-Security-Policy:
-      - frame-ancestors 'none'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
+      - Wed, 14 Feb 2024 08:40:42 GMT
       Keep-Alive:
       - timeout=30, max=97
       Server:
@@ -817,13 +477,13 @@ interactions:
       Content-Type:
       - text/plain; charset=UTF-8
       Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
+      - Wed, 14 Feb 2024 08:40:42 GMT
       Keep-Alive:
       - timeout=30, max=100
       Server:
       - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
       Set-Cookie:
-      - ipa_session=MagBearerToken=6UoX%2bPKPVScQiF8cCqCKGAgLudJs6qO4vmRGUMCB1kcZACx0B7pXtd%2bw52SBGvKIIpeQL%2bWmQPt%2boGMgK4u9nJtnQUCLHpuwyRWGzRYyU5%2bWSrDRaBUXA%2beuTmnwKNb1g462fYe2%2f4y9vrXMbwQazZsjFeaUF9qRWEHEl1ww35gTpFlsmyeFFKWRk9VPDlvAQbRLq8L2Xn%2fNf063Z3txhw%3d%3d;path=/ipa;httponly;secure;
+      - ipa_session=MagBearerToken=z%2byag2G6fq%2bcwkjOdfUqcKpnV76kJd97P%2bC1KMleyJ1iqP3IfXaTjtKt2pSm3XIzi7miM8vtu%2fPryEdfKZ7FdcKuy8rno%2bmWVkv5oG73HOQgyLF4l%2fbJhKjuPjrrFCuEV1MsbssrRUeM3a8sFnOUuSYtmkZSzIJZxLOluseNCYtBEZDzuKxg8brwUdbowzh5j%2bGLsVLAc3F%2b1LiHlbn3lg%3d%3d;path=/ipa;httponly;secure;
       Vary:
       - Accept-Encoding
       X-Frame-Options:
@@ -845,7 +505,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=6UoX%2bPKPVScQiF8cCqCKGAgLudJs6qO4vmRGUMCB1kcZACx0B7pXtd%2bw52SBGvKIIpeQL%2bWmQPt%2boGMgK4u9nJtnQUCLHpuwyRWGzRYyU5%2bWSrDRaBUXA%2beuTmnwKNb1g462fYe2%2f4y9vrXMbwQazZsjFeaUF9qRWEHEl1ww35gTpFlsmyeFFKWRk9VPDlvAQbRLq8L2Xn%2fNf063Z3txhw%3d%3d
+      - ipa_session=MagBearerToken=z%2byag2G6fq%2bcwkjOdfUqcKpnV76kJd97P%2bC1KMleyJ1iqP3IfXaTjtKt2pSm3XIzi7miM8vtu%2fPryEdfKZ7FdcKuy8rno%2bmWVkv5oG73HOQgyLF4l%2fbJhKjuPjrrFCuEV1MsbssrRUeM3a8sFnOUuSYtmkZSzIJZxLOluseNCYtBEZDzuKxg8brwUdbowzh5j%2bGLsVLAc3F%2b1LiHlbn3lg%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -870,7 +530,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:56 GMT
+      - Wed, 14 Feb 2024 08:40:42 GMT
       Keep-Alive:
       - timeout=30, max=99
       Server:
@@ -885,8 +545,8 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "otptoken_del", "params": [["6b2b353c-7277-4079-a85b-b34c60df4db8"],
-      {"continue": false, "version": "2.235"}]}'
+    body: '{"method": "stageuser_show", "params": [["dummy"], {"rights": false, "all":
+      true, "raw": false, "no_members": false, "version": "2.235"}]}'
     headers:
       Accept:
       - application/json
@@ -895,11 +555,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '121'
+      - '138'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=6UoX%2bPKPVScQiF8cCqCKGAgLudJs6qO4vmRGUMCB1kcZACx0B7pXtd%2bw52SBGvKIIpeQL%2bWmQPt%2boGMgK4u9nJtnQUCLHpuwyRWGzRYyU5%2bWSrDRaBUXA%2beuTmnwKNb1g462fYe2%2f4y9vrXMbwQazZsjFeaUF9qRWEHEl1ww35gTpFlsmyeFFKWRk9VPDlvAQbRLq8L2Xn%2fNf063Z3txhw%3d%3d
+      - ipa_session=MagBearerToken=z%2byag2G6fq%2bcwkjOdfUqcKpnV76kJd97P%2bC1KMleyJ1iqP3IfXaTjtKt2pSm3XIzi7miM8vtu%2fPryEdfKZ7FdcKuy8rno%2bmWVkv5oG73HOQgyLF4l%2fbJhKjuPjrrFCuEV1MsbssrRUeM3a8sFnOUuSYtmkZSzIJZxLOluseNCYtBEZDzuKxg8brwUdbowzh5j%2bGLsVLAc3F%2b1LiHlbn3lg%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -909,10 +569,16 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA4yOuwrCMBSGXyWc2Zbau04KFnFRoVnEOiTNKQTTtKStIKXvbjLp6Pb98N9mMDhM
-        aoQtmX+xYVKhsHh/LCsCL6YmdApSHvIoiWovC7PMi4Ns47E84R6P4joNRBMLnsPDRoapbZl52xAc
-        UOGIglzolYzdEzWp/uqpANw4GtMZ26MnpayU4su9kbqWPVNuholW6h09nW8l3R8LnxYlBXcezSA7
-        7Syxvw78CJYPAAAA//8DAEWTNvj3AAAA
+        H4sIAAAAAAAAA4RS24rbQAz9leDnbG7NQ1kItNBlWQptIdmHthQjjye2mrHGHc2k64b8ezVj57Il
+        0CdLR7J0ztEcMqc5GJ/djw7XoSL5fM8+hKbpRs+sXfZjPMpK5NZAR9DoW2Uk9AiG+9pzwiqtLN9q
+        tsVPrbwywH3Z2zYTuNWOLcXIugoI/4BHS2AuOJL2UnsNhDg2/m4ZX0ApG8jHfOeK1iEpbMFAeBkg
+        j2qnfWsNqm5ApaFnNCTM9WnmFvgUSmHN9aOzof28/RKKj7rjXnoLgfBX0FgmNRC8rTRpB1731mlW
+        DtsoJjXkOdk8tFWep7KQUkCWUIE521tGx95tnj59XW/ePz5MNg/rTeoOw5bUkBDhqJxOXnnsfz/I
+        jlLWx1y23I+yxWyxnC3my9nb5Ww5/5Ydh1kUmkL0xYl38xOds23/p1PbRpfoxDzrutQ6jdD0Qo97
+        0efjEw83MlbtpORd0AI3gOZqlTjqJ16z55NG9iCnJut7RqA87nt/Kwno9cNMuLEVEtfa9IOnBdK0
+        AK6Hn25or4HzeP/f1kWXt/Kg9QDvdOehuALLqCtauEqMx4pWQrHS5Si+GI75IDTFrbN7ZLkRUjUu
+        1cojdak/JSI0O8rQPZgQZQznjfZJAMlaCsbEHu2cdUMen195ic+HiyOgbJD+vVncIez6p5gtJ/PZ
+        5E12/AsAAP//AwCvMxaOCwQAAA==
     headers:
       Cache-Control:
       - no-cache, private
@@ -925,7 +591,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:57 GMT
+      - Wed, 14 Feb 2024 08:40:42 GMT
       Keep-Alive:
       - timeout=30, max=98
       Server:
@@ -953,7 +619,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=6UoX%2bPKPVScQiF8cCqCKGAgLudJs6qO4vmRGUMCB1kcZACx0B7pXtd%2bw52SBGvKIIpeQL%2bWmQPt%2boGMgK4u9nJtnQUCLHpuwyRWGzRYyU5%2bWSrDRaBUXA%2beuTmnwKNb1g462fYe2%2f4y9vrXMbwQazZsjFeaUF9qRWEHEl1ww35gTpFlsmyeFFKWRk9VPDlvAQbRLq8L2Xn%2fNf063Z3txhw%3d%3d
+      - ipa_session=MagBearerToken=z%2byag2G6fq%2bcwkjOdfUqcKpnV76kJd97P%2bC1KMleyJ1iqP3IfXaTjtKt2pSm3XIzi7miM8vtu%2fPryEdfKZ7FdcKuy8rno%2bmWVkv5oG73HOQgyLF4l%2fbJhKjuPjrrFCuEV1MsbssrRUeM3a8sFnOUuSYtmkZSzIJZxLOluseNCYtBEZDzuKxg8brwUdbowzh5j%2bGLsVLAc3F%2b1LiHlbn3lg%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -977,13 +643,178 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:57 GMT
+      - Wed, 14 Feb 2024 08:40:42 GMT
       Keep-Alive:
       - timeout=30, max=97
       Server:
       - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
       Set-Cookie:
       - ipa_session=;Max-Age=0;path=/ipa;httponly;secure;
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: Success
+- request:
+    body: user=admin&password=password
+    headers:
+      Accept:
+      - text/plain
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '28'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Referer:
+      - https://ipa.tinystage.test/ipa/session/login_password
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://ipa.tinystage.test/ipa/session/login_password
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwAAAP//AwAAAAAAAAAAAA==
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - text/plain; charset=UTF-8
+      Date:
+      - Wed, 14 Feb 2024 08:40:42 GMT
+      Keep-Alive:
+      - timeout=30, max=100
+      Server:
+      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
+      Set-Cookie:
+      - ipa_session=MagBearerToken=mggbWaD7P4I1imcGyM4KWwh0GJi65r9mo9m9JDYOA7fBzRIug83a%2bN1F%2bZFmcDuvWBlsJYgfz4cYji%2fA4TGpRF1XZHFkPJwz1JYtNFO1GCHCM%2byOGHbgzCQ0paDsoU%2fZDS%2b81uPNLbUIOo9vhfCoPktPzhlQiUKTydUUkK5JDiUKmWySrynI73u9c5FK0JYXzHHXVbK03XYOoDC5SEMQGg%3d%3d;path=/ipa;httponly;secure;
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: Success
+- request:
+    body: '{"method": "ping", "params": [[], {"version": "2.235"}]}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Cookie:
+      - ipa_session=MagBearerToken=mggbWaD7P4I1imcGyM4KWwh0GJi65r9mo9m9JDYOA7fBzRIug83a%2bN1F%2bZFmcDuvWBlsJYgfz4cYji%2fA4TGpRF1XZHFkPJwz1JYtNFO1GCHCM%2byOGHbgzCQ0paDsoU%2fZDS%2b81uPNLbUIOo9vhfCoPktPzhlQiUKTydUUkK5JDiUKmWySrynI73u9c5FK0JYXzHHXVbK03XYOoDC5SEMQGg%3d%3d
+      Referer:
+      - https://ipa.tinystage.test/ipa
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://ipa.tinystage.test/ipa/session/json
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqFYqLs3NTSyqBLKVPAMcFYpTi8pSixSAuDgzP0/BRM/QQM9Y
+        T8ExwBMuZqRnZGqkVKujoJRaVJRfBNSZV5qTA+RmpiDYBUWZecmZBYk5IIMTU3Iz8xxCPP0ig0Mc
+        3V31QlyDQ5SAiqAmgpRALFKqBQAAAP//AwD86eRsnAAAAA==
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 14 Feb 2024 08:40:42 GMT
+      Keep-Alive:
+      - timeout=30, max=99
+      Server:
+      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: Success
+- request:
+    body: '{"method": "stageuser_show", "params": [["dummy"], {"rights": false, "all":
+      true, "raw": false, "no_members": false, "version": "2.235"}]}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '138'
+      Content-Type:
+      - application/json
+      Cookie:
+      - ipa_session=MagBearerToken=mggbWaD7P4I1imcGyM4KWwh0GJi65r9mo9m9JDYOA7fBzRIug83a%2bN1F%2bZFmcDuvWBlsJYgfz4cYji%2fA4TGpRF1XZHFkPJwz1JYtNFO1GCHCM%2byOGHbgzCQ0paDsoU%2fZDS%2b81uPNLbUIOo9vhfCoPktPzhlQiUKTydUUkK5JDiUKmWySrynI73u9c5FK0JYXzHHXVbK03XYOoDC5SEMQGg%3d%3d
+      Referer:
+      - https://ipa.tinystage.test/ipa
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://ipa.tinystage.test/ipa/session/json
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA4RS24rbQAz9leDnbG7NQ1kItNBlWQptIdmHthQjjye2mrHGHc2k64b8ezVj57Il
+        0CdLR7J0ztEcMqc5GJ/djw7XoSL5fM8+hKbpRs+sXfZjPMpK5NZAR9DoW2Uk9AiG+9pzwiqtLN9q
+        tsVPrbwywH3Z2zYTuNWOLcXIugoI/4BHS2AuOJL2UnsNhDg2/m4ZX0ApG8jHfOeK1iEpbMFAeBkg
+        j2qnfWsNqm5ApaFnNCTM9WnmFvgUSmHN9aOzof28/RKKj7rjXnoLgfBX0FgmNRC8rTRpB1731mlW
+        DtsoJjXkOdk8tFWep7KQUkCWUIE521tGx95tnj59XW/ePz5MNg/rTeoOw5bUkBDhqJxOXnnsfz/I
+        jlLWx1y23I+yxWyxnC3my9nb5Ww5/5Ydh1kUmkL0xYl38xOds23/p1PbRpfoxDzrutQ6jdD0Qo97
+        0efjEw83MlbtpORd0AI3gOZqlTjqJ16z55NG9iCnJut7RqA87nt/Kwno9cNMuLEVEtfa9IOnBdK0
+        AK6Hn25or4HzeP/f1kWXt/Kg9QDvdOehuALLqCtauEqMx4pWQrHS5Si+GI75IDTFrbN7ZLkRUjUu
+        1cojdak/JSI0O8rQPZgQZQznjfZJAMlaCsbEHu2cdUMen195ic+HiyOgbJD+vVncIez6p5gtJ/PZ
+        5E12/AsAAP//AwCvMxaOCwQAAA==
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Wed, 14 Feb 2024 08:40:42 GMT
+      Keep-Alive:
+      - timeout=30, max=98
+      Server:
+      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
       Transfer-Encoding:
       - chunked
       Vary:
@@ -1007,7 +838,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=diEcdZAN9dlKgIGs7SNd3SACnailLaYxL%2bR3GWGriU6vOdcBwkX4zFXaAKdnwdXIwnCISya5L8Qxv3cIRKI7QqQAuqLxdJahSujpI5KmWDzK7ZfqXQCLUR6mvkyC3sNvbaMMigl0E%2bedzXKa3%2flFMoeCB8mFSskVhSfYXU4aA4V7WdAKRMLEIgisddFR2U%2b3ZpbsTcJGKYAVbdIWII6KYw%3d%3d
+      - ipa_session=MagBearerToken=mggbWaD7P4I1imcGyM4KWwh0GJi65r9mo9m9JDYOA7fBzRIug83a%2bN1F%2bZFmcDuvWBlsJYgfz4cYji%2fA4TGpRF1XZHFkPJwz1JYtNFO1GCHCM%2byOGHbgzCQ0paDsoU%2fZDS%2b81uPNLbUIOo9vhfCoPktPzhlQiUKTydUUkK5JDiUKmWySrynI73u9c5FK0JYXzHHXVbK03XYOoDC5SEMQGg%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -1017,8 +848,8 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA6pWKkotLs0pUbJSqEYw80pzcmp1FJRSi4ryi6B8IDczBcEuKMrMS84sSMwBCiml
-        lObmVjqEePpFBoc4urvqhbgGhygBFZWlFhVn5ueBlJjoGRroGSvVAgAAAP//AwBgItqGcQAAAA==
+        H4sIAAAAAAAAA6pWKkotLs0pUbJSqEYw80pzcmp1FJRSi4ryi6B8IDczBcEuKMrMS84sSMwBCikl
+        puRm5jmEePpFBoc4urvqhbgGhygBFZWlFhVn5ueBlJjoGRroGSvVAgAAAP//AwBhPAFlcQAAAA==
     headers:
       Cache-Control:
       - no-cache, private
@@ -1031,7 +862,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:57 GMT
+      - Wed, 14 Feb 2024 08:40:42 GMT
       Keep-Alive:
       - timeout=30, max=97
       Server:
@@ -1084,13 +915,13 @@ interactions:
       Content-Type:
       - text/plain; charset=UTF-8
       Date:
-      - Wed, 14 Feb 2024 08:44:57 GMT
+      - Wed, 14 Feb 2024 08:40:42 GMT
       Keep-Alive:
       - timeout=30, max=100
       Server:
       - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
       Set-Cookie:
-      - ipa_session=MagBearerToken=z3woExsRN6XNduGA5b3mrtaSwRtgbOvEDRYL8Q%2bldX9ZNUHXtmMrL2XrFasIjRVgCrRCjyBmeSeEfkhJz0AWvHLptneoUM1TtHIYWzUa0plR5pqI91L%2fLBTb5PzDREGt%2fUvlv44u2zDtoOPXv6imGR0%2b8VWbpspq%2b3zUYt1JhQTfj8Xqn1MhMYLl89l2dFzHbCMM4GpmhRBFl54SVCUQ8g%3d%3d;path=/ipa;httponly;secure;
+      - ipa_session=MagBearerToken=s8Axb7FXU6TLuHkK1SMFLdI053kS7mMKjC5mESS%2buV70h0axMi6mg0yNjGaheAWtAGf5FbbqAMCZ055CTG0m6uejkomODMHMM95cpoLi9imk7vtPYv927wCXyMHRZSBEGy%2f%2f8FTL6DTGmxPHt8Ow7mmLmqJ1DcXJVIZcAWtDwWJSRsZ%2bJHkaAcgaJcMBHbMo2L5L4avkpW%2bkVbYB8atWfQ%3d%3d;path=/ipa;httponly;secure;
       Vary:
       - Accept-Encoding
       X-Frame-Options:
@@ -1112,7 +943,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=z3woExsRN6XNduGA5b3mrtaSwRtgbOvEDRYL8Q%2bldX9ZNUHXtmMrL2XrFasIjRVgCrRCjyBmeSeEfkhJz0AWvHLptneoUM1TtHIYWzUa0plR5pqI91L%2fLBTb5PzDREGt%2fUvlv44u2zDtoOPXv6imGR0%2b8VWbpspq%2b3zUYt1JhQTfj8Xqn1MhMYLl89l2dFzHbCMM4GpmhRBFl54SVCUQ8g%3d%3d
+      - ipa_session=MagBearerToken=s8Axb7FXU6TLuHkK1SMFLdI053kS7mMKjC5mESS%2buV70h0axMi6mg0yNjGaheAWtAGf5FbbqAMCZ055CTG0m6uejkomODMHMM95cpoLi9imk7vtPYv927wCXyMHRZSBEGy%2f%2f8FTL6DTGmxPHt8Ow7mmLmqJ1DcXJVIZcAWtDwWJSRsZ%2bJHkaAcgaJcMBHbMo2L5L4avkpW%2bkVbYB8atWfQ%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -1137,7 +968,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:57 GMT
+      - Wed, 14 Feb 2024 08:40:43 GMT
       Keep-Alive:
       - timeout=30, max=99
       Server:
@@ -1152,7 +983,7 @@ interactions:
       code: 200
       message: Success
 - request:
-    body: '{"method": "user_del", "params": [["dummy"], {"continue": false, "version":
+    body: '{"method": "stageuser_del", "params": [["dummy"], {"continue": false, "version":
       "2.235"}]}'
     headers:
       Accept:
@@ -1162,11 +993,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '86'
+      - '91'
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=z3woExsRN6XNduGA5b3mrtaSwRtgbOvEDRYL8Q%2bldX9ZNUHXtmMrL2XrFasIjRVgCrRCjyBmeSeEfkhJz0AWvHLptneoUM1TtHIYWzUa0plR5pqI91L%2fLBTb5PzDREGt%2fUvlv44u2zDtoOPXv6imGR0%2b8VWbpspq%2b3zUYt1JhQTfj8Xqn1MhMYLl89l2dFzHbCMM4GpmhRBFl54SVCUQ8g%3d%3d
+      - ipa_session=MagBearerToken=s8Axb7FXU6TLuHkK1SMFLdI053kS7mMKjC5mESS%2buV70h0axMi6mg0yNjGaheAWtAGf5FbbqAMCZ055CTG0m6uejkomODMHMM95cpoLi9imk7vtPYv927wCXyMHRZSBEGy%2f%2f8FTL6DTGmxPHt8Ow7mmLmqJ1DcXJVIZcAWtDwWJSRsZ%2bJHkaAcgaJcMBHbMo2L5L4avkpW%2bkVbYB8atWfQ%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -1176,9 +1007,9 @@ interactions:
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA0yNMQvCMBCF/0q4WYKik5OCRVy6NIvYDsGccHBNy6URSul/94KDbt97fO9uAcGU
-        eYKjWf7x5YkxKD66dWPg7TljSRBy38/QaZeUvMzawgUZJwwmJxTTfp0WoCxRZBB1YmbWSOHHo1B8
-        0ui5nPChp3hyt/reuPO1sq5qHJTPKImGWJSD3W3tHtYPAAAA//8DAD81Y3+0AAAA
+        H4sIAAAAAAAAA0yNMQvCMBCF/0q4WYKik5OCRVxcmkVsh8OcErik5ZIIpfS/m+Cg2/ce37ubQShm
+        TrBX8z8+0THZgvd+WSl4I2eqCWz2foK+dLEQylRaOBFTIqtiwhepHElU9zU7gLonkUGKGTJzic7+
+        eBQXHm5ErofQehcO5nK9teZ4brRpWgP1P0l0Q6jKTm/WegvLBwAA//8DAIBxqZ66AAAA
     headers:
       Cache-Control:
       - no-cache, private
@@ -1191,7 +1022,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:57 GMT
+      - Wed, 14 Feb 2024 08:40:43 GMT
       Keep-Alive:
       - timeout=30, max=98
       Server:
@@ -1219,7 +1050,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - ipa_session=MagBearerToken=z3woExsRN6XNduGA5b3mrtaSwRtgbOvEDRYL8Q%2bldX9ZNUHXtmMrL2XrFasIjRVgCrRCjyBmeSeEfkhJz0AWvHLptneoUM1TtHIYWzUa0plR5pqI91L%2fLBTb5PzDREGt%2fUvlv44u2zDtoOPXv6imGR0%2b8VWbpspq%2b3zUYt1JhQTfj8Xqn1MhMYLl89l2dFzHbCMM4GpmhRBFl54SVCUQ8g%3d%3d
+      - ipa_session=MagBearerToken=s8Axb7FXU6TLuHkK1SMFLdI053kS7mMKjC5mESS%2buV70h0axMi6mg0yNjGaheAWtAGf5FbbqAMCZ055CTG0m6uejkomODMHMM95cpoLi9imk7vtPYv927wCXyMHRZSBEGy%2f%2f8FTL6DTGmxPHt8Ow7mmLmqJ1DcXJVIZcAWtDwWJSRsZ%2bJHkaAcgaJcMBHbMo2L5L4avkpW%2bkVbYB8atWfQ%3d%3d
       Referer:
       - https://ipa.tinystage.test/ipa
       User-Agent:
@@ -1243,7 +1074,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Wed, 14 Feb 2024 08:44:57 GMT
+      - Wed, 14 Feb 2024 08:40:43 GMT
       Keep-Alive:
       - timeout=30, max=97
       Server:
