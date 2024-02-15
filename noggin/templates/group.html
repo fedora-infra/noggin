@@ -21,6 +21,9 @@
           {% if group.mailing_list %}
             <div id="group-mailinglist"><i class="fa fa-fw fa-envelope" aria-hidden="true"></i> <a href="mailto:{{group.mailing_list}}">{{group.mailing_list}}</a></div>
           {% endif %}
+          {% if group.discussion_url %}
+          <div id="group-discussion_url"><i class="fa fa-fw fa-comment-o" aria-hidden="true"></i> <a href="{{group.discussion_url}}">{{group.discussion_url}}</a></div>
+          {% endif %}
           {% if group.irc_channel %}
             <div id="group-ircchannel"><i class="fa fa-fw fa-comments-o" aria-hidden="true"></i> {{ group.irc_channel | channel }}</div>
           {% endif %}
