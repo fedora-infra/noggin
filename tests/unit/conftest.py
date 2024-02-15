@@ -211,6 +211,7 @@ def make_group(ipa_testing_config, app):
             fasurl=f"http://{name}.unit.tests",
             fasmailinglist=f"{name}@lists.unit.tests",
             fasircchannel=f"irc://irc.unit.tests/#{name}",
+            fasdiscussionurl=f"http://discussion.{name}.unit.tests",
         )
         created.append(name)
         return result
