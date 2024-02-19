@@ -315,7 +315,7 @@ def test_user_settings_email_post_multiple(client, logged_in_dummy_user):
 @pytest.mark.vcr()
 def test_user_settings_email_removal(client, logged_in_dummy_user):
     """Clear a user email"""
-    ipa_admin.user_mod("dummy", fasrhbzemail="dummy-rhbz@noggin.test")
+    ipa_admin.user_mod("dummy", fasrhbzemail="dummy-rhbz@tinystage.test")
     data = POST_CONTENTS_EMAIL.copy()
     data["rhbz_mail"] = ""
     with fml_testing.mock_sends(

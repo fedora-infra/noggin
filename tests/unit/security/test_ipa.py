@@ -9,11 +9,14 @@ from python_freeipa.exceptions import BadRequest, FreeIPAError
 from noggin.app import ipa_admin
 from noggin.security.ipa import (
     Client,
+    NoIPAServer,
     choose_server,
     maybe_ipa_login,
     maybe_ipa_session,
     untouched_ipa_client,
 )
+
+from ..utilities import make_srv
 
 
 @pytest.fixture
@@ -24,12 +27,11 @@ def ipa_call_error():
     }
 
 
-def test_choose_server(client, mocker):
-    mocker.patch.dict(
-        current_app.config, {"FREEIPA_SERVERS": ["a.example.test", "b.example.com"]}
-    )
-    random = mocker.patch("noggin.security.ipa.random")
-    random.choice.side_effect = ["a.example.test", "b.example.test", "c.example.test"]
+def test_choose_server(client, srvlookup_mock):
+    srvlookup_mock.lookup.side_effect = [
+        [make_srv("a.example.test"), make_srv("b.example.test")],
+        [make_srv("b.example.test"), make_srv("a.example.test")],
+    ]
     with client.session_transaction() as sess:
         server = choose_server(current_app, sess)
     assert server == "a.example.test"
@@ -37,28 +39,37 @@ def test_choose_server(client, mocker):
         server = choose_server(current_app, sess)
     # After a second call it is still the first result
     assert server == "a.example.test"
-    random.choice.assert_called_once()
+    assert srvlookup_mock.lookup.call_count == 2
 
 
-def test_choose_server_no_session(client, mocker):
-    random = mocker.patch("noggin.security.ipa.random")
-    random.choice.side_effect = ["a.example.test", "b.example.test", "c.example.test"]
+def test_choose_server_no_session(client, srvlookup_mock):
+    srvlookup_mock.lookup.side_effect = [
+        [make_srv("a.example.test"), make_srv("b.example.test")],
+        [make_srv("b.example.test"), make_srv("a.example.test")],
+    ]
     server = choose_server(current_app)
     assert server == "a.example.test"
     server = choose_server(current_app)
     # If we can't store the value in the session, we'll call random.choice again.
     assert server == "b.example.test"
-    assert random.choice.call_count == 2
+    assert srvlookup_mock.lookup.call_count == 2
 
 
-def test_choose_server_not_in_config(client, mocker):
-    mocker.patch.dict(current_app.config, {"FREEIPA_SERVERS": ["a.example.test"]})
+def test_choose_server_not_in_lookup(client, srvlookup_mock):
     with client.session_transaction() as sess:
-        sess['noggin_ipa_server_hostname'] = "b.example.test"
+        sess['noggin_ipa_server_hostname'] = "srv.example.test"
     with client.session_transaction() as sess:
         server = choose_server(current_app, sess)
-    # It should be the one from the config
-    assert server == "a.example.test"
+    # It should be the one from the lookup
+    assert server == "ipa.tinystage.test"
+    srvlookup_mock.lookup.assert_called_once()
+
+
+def test_choose_server_no_server(client, srvlookup_mock):
+    srvlookup_mock.lookup.side_effect = None
+    srvlookup_mock.lookup.return_value = []
+    with pytest.raises(NoIPAServer):
+        choose_server(current_app)
 
 
 @pytest.mark.vcr
@@ -101,13 +112,22 @@ def test_ipa_login(client, dummy_user):
     assert ipa is not None
     with client.session_transaction() as sess:
         assert sess.get('noggin_session')
-        assert sess.get('noggin_ipa_server_hostname') == "ipa.noggin.test"
+        assert sess.get('noggin_ipa_server_hostname') == "ipa.tinystage.test"
         assert sess.get('noggin_username') == "dummy"
         # Test that the session is valid Fernet
         ipa_session = Fernet(current_app.config['FERNET_SECRET']).decrypt(
             sess.get('noggin_session')
         )
         assert str(ipa_session, 'ascii').startswith("MagBearerToken=")
+
+
+@pytest.mark.vcr
+def test_ipa_login_no_ipa_server(client):
+    with patch("noggin.security.ipa.choose_server") as choose_server:
+        choose_server.side_effect = NoIPAServer
+        with client.session_transaction() as sess:
+            ipa = maybe_ipa_login(current_app, sess, "dummy", "dummy_password")
+            assert ipa is None
 
 
 def test_ipa_untouched_client(client):

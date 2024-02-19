@@ -1,4 +1,5 @@
 import datetime
+from unittest import mock
 
 import pytest
 import python_freeipa
@@ -8,7 +9,7 @@ from flask import current_app
 
 from noggin.app import ipa_admin, mailer
 from noggin.representation.user import User
-from noggin.security.ipa import maybe_ipa_login
+from noggin.security.ipa import NoIPAServer, maybe_ipa_login
 from noggin.signals import stageuser_created, user_registered
 from noggin.utility.token import Audience, make_token
 from noggin_messages import UserCreateV1
@@ -66,6 +67,7 @@ def dummy_stageuser(ipa_testing_config):
         o_mail="dummy@unit.tests",
         o_loginshell='/bin/bash',
         fascreationtime=f"{now.isoformat()}Z",
+        fasstatusnote="spamcheck_awaiting",
     )['result']
     yield User(user)
     try:
@@ -269,13 +271,15 @@ def test_step_1_spamcheck(
 
 
 @pytest.mark.parametrize(
-    "spamcheck_status", ["spamcheck_awaiting", "spamcheck_denied", "spamcheck_manual"]
+    "spamcheck_status", ["active", "spamcheck_denied", "spamcheck_manual"]
 )
 @pytest.mark.vcr()
 def test_spamcheck_wait(client, dummy_stageuser, spamcheck_status):
     """Test the spamcheck_wait endpoint"""
     ipa_admin.stageuser_mod(a_uid="dummy", fasstatusnote=spamcheck_status)
-    result = client.get('/register/spamcheck-wait?username=dummy')
+    result = client.get(
+        '/register/spamcheck-wait?username=dummy', follow_redirects=True
+    )
     assert result.status_code == 200
 
 
@@ -715,6 +719,28 @@ def test_generic_pwchange_error(
 
 
 @pytest.mark.vcr()
+def test_no_ipa_server(
+    client, token_for_dummy_user, post_data_step_3, cleanup_dummy_user, mocker
+):
+    """Change user's password when no IPA server is available"""
+    ipa_client = mocker.Mock()
+    ipa_client.change_password.side_effect = NoIPAServer()
+    untouched_ipa_client = mocker.patch(
+        "noggin.controller.registration.untouched_ipa_client"
+    )
+    untouched_ipa_client.return_value = ipa_client
+    record_signal = mocker.Mock()
+    with fml_testing.mock_sends(
+        UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+    ), user_registered.connected_to(record_signal):
+        result = client.post(
+            f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
+        )
+    assert_form_generic_error(result, 'No IPA server available')
+    record_signal.assert_called_once()
+
+
+@pytest.mark.vcr()
 def test_no_direct_login(
     client, token_for_dummy_user, post_data_step_3, cleanup_dummy_user, mocker
 ):
@@ -979,14 +1005,14 @@ def test_registering_delete_error(
     dummy_stageuser,
     mocker,
 ):
-    method = mocker.patch("noggin.security.ipa.Client.stageuser_del")
-    method.side_effect = python_freeipa.exceptions.BadRequest(
-        message="something went wrong", code="4242"
-    )
-    with mailer.record_messages() as outbox:
-        response = client.post(
-            "/registering/", data={"username": "dummy", "action": "delete"}
+    with mock.patch("noggin.security.ipa.Client.stageuser_del") as method:
+        method.side_effect = python_freeipa.exceptions.BadRequest(
+            message="something went wrong", code="4242"
         )
+        with mailer.record_messages() as outbox:
+            response = client.post(
+                "/registering/", data={"username": "dummy", "action": "delete"}
+            )
     expected_msg = "Could not delete registering user dummy: something went wrong"
     assert_form_generic_error(response, expected_msg)
     # Check that the status was not changed and that no email was sent
