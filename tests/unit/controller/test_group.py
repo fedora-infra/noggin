@@ -19,7 +19,7 @@ def test_groups_list(client, logged_in_dummy_user, dummy_group):
     result = client.get('/groups/')
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    groups = page.select("ul.list-group li")
+    groups = page.select("ul.list-group li.justify-content-between")
     group_names = [g.find("span", class_="title").get_text(strip=True) for g in groups]
     assert "dummy-group" in group_names
     dummy_group_index = group_names.index("dummy-group")
@@ -35,12 +35,25 @@ def test_groups_list(client, logged_in_dummy_user, dummy_group):
 
 
 @pytest.mark.vcr()
+def test_groups_list_search(client, logged_in_dummy_user, many_dummy_groups):
+    """Test the groups list: /groups/"""
+    result = client.get('/groups/?searchterm=04')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    groups = page.select("ul.list-group li.justify-content-between")
+    group_names = [g.find("span", class_="title").get_text(strip=True) for g in groups]
+    assert "dummy-group-04" in group_names
+    assert "dummy-group-104" in group_names
+    assert len(group_names) == 2
+
+
+@pytest.mark.vcr()
 def test_groups_list_no_hidden(client, logged_in_dummy_user, dummy_group):
     """Test the groups list: /groups/"""
     result = client.get('/groups/')
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    groups = page.select("ul.list-group li")
+    groups = page.select("ul.list-group li.justify-content-between")
     group_names = [g.find("span", class_="title").get_text(strip=True) for g in groups]
     assert "ipausers" not in group_names
 

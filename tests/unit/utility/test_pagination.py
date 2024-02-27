@@ -1,54 +1,8 @@
 import pytest
 from bs4 import BeautifulSoup
 
-from noggin.app import ipa_admin
 from noggin.representation.group import Group
 from noggin.utility.pagination import PagedResult, paginated_find
-
-
-@pytest.fixture
-def many_dummy_groups(ipa_testing_config):
-    all_fas_groups = ipa_admin.group_find(fasgroup=True)["result"]
-
-    # Don't call remote batch method with an empty list
-    if all_fas_groups:
-        ipa_admin.batch(
-            a_methods=[
-                {"method": "group_del", "params": [[entry["cn"][0]], {}]}
-                for entry in all_fas_groups
-            ]
-        )
-
-    group_list = [f"dummy-group-{i:02d}" for i in range(1, 200)]
-    ipa_admin.batch(
-        a_methods=[
-            {"method": "group_add", "params": [[name], {"fasgroup": True}]}
-            for name in group_list
-        ]
-    )
-
-    yield
-
-    ipa_admin.batch(
-        a_methods=[
-            {"method": "group_del", "params": [[name], {}]} for name in group_list
-        ]
-    )
-
-    # Add back original FAS groups
-    if all_fas_groups:
-        ipa_admin.batch(
-            a_methods=[
-                {
-                    "method": "group_add",
-                    "params": [
-                        [entry["cn"][0]],
-                        {k: v for k, v in entry.items() if k != "cn"},
-                    ],
-                }
-                for entry in all_fas_groups
-            ]
-        )
 
 
 @pytest.mark.vcr()
@@ -57,7 +11,7 @@ def test_groups_page(client, logged_in_dummy_user, many_dummy_groups):
     result = client.get("/groups/?page_number=2&page_size=3")
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    groups = page.select("ul.list-group li")
+    groups = page.select("ul.list-group li.justify-content-between")
     group_names = [g.find("span", class_="title").get_text(strip=True) for g in groups]
     assert group_names == [
         "dummy-group-04",
@@ -184,9 +138,11 @@ def test_groups_page_nopaging(client, logged_in_dummy_user, mocker):
     result = client.get("/groups/?page_size=0")
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
-    groups = page.select("ul.list-group li")
+    groups = page.select("ul.list-group li.justify-content-between")
     assert len(groups) == 2
-    ipa.group_find.assert_called_with(fasgroup=True, all=True, sizelimit=0)
+    ipa.group_find.assert_called_with(
+        fasgroup=True, all=True, sizelimit=0, a_criteria=None
+    )
     ipa.batch.assert_not_called()
 
 
