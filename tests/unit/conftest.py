@@ -12,6 +12,24 @@ from noggin.representation.agreement import Agreement
 from noggin.representation.otptoken import OTPToken
 from noggin.security.ipa import maybe_ipa_login, untouched_ipa_client
 
+from .utilities import make_srv
+
+
+def _mock_srvlookup(mocker):
+    srvlookup_mock = mocker.patch("noggin.security.ipa.srvlookup")
+    srvlookup_mock.lookup.return_value = [make_srv("ipa.tinystage.test")]
+    return srvlookup_mock
+
+
+@pytest.fixture
+def srvlookup_mock(mocker):
+    return _mock_srvlookup(mocker)
+
+
+@pytest.fixture(scope="session")
+def session_srvlookup_mock(session_mocker):
+    return _mock_srvlookup(session_mocker)
+
 
 @pytest.fixture(scope="session")
 def app_config(ipa_cert):
@@ -20,7 +38,7 @@ def app_config(ipa_cert):
         DEBUG=True,
         WTF_CSRF_ENABLED=False,
         # IPA settings
-        FREEIPA_SERVERS=['ipa.noggin.test'],
+        FREEIPA_DOMAIN='tinystage.test',
         FREEIPA_CACERT=ipa_cert,
         # Any user with admin privileges
         FREEIPA_ADMIN_USER='admin',
@@ -43,7 +61,7 @@ def app_config(ipa_cert):
 
 
 @pytest.fixture(scope="session")
-def app(app_config):
+def app(app_config, session_srvlookup_mock):
     return create_app(app_config)
 
 
@@ -77,7 +95,7 @@ def ipa_cert():
 
 
 @pytest.fixture
-def client(app, ipa_cert):
+def client(app, ipa_cert, srvlookup_mock):
     # app.config['FREEIPA_CACERT'] = ipa_cert
     with app.test_client() as client:
         with app.app_context():
@@ -193,6 +211,7 @@ def make_group(ipa_testing_config, app):
             fasurl=f"http://{name}.unit.tests",
             fasmailinglist=f"{name}@lists.unit.tests",
             fasircchannel=f"irc://irc.unit.tests/#{name}",
+            fasdiscussionurl=f"http://discussion.{name}.unit.tests",
         )
         created.append(name)
         return result

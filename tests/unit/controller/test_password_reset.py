@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from fedora_messaging import testing as fml_testing
 
 from noggin.app import ipa_admin
+from noggin.security.ipa import NoIPAServer
 from noggin_messages import UserUpdateV1
 
 from ..utilities import (
@@ -274,6 +275,23 @@ def test_reset_generic_error(client, mocker):
         },
     )
     assert_form_generic_error(result, 'Could not change password.')
+
+
+def test_reset_no_ipa_server(client, mocker):
+    """Reset password with an unhandled error"""
+    untouched_ipa_client = mocker.patch(
+        "noggin.controller.password.untouched_ipa_client"
+    )
+    untouched_ipa_client.side_effect = NoIPAServer()
+    result = client.post(
+        '/password-reset?username=dummy',
+        data={
+            "current_password": "dummy_password",
+            "password": "password",
+            "password_confirm": "password",
+        },
+    )
+    assert_form_generic_error(result, 'No IPA server available')
 
 
 @pytest.mark.vcr()

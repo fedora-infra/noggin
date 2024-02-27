@@ -108,6 +108,10 @@ def test_group(client, dummy_user_as_group_manager, make_user):
         page.select_one("#group-urls a").get_text(strip=True)
         == "http://dummy-group.unit.tests"
     )
+    assert (
+        page.select_one("#group-discussion_url a").get_text(strip=True)
+        == "http://discussion.dummy-group.unit.tests"
+    )
 
 
 @pytest.mark.vcr()
@@ -448,7 +452,7 @@ def test_group_remove_sponsor_unknown(
     expected_message = (
         "Unable to remove user dummy: Insufficient access: Insufficient "
         "'write' privilege to the 'memberManager' attribute of entry "
-        "'cn=dummy-group,cn=groups,cn=accounts,dc=noggin,dc=test'."
+        "'cn=dummy-group,cn=groups,cn=accounts,dc=tinystage,dc=test'."
     )
     assert_redirects_with_flash(
         result,

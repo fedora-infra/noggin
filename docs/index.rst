@@ -62,8 +62,8 @@ for information on migrating applications to the new API.
    :maxdepth: 2
    :caption: Sysadmin's Guide
 
-   installation
-
+   installation/01-freeipa-server.rst
+   installation/02-freeipa-client.rst
 
 .. Contributor's Guide
 

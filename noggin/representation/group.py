@@ -10,6 +10,7 @@ class Group(Representation):
         "urls": "fasurl",
         "irc_channel": "fasircchannel",
         "mailing_list": "fasmailinglist",
+        "discussion_url": "fasdiscussionurl",
     }
     attr_types = {
         "members": "list",
