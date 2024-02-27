@@ -40,7 +40,7 @@ jobs:
       - name: Mark the directory as safe for git
         run: git config --global --add safe.directory $PWD
       - name: Run tests
-        run: tox -e ${{ matrix.tox_env }}
+        run: tox -e ${{ matrix.tox_env }},covreport
     strategy:
       matrix:
         tox_env:
