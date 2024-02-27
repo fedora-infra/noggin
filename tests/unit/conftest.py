@@ -308,3 +308,48 @@ def dummy_group_with_agreement(dummy_group, dummy_agreement):
     ipa_admin.fasagreement_add_group("dummy agreement", group="dummy-group")
     yield
     ipa_admin.fasagreement_remove_group("dummy agreement", group="dummy-group")
+
+
+@pytest.fixture
+def many_dummy_groups(ipa_testing_config):
+    all_fas_groups = ipa_admin.group_find(fasgroup=True)["result"]
+
+    # Don't call remote batch method with an empty list
+    if all_fas_groups:
+        ipa_admin.batch(
+            a_methods=[
+                {"method": "group_del", "params": [[entry["cn"][0]], {}]}
+                for entry in all_fas_groups
+            ]
+        )
+
+    group_list = [f"dummy-group-{i:02d}" for i in range(1, 200)]
+    ipa_admin.batch(
+        a_methods=[
+            {"method": "group_add", "params": [[name], {"fasgroup": True}]}
+            for name in group_list
+        ]
+    )
+
+    yield
+
+    ipa_admin.batch(
+        a_methods=[
+            {"method": "group_del", "params": [[name], {}]} for name in group_list
+        ]
+    )
+
+    # Add back original FAS groups
+    if all_fas_groups:
+        ipa_admin.batch(
+            a_methods=[
+                {
+                    "method": "group_add",
+                    "params": [
+                        [entry["cn"][0]],
+                        {k: v for k, v in entry.items() if k != "cn"},
+                    ],
+                }
+                for entry in all_fas_groups
+            ]
+        )

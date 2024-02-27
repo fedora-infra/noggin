@@ -13,6 +13,19 @@
         <h4>{{ _("Group List") }}</h4>
 
         <ul class="list-group">
+          <li class="list-group-item bg-light d-flex align-items-center">
+            <div class="flex-grow-1">
+              <form action="{{url_for('.groups')}}">
+                  <input type="text" name="searchterm" id="searchterm" value="{{request.args.get('searchterm') or ''}}" placeholder="Search groups" class="form-control" title="Search Groups" />
+              </form>
+            </div>
+            {% if request.args.get('searchterm') %}
+            <a href="{{url_for('.groups')}}"><i class="fa fa-times pl-3"></i></a>
+            {% endif %}
+          </li>
+          <li class="list-group-item bg-light text-center">
+            showing {{groups.total}} groups
+          </li>
           {% for group in groups.items %}
           <li class="list-group-item d-flex justify-content-between align-items-center">
               <div class="d-flex align-items-center">
