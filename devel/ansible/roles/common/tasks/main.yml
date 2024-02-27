@@ -5,4 +5,40 @@
     - bash-completion
     - tmux
     - vim-enhanced
+    - git
+    - python3
+    - fedora-messaging
     state: present
+
+- name: Determine Python version
+  command:
+    argv:
+      - python3
+      - -c
+      - "from sys import version_info as vi; print(f'{vi[0]}.{vi[1]}')"
+  register: _python3_version_result
+  changed_when: False
+
+- name: Prepare the facts dir
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+
+- name: Set Python version fact
+  ini_file:
+    path: /etc/ansible/facts.d/python.fact
+    section: py3
+    option: version
+    value: "{{ _python3_version_result.stdout | trim }}"
+  register: fact_ini
+
+- name: Re-read facts after adding custom fact
+  ansible.builtin.setup:
+    filter: ansible_local
+  when: fact_ini.changed
+
+- name: configure fedora-messaging to point at tinystage rabbitmq
+  lineinfile:
+    path: /etc/fedora-messaging/config.toml
+    regexp: "amqp_url = \"amqp://\""
+    line: "amqp_url = \"amqp://fedoramessages:fedoramessages@tinystage.tinystage.test\"" # gitleaks:allow

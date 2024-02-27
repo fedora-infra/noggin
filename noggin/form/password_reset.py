@@ -7,7 +7,6 @@ from .validators import PasswordLength
 
 
 class NewPasswordForm(BaseForm):
-
     password = PasswordField(
         _('New Password'),
         validators=[
@@ -19,11 +18,13 @@ class NewPasswordForm(BaseForm):
 
     password_confirm = PasswordField(_('Confirm New Password'))
 
-    otp = StringField(_('One-Time Password'), validators=[Optional()])
+    otp = StringField(
+        _('One-Time Password (if your account has Two-Factor Authentication enabled)'),
+        validators=[Optional()],
+    )
 
 
 class PasswordResetForm(NewPasswordForm):
-
     current_password = PasswordField(
         _('Current Password'),
         validators=[DataRequired(message=_('Current password must not be empty'))],
@@ -31,7 +32,6 @@ class PasswordResetForm(NewPasswordForm):
 
 
 class ForgottenPasswordForm(BaseForm):
-
     username = StringField(
         _('Username'),
         validators=[DataRequired(message=_('User name must not be empty'))],

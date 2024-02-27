@@ -1,0 +1,11 @@
+[Unit]
+Description=Noggin Accounts Management Portal
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/noggin
+ExecStart=sh -c "gunicorn-3 ${GUNICORN_OPTS} -w ${GUNICORN_WORKERS} --env NOGGIN_CONFIG_PATH=/etc/noggin/noggin.cfg --access-logfile /var/log/noggin/access.log --error-logfile /var/log/noggin/error.log --bind tcp://127.0.0.1:8000 'noggin.app:create_app()'"
+
+[Install]
+WantedBy=multi-user.target

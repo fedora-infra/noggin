@@ -9,8 +9,8 @@ from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from whitenoise import WhiteNoise
 
+from noggin import l10n
 from noggin.controller import blueprint
-from noggin.l10n import babel
 from noggin.middleware import IPAErrorHandler
 from noggin.security.ipa_admin import IPAAdmin
 from noggin.themes import Theme
@@ -75,7 +75,7 @@ def create_app(config=None):
     )
 
     # Extensions
-    babel.init_app(app)
+    l10n.babel.init_app(app, locale_selector=l10n.get_locale)
     app.jinja_env.add_extension("jinja2.ext.i18n")
     csrf.init_app(app)
     ipa_admin.init_app(app)

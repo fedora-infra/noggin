@@ -10,7 +10,7 @@
   <div class="bg-light border-bottom">
   <div class="container section">
     <div class="row py-4" data-section="identity">
-      <div class="col">
+      <div class="col col-9">
           <h3 class="mb-0">
             {{ group.name }}
             {% if edit_group_details is defined %}
@@ -21,10 +21,23 @@
           {% if group.mailing_list %}
             <div id="group-mailinglist"><i class="fa fa-fw fa-envelope" aria-hidden="true"></i> <a href="mailto:{{group.mailing_list}}">{{group.mailing_list}}</a></div>
           {% endif %}
+          {% if group.discussion_url %}
+          <div id="group-discussion_url"><i class="fa fa-fw fa-comment-o" aria-hidden="true"></i> <a href="{{group.discussion_url}}">{{group.discussion_url}}</a></div>
+          {% endif %}
           {% if group.irc_channel %}
             <div id="group-ircchannel"><i class="fa fa-fw fa-comments-o" aria-hidden="true"></i> {{ group.irc_channel | channel }}</div>
           {% endif %}
       </div>
+      {% if current_user.username in group.members %}
+      <div class="col col-3">
+        <form action="{{ url_for('.group_remove_member', groupname=group.name) }}" method="post">
+          {{ sponsor_form.hidden_tag() }}
+          <button type="submit" class="btn btn-sm btn-outline-danger d-block mr-0 ml-auto" name="username" value="{{ current_user.username }}" id="leave-group-btn">
+            {{ _("Leave group") }}
+          </button>
+        </form>
+      </div>
+      {% endif %}
       {% if group.urls %}
       <div id="group-urls" class="col-auto align-self-center">
           {% for url in group.urls %}
@@ -100,13 +113,6 @@
                 </div>
               </div>
             </form>
-          {% elif current_user.username in group.members %}
-          <form action="{{ url_for('.group_remove_member', groupname=group.name) }}" method="post">
-            {{ sponsor_form.hidden_tag() }}
-            <button type="submit" class="btn btn-sm btn-outline-danger" name="username" value="{{ current_user.username }}" id="leave-group-btn">
-              {{ _("Leave group") }}
-            </button>
-          </form>
           {% endif %}
           </div>
         {% if members|length == 0 %}

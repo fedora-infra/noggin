@@ -1,3 +1,4 @@
+from flask import current_app
 from flask_babel import lazy_gettext as _
 from wtforms.fields import (
     BooleanField,
@@ -6,11 +7,18 @@ from wtforms.fields import (
     PasswordField,
     StringField,
 )
-from wtforms.validators import DataRequired, EqualTo, Length
+from wtforms.validators import DataRequired, EqualTo, Length, Regexp
 
-from noggin.form.validators import Email, PasswordLength, StopOnError, username_format
+from noggin.form.validators import (
+    BlockedPatterns,
+    Email,
+    PasswordLength,
+    StopOnError,
+    no_mixed_case,
+    validator_proxy,
+)
 
-from .base import BaseForm, ModestForm, strip, SubmitButtonField
+from .base import BaseForm, ModestForm, SubmitButtonField, lower, strip
 
 
 class RegisterUserForm(ModestForm):
@@ -30,8 +38,27 @@ class RegisterUserForm(ModestForm):
         _('Username'),
         validators=[
             DataRequired(message=_('User name must not be empty')),
-            StopOnError(Length(min=3, max=32)),
-            username_format,
+            StopOnError(
+                validator_proxy(
+                    lambda: Length(
+                        min=current_app.config["ALLOWED_USERNAME_MIN_SIZE"],
+                        max=current_app.config["ALLOWED_USERNAME_MAX_SIZE"],
+                    )
+                )
+            ),
+            StopOnError(no_mixed_case),
+            validator_proxy(
+                lambda: Regexp(
+                    current_app.config["ALLOWED_USERNAME_PATTERN"],
+                    message=_(
+                        "Only these characters are allowed: \"%(chars)s\".",
+                        chars="\", \"".join(
+                            current_app.config["ALLOWED_USERNAME_HUMAN"]
+                        ),
+                    ),
+                )
+            ),
+            BlockedPatterns("USERNAME_BLOCKLIST"),
         ],
         filters=[strip],
     )
@@ -42,7 +69,7 @@ class RegisterUserForm(ModestForm):
             DataRequired(message=_('Email must not be empty')),
             Email(message=_('Email must be valid')),
         ],
-        filters=[strip],
+        filters=[strip, lower],
     )
 
     underage = BooleanField(
@@ -62,7 +89,6 @@ class ResendValidationEmailForm(BaseForm):
 
 
 class PasswordSetForm(BaseForm):
-
     password = PasswordField(
         _('Password'),
         validators=[

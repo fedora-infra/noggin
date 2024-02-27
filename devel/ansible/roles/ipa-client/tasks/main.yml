@@ -1,0 +1,19 @@
+---
+- name: Install RPM packages
+  dnf:
+    name:
+      - ipa-client
+    state: present
+
+- name: Enroll system as IPA client
+  shell: |
+    ipa-client-install \
+      --hostname {{ ansible_fqdn }} \
+      --domain {{ ansible_domain }} \
+      --realm {{ ansible_domain | upper }} \
+      --server ipa.{{ ansible_domain }} \
+      -p {{ ipa_admin_user }} \
+      -w {{ ipa_admin_password }} \
+      -U -N --force-join
+  args:
+    creates: /etc/ipa/default.conf

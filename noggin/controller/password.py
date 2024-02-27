@@ -1,6 +1,7 @@
 import datetime
 import random
 import string
+from smtplib import SMTPRecipientsRefused
 
 import jwt
 import python_freeipa
@@ -24,7 +25,7 @@ from noggin.form.password_reset import (
     PasswordResetForm,
 )
 from noggin.representation.user import User
-from noggin.security.ipa import maybe_ipa_session, untouched_ipa_client
+from noggin.security.ipa import NoIPAServer, maybe_ipa_session, untouched_ipa_client
 from noggin.utility import messaging
 from noggin.utility.controllers import require_self, user_or_404, with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
@@ -37,7 +38,10 @@ from . import blueprint as bp
 
 def _validate_change_pw_form(form, username, ipa=None):
     if ipa is None:
-        ipa = untouched_ipa_client(current_app)
+        try:
+            ipa = untouched_ipa_client(current_app, session)
+        except NoIPAServer:
+            raise FormError("non_field_errors", _("No IPA server available"))
 
     current_password = form.current_password.data
     password = form.password.data
@@ -86,9 +90,10 @@ def password_reset():
     form = PasswordResetForm()
 
     if form.validate_on_submit():
-        res = _validate_change_pw_form(form, username)
-        if res and res.ok:
-            return redirect(url_for('.root'))
+        with handle_form_errors(form):
+            res = _validate_change_pw_form(form, username)
+            if res and res.ok:
+                return redirect(url_for('.root'))
 
     return render_template(
         'password-reset.html', password_reset_form=form, username=username
@@ -109,9 +114,10 @@ def user_settings_password(ipa, username):
         form.current_password.description = ""
 
     if form.validate_on_submit():
-        res = _validate_change_pw_form(form, username, ipa)
-        if res and res.ok:
-            return redirect(url_for('.root'))
+        with handle_form_errors(form):
+            res = _validate_change_pw_form(form, username, ipa)
+            if res and res.ok:
+                return redirect(url_for('.root'))
 
     return render_template(
         'user-settings-password.html',
@@ -166,6 +172,10 @@ def forgot_password_ask():
                     f"Impossible to send a password reset email: {e}"
                 )
                 flash(_("We could not send you an email, please retry later"), "danger")
+                return redirect(url_for('.root'))
+            except SMTPRecipientsRefused as e:
+                current_app.logger.error(f"Could not send a password reset email: {e}")
+                flash(_("Your email address is rejected by smtp server"), "danger")
                 return redirect(url_for('.root'))
             if current_app.config["DEBUG"]:  # pragma: no cover
                 current_app.logger.debug(email)
@@ -231,7 +241,7 @@ def forgot_password_change():
             # example)
             ipa_admin.user_mod(username, userpassword=temp_password)
             # Change the password as the user, so it's not expired.
-            ipa = untouched_ipa_client(current_app)
+            ipa = untouched_ipa_client(current_app, session)
             ipa.change_password(
                 username,
                 new_password=password,
@@ -276,6 +286,8 @@ def forgot_password_change():
             form.non_field_errors.errors.append(
                 _('Could not change password, please try again.')
             )
+        except NoIPAServer:
+            form.non_field_errors.errors.append(_("No IPA server available"))
         else:
             lock.delete()
             flash(_('Your password has been changed.'), 'success')

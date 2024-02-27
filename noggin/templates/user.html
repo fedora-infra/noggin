@@ -89,6 +89,12 @@
                   <a href="{{ user.website_url }}" target="_blank">{{ user.website_url }}</a>
                 </li>
               {% endif %}
+              {% if user.rss_url %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong title='{{_("RSS URL")}}'><i class="fa fa-fw fa-link" aria-hidden="true"></i> {{_("RSS")}}</strong>
+                  <a href="{{ user.rss_url }}" target="_blank">{{ user.rss_url }}</a>
+                </li>
+              {% endif %}
               {% if user.rhbz_mail %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <strong title='{{_("RHBZ")}}'><i class="fa fa-fw fa-bug"></i> {{_("RHBZ")}}</strong>

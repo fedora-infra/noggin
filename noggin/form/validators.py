@@ -1,7 +1,9 @@
+import re
+
 from flask import current_app
 from flask_babel import lazy_gettext as _
 from wtforms.validators import Email as WTFormsEmailValidator
-from wtforms.validators import Length, Regexp, StopValidation, ValidationError
+from wtforms.validators import Length, StopValidation, ValidationError
 
 
 class Email(WTFormsEmailValidator):
@@ -37,15 +39,14 @@ def no_mixed_case(form, field):
         raise ValidationError(_("Mixed case is not allowed, try lower case."))
 
 
-def username_format(form, field):
-    # Don't use it directly to allow access to current_app
-    return Regexp(
-        current_app.config["ALLOWED_USERNAME_PATTERN"],
-        message=_(
-            "Only these characters are allowed: \"%(chars)s\".",
-            chars="\", \"".join(current_app.config["ALLOWED_USERNAME_HUMAN"]),
-        ),
-    )(form, field)
+def validator_proxy(factory):
+    """Proxy the validator through a factory to allow access to current_app."""
+
+    def _validate(form, field):
+        validator = factory()
+        return validator(form, field)
+
+    return _validate
 
 
 class StopOnError:
@@ -57,3 +58,19 @@ class StopOnError:
             self.validator(form, field)
         except ValidationError as e:
             raise StopValidation(str(e))
+
+
+class BlockedPatterns(object):
+    """Block values according to a list of patterns in the configuration."""
+
+    message = _('Field must not match "%(pattern)s".')
+
+    def __init__(self, config_key=None):
+        self.config_key = config_key
+
+    def __call__(self, form, field):
+        value = field.data
+        patterns = current_app.config[self.config_key]
+        for pattern in patterns:
+            if re.match(pattern, value):
+                raise ValidationError(self.message % {"pattern": pattern})

@@ -7,7 +7,6 @@ from flask import (
     current_app,
     flash,
     g,
-    Markup,
     redirect,
     render_template,
     request,
@@ -16,6 +15,7 @@ from flask import (
 )
 from flask_babel import _
 from flask_mail import Message
+from markupsafe import Markup
 from pyotp import TOTP
 from werkzeug.datastructures import MultiDict
 
@@ -27,6 +27,7 @@ from noggin.form.edit_user import (
     UserSettingsConfirmOTPForm,
     UserSettingsEmailForm,
     UserSettingsKeysForm,
+    UserSettingsOTPNameChange,
     UserSettingsOTPStatusChange,
     UserSettingsProfileForm,
 )
@@ -142,8 +143,14 @@ def user_settings_profile(ipa, username):
             if field.short_name in user
         }
         fullname = f"{form.firstname.data} {form.lastname.data}"
-        changes["o_cn"] = changes["o_displayname"] = fullname
-        result = _user_mod(ipa, form, user, changes, ".user_settings_profile",)
+        changes["o_cn"] = changes["o_displayname"] = changes["o_gecos"] = fullname
+        result = _user_mod(
+            ipa,
+            form,
+            user,
+            changes,
+            ".user_settings_profile",
+        )
         if result:
             return result
     if not form.errors:
@@ -196,7 +203,11 @@ def user_settings_email(ipa, username):
         should_redirect = False
         if change_now:
             should_redirect = _user_mod(
-                ipa, form, user, change_now, ".user_settings_email",
+                ipa,
+                form,
+                user,
+                change_now,
+                ".user_settings_email",
             )
         if needs_validation:
             for attr, value in needs_validation.items():
@@ -270,7 +281,11 @@ def user_settings_email_validate(ipa, username):
     if form.validate_on_submit():
         option_name = user.get_attr_option(token["attr"])
         result = _user_mod(
-            ipa, form, user, {option_name: value}, ".user_settings_email",
+            ipa,
+            form,
+            user,
+            {option_name: value},
+            ".user_settings_email",
         )
         if result:
             return result
@@ -386,6 +401,35 @@ def user_settings_otp(ipa, username):
         tokens=tokens,
         otp_uri=otp_uri,
     )
+
+
+@bp.route('/user/<username>/settings/otp/rename/', methods=['POST'])
+@with_ipa()
+@require_self
+def user_settings_otp_rename(ipa, username):
+    form = UserSettingsOTPNameChange()
+
+    if form.validate_on_submit():
+        try:
+            ipa.otptoken_mod(
+                a_ipatokenuniqueid=form.token.data,
+                o_description=form.description.data,
+            )
+        except (
+            python_freeipa.exceptions.BadRequest,
+            python_freeipa.exceptions.FreeIPAError,
+        ) as e:
+            if e.message != "no modifications to be performed":
+                flash(_('Cannot rename the token.'), 'danger')
+                current_app.logger.error(
+                    f'Something went wrong renaming an OTP token for user {username}: {e}'
+                )
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'danger')
+
+    return redirect(url_for('.user_settings_otp', username=username))
 
 
 @bp.route('/user/<username>/settings/otp/disable/', methods=['POST'])

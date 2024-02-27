@@ -2,7 +2,6 @@ from .base import CONVERTERS, Representation
 
 
 class User(Representation):
-
     attr_names = {
         "username": "uid",
         "firstname": "givenname",
@@ -28,6 +27,7 @@ class User(Representation):
         "pronouns": "faspronoun",
         "krbname": "krbcanonicalname",
         "roles": "memberof_role",
+        "rss_url": "fasrssurl",
     }
     attr_types = {
         "sshpubkeys": "list",

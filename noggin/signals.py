@@ -52,6 +52,7 @@ def request_basset_check(sender, **kwargs):
                 "callback": url_for('.spamcheck_hook', _external=True),
             },
         },
+        timeout=30,
     )
     if not response.ok:
         current_app.logger.warning(

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "noggin-aaa"
-version = "1.5.1"
+version = "1.9.0"
 description = "Noggin is a self-service portal for FreeIPA. The primary purpose of the portal is to allow users to sign up and manage their account information and group membership."
 
 license = "MIT"
@@ -21,11 +21,11 @@ packages = [
 ]
 
 include = [
-    "tox.ini",
-    "noggin.cfg.example",
-    "babel.cfg",
-    "docs/*",
-    "docs/*/*",
+    { path = "tox.ini", format = "sdist" },
+    { path = "babel.cfg", format = "sdist" },
+    { path = "deployment/*", format = "sdist" },
+    { path = "docs/*", format = "sdist" },
+    { path = "tests/*", format = "sdist" },
 ]
 
 classifiers = [
@@ -43,64 +43,67 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6.2"
-cryptography = "^36.0.0"
-flask = "^2.0.2"
-flask-wtf = "^1.0.0"
+python = "^3.9.0"
+cryptography = ">=3.4.7"
+flask = "^2.0.0 || ^3.0.0"
+flask-wtf = ">=0.14.3, <2.0.0"
 python-freeipa = "^1.0.6"
 click = "^8.0"
-pyjwt = "^2.3.0"
+pyjwt = "^2.1.0"
 Flask-Mail = "^0.9.1"
-gunicorn = {version = "^20.0", optional = true}
-fedora-messaging = "^2.0.1"
-backoff = "^1.10.0"
+gunicorn = {version = "^20.0 || ^21.0.0", optional = true}
+fedora-messaging = ">=2.1.0, <4.0"
+backoff = ">=1.6.0, <3.0"
 noggin-messages = "^1.0.0"
-whitenoise = "^5.0.1"
-flask-babel = "^2.0.0"
-flask-healthz = "^0.0.3"
-markupsafe = "^2.0.0"
+whitenoise = ">=5.3, <7.0"
+flask-babel = "^4.0.0"
+flask-healthz = "^1.0.0"
+markupsafe = "^1.1.1 || ^2.0.0"
 wtforms = {extras = ["email"], version = "^3.0.0"}
-requests = {extras = ["security"], version = "^2.26.0"}
+requests = {extras = ["security"], version = "^2.25.0"}
 translitcodec = "0.7.0"
 unidecode = "^1.2.0"
-flask-talisman = "^0.8.1"
-pyotp = "^2.6.0"
+flask-talisman = ">=0.8.1, <2.0"
+pyotp = "^2.2.7"
+srvlookup = "^2.0.0 || ^3.0.0"
 
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
-pytest-cov = "^3.0.0"
-sphinx = "^4.2"
-beautifulsoup4 = "^4.9"
-vcrpy = "^4.0"
-pytest-vcr = "^1.0"
-liccheck = "^0.6.4"
-bandit = "^1.6"
-black = {version = "^21.12b0", allow-prereleases = true}
-flake8 = "^4.0.1"
-Faker = "^10.0.0"
-pytest-mock = "^3.0.0"
-isort = "^5.1.4"
-rstcheck = "^3.3.1"
-pre-commit = "^2.13.0"
-safety = "^1.10.3"
-towncrier = "^21.3.0"
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.1.0"
+pytest-cov = ">=3.0.0"
+sphinx = ">=4.2"
+beautifulsoup4 = ">=4.9"
+vcrpy = ">=5.0"
+pytest-vcr = ">=1.0"
+liccheck = ">=0.6.4"
+bandit = ">=1.6"
+black = ">=22.0.0"
+flake8 = ">=4.0.1"
+Faker = ">=13.0.0"
+pytest-mock = ">=3.0.0"
+isort = ">=5.1.4"
+rstcheck = ">=5.0.0"
+pre-commit = ">=2.13.0"
+safety = ">=2.2.0"
+towncrier = ">=21.3.0"
+myst-parser = "^2.0.0"
+poetry-plugin-export = "^1.6.0"
 
 [tool.poetry.extras]
 deploy = ["gunicorn"]
+
 
 [tool.black]
 skip-string-normalization = true
 
 [tool.towncrier]
 package = "noggin"
-filename = "docs/release_notes.rst"
+filename = "docs/release_notes.md"
 directory = "news/"
-title_format = "v{version}"
+start_string = "<!-- towncrier release notes start -->\n"
+underlines = ["", "", ""]
+template = "news/_template.md"
+title_format = "## v{version}"
 issue_format = "{issue}"
-template = "news/_template.rst.j2"
-underlines = "=^-"
-wrap = true
-all_bullets = true
 
   [[tool.towncrier.type]]
   directory = "bic"
@@ -142,53 +145,16 @@ all_bullets = true
   name = "Contributors"
   showcontent = true
 
-
-[tool.liccheck]
-authorized_licenses = [
-  "bsd",
-  "new bsd",
-  "simplified bsd",
-  "apache",
-  "apache 2.0",
-  "apache software",
-  "Apache License 2.0",
-  "gnu lgpl",
-  "gpl v2",
-  "GNU General Public License v2 or later (GPLv2+)",
-  "GNU Library or Lesser General Public License (LGPL)",
-  "gpl v3",
-  "lgpl with exceptions or zpl",
-  "isc",
-  "isc license (iscl)",
-  "mit",
-  "python software foundation",
-  "zpl 2.1",
-  "mpl-2.0",
-  "MPL 2.0",
-  "Mozilla Public License 2.0 (MPL 2.0)",
-  "lgpl",
-  "CC0 (copyright waived)",
-  "Public Domain",
-  "Public Domain <http://unlicense.org>",
-  "Unlicense",
-  "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
-  "Zope Public",
-]
-
-[tool.liccheck.authorized_packages]
-noggin-messages = ">=0.0.1"
-
 [tool.isort]
 profile = "black"
 known_first_party = ["noggin", "noggin_messages"]
 lines_after_imports = 2
-force_alphabetical_sort_within_sections = true
 
 [tool.pytest.ini_options]
 testpaths = [
-    "noggin/tests/unit",
+    "tests/unit",
 ]
 
 [build-system]
-requires = ["poetry>=1.0.0"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,34 +1,17 @@
 ---
 - name: Install RPM packages
   dnf:
-      name:
-      - freeipa-server
-      - fedora-messaging
-      - gcc
-      - git
-      - ipa-client
-      - libffi-devel
-      - poetry
-      - python3-cryptography
-      - python3-devel
-      - python3-flask
-      - python3-pip
-      - vim
-      state: present
+    name:
+    - gcc
+    - libffi-devel
+    - python3-cryptography
+    - python3-devel
+    - python3-flask
+    - python3-pip
+    state: present
 
-- name: Enroll system as IPA client
-  shell: |
-    ipa-client-install --uninstall --unattended
-    ipa-client-install \
-      --hostname noggin.noggin.test \
-      --domain noggin.test \
-      --realm {{ krb_realm }} \
-      --server ipa.noggin.test \
-      -p {{ ipa_admin_user }} \
-      -w {{ ipa_admin_password }} \
-      --unattended \
-      --no-ntp \
-      --force-join
+- name: Install poetry Python package
+  command: pip install poetry
 
 - name: install python deps with poetry
   become_user: vagrant
@@ -38,7 +21,7 @@
 
 - name: Install the .bashrc
   copy:
-    src: .bashrc
+    src: bashrc
     dest: /home/vagrant/.bashrc
     mode: 0644
     owner: vagrant
@@ -68,5 +51,3 @@
     name: noggin
     daemon_reload: yes
     enabled: yes
-
-- import_tasks: rabbitmq.yml

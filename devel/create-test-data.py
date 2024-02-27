@@ -13,9 +13,9 @@ USER_PASSWORD = "testuserpw"
 fake = Faker()
 fake.seed_instance(0)
 
-ipa_server = "ipa.noggin.test"
+ipa_server = "ipa.tinystage.test"
 ipa_user = "admin"
-ipa_pw = "adminPassw0rd!"
+ipa_pw = "password"
 ipa = Client(host=ipa_server, verify_ssl=False)
 ipa.login(ipa_user, ipa_pw)
 

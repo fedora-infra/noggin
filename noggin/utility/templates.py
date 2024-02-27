@@ -1,8 +1,9 @@
 import hashlib
 from urllib.parse import urlparse
 
-from flask import current_app, Markup
+from flask import current_app
 from flask_babel import lazy_gettext as _
+from markupsafe import Markup
 
 
 def gravatar(email, size):

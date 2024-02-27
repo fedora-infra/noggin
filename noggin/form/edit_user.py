@@ -15,11 +15,11 @@ from wtforms.fields import (
     URLField,
 )
 from wtforms.validators import (
+    URL,
     AnyOf,
     DataRequired,
     Length,
     Optional,
-    URL,
     ValidationError,
 )
 
@@ -32,11 +32,11 @@ from .base import (
     CSVListField,
     ModestForm,
     NonEmptyFieldList,
+    SubmitButtonField,
+    TypeAndStringField,
     replace,
     strip,
     strip_at,
-    SubmitButtonField,
-    TypeAndStringField,
 )
 
 
@@ -126,6 +126,11 @@ class UserSettingsProfileForm(BaseForm):
         validators=[Optional(), URL(message=_('Valid URL required'))],
     )
 
+    rss_url = URLField(
+        _('RSS URL'),
+        validators=[Optional(), URL(message=_('Valid URL required'))],
+    )
+
     is_private = BooleanField(
         _('Private'),
         description=_(
@@ -207,6 +212,15 @@ class UserSettingsConfirmOTPForm(ModestForm):
 class UserSettingsOTPStatusChange(BaseForm):
     token = HiddenField(
         'token', validators=[DataRequired(message=_('Token must not be empty'))]
+    )
+
+
+class UserSettingsOTPNameChange(BaseForm):
+    token = HiddenField(
+        'token', validators=[DataRequired(message=_('Token must not be empty'))]
+    )
+    description = StringField(
+        validators=[Optional()],
     )
 
 
