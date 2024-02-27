@@ -15,13 +15,13 @@ on:
 jobs:
   misc_tests:
     name: Misc tests
-    container:
-      image: fedorapython/fedora-python-tox
-      options: --user 1001:1001
     steps:
       - uses: actions/checkout@v4
-      - name: Run tests
-        run: tox -e ${{ matrix.tox_env }}
+      - name: Run Tests
+        uses: fedora-python/tox-github-action@main
+        with:
+          tox_env: ${{ matrix.tox_env }}
+          # dnf_install: pre-commit git libpq-devel poetry krb5-devel openldap-devel python-distlib
     strategy:
       matrix:
         tox_env:
@@ -34,13 +34,13 @@ jobs:
 
   unit_tests:
     name: Unit tests
-    container: fedorapython/fedora-python-tox:latest
     steps:
       - uses: actions/checkout@v4
-      - name: Mark the directory as safe for git
-        run: git config --global --add safe.directory $PWD
-      - name: Run tests
-        run: tox -e ${{ matrix.tox_env }}
+      - name: Run Tests
+        uses: fedora-python/tox-github-action@main
+        with:
+          tox_env: ${{ matrix.tox_env }}
+          #dnf_install: pre-commit git libpq-devel poetry krb5-devel openldap-devel python-distlib
     strategy:
       matrix:
         tox_env:
