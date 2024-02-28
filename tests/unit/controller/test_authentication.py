@@ -192,7 +192,7 @@ def test_login_username_created_with_case(client, dummy_user_with_case):
         follow_redirects=True,
     )
     page = BeautifulSoup(result.data, 'html.parser')
-    messages = page.select(".flash-messages .alert-success")
+    messages = page.select(".flash-messages .toast .toast-body")
     assert len(messages) == 1
     assert messages[0].get_text(strip=True) == 'Welcome, dummy!'
     assert session.get("noggin_username") == "dummy"

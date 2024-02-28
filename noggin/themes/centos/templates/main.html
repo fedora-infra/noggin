@@ -36,11 +36,11 @@
     </nav>
     {% with flashes = get_flashed_messages(with_categories=True) %}
         {% if flashes %}
-        <div class="container flash-messages mt-4">
+        <div class="toast-container flash-messages position-fixed mt-2 top-0 start-50 translate-middle-x">
             {% for category, flash in flashes %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ flash }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="toast text-white bg-{{ category }} d-flex" {{"data-bs-autohide=false" if category != 'success'}} role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-body">{{ flash }}</div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             {% endfor %}
         </div>
