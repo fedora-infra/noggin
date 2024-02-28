@@ -111,16 +111,12 @@ class TypeAndStringWidget(TextInput):
             errors.append('</div>')
         html = [
             '<div class="input-group">',
-            '<div class="input-group-prepend">',
-            field.subfields[0](class_="custom-select"),
-            '</div>',
+            field.subfields[0](class_="form-select flex-grow-0 w-25"),
             field.subfields[1](**kwargs),
-            '<div class="input-group-append">',
-            '<button class="btn btn-outline-secondary form-control" '
+            '<button class="btn btn-outline-secondary" '
             'data-action="clear" type="button">',
             '<i class="fa fa-fw fa-times"></i>',
             '</button>',
-            '</div>',
             '</div>',
             " ".join(errors),
         ]

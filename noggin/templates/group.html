@@ -14,7 +14,7 @@
           <h3 class="mb-0">
             {{ group.name }}
             {% if edit_group_details is defined %}
-              <span class="pl-1">{{ edit_group_details()}}</span>
+              <span class="ps-1">{{ edit_group_details()}}</span>
             {% endif %}
           </h3>
           {% if group.description %}<div>{{ group.description }}</div>{% endif %}
@@ -76,9 +76,11 @@
             {% for sponsor in sponsors|sort(attribute='username') %}
               <li class="col-lg-3 col-md-4 col-sm-6">
                 <div class="card card-body mb-4 px-2 py-3">
-                <div class="media align-items-center">
-                  <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 50) }}" alt="gravatar">
-                  <div class="media-body ml-2">
+                <div class="d-flex align-items-center">
+                  <div class="flex-shrink-0">
+                    <img src="{{ gravatar(sponsor.mail if sponsor.mail else 'default', 50) }}" alt="gravatar">
+                  </div>
+                  <div class="flex-grow-1 ms-2">
                       <div class="my-0 font-weight-bold">
                         <a href="{{ url_for('.user', username=sponsor.username) }}">
                           <span class="title">{{ sponsor.username }}</span>
@@ -125,9 +127,11 @@
             {% for member in members.items %}
               <li class="col-lg-3 col-md-4 col-sm-6">
               <div class="card card-body mb-4 px-2 py-3">
-                <div class="media align-items-center">
-                  <img src="{{ gravatar(member.mail if member.mail else 'default', 50) }}" alt="gravatar">
-                  <div class="media-body ml-2">
+                <div class="d-flex align-items-center">
+                  <div class="flex-shrink-0">
+                    <img src="{{ gravatar(member.mail if member.mail else 'default', 50) }}" alt="gravatar">
+                  </div>
+                  <div class="flex-grow-1 ms-2">
                       <div class="my-0 font-weight-bold">
                         <a href="{{ url_for('.user', username=member.username) }}">
                           <span class="title">{{ member.username }}</span>

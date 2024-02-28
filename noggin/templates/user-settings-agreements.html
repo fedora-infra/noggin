@@ -12,9 +12,9 @@
           </div>
           <div class="col-auto">
             {% if agreement.name in user.agreements %}
-            <a data-toggle="modal" data-target="#agreement-modal-{{agreement.slug}}" class="btn btn-link" href="javascript:void(0)">{{ _("View agreement") }}</a>
+            <a data-bs-toggle="modal" data-bs-target="#agreement-modal-{{agreement.slug}}" class="btn btn-link" href="javascript:void(0)">{{ _("View agreement") }}</a>
             {% else %}
-            <a data-toggle="modal" data-target="#agreement-modal-{{agreement.slug}}" class="btn btn-primary" href="javascript:void(0)">{{ _("Sign") }}</a>
+            <a data-bs-toggle="modal" data-bs-target="#agreement-modal-{{agreement.slug}}" class="btn btn-primary" href="javascript:void(0)">{{ _("Sign") }}</a>
             {% endif %}
           </div>
         </div>
@@ -27,9 +27,7 @@
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <pre>{{ agreement.description}}</pre>

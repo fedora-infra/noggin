@@ -4,16 +4,16 @@
 <form action="{{ url_for('.root') }}?tab=register" method="post" novalidate>
   {{ register_form.csrf_token }}
   <div class="card-body">
-    <div class="form-group">{{ macros.with_errors(register_form.username, tabindex="4") }}</div>
-    <div class="form-row">
-      <div class="form-group col">{{ macros.with_errors(register_form.firstname, tabindex="5") }}</div>
-      <div class="form-group col">{{ macros.with_errors(register_form.lastname, tabindex="6") }}</div>
+    <div class="mb-3">{{ macros.with_errors(register_form.username, tabindex="4") }}</div>
+    <div class="row">
+      <div class="mb-3 col">{{ macros.with_errors(register_form.firstname, tabindex="5") }}</div>
+      <div class="mb-3 col">{{ macros.with_errors(register_form.lastname, tabindex="6") }}</div>
     </div>
-    <div class="form-row">
-      <div class="form-group col">{{ macros.with_errors(register_form.mail, tabindex="7") }}</div>
+    <div class="row">
+      <div class="mb-3 col">{{ macros.with_errors(register_form.mail, tabindex="7") }}</div>
     </div>
-    <div class="form-row form-check">
-      <div class="form-group col">{{ macros.with_errors(register_form.underage, tabindex="8") }}</div>
+    <div class="row form-check">
+      <div class="mb-3 col">{{ macros.with_errors(register_form.underage, tabindex="8") }}</div>
     </div>
   </div>
   <div class="card-footer d-flex justify-content-between">

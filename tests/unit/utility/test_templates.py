@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from flask import current_app
 
@@ -74,8 +76,8 @@ def test_format_nickname_no_matrixto_args(request_context):
     title = "Matrix on unit.tests"
     href = "https://matrix.to/#/@username:unit.tests"
     expected_html = f'<a href="{href}" title="{title}">{name}</a>'
-    current_app.config["CHAT_MATRIX_TO_ARGS"] = None
-    assert str(format_nickname(value)) == expected_html
+    with mock.patch.dict(current_app.config, CHAT_MATRIX_TO_ARGS=None):
+        assert str(format_nickname(value)) == expected_html
 
 
 def test_format_nickname_invalid(request_context):
@@ -123,7 +125,10 @@ def test_format_nickname_invalid_with_config(app, request_context, mocker):
         (
             "matrix:/channel",
             {
-                "href": "https://matrix.to/#/#channel:matrix.org",
+                "href": (
+                    "https://matrix.to/#/#channel:matrix.org"
+                    "?web-instance[element.io]=app.element.io"
+                ),
                 "title": "Matrix on matrix.org",
                 "name": "#channel:matrix.org",
             },
@@ -131,7 +136,10 @@ def test_format_nickname_invalid_with_config(app, request_context, mocker):
         (
             "matrix://unit.tests/#channel",
             {
-                "href": "https://matrix.to/#/#channel:unit.tests",
+                "href": (
+                    "https://matrix.to/#/#channel:unit.tests"
+                    "?web-instance[element.io]=app.element.io"
+                ),
                 "title": "Matrix on unit.tests",
                 "name": "#channel:unit.tests",
             },
