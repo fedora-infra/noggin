@@ -14,7 +14,7 @@
       <li class="nav-item">
         <a class="nav-link {% if filter == status.name %}active{% endif %}" href="?status={{status.name}}">
           {{status.title}}
-          <span class="badge badge-secondary ml-1">{{status.count}}</span>
+          <span class="badge badge-secondary ms-1">{{status.count}}</span>
         </a>
       </li>
     {% endfor %}
@@ -27,13 +27,13 @@
 
       <div class="nav flex-column nav-pills col-5 col-lg-4" role="tablist" aria-orientation="vertical">
         {% for user in stage_users %}
-          <a class="nav-link {% if loop.index == 1 %}active{% endif %}" data-toggle="pill" id="t-{{ user.username }}" href="#u-{{ user.username }}" role="tab" aria-controls="u-{{ user.username }}" aria-selected="true">
+          <a class="nav-link {% if loop.index == 1 %}active{% endif %}" data-bs-toggle="pill" id="t-{{ user.username }}" href="#u-{{ user.username }}" role="tab" aria-controls="u-{{ user.username }}" aria-selected="true">
             {{ user.username }} ({{ user.name }})
           </a>
         {% endfor %}
       </div>
 
-      <div class="tab-content col pl-5">
+      <div class="tab-content col ps-5">
         {% for user in stage_users %}
           <div class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}" id="u-{{ user.username }}" role="tabpanel" aria-labelledby="t-{{ user.username }}">
 

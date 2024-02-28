@@ -588,7 +588,7 @@ def test_user_can_see_dummy_group(client, dummy_user_as_group_manager):
     assert page.title
     assert page.title.string == 'Profile for dummy - noggin'
     assert (
-        page.select_one('.list-group-item.text-right.bg-light strong').get_text(
+        page.select_one('.list-group-item.text-end.bg-light strong').get_text(
             strip=True
         )
         == '1 Group(s), 0 Agreement(s)'
@@ -605,7 +605,7 @@ def test_user_with_indirect_groups(
     result = client.get('/user/dummy/')
     page = BeautifulSoup(result.data, 'html.parser')
     assert (
-        page.select_one('.list-group-item.text-right.bg-light strong').get_text(
+        page.select_one('.list-group-item.text-end.bg-light strong').get_text(
             strip=True
         )
         == '2 Group(s), 0 Agreement(s)'

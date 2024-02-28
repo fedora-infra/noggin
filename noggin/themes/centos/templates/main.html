@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-    <link rel="stylesheet" href="{{ url_for('theme.static', filename='vendor/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ url_for('theme.static', filename='vendor/bootstrap-4.3.1/bootstrap.min.nodata.css') }}" type="text/css">
+    <link href="{{ url_for('theme.static', filename='vendor/bootstrap-5.2.0-beta1/bootstrap.min.nodata.css') }}" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="{{ url_for('theme.static', filename='fonts/Montserrat.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('theme.static', filename='css/default.css') }}" type="text/css">
 {% endblock %}
@@ -17,11 +16,11 @@
                 <a class="nav-link color-white" href="{{ url_for('.groups') }}">{{_("Groups")}}</a>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img src="{{ gravatar(current_user.mail if current_user.mail else 'default', 30) }}" class="bg-white rounded-circle"/>
 
                 </a>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="{{ url_for('.user', username=current_user.username) }}">{{_("Profile")}}</a>
                     <a class="dropdown-item" href="{{ url_for('.user_settings_profile', username=current_user.username) }}">{{_("Settings")}}</a>
                     {% if config["STAGE_USERS_ROLE"] in current_user.roles %}
@@ -39,11 +38,9 @@
         {% if flashes %}
         <div class="container flash-messages mt-4">
             {% for category, flash in flashes %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show">
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                 {{ flash }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {% endfor %}
         </div>
@@ -71,8 +68,7 @@
 
 {% block scripts %}
     <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/jquery/jquery-3.3.1.min.js') }}"></script>
-    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/popper-1.14.7/popper.min.js') }}"></script>
-    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/bootstrap-4.3.1/bootstrap.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/bootstrap-5.2.0-beta1/bootstrap.bundle.min.js') }}"></script>
     {{ super() }}
 {% endblock %}
 
