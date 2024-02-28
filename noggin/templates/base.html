@@ -36,6 +36,11 @@
           $('[data-toggle="popover"]').popover()
         })
         </script>
+        <script nonce="{{ csp_nonce() }}">
+          const toastElList = document.querySelectorAll('.toast')
+          const toastList = [...toastElList].map(toastEl => new bootstrap.Toast(toastEl))
+          toastList.forEach(toast => toast.show());
+        </script>
       {% endif %}
     {% endblock %}
   </body>
