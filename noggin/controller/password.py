@@ -132,11 +132,27 @@ def user_settings_password(ipa, username):
 def forgot_password_ask():
     form = ForgottenPasswordForm()
     if form.validate_on_submit():
-        username = form.username.data
-        lock = PasswordResetLock(username)
-        valid_until = lock.valid_until()
-        now = datetime.datetime.now()
         with handle_form_errors(form):
+            username_or_email = form.username.data
+
+            if "@" in username_or_email:
+                emails = ipa_admin.user_find(o_mail=username_or_email)['result']
+                if not emails:
+                    raise FormError(
+                        "username",
+                        _(
+                            "No Users with email %(username_or_email)s found",
+                            username_or_email=username_or_email,
+                        ),
+                    )
+                username = emails[0]["uid"][0]
+            else:
+                username = username_or_email
+
+            lock = PasswordResetLock(username)
+            valid_until = lock.valid_until()
+            now = datetime.datetime.now()
+
             if valid_until is not None and now < valid_until:
                 wait_min = int((valid_until - now).total_seconds() / 60)
                 wait_sec = int((valid_until - now).total_seconds() % 60)
