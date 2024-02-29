@@ -5,6 +5,7 @@ import requests
 from cryptography.fernet import Fernet, InvalidToken
 from flask import current_app
 from python_freeipa.exceptions import BadRequest, FreeIPAError
+from srvlookup import SRVQueryFailure
 
 from noggin.app import ipa_admin
 from noggin.security.ipa import (
@@ -72,6 +73,12 @@ def test_choose_server_no_server(client, srvlookup_mock):
         choose_server(current_app)
 
 
+def test_choose_server_query_failure(client, srvlookup_mock):
+    srvlookup_mock.lookup.side_effect = SRVQueryFailure("failure")
+    with pytest.raises(NoIPAServer):
+        choose_server(current_app)
+
+
 @pytest.mark.vcr
 def test_ipa_session_authed(client, logged_in_dummy_user):
     """Check maybe_ipa_session() when a user is logged in"""
@@ -83,6 +90,13 @@ def test_ipa_session_anonymous(client):
     """Check maybe_ipa_session() when no user is logged in"""
     with client.session_transaction() as sess:
         assert maybe_ipa_session(current_app, sess) is None
+
+
+def test_ipa_session_no_ipa_server(client):
+    with patch("noggin.security.ipa.choose_server") as choose_server:
+        choose_server.side_effect = NoIPAServer
+        with client.session_transaction() as sess:
+            assert maybe_ipa_session(current_app, sess) is None
 
 
 @pytest.mark.vcr

@@ -4,6 +4,7 @@ from cryptography.fernet import Fernet
 from python_freeipa.client_meta import ClientMeta as IPAClient
 from python_freeipa.exceptions import BadRequest, ValidationError
 from requests import RequestException
+from srvlookup import SRVQueryFailure
 
 
 class Client(IPAClient):
@@ -140,7 +141,7 @@ def choose_server(app, session=None):
             record.hostname
             for record in srvlookup.lookup('ldap', domain=app.config["FREEIPA_DOMAIN"])
         ]
-    except srvlookup.SRVQueryFailure:
+    except SRVQueryFailure:
         available_servers = []
     if server is None or server not in available_servers:
         try:
