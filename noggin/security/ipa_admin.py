@@ -8,6 +8,7 @@ from .ipa import Client, choose_server
 class IPAAdmin:
     __WRAPPED_METHODS = (
         "user_show",
+        "user_find",
         "user_mod",
         "stageuser_add",
         "stageuser_show",

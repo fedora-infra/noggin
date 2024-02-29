@@ -89,9 +89,12 @@ def test_ask_get(client):
 
 
 @pytest.mark.vcr()
-def test_ask_post(client, dummy_user, patched_lock):
+@pytest.mark.parametrize(
+    "data", [{"username": "dummy"}, {"username": "dummy@unit.tests"}]
+)
+def test_ask_post(client, dummy_user, patched_lock, data):
     with mailer.record_messages() as outbox:
-        result = client.post('/forgot-password/ask', data={"username": "dummy"})
+        result = client.post('/forgot-password/ask', data=data)
     # Confirmation message
     assert_redirects_with_flash(
         result,
@@ -123,6 +126,18 @@ def test_ask_post_non_existant_user(client):
     result = client.post('/forgot-password/ask', data={"username": "nosuchuser"})
     assert_form_field_error(
         result, field_name="username", expected_message="User nosuchuser does not exist"
+    )
+
+
+@pytest.mark.vcr()
+def test_ask_post_non_existant_user_email(client):
+    result = client.post(
+        '/forgot-password/ask', data={"username": "nosuchuser@pants.com"}
+    )
+    assert_form_field_error(
+        result,
+        field_name="username",
+        expected_message="No Users with email nosuchuser@pants.com found",
     )
 
 
