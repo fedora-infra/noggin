@@ -33,8 +33,8 @@ class PasswordResetForm(NewPasswordForm):
 
 class ForgottenPasswordForm(BaseForm):
     username = StringField(
-        _('Username'),
+        _('Username or Email'),
         validators=[DataRequired(message=_('User name must not be empty'))],
-        description=_("Enter your username to reset your password"),
+        description=_("Enter your username or email to reset your password"),
         filters=[lower],
     )
