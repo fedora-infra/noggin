@@ -279,7 +279,7 @@ Installing from PyPI
 
    .. code-block:: shell
 
-        pip3 install noggin noggin-messages
+        pip3 install noggin-aaa noggin-messages
 
 2. Download the ``noggin.cfg.example`` file from
    `here <https://github.com/fedora-infra/noggin/raw/v1.9.0/deployment/noggin.cfg.example>`__
