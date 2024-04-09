@@ -46,7 +46,7 @@ CHAT_NETWORKS = {
 }
 # Link to matrix rooms and usernames using a element.io web client
 # instance. Set this variable to whatever instance you have.
-# e.g. chat.fedoraproject.org, chat.opensuse.org
+# e.g. chat.fedoraproject.org
 CHAT_MATRIX_TO_ARGS = "web-instance[element.io]=app.element.io"
 
 STAGE_USERS_ROLE = "Stage User Managers"
