@@ -2,6 +2,42 @@
 
 <!-- towncrier release notes start -->
 
+## v1.10.0
+
+Released on 2024-04-15.
+
+### Features
+
+- Show the Discussion URL in the group infomation page (#867)
+- Use DNS to list the IPA servers (#1357)
+
+### Bug Fixes
+
+- Previously, the Leave Group button on the group page was at the top of the list of group members. 
+  However if a group has a large number of sponsors, this button would be far down the page.
+  The leave group button is now located in the subheader of the group listing page, avoiding this issue. (#600)
+- Only choose an IPA server that is in the config (#1356)
+- Revisited and rewrote the installation steps in greater detail (#1363)
+- Alerts / Flash Messages of type Success now timeout and disappear after 5 seconds (#1379)
+
+### Other Changes
+
+- The Fedora, Default, and CentOS themes now use Bootstrap 5 or Fedora Bootstrap 2 (#966)
+- Remove OpenSUSE theme assets as they are not used anymore (#1391)
+
+### Contributors
+
+Many thanks to the contributors of bug reports, pull requests, and pull request reviews for this release:
+
+- Akashdeep Dhar
+- Aurélien Bompard
+- Cappy Ishihara
+- Elias
+- Nils Philippsen
+- Patrik Polakovič
+- Ryan Lerch
+- William Modave
+
 ## v1.9.0
 
 Released on 2024-01-10.
