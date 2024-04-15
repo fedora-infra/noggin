@@ -128,7 +128,7 @@ def test_gecos(client, post_data_non_ascii, cleanup_dummy_user, mocker):
     # Check that default values are added
     user = User(ipa_admin.stageuser_show("dummy")['result'])
 
-    assert user.gecos == "Xi Jin Ping aeoeue ss AeOeUe Ss An Bei Jin San"
+    assert user.gecos == "Xi Jin Ping aeoeue ss AeOeUe SS An Bei Jin San"
 
 
 @pytest.mark.vcr()
