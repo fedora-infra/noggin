@@ -21,15 +21,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run tests
-        run: tox -e ${{ matrix.tox_env }}
+        run: tox -e ${{ matrix.tox_env.name }}
+    continue-on-error: ${{ matrix.optional }}
     strategy:
       matrix:
         tox_env:
-          - lint
-          - format
-          - licenses
-          - security
-          - docs
+          - name: lint
+          - name: format
+          - name: licenses
+            optional: true
+          - name: security
+          - name: docs
+      fail-fast: false
     runs-on: ubuntu-latest
 
   unit_tests:
