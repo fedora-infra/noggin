@@ -1,0 +1,55 @@
+---
+- name: Install RPM packages
+  dnf:
+    name:
+      - python3-psycopg2
+      - postgresql-server
+      - acl
+    state: present
+
+- name: Setup the postgresql DB
+  command: postgresql-setup --initdb
+  args:
+    creates: /var/lib/pgsql/data/postgresql.conf
+
+
+- name: Configure access to postgresql
+  postgresql_pg_hba:
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    contype: host
+    databases: all
+    users: all
+    address: "{{item}}"
+    method: md5
+  loop:
+    - 127.0.0.1/32
+    - ::1/128
+
+- name: Start postgresql
+  service:
+    name: postgresql
+    enabled: yes
+    state: started
+
+- block:
+    - name: Create the user
+      postgresql_user:
+        name: kerneltest
+        password: kerneltest
+
+    - name: Create the database
+      postgresql_db:
+        name: kerneltestdb
+        owner: kerneltest
+
+  become: yes
+  become_user: postgres
+  become_method: sudo
+
+- name: Make connection easier
+  copy:
+    dest: /home/vagrant/.pgpass
+    content: "*:*:kerneltestdb:kerneltest:kerneltest\n"
+    owner: vagrant
+    group: vagrant
+    mode: 0600
