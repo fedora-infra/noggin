@@ -1,0 +1,26 @@
+
+
+- name: Generate and get SSL cert
+  shell: ipa-getcert request -f /etc/pki/tls/certs/{{ cert_basename }}.pem -k /etc/pki/tls/private/{{ cert_basename }}.key -K {{ krb_service }}/{{ cert_hostname }} -N {{ cert_hostname }}
+  args:
+    creates: /etc/pki/tls/certs/{{ cert_basename }}.pem
+
+- name: Check the cert is there
+  wait_for:
+    path: /etc/pki/tls/certs/{{ cert_basename }}.pem
+    state: present
+
+- name: Check the key is there
+  wait_for:
+    path: /etc/pki/tls/private/{{ cert_basename }}.key
+    state: present
+
+- name: Change file ownership, group and permissions
+  ansible.builtin.file:
+    path: /etc/pki/tls/certs/{{ cert_basename }}.pem
+    mode: '0644'
+
+- name: Change file ownership, group and permissions
+  ansible.builtin.file:
+    path: /etc/pki/tls/private/{{ cert_basename }}.key
+    mode: '0644'
