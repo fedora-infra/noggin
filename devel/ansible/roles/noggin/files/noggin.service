@@ -4,11 +4,16 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
+# Allow the service to run on a priviledged port as an unpriviledged user
+AmbientCapabilities = CAP_NET_BIND_SERVICE
+
+# Environment variables
 Environment=FLASK_APP=/home/vagrant/noggin/noggin/app.py
 Environment=NOGGIN_CONFIG_PATH=/home/vagrant/noggin.cfg
 Environment=REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
 Environment=FLASK_DEBUG=1
 Environment=PYTHONUNBUFFERED=1
+
 User=vagrant
 WorkingDirectory=/home/vagrant/noggin/noggin
 ExecStart=poetry run flask run -h 0.0.0.0 --port 443 --cert "/etc/pki/tls/certs/server.pem" --key "/etc/pki/tls/private/server.key"
