@@ -136,13 +136,18 @@ def choose_server(app, session=None):
     server = None
     if session is not None:
         server = session.get('noggin_ipa_server_hostname', None)
-    try:
-        available_servers = [
-            record.hostname
-            for record in srvlookup.lookup('ldap', domain=app.config["FREEIPA_DOMAIN"])
-        ]
-    except SRVQueryFailure:
-        available_servers = []
+    if app.config["FREEIPA_SERVERS"]:
+        available_servers = app.config["FREEIPA_SERVERS"]
+    else:
+        try:
+            available_servers = [
+                record.hostname
+                for record in srvlookup.lookup(
+                    'ldap', domain=app.config["FREEIPA_DOMAIN"]
+                )
+            ]
+        except SRVQueryFailure:
+            available_servers = []
     if server is None or server not in available_servers:
         try:
             server = available_servers[0]

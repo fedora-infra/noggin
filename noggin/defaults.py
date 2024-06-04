@@ -6,6 +6,7 @@ TEMPLATES_AUTO_RELOAD = False
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True
 FREEIPA_DOMAIN = ".".join(socket.getfqdn().split('.')[1:])
+FREEIPA_SERVERS = None
 USER_DEFAULTS = {
     "locale": "en-US",
     "timezone": "UTC",
