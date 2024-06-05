@@ -43,6 +43,14 @@ def test_choose_server(client, srvlookup_mock):
     assert srvlookup_mock.lookup.call_count == 2
 
 
+def test_choose_server_prefer_config(client, srvlookup_mock, mocker):
+    mocker.patch.dict(current_app.config, {"FREEIPA_SERVERS": ["a.example.test"]})
+    with client.session_transaction() as sess:
+        server = choose_server(current_app, sess)
+    assert server == "a.example.test"
+    srvlookup_mock.lookup.assert_not_called
+
+
 def test_choose_server_no_session(client, srvlookup_mock):
     srvlookup_mock.lookup.side_effect = [
         [make_srv("a.example.test"), make_srv("b.example.test")],
