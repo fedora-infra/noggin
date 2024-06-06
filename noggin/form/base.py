@@ -102,7 +102,22 @@ class CSVListField(Field):
             self.data = []
 
 
-class TypeAndStringWidget(TextInput):
+class ClearButtonWidget:
+    def __call__(self, field, **kwargs):
+        kwargs.setdefault("class", "btn btn-outline-secondary")
+        kwargs.setdefault("type", "button")
+        kwargs.setdefault("data-action", "clear")
+        return Markup(
+            f"<button {html_params(**kwargs)}>"
+            '<i class="fa fa-fw fa-times"></i>'
+            "</button>"
+        )
+
+
+class FieldWithClearButtonWidget:
+    def __init__(self, wrapped_widget=None):
+        self.wrapped_widget = wrapped_widget or TextInput()
+
     def __call__(self, field, **kwargs):
         kwargs.setdefault('id', field.id)
         errors = [str(e) for e in field.errors or []]
@@ -111,20 +126,29 @@ class TypeAndStringWidget(TextInput):
             errors.append('</div>')
         html = [
             '<div class="input-group">',
-            field.subfields[0](class_="form-select flex-grow-0 w-25"),
-            field.subfields[1](**kwargs),
-            '<button class="btn btn-outline-secondary" '
-            'data-action="clear" type="button">',
-            '<i class="fa fa-fw fa-times"></i>',
-            '</button>',
+            self.wrapped_widget(field, **kwargs),
+            ClearButtonWidget()(field),
             '</div>',
             " ".join(errors),
         ]
         return Markup(''.join(html))
 
 
+class JoinedFieldsWithClearButtonWidget(FieldWithClearButtonWidget):
+    def __init__(self):
+        self.wrapped_widget = self._joined_fields
+
+    def _joined_fields(self, field, **kwargs):
+        return " ".join(
+            [
+                field.subfields[0](class_="form-select flex-grow-0 w-25"),
+                field.subfields[1](**kwargs),
+            ]
+        )
+
+
 class TypeAndStringField(Field):
-    widget = TypeAndStringWidget()
+    widget = JoinedFieldsWithClearButtonWidget()
 
     def __init__(self, *args, **kwargs):
         choices = kwargs.pop("choices", None)
