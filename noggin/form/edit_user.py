@@ -121,12 +121,9 @@ class UserSettingsProfileForm(BaseForm):
         _('GitLab Username'), validators=[Optional()], filters=[strip_at]
     )
 
-    website_url = FieldList(
-        URLField(
-            validators=[Optional(), URL(message=_('Valid URL required'))],
-            render_kw={"rows": 6},
-        ),
-        label=_('Website or Blog URL'),
+    website_url = URLField(
+        _('Website or Blog URL'),
+        validators=[Optional(), URL(message=_('Valid URL required'))],
     )
 
     rss_url = FieldList(
