@@ -32,6 +32,7 @@ class User(Representation):
     attr_types = {
         "sshpubkeys": "list",
         "ircnick": "list",
+        "rss_url": "list",
         "gpgkeys": "list",
         "groups": "list",
         "agreements": "list",
