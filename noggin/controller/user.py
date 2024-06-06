@@ -153,8 +153,11 @@ def user_settings_profile(ipa, username):
         )
         if result:
             return result
+    # Add empty field at the end of field lists
     if not form.errors:
-        form.ircnick.append_entry()
+        for field in form:
+            if field.type == "FieldList":
+                field.append_entry()
 
     return render_template(
         'user-settings-profile.html', user=user, form=form, activetab="profile"
