@@ -30,6 +30,7 @@ from noggin.utility.timezones import TIMEZONES
 from .base import (
     BaseForm,
     CSVListField,
+    FieldWithClearButtonWidget,
     ModestForm,
     NonEmptyFieldList,
     SubmitButtonField,
@@ -129,7 +130,7 @@ class UserSettingsProfileForm(BaseForm):
     rss_url = FieldList(
         URLField(
             validators=[Optional(), URL(message=_('Valid URL required'))],
-            render_kw={"rows": 6},
+            widget=FieldWithClearButtonWidget(URLField.widget),
         ),
         label=_('RSS URL'),
     )
