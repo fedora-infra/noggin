@@ -33,8 +33,8 @@ Refer to the `fasjson documentation <https://fasjson.readthedocs.io/>`_
 for information on migrating applications to the new API.
 
 
-.. image:: https://github.com/fedora-infra/noggin/actions/workflows/tests.yml/badge.svg?branch=dev
-    :target: https://github.com/fedora-infra/noggin/actions/workflows/tests.yml?query=branch%3Adev
+.. image:: https://github.com/fedora-infra/noggin/actions/workflows/main.yml/badge.svg?branch=dev
+    :target: https://github.com/fedora-infra/noggin/actions/workflows/main.yml?query=branch%3Adev
 
 .. image:: https://img.shields.io/pypi/v/noggin-aaa.svg
     :target: https://pypi.org/project/noggin-aaa/
