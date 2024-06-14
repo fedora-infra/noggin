@@ -80,6 +80,11 @@ class ProtocolAndNickField(TypeAndStringField):
             raise ValidationError(_("This does not look like a valid server name."))
 
 
+def https_required(form, field):
+    if not field.data.startswith('https://'):
+        raise ValidationError('URL should start with "https://".')
+
+
 class UserSettingsProfileForm(BaseForm):
     firstname = StringField(
         _('First Name'),
@@ -122,14 +127,25 @@ class UserSettingsProfileForm(BaseForm):
         _('GitLab Username'), validators=[Optional()], filters=[strip_at]
     )
 
-    website_url = URLField(
-        _('Website or Blog URL'),
-        validators=[Optional(), URL(message=_('Valid URL required'))],
+    website_url = FieldList(
+        URLField(
+            validators=[
+                Optional(),
+                URL(message=_('Valid URL required')),
+                https_required,
+            ],
+            widget=FieldWithClearButtonWidget(URLField.widget),
+        ),
+        label=_('Blog URL'),
     )
 
     rss_url = FieldList(
         URLField(
-            validators=[Optional(), URL(message=_('Valid URL required'))],
+            validators=[
+                Optional(),
+                URL(message=_('Valid URL required')),
+                https_required,
+            ],
             widget=FieldWithClearButtonWidget(URLField.widget),
         ),
         label=_('RSS URL'),
