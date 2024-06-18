@@ -16,11 +16,11 @@ on:
 jobs:
   misc_tests:
     name: Misc tests
-    container:
-      image: fedorapython/fedora-python-tox
-      options: --user 1001:1001
+    container: fedorapython/fedora-python-tox
     steps:
       - uses: actions/checkout@v4
+      - name: Install RPM dependencies
+        run: dnf install -y poetry
       - name: Run tests
         run: tox -e ${{ matrix.tox_env }}
     continue-on-error: ${{ matrix.optional }}
@@ -45,6 +45,8 @@ jobs:
     container: fedorapython/fedora-python-tox:latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install RPM dependencies
+        run: dnf install -y poetry
       - name: Mark the directory as safe for git
         run: git config --global --add safe.directory $PWD
       - name: Run tests
@@ -69,7 +71,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install Tox
-        run: pip install tox
+        run: pip install tox poetry
       - name: Run integration tests
         # Run tox using the version of Python in `PATH`
         run: tox -e py-integration
