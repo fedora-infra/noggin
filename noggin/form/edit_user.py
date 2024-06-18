@@ -80,12 +80,11 @@ class ProtocolAndNickField(TypeAndStringField):
             raise ValidationError(_("This does not look like a valid server name."))
 
 
-def https_required(form, field):
-    if not field.data.startswith('https://'):
-        raise ValidationError('URL should start with "https://".')
-
-
 class UserSettingsProfileForm(BaseForm):
+    def _https_required(form, field):
+        if not field.data.startswith('https://'):
+            raise ValidationError('URL should start with "https://".')
+
     firstname = StringField(
         _('First Name'),
         validators=[DataRequired(message=_('First name must not be empty'))],
@@ -132,7 +131,7 @@ class UserSettingsProfileForm(BaseForm):
             validators=[
                 Optional(),
                 URL(message=_('Valid URL required')),
-                https_required,
+                _https_required,
             ],
             widget=FieldWithClearButtonWidget(URLField.widget),
         ),
@@ -144,7 +143,7 @@ class UserSettingsProfileForm(BaseForm):
             validators=[
                 Optional(),
                 URL(message=_('Valid URL required')),
-                https_required,
+                _https_required,
             ],
             widget=FieldWithClearButtonWidget(URLField.widget),
         ),
