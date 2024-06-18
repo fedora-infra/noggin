@@ -3,6 +3,10 @@ from collections import namedtuple
 import pytest
 from bs4 import BeautifulSoup
 
+from wtforms import Form
+from wtforms.fields import StringField
+from wtforms.validators import ValidationError
+
 from noggin.form.edit_user import UserSettingsProfileForm
 
 
@@ -92,3 +96,35 @@ def test_form_edit_user_ircnick_valid_empty(app):
     html = BeautifulSoup(form.ircnick.entries[0](), 'html.parser')
     msg = html.select_one("div.invalid-feedback")
     assert msg is None
+
+
+MockField = namedtuple('Field', ['data'])
+
+
+@pytest.mark.parametrize(
+    "data,expected",
+    [
+        # Valid URL
+        ('https://example.com', True),
+        # Invalid URL
+        ('http://example.com', False),
+        # Without protocol
+        ('example.com', False),
+        # Valid with path
+        ('https://example.com/path/test', True),
+        # Valid with query params
+        ('https://example.com/path/?query=param', True),
+    ],
+)
+def test_form_edit_user_https_required(data, expected):
+    form = Form()
+    field = MockField(data)
+
+    if expected:
+        try:
+            UserSettingsProfileForm._https_required(form, field)
+        except ValidationError:
+            pytest.fail("Unexpected ValidationError raised.")
+    else:
+        with pytest.raises(ValidationError):
+            UserSettingsProfileForm._https_required(form, field)
