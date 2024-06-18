@@ -1,0 +1,14 @@
+[Unit]
+Description=Synced Folder with sshfs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStartPre=sh -c "while true; do [ -d /home/vagrant/noggin/.git ] && break; sleep 1; done"
+ExecStart=sh -c "while true; do [ -d /home/vagrant/noggin/.git ] || exit 1; sleep 1; done"
+Restart=always
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
+

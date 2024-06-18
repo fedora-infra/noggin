@@ -39,15 +39,27 @@
     cmd: poetry run pybabel compile -d /home/vagrant/noggin/noggin/translations
     chdir: noggin
 
-- name: Install the systemd unit files for noggin services
+- name: Install the systemd unit files
   copy:
-    src: noggin.service
-    dest: /etc/systemd/system/noggin.service
+    src: "{{ item }}"
+    dest: /etc/systemd/system/{{ item }}
+    owner: vagrant
+    group: vagrant
     mode: 0644
+  loop:
+    - synced-folder.service
+    - noggin.service
+  notify:
+    - reload systemd
+    - restart synced-folder
+    - restart noggin
 
-- name: Start noggin service using systemd
+- name: Start the services using systemd
   systemd:
     state: started
-    name: noggin
+    name: "{{ item }}"
     daemon_reload: yes
     enabled: yes
+  loop:
+    - synced-folder.service
+    - noggin.service
