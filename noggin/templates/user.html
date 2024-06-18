@@ -86,13 +86,25 @@
               {% if user.website_url %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <strong title='{{_("Blog URL")}}'><i class="fa fa-fw fa-link" aria-hidden="true"></i> {{_("Blog")}}</strong>
-                  <a href="{{ user.website_url }}" target="_blank">{{ user.website_url }}</a>
+                  <div class="text-end">
+                    {% for blog in user.website_url %}
+                    <div class="mb-0 text-monospace">
+                      <a href="{{ blog }}" target="_blank">{{ blog[8:] }}</a>
+                    </div>
+                    {% endfor %}
+                  </div>                
                 </li>
               {% endif %}
               {% if user.rss_url %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <strong title='{{_("RSS URL")}}'><i class="fa fa-fw fa-link" aria-hidden="true"></i> {{_("RSS")}}</strong>
-                  <a href="{{ user.rss_url }}" target="_blank">{{ user.rss_url }}</a>
+                  <div class="text-end">
+                    {% for rss in user.rss_url %}
+                    <div class="mb-0 text-monospace">
+                      <a href="{{ rss }}" target="_blank">{{ rss[8:] }}</a>
+                    </div>
+                    {% endfor %}
+                  </div>
                 </li>
               {% endif %}
               {% if user.rhbz_mail %}
