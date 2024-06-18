@@ -2,9 +2,7 @@ from collections import namedtuple
 
 import pytest
 from bs4 import BeautifulSoup
-
 from wtforms import Form
-from wtforms.fields import StringField
 from wtforms.validators import ValidationError
 
 from noggin.form.edit_user import UserSettingsProfileForm
