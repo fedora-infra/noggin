@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from wtforms import Form
 from wtforms.validators import ValidationError
 
-from noggin.form.edit_user import UserSettingsProfileForm
+from noggin.form.edit_user import UserSettingsProfileForm, https_required
 
 
 Obj = namedtuple("Obj", ["ircnick"])
@@ -120,9 +120,9 @@ def test_form_edit_user_https_required(data, expected):
 
     if expected:
         try:
-            UserSettingsProfileForm._https_required(form, field)
+            https_required(form, field)
         except ValidationError:
             pytest.fail("Unexpected ValidationError raised.")
     else:
         with pytest.raises(ValidationError):
-            UserSettingsProfileForm._https_required(form, field)
+            https_required(form, field)
