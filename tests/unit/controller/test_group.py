@@ -8,7 +8,7 @@ from fedora_messaging import testing as fml_testing
 from markupsafe import Markup
 
 from noggin.app import ipa_admin
-from noggin_messages import MemberSponsorV1
+from noggin_messages import MemberRemovedV1, MemberSponsorV1
 
 from ..utilities import assert_redirects_with_flash
 
@@ -248,9 +248,15 @@ def test_group_remove_member(client, dummy_user_as_group_manager, make_user):
     """Test removing a member from a group"""
     make_user("testuser")
     ipa_admin.group_add_member(a_cn="dummy-group", o_user="testuser")
-    result = client.post(
-        '/group/dummy-group/members/remove', data={"username": "testuser"}
-    )
+    with fml_testing.mock_sends(
+        MemberRemovedV1(
+            {"msg": {"agent": "dummy", "user": "testuser", "group": "dummy-group"}}
+        )
+    ):
+        result = client.post(
+            '/group/dummy-group/members/remove', data={"username": "testuser"}
+        )
+
     expected_message = """You got it! testuser has been removed from dummy-group.
     <span class='ml-auto' id="flashed-undo-button">
         <form action="/group/dummy-group/members/" method="post">
@@ -264,7 +270,7 @@ def test_group_remove_member(client, dummy_user_as_group_manager, make_user):
     assert_redirects_with_flash(
         result,
         expected_url="/group/dummy-group/",
-        expected_message=expected_message,
+        expected_message=Markup(expected_message),
         expected_category="success",
     )
 

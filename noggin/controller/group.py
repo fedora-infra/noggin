@@ -10,7 +10,7 @@ from noggin.utility import messaging
 from noggin.utility.controllers import group_or_404, with_ipa
 from noggin.utility.pagination import paginated_find
 from noggin.utility.templates import undo_button
-from noggin_messages import MemberSponsorV1
+from noggin_messages import MemberRemovedV1, MemberSponsorV1
 
 from . import blueprint as bp
 
@@ -149,6 +149,18 @@ def group_remove_member(ipa, groupname):
                 form.hidden_tag(),
             ),
             'success',
+        )
+
+        messaging.publish(
+            MemberRemovedV1(
+                {
+                    "msg": {
+                        "agent": g.current_user.username,
+                        "user": username,
+                        "group": groupname,
+                    }
+                }
+            )
         )
         return redirect(url_for('.group', groupname=groupname))
 
