@@ -21,9 +21,5 @@ poetry install --no-dev --extras deploy
 echo "---> Compiling translations ..."
 pybabel compile -d noggin/translations
 
-echo "---> Apply patches ..."
-curl https://github.com/waldur/python-freeipa/commit/43a4acba7edaec722c65226ed951c1d3fbd56066.patch \
-    | patch -p3 -d /opt/app-root/lib/python3.*/site-packages/python_freeipa
-
 # set permissions for any installed artifacts
 fix-permissions /opt/app-root -P
