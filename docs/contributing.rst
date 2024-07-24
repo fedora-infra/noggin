@@ -35,7 +35,17 @@ packages needed, and start the libvirt service::
     $ sudo systemctl enable libvirtd
     $ sudo systemctl start libvirtd
 
-Check out the code and run ``vagrant up``::
+Check out the tiny-stage repo and run ``vagrant up ipa``::
+
+    $ git clone https://github.com/fedora-infra/tiny-stage
+    $ cd tiny-stage
+    $ vagrant up ipa
+
+Navigate back to the parent directory::
+
+    $ cd ..
+
+Next, Check out the noggin repo and run ``vagrant up``::
 
     $ git clone https://github.com/fedora-infra/noggin
     $ cd noggin
