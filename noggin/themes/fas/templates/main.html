@@ -123,7 +123,17 @@
 
 {% block scripts %}
     <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/jquery/jquery-3.3.1.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/popperjs-2.9.2/popper.min.js') }}"></script>
     <script nonce="{{ csp_nonce() }}" src="{{ url_for('theme.static', filename='vendor/fedora-bootstrap-5.3.3-0/fedora-bootstrap.min.js') }}"></script>
+    <script nonce="{{ csp_nonce() }}">
+    $(function () {
+      // https://getbootstrap.com/docs/5.0/components/popovers/#example-enable-popovers-everywhere
+      var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+      var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+	return new bootstrap.Popover(popoverTriggerEl, {html: true})
+      })
+    })
+    </script>
     {{ super() }}
 {% endblock %}
 
