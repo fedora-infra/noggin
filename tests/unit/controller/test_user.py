@@ -710,4 +710,6 @@ def test_user_private(client, logged_in_dummy_user, make_user):
     assert user_fullname.get_text(strip=True) == "testuser"
     user_attributes = page.select_one("ul#user_attributes")
     assert user_attributes is not None
-    assert len(user_attributes.find_all("li")) == 0
+    assert len(user_attributes.find_all("li")) == 1
+    attr = user_attributes.select_one("li").select_one("strong")
+    assert attr["title"] == "Created On"
