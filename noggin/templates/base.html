@@ -38,8 +38,15 @@
         </script>
         <script nonce="{{ csp_nonce() }}">
           const toastElList = document.querySelectorAll('.toast')
-          const toastList = [...toastElList].map(toastEl => new bootstrap.Toast(toastEl))
-          toastList.forEach(toast => toast.show());
+          toastElList.forEach((element) => {
+            const toast = new bootstrap.Toast(element);
+            toast.show();
+            // Remove the element when it's autohidden
+            // https://github.com/fedora-infra/noggin/issues/1430
+            element.addEventListener('hidden.bs.toast', () => {
+              element.remove();
+            })
+          });
         </script>
       {% endif %}
     {% endblock %}
