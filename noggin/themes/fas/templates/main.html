@@ -47,7 +47,7 @@
     </nav>
     {% with flashes = get_flashed_messages(with_categories=True) %}
         {% if flashes %}
-        <div class="toast-container flash-messages position-fixed mt-2 top-0 start-50 translate-middle-x">
+        <div class="toast-container flash-messages position-fixed mt-0 top-0 start-50 translate-middle-x">
             {% for category, flash in flashes %}
             <div class="toast text-lightstyles-{{ category }} bg-lightstyles-{{ category }} border-lightstyles-{{ category }} d-flex" {{"data-bs-autohide=false" if category != 'success'}} role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-body">{{ flash }}</div>
