@@ -1,6 +1,56 @@
 queue_rules:
+  - name: duplicated default from Sensitive files
+    queue_conditions:
+      - -files~=^noggin/security/
+      - label!=WIP
+      - -draft
+      - approved-reviews-by=@fedora-infra/authdev
+      - "#approved-reviews-by>=1"
+      - "#changes-requested-reviews-by=0"
+      - status-success=DCO
+      - status-success=Misc tests (lint)
+      - status-success=Misc tests (format)
+      - status-success=Misc tests (security)
+      - status-success=Misc tests (docs)
+      - status-success=Unit tests (py39-unittest)
+      - status-success=Unit tests (py310-unittest)
+      - status-success=Integration tests (3.9)
+      - status-success=Integration tests (3.10)
+      - files~=^noggin/security/
+      - label!=WIP
+      - -draft
+      - approved-reviews-by=@fedora-infra/authdev
+      - "#approved-reviews-by>=2"
+      - "#changes-requested-reviews-by=0"
+      - status-success=DCO
+      - status-success=Misc tests (lint)
+      - status-success=Misc tests (format)
+      - status-success=Misc tests (security)
+      - status-success=Misc tests (docs)
+      - status-success=Unit tests (py39-unittest)
+      - status-success=Unit tests (py310-unittest)
+      - status-success=Integration tests (3.9)
+      - status-success=Integration tests (3.10)
+    merge_conditions: []
+    merge_method: rebase
   - name: default
-    conditions:
+    queue_conditions:
+      - -files~=^noggin/security/
+      - label!=WIP
+      - -draft
+      - approved-reviews-by=@fedora-infra/authdev
+      - "#approved-reviews-by>=1"
+      - "#changes-requested-reviews-by=0"
+      - status-success=DCO
+      - status-success=Misc tests (lint)
+      - status-success=Misc tests (format)
+      - status-success=Misc tests (security)
+      - status-success=Misc tests (docs)
+      - status-success=Unit tests (py39-unittest)
+      - status-success=Unit tests (py310-unittest)
+      - status-success=Integration tests (3.9)
+      - status-success=Integration tests (3.10)
+    merge_conditions:
       # Conditions to get out of the queue (= merged)
       - status-success=Misc tests (lint)
       - status-success=Misc tests (format)
@@ -11,50 +61,10 @@ queue_rules:
       - status-success=Unit tests (py310-unittest)
       - status-success=Integration tests (3.9)
       - status-success=Integration tests (3.10)
+    merge_method: rebase
 
 pull_request_rules:
-  - name: Automatic merge on approval
+  - name: Automatic merge on approval + Sensitive files
+    conditions: []
     actions:
       queue:
-        name: default
-        method: rebase
-    conditions:
-      - -files~=^noggin/security/
-      - label!=WIP
-      - -draft
-      - approved-reviews-by=@fedora-infra/authdev
-      - "#approved-reviews-by>=1"
-      - "#changes-requested-reviews-by=0"
-      - status-success=DCO
-      - status-success=Misc tests (lint)
-      - status-success=Misc tests (format)
-      # - status-success=Misc tests (licenses)
-      - status-success=Misc tests (security)
-      - status-success=Misc tests (docs)
-      - status-success=Unit tests (py39-unittest)
-      - status-success=Unit tests (py310-unittest)
-      - status-success=Integration tests (3.9)
-      - status-success=Integration tests (3.10)
-
-  - name: Sensitive files
-    actions:
-      queue:
-        name: default
-        method: rebase
-    conditions:
-      - files~=^noggin/security/
-      - label!=WIP
-      - -draft
-      - approved-reviews-by=@fedora-infra/authdev
-      - "#approved-reviews-by>=2"
-      - "#changes-requested-reviews-by=0"
-      - status-success=DCO
-      - status-success=Misc tests (lint)
-      - status-success=Misc tests (format)
-      # - status-success=Misc tests (licenses)
-      - status-success=Misc tests (security)
-      - status-success=Misc tests (docs)
-      - status-success=Unit tests (py39-unittest)
-      - status-success=Unit tests (py310-unittest)
-      - status-success=Integration tests (3.9)
-      - status-success=Integration tests (3.10)
