@@ -52,36 +52,32 @@ jobs:
       - name: Mark the directory as safe for git
         run: git config --global --add safe.directory $PWD
       - name: Run tests
-        run: tox -e ${{ matrix.tox_env }}
+        run: tox -e py${{ matrix.python }}-unittest
     strategy:
       matrix:
-        tox_env:
-          - py39-unittest
-          - py310-unittest
+        python:
+          - "39"
+          - "310"
     runs-on: ubuntu-latest
 
   integration_tests:
     name: Integration tests
+    container: fedorapython/fedora-python-tox:latest
     steps:
       - uses: actions/checkout@v4
       - name: Install RabbitMQ
         uses: mer-team/rabbitmq-mng-action@v1.2
         with:
           RABBITMQ_TAG: "3-management-alpine"
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Install Tox
-        run: pip install tox poetry
+      - name: Install RPM dependencies
+        run: dnf install -y poetry krb5-devel
       - name: Run integration tests
-        # Run tox using the version of Python in `PATH`
-        run: tox -e py-integration
+        run: tox -e py${{ matrix.python }}-integration
     strategy:
       matrix:
         python:
-          - "3.9"
-          - "3.10"
+          - "39"
+          - "310"
     runs-on: ubuntu-latest
 
   # https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
