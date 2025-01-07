@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install RPM dependencies
-        run: dnf install -y poetry
+        run: dnf install -y poetry krb5-devel
       - name: Mark the directory as safe for git
         run: git config --global --add safe.directory $PWD
       - name: Run tests
@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install RPM dependencies
-        run: dnf install -y poetry
+        run: dnf install -y poetry krb5-devel
       - name: Mark the directory as safe for git
         run: git config --global --add safe.directory $PWD
       - name: Run tests
