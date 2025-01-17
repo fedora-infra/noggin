@@ -224,6 +224,23 @@ def test_login_bad_format(client, mocker, username):
     assert maybe_ipa_login.call_args_list[0][0][2] == username
 
 
+def test_login_email_address(client):
+    """Test giving an email address instead of a username"""
+    result = client.post(
+        '/',
+        data={
+            "login-username": "dummy@example.com",
+            "login-password": "dummy_password",
+            "login-submit": "1",
+        },
+    )
+    assert_form_field_error(
+        result,
+        "login-username",
+        "Please use your username, not your email address.",
+    )
+
+
 @pytest.mark.vcr()
 def test_login_incorrect_password(client, dummy_user):
     """Test a incorrect password"""
