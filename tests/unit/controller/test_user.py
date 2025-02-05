@@ -712,4 +712,4 @@ def test_user_private(client, logged_in_dummy_user, make_user):
     assert user_attributes is not None
     assert len(user_attributes.find_all("li")) == 1
     attr = user_attributes.select_one("li").select_one("strong")
-    assert attr["title"] == "Created On"
+    assert attr["title"] == "Created on"
