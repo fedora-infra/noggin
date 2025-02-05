@@ -18,6 +18,12 @@
             {% endif %}
           </div>
           <ul class="list-group list-group-flush" id="user_attributes">
+              {% if user.creation_time %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong title="{{_("Created on")}}"><i class="fa fa-fw fa-plus-circle"></i> {{_("Created on")}}</strong>
+                  {{ user.creation_time|dateformat }}
+                </li>
+              {% endif %}
               {% if user.pronouns %}
                 <li class="list-group-item d-flex justify-content-between">
                   <strong title="{{_('Pronouns')}}">
@@ -126,12 +132,6 @@
                 </li>
               {% endif %}
               {{ userlinks() if userlinks is defined }}
-              {% if user.creation_time %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <strong title="{{_("Created On")}}"><i class="fa fa-fw fa-plus-circle"></i> {{_("Created On")}}</strong>
-                  {{ user.creation_time|dateformat }}
-                </li>
-              {% endif %}
           </ul>
       </div>
       <div class="col-md-8">
