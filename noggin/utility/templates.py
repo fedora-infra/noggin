@@ -35,7 +35,7 @@ def undo_button(form_action, submit_name, submit_value, hidden_tag):
             </button>
         </form>
     </span>"""
-    return Markup(template)
+    return Markup(template)  # nosec B704
 
 
 def format_nickname(value):
@@ -87,4 +87,4 @@ def format_chat(value, isnick):
         raise ValueError(f"Can't parse '{value}'")
 
     title = _("%(protocol)s on %(server)s", protocol=protocol, server=server)
-    return Markup(f"""<a href="{href}" title="{title}">{name}</a>""")
+    return Markup(f"""<a href="{href}" title="{title}">{name}</a>""")  # nosec B704

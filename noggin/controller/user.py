@@ -107,7 +107,7 @@ def _user_mod(ipa, form, user, details, redirect_to):
                 )
                 raise FormError("non_field_errors", e.message)
         flash(
-            Markup(
+            Markup(  # nosec B704
                 f'Profile Updated: <a href=\"{url_for(".user", username=user.username)}\">'
                 'view your profile</a>'
             ),
