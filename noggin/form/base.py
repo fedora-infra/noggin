@@ -48,7 +48,9 @@ class ButtonWidget:
         classes.append(kwargs.get("class"))
         kwargs["class"] = " ".join(c for c in classes if c)
         # Rendering
-        return Markup(f"<button {html_params(**kwargs)}>{escape(label)}</button>")
+        return Markup(  # nosec B704
+            f"<button {html_params(**kwargs)}>{escape(label)}</button>"
+        )
 
 
 class ButtonSubmitWidget(ButtonWidget):
@@ -107,7 +109,7 @@ class ClearButtonWidget:
         kwargs.setdefault("class", "btn btn-outline-secondary")
         kwargs.setdefault("type", "button")
         kwargs.setdefault("data-action", "clear")
-        return Markup(
+        return Markup(  # nosec B704
             f"<button {html_params(**kwargs)}>"
             '<i class="fa fa-fw fa-times"></i>'
             "</button>"
@@ -131,7 +133,7 @@ class FieldWithClearButtonWidget:
             '</div>',
             " ".join(errors),
         ]
-        return Markup(''.join(html))
+        return Markup(''.join(html))  # nosec B704
 
 
 class JoinedFieldsWithClearButtonWidget(FieldWithClearButtonWidget):
