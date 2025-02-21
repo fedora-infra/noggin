@@ -27,7 +27,12 @@ from noggin.form.password_reset import (
 from noggin.representation.user import User
 from noggin.security.ipa import NoIPAServer, maybe_ipa_session, untouched_ipa_client
 from noggin.utility import messaging
-from noggin.utility.controllers import require_self, user_or_404, with_ipa
+from noggin.utility.controllers import (
+    get_username_from_email,
+    require_self,
+    user_or_404,
+    with_ipa,
+)
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.password_reset import PasswordResetLock
 from noggin.utility.token import Audience, make_password_change_token, read_token
@@ -133,21 +138,10 @@ def forgot_password_ask():
     form = ForgottenPasswordForm()
     if form.validate_on_submit():
         with handle_form_errors(form):
-            username_or_email = form.username.data
-
-            if "@" in username_or_email:
-                emails = ipa_admin.user_find(o_mail=username_or_email)['result']
-                if not emails:
-                    raise FormError(
-                        "username",
-                        _(
-                            "No Users with email %(username_or_email)s found",
-                            username_or_email=username_or_email,
-                        ),
-                    )
-                username = emails[0]["uid"][0]
-            else:
-                username = username_or_email
+            try:
+                username = get_username_from_email(ipa_admin, form.username.data)
+            except ValueError as e:
+                raise FormError("username", str(e))
 
             lock = PasswordResetLock(username)
             valid_until = lock.valid_until()

@@ -10,17 +10,22 @@ from flask import (
 )
 from flask_babel import _
 
+from noggin.app import ipa_admin
 from noggin.form.sync_token import SyncTokenForm
 from noggin.security.ipa import NoIPAServer, maybe_ipa_login, untouched_ipa_client
+from noggin.utility.controllers import get_username_from_email
 from noggin.utility.forms import FormError, handle_form_errors
 
 from . import blueprint as bp
 
 
 def handle_login_form(form):
-    username = form.username.data
-    password = form.password.data
+    try:
+        username = get_username_from_email(ipa_admin, form.username.data)
+    except ValueError as e:
+        raise FormError("username", str(e))
 
+    password = form.password.data
     if form.otp.data:
         password += form.otp.data
 
