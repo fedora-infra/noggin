@@ -66,3 +66,18 @@ def user_or_404(ipa, username):
     if User(user).locked:
         abort(404)
     return user
+
+
+def get_username_from_email(ipa, username_or_email):
+    if "@" not in username_or_email:
+        return username_or_email
+
+    result = ipa.user_find(o_mail=username_or_email)['result']
+    if not result:
+        msg = _(
+            "No Users with email %(username_or_email)s found",
+            username_or_email=username_or_email,
+        )
+        current_app.logger.info(msg)
+        raise ValueError(msg)
+    return result[0]["uid"][0]

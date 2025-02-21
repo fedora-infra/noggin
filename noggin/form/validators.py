@@ -74,8 +74,3 @@ class BlockedPatterns(object):
         for pattern in patterns:
             if re.match(pattern, value):
                 raise ValidationError(self.message % {"pattern": pattern})
-
-
-def no_email(form, field):
-    if "@" in field.data:
-        raise ValidationError(_("Please use your username, not your email address."))

@@ -224,12 +224,32 @@ def test_login_bad_format(client, mocker, username):
     assert maybe_ipa_login.call_args_list[0][0][2] == username
 
 
-def test_login_email_address(client):
+@pytest.mark.vcr()
+def test_login_email_address(client, dummy_user):
     """Test giving an email address instead of a username"""
     result = client.post(
         '/',
         data={
-            "login-username": "dummy@example.com",
+            "login-username": "dummy@unit.tests",
+            "login-password": "dummy_password",
+            "login-submit": "1",
+        },
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/",
+        expected_message="Welcome, dummy!",
+        expected_category="success",
+    )
+
+
+@pytest.mark.vcr()
+def test_login_non_existent_email_address(client):
+    """Test giving an unknown email address"""
+    result = client.post(
+        '/',
+        data={
+            "login-username": "unknown@example.com",
             "login-password": "dummy_password",
             "login-submit": "1",
         },
@@ -237,7 +257,7 @@ def test_login_email_address(client):
     assert_form_field_error(
         result,
         "login-username",
-        "Please use your username, not your email address.",
+        "No Users with email unknown@example.com found",
     )
 
 
