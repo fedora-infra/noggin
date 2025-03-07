@@ -652,7 +652,7 @@ def test_user_settings_agreements_post(client, logged_in_dummy_user, dummy_agree
     )
     assert_redirects_with_flash(
         result,
-        expected_url="/user/dummy/settings/agreements/",
+        expected_url="http://localhost/user/dummy/settings/agreements/",
         expected_message="You signed the \"dummy agreement\" agreement.",
         expected_category="success",
     )
@@ -674,7 +674,7 @@ def test_user_settings_agreements_post_bad_request(
         )
     assert_redirects_with_flash(
         result,
-        expected_url="/user/dummy/settings/agreements/",
+        expected_url="http://localhost/user/dummy/settings/agreements/",
         expected_message="Cannot sign the agreement \"dummy agreement\": something went wrong",
         expected_category="danger",
     )
@@ -690,9 +690,12 @@ def test_user_settings_agreements_post_unknown(
     )
     assert_redirects_with_flash(
         result,
-        expected_url="/user/dummy/settings/agreements/",
-        expected_message="Unknown agreement: this does not exist.",
-        expected_category="warning",
+        expected_url="http://localhost/user/dummy/settings/agreements/",
+        expected_message=(
+            'Cannot sign the agreement "this does not exist": this does not exist: '
+            'Agreement not found'
+        ),
+        expected_category="danger",
     )
 
 

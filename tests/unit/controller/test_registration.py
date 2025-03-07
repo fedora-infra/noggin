@@ -305,7 +305,7 @@ def test_step_3(
         )
     assert_redirects_with_flash(
         result,
-        expected_url="/",
+        expected_url="/register/agreements",
         expected_message="Congratulations, your account has been created! Welcome, Dummy User.",
         expected_category="success",
     )
@@ -327,6 +327,37 @@ def test_step_1_no_smtp(client, post_data_step_1, cleanup_dummy_user, mocker):
     )
     # Log message
     logger.error.assert_called_once()
+
+
+@pytest.mark.vcr()
+def test_no_agreement(client, logged_in_dummy_user):
+    """Test skipping the agreement signing"""
+    response = client.get('/register/agreements')
+    print(response.text)
+    assert response.status_code == 302
+    assert response.location == "/"
+
+
+@pytest.mark.vcr()
+def test_agreements(client, logged_in_dummy_user, dummy_agreement):
+    """Test getting the user agreements page during registration"""
+    result = client.get('/register/agreements')
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, 'html.parser')
+    assert page.title
+    assert len(page.select("#agreement-modal-dummyagreement")) == 1
+
+
+@pytest.mark.vcr()
+def test_agreements_post(client, logged_in_dummy_user, dummy_agreement):
+    """Test signing an agreement during registration"""
+    result = client.post('/register/agreements', data={"agreement": "dummy agreement"})
+    assert_redirects_with_flash(
+        result,
+        expected_url="http://localhost/register/agreements",
+        expected_message="You signed the \"dummy agreement\" agreement.",
+        expected_category="success",
+    )
 
 
 @pytest.mark.vcr()
@@ -760,7 +791,7 @@ def test_no_direct_login(
         )
     assert_redirects_with_flash(
         result,
-        expected_url="/",
+        expected_url="/register/agreements",
         expected_message=(
             "Congratulations, your account has been created! Go ahead and sign in to proceed."
         ),
