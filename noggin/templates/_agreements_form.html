@@ -1,0 +1,39 @@
+<div class="list-group">
+    {% for agreement in agreementslist %}
+    <div class="list-group-item">
+        <div class="row align-items-center">
+          <div class="col h6">
+            <div>{{ agreement.name }}</div>
+          </div>
+          <div class="col-auto">
+            {% if agreement.name in user.agreements %}
+            <a data-bs-toggle="modal" data-bs-target="#agreement-modal-{{agreement.slug}}" class="btn btn-link" href="javascript:void(0)">{{ _("View agreement") }}</a>
+            {% else %}
+            <a data-bs-toggle="modal" data-bs-target="#agreement-modal-{{agreement.slug}}" class="btn btn-primary" href="javascript:void(0)">{{ _("Sign") }}</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+</div>
+
+{% for agreement in agreementslist %}
+<div class="modal fade" id="agreement-modal-{{agreement.slug}}" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <pre>{{ agreement.description}}</pre>
+        {% if agreement.name not in user.agreements %}
+        <form action="{{ request.url }}" method="post" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type='submit' class="btn btn-lg btn-block btn-primary" name="agreement" value="{{ agreement.name }}">{{ _("Sign User Agreement") }}</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}

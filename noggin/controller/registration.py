@@ -20,12 +20,14 @@ from translitcodec import codecs
 from unidecode import unidecode
 
 from noggin.app import csrf, ipa_admin, mailer
+from noggin.form.edit_user import UserSettingsAgreementSign
 from noggin.form.register_user import (
     PasswordSetForm,
     RegisteringActionForm,
     ResendValidationEmailForm,
 )
 from noggin.l10n import guess_locale
+from noggin.representation.agreement import Agreement
 from noggin.representation.user import User
 from noggin.security.ipa import NoIPAServer, maybe_ipa_login, untouched_ipa_client
 from noggin.signals import stageuser_created, user_registered
@@ -34,6 +36,7 @@ from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.token import Audience, make_token, read_token
 
 from . import blueprint as bp
+from .user import handle_agreement_form
 
 
 # Errors coming from FreeIPA are specified by a field name that is different from our form field
@@ -326,9 +329,33 @@ def activate_account():
                     ),
                     'success',
                 )
-            return redirect(url_for('.root'))
+            return redirect(url_for('.sign_agreements'))
 
     return render_template('registration-activation.html', user=user, form=form)
+
+
+@bp.route('/register/agreements', methods=["GET", "POST"])
+@with_ipa()
+def sign_agreements(ipa):
+    agreements = [
+        Agreement(a) for a in ipa.fasagreement_find(all=False, ipaenabledflag=True)
+    ]
+    if not agreements:
+        return redirect(url_for('.root'))
+
+    ipa_user = ipa.user_show(a_uid=session.get('noggin_username'))['result']
+    user = User(ipa_user)
+
+    form = UserSettingsAgreementSign()
+    if form.validate_on_submit():
+        return handle_agreement_form(ipa, user, form)
+
+    return render_template(
+        'registration-agreements.html',
+        user=user,
+        agreementslist=agreements,
+        all_signed=all(agreement.name in user.agreements for agreement in agreements),
+    )
 
 
 @bp.route('/register/spamcheck-hook', methods=["POST"])
