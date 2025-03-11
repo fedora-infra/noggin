@@ -41,3 +41,11 @@ def test_lock_delete_alread_deleted(tmp_lock_dir):
     except FileNotFoundError:
         assert False, "delete() crashes on absent files"
     assert lock.valid_until() is None
+
+
+def test_lock_bad_username(tmp_lock_dir):
+    username = "/etc/passwd"
+    lock = PasswordResetLock(username)
+    valid_until = lock.valid_until()
+    assert valid_until is None
+    assert lock._get_file_path() != username

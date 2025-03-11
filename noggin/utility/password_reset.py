@@ -6,7 +6,7 @@ from flask import current_app
 
 class PasswordResetLock:
     def __init__(self, username):
-        self.username = username
+        self.username = username.replace("/", "")
 
     def valid_until(self):
         try:
