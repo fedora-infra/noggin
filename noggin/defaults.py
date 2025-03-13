@@ -13,7 +13,8 @@ USER_DEFAULTS = {
     "status_note": "active",
 }
 THEME = "default"
-PASSWORD_POLICY = {"min": 8, "max": -1}
+# Max password length + 6-digits OTP is 128: https://pagure.io/freeipa/issue/9600
+PASSWORD_POLICY = {"min": 8, "max": 122}
 PASSWORD_RESET_EXPIRATION = 10  # in minutes
 # We're running in Openshift, so nobody else has access to /tmp
 PASSWORD_RESET_LOCK_DIR = "/tmp/noggin-pw-reset"  # nosec

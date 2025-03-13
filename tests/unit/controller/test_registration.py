@@ -518,7 +518,27 @@ def test_short_password_form(
         f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
     )
     assert_form_field_error(
-        result, "password", expected_message='Field must be at least 6 characters long.'
+        result,
+        "password",
+        expected_message='Field must be between 6 and 122 characters long.',
+    )
+
+
+@pytest.mark.vcr()
+def test_password_form_too_long(
+    client, post_data_step_3, token_for_dummy_user, cleanup_dummy_user
+):
+    """Register a user with too short a password"""
+    post_data_step_3["password"] = post_data_step_3["password_confirm"] = "x" * 123
+    result = client.post(
+        f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
+    )
+    print(result.status_code)
+    print(result.data)
+    assert_form_field_error(
+        result,
+        "password",
+        expected_message='Field must be between 6 and 122 characters long.',
     )
 
 

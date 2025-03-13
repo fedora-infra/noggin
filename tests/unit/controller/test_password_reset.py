@@ -234,7 +234,7 @@ def test_short_password_form(client, dummy_user):
     assert_form_field_error(
         result,
         field_name="password",
-        expected_message="Field must be at least 6 characters long.",
+        expected_message="Field must be between 6 and 122 characters long.",
     )
 
 

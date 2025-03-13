@@ -357,7 +357,9 @@ def test_change_post_password_too_short(
         data={"password": "42", "password_confirm": "42"},
     )
     assert_form_field_error(
-        result, "password", expected_message="Field must be at least 6 characters long."
+        result,
+        "password",
+        expected_message="Field must be between 6 and 122 characters long.",
     )
 
 

@@ -52,7 +52,7 @@ def app_config(ipa_cert):
         # Email sender
         MAIL_DEFAULT_SENDER="Noggin <noggin@unit.tests>",
         # Set a different password policy betweed the form and the server so we can test both
-        PASSWORD_POLICY={"min": 6},
+        PASSWORD_POLICY={"min": 6, "max": 122},
         # Don't delete the role we may have in the dev env
         STAGE_USERS_ROLE="Testing Stage Users Admins",
         # Turn on Fedora Messaging
