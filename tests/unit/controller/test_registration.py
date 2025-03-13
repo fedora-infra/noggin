@@ -911,7 +911,6 @@ def test_spamcheck_wrong_status(client, dummy_user, mocker, spamcheck_on):
 
 
 @pytest.fixture
-@pytest.mark.vcr()
 def logged_in_stage_users_admin(client, make_user, app):
     make_user("stageadmin")
     ipa_admin.role_add_member(app.config["STAGE_USERS_ROLE"], o_user=["stageadmin"])
