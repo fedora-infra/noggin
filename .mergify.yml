@@ -49,3 +49,9 @@ pull_request_rules:
     conditions: []
     actions:
       queue:
+priority_rules:
+  - name: priority for queue `Sensitive files`
+    conditions:
+      - files~=^noggin/security/
+      - "#approved-reviews-by>=2"
+    priority: 2250
