@@ -171,6 +171,23 @@ class UserSettingsEmailForm(BaseForm):
         ],
     )
 
+    extra_mails = FieldList(
+        EmailField(
+            _('Additional email'),
+            validators=[Optional(), Email(message=_('Email must be valid'))],
+        ),
+        label=_('Additional emails'),
+    )
+
+    display_fedoraproject_email = BooleanField(
+        _('Display Fedora Project email alias'),
+        description=_(
+            "When checked, Noggin will display your @fedoraproject.org address on your profile "
+            "and use it for Gravatar if you have one."
+        ),
+        validators=[Optional()],
+    )
+
     rhbz_mail = EmailField(_('Red Hat Bugzilla Email'), validators=[Optional()])
 
 

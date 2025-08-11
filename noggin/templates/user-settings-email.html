@@ -6,7 +6,34 @@
 <form class="needs-validation" action="{{ url_for('.user_settings_email', username=user.username) }}" method="post" novalidate>
     {{ form.csrf_token }}
     <div class="card-body">
-      <div class="mb-3">{{ macros.with_errors(form.mail) }}</div>
+      <div class="mb-3">{{ macros.with_errors(form.mail, label=_('Primary E-mail Address')) }}</div>
+
+      <hr>
+
+      <div class="mb-3" id="extra-emails-fields">
+        <label class="form-label">{{ form.extra_mails.label }}</label>
+        <div id="extra-emails-container">
+          {% for subfield in form.extra_mails %}
+            <div class="input-group mb-3">
+              {{ macros.with_errors(subfield, placeholder=_("user@example.com"), hide_label=True) }}
+              <button class="btn btn-danger remove-field" type="button"><i class="fa fa-trash"></i></button>
+            </div>
+          {% endfor %}
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="add-email-btn">{{_('Add another email')}}</button>
+      </div>
+
+      <hr>
+
+      <div class="mb-3">{{ macros.with_errors(form.display_fedoraproject_email) }}</div>
+      {% if form.display_fedoraproject_email.data and not user.fedora_alias %}
+        <div class="alert alert-warning">
+          {{ _('You have enabled displaying your Fedora Project email alias, but you do not have one. Please add %(username)s@fedoraproject.org to your emails.', username=user.username) }}
+        </div>
+      {% endif %}
+
+      <hr>
+
       <div class="mb-3">{{ macros.with_errors(form.rhbz_mail) }}</div>
     </div>
     <div class="card-footer d-flex justify-content-between">
@@ -19,4 +46,34 @@
 {% block scripts %}
   {{ super () }}
   {{ macros.unsaved_changes() }}
+  <script nonce="{{ csp_nonce() }}">
+    document.addEventListener('DOMContentLoaded', function () {
+      const container = document.getElementById('extra-emails-container');
+      const addButton = document.getElementById('add-email-btn');
+      let fieldIndex = {{ form.extra_mails|length }};
+
+      addButton.addEventListener('click', function() {
+        const newFieldHTML = `
+        <div class="input-group mb-3">
+          <input class="form-control" id="extra_mails-${fieldIndex}" name="extra_mails-${fieldIndex}" type="email" value="" placeholder="user@example.com">
+          <button class="btn btn-danger remove-field" type="button"><i class="fa fa-trash"></i></button>
+        </div>`;
+        const newField = document.createElement('div');
+        // a bit of a hack to parse the html
+        newField.innerHTML = newFieldHTML;
+        container.appendChild(newField.firstElementChild);
+        fieldIndex++;
+      });
+
+      container.addEventListener('click', function(e) {
+        if (e.target && e.target.closest('.remove-field')) {
+          // Mark for deletion by clearing the value, the backend will handle it.
+          const fieldGroup = e.target.closest('.input-group');
+          const input = fieldGroup.querySelector('input');
+          input.value = "";
+          fieldGroup.style.display = 'none';
+        }
+      });
+    });
+  </script>
 {% endblock %}

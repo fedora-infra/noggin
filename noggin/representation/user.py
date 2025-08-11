@@ -10,6 +10,7 @@ class User(Representation):
         "displayname": "displayname",
         "gecos": "gecos",
         "mail": "mail",
+        "description": "description",
         "sshpubkeys": "ipasshpubkey",
         "last_password_change": "krblastpwdchange",
         "agreements": "memberof_fasagreement",
@@ -30,6 +31,8 @@ class User(Representation):
         "rss_url": "fasrssurl",
     }
     attr_types = {
+        "mail": "list",
+        "description": "list",
         "sshpubkeys": "list",
         "ircnick": "list",
         "website_url": "list",
@@ -66,6 +69,33 @@ class User(Representation):
         direct_groups = self.raw.get("memberof_group", [])
         indirect_groups = self.raw.get("memberofindirect_group", [])
         return CONVERTERS["list"](direct_groups + indirect_groups)
+
+    @property
+    def emails(self):
+        return self.mail
+
+    @property
+    def primary_email(self):
+        return self.emails[0] if self.emails else None
+
+    @property
+    def fedora_alias(self):
+        if not self.emails:
+            return None
+        for email in self.emails:
+            if email.endswith("@fedoraproject.org"):
+                return email
+        return None
+
+    @property
+    def display_email(self):
+        if (
+            self.fedora_alias
+            and self.description
+            and "display_fedoraproject_email=true" in self.description
+        ):
+            return self.fedora_alias
+        return self.primary_email
 
     def anonymize(self):
         not_hidden = [
