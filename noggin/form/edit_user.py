@@ -169,6 +169,7 @@ class UserSettingsEmailForm(BaseForm):
             DataRequired(message=_('Email must not be empty')),
             Email(message=_('Email must be valid')),
         ],
+        render_kw={'readonly': True}
     )
 
     extra_mails = FieldList(
