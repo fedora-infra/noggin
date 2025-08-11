@@ -8,7 +8,7 @@
 {% endblock %}
 {% block settings_content %}
   <div class="card-body border-bottom">
-    <img src="{{ gravatar(user.mail if user.mail else 'default', 100) }}" class="pb-2" alt="user avatar"/>
+    <img src="{{ gravatar(user.display_email if user.display_email else 'default', 100) }}" class="pb-2" alt="user avatar"/>
     {% set buttontext = _('Change Avatar')%}
     {%- if OPENID is defined %}
     <form method="GET" action="https://www.libravatar.org/openid/login/">

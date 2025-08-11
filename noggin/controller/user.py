@@ -4,6 +4,7 @@ from base64 import b32encode
 import jwt
 import python_freeipa
 from flask import (
+    abort,
     current_app,
     flash,
     g,
@@ -108,7 +109,7 @@ def _user_mod(ipa, form, user, details, redirect_to):
                 raise FormError("non_field_errors", e.message)
         flash(
             Markup(  # nosec B704
-                f'Profile Updated: <a href=\"{url_for(".user", username=user.username)}\">'
+                f'Profile Updated: <a href="{url_for(".user", username=user.username)}">'
                 'view your profile</a>'
             ),
             'success',
@@ -186,62 +187,111 @@ def _send_validation_email(user, attr, value):
 @with_ipa()
 @require_self
 def user_settings_email(ipa, username):
-    user = User(user_or_404(ipa, username))
-    form = UserSettingsEmailForm(obj=user)
-    attrs = ["mail", "rhbz_mail"]
+    user = User(user_or_404(ipa, username, all=True))
+    form = UserSettingsEmailForm()
+
+    if request.method == "GET":
+        form.mail.data = user.primary_email
+        form.rhbz_mail.data = user.rhbz_mail
+        if user.emails:
+            for email in user.emails[1:]:
+                form.extra_mails.append_entry(email)
+        if user.description and "display_fedoraproject_email=true" in user.description:
+            form.display_fedoraproject_email.data = True
 
     if form.validate_on_submit():
-        change_now = {}
-        needs_validation = {}
-        for attr in attrs:
-            value = getattr(form, attr).data
-            old_value = getattr(user, attr) or ""
-            option_name = user.get_attr_option(attr)
-            if value != old_value:
-                if not value:
-                    # email has been removed
-                    change_now[option_name] = value
-                else:
-                    needs_validation[attr] = value
-        should_redirect = False
-        if change_now:
-            should_redirect = _user_mod(
-                ipa,
-                form,
-                user,
-                change_now,
-                ".user_settings_email",
-            )
-        if needs_validation:
-            for attr, value in needs_validation.items():
-                try:
-                    _send_validation_email(user, attr, value)
-                except ConnectionRefusedError as e:
-                    current_app.logger.error(
-                        f"Impossible to send an address validation email: {e}"
-                    )
-                    form["non_field_errors"].errors.append(
-                        _(
-                            "We could not send you the address validation email, please retry later"
-                        )
-                    )
-                    break
+        mods_made = False
+        # We have to handle redirects manually so we can process all fields before returning
+        should_redirect = None
+
+        # Handle rhbz_mail separately, as it has its own attribute
+        rhbz_mail_val = form.rhbz_mail.data or ""
+        if rhbz_mail_val != (user.rhbz_mail or ""):
+            if not rhbz_mail_val:
+                with handle_form_errors(form):
+                    ipa.user_mod(user.username, o_fasrhbzemail="")
+                flash("Red Hat Bugzilla email removed.", "success")
+                mods_made = True
+            else:
+                _send_validation_email(user, "rhbz_mail", rhbz_mail_val)
                 flash(
-                    _(
-                        "The email address %(mail)s needs to be validated. Please check your "
-                        "inbox and click on the link to proceed. If you can't find the email "
-                        "in a couple minutes, check your spam folder.",
-                        mail=value,
-                    ),
+                    f"A validation email has been sent to {rhbz_mail_val} for your "
+                    "Red Hat Bugzilla email.",
                     "info",
                 )
-                should_redirect = redirect(
-                    url_for('.user_settings_email', username=user.username)
+                mods_made = True
+
+        # Handle mail attributes
+        old_emails = user.emails or []
+        new_emails_list = [form.mail.data] + [
+            e.data for e in form.extra_mails if e.data
+        ]
+
+        added_emails = [e for e in new_emails_list if e not in old_emails]
+        removed_emails = [e for e in old_emails if e not in new_emails_list]
+        reordered = (
+            not added_emails
+            and not removed_emails
+            and old_emails != new_emails_list
+        )
+
+        with handle_form_errors(form):
+            if removed_emails:
+                ipa.user_mod(user.username, delattr=[f"mail={email}" for email in removed_emails])
+                flash(f"Email(s) removed: {', '.join(removed_emails)}", "success")
+                mods_made = True
+
+            if reordered:
+                ipa.user_mod(user.username, o_mail=new_emails_list)
+                flash("Email order has been updated.", "success")
+                mods_made = True
+
+        for email in added_emails:
+            try:
+                _send_validation_email(user, "mail", email)
+                flash(f"A validation email has been sent to {email}", "info")
+                mods_made = True
+            except ConnectionRefusedError as e:
+                current_app.logger.error(
+                    f"Impossible to send an address validation email: {e}"
                 )
+                form["non_field_errors"].errors.append(
+                    _(
+                        "We could not send you the address validation email, please retry later"
+                    )
+                )
+                break
+
+        # Handle the display_fedoraproject_email checkbox
+        display_fedora_email = form.display_fedoraproject_email.data
+        description_tag = "display_fedoraproject_email=true"
+        has_tag = user.description and description_tag in user.description
+
+        with handle_form_errors(form):
+            if display_fedora_email and not has_tag:
+                ipa.user_mod(user.username, setattr=[f"description={description_tag}"])
+                flash("Display preference updated.", "success")
+                mods_made = True
+            elif not display_fedora_email and has_tag:
+                # Per instructions, set description to empty string on uncheck
+                ipa.user_mod(user.username, setattr=["description="])
+                flash("Display preference updated.", "success")
+                mods_made = True
+
+        if mods_made and not form.errors:
+            should_redirect = redirect(
+                url_for('.user_settings_email', username=user.username)
+            )
+
         if should_redirect:
             return should_redirect
-        if not change_now and not needs_validation:
+
+        if not mods_made and not form.errors:
             form["non_field_errors"].errors.append(_("No modifications."))
+
+    # Add an empty field for new emails on GET, or if POST fails validation
+    if not form.errors:
+        form.extra_mails.append_entry()
 
     return render_template(
         'user-settings-email.html', user=user, form=form, activetab="email"
@@ -282,22 +332,27 @@ def user_settings_email_validate(ipa, username):
     form = BaseForm()
 
     if form.validate_on_submit():
-        option_name = user.get_attr_option(token["attr"])
-        result = _user_mod(
-            ipa,
-            form,
-            user,
-            {option_name: value},
-            ".user_settings_email",
-        )
-        if result:
-            return result
+        with handle_form_errors(form):
+            if attr == "mail":
+                ipa.user_mod(user.username, addattr=[f"mail={value}"])
+                flash(_("Email address %(mail)s added.", mail=value), "success")
+            else:
+                # Fallback for rhbz_mail and other potential fields
+                option_name = user.get_attr_option(attr)
+                ipa.user_mod(user.username, **{option_name: value})
+                flash(
+                    _("Email address %(mail)s verified and updated.", mail=value),
+                    "success",
+                )
+        return redirect(url_for(".user_settings_email", username=user.username))
 
     return render_template(
         'user-settings-email-validation.html',
         form=form,
         user=user,
-        attr_label=UserSettingsEmailForm()[attr].label,
+        attr_label=UserSettingsEmailForm().mail.label
+        if attr == "mail"
+        else UserSettingsEmailForm()[attr].label,
         value=value,
     )
 
@@ -448,7 +503,7 @@ def user_settings_otp_disable(ipa, username):
         except python_freeipa.exceptions.BadRequest as e:
             if (
                 e.message
-                == "Server is unwilling to perform: Can't disable last active token"
+                == "Server is unwilling to perform: Can\'t disable last active token"
             ):
                 flash(_('Sorry, You cannot disable your last active token.'), 'warning')
             else:
@@ -509,7 +564,7 @@ def user_settings_otp_delete(ipa, username):
         except python_freeipa.exceptions.BadRequest as e:
             if (
                 e.message
-                == "Server is unwilling to perform: Can't delete last active token"
+                == "Server is unwilling to perform: Can\'t delete last active token"
             ):
                 flash(_('Sorry, You cannot delete your last active token.'), 'warning')
             else:
@@ -537,7 +592,7 @@ def handle_agreement_form(ipa, user, form):
         current_app.logger.error(f"Cannot sign the agreement {agreement_name!r}: {e}")
         flash(
             _(
-                'Cannot sign the agreement "%(name)s": %(error)s',
+                'Cannot sign the agreement "%s": %s',
                 name=agreement_name,
                 error=e,
             ),
@@ -545,7 +600,7 @@ def handle_agreement_form(ipa, user, form):
         )
     else:
         flash(
-            _('You signed the "%(name)s" agreement.', name=agreement_name),
+            _('You signed the "%s" agreement.', name=agreement_name),
             "success",
         )
     return redirect(request.url)
