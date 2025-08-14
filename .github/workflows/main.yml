@@ -18,7 +18,7 @@ jobs:
     name: Misc tests
     container: fedorapython/fedora-python-tox
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install RPM dependencies
         run: dnf install -y poetry python3-poetry-plugin-export krb5-devel
       - name: Mark the directory as safe for git
@@ -46,7 +46,7 @@ jobs:
     name: Unit tests
     container: fedorapython/fedora-python-tox:latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install RPM dependencies
         run: dnf install -y poetry python3-poetry-plugin-export krb5-devel
       - name: Mark the directory as safe for git
@@ -66,7 +66,7 @@ jobs:
     name: Integration tests
     container: fedorapython/fedora-python-tox:latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install RabbitMQ
         uses: mer-team/rabbitmq-mng-action@v1.2
         with:
@@ -97,7 +97,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
