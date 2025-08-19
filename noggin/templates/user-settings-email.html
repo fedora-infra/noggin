@@ -6,6 +6,7 @@
 <form class="needs-validation" action="{{ url_for('.user_settings_email', username=user.username) }}" method="post" novalidate>
     {{ form.csrf_token }}
     <div class="card-body">
+      {# Create the main body of the user seettings form. Render fields and buttons. #}
       <div class="mb-3">{{ macros.with_errors(form.mail, label=_('Primary E-mail Address')) }}</div>
 
       <hr>
@@ -46,6 +47,8 @@
 {% block scripts %}
   {{ super () }}
   {{ macros.unsaved_changes() }}
+
+  {# Add JavaScript to handle dynamic addition and removal of email fields #}
   <script nonce="{{ csp_nonce() }}">
     document.addEventListener('DOMContentLoaded', function () {
       const container = document.getElementById('extra-emails-container');
@@ -59,7 +62,7 @@
           <button class="btn btn-danger remove-field" type="button"><i class="fa fa-trash"></i></button>
         </div>`;
         const newField = document.createElement('div');
-        // a bit of a hack to parse the html
+        
         newField.innerHTML = newFieldHTML;
         container.appendChild(newField.firstElementChild);
         fieldIndex++;

@@ -169,9 +169,9 @@ class UserSettingsEmailForm(BaseForm):
             DataRequired(message=_('Email must not be empty')),
             Email(message=_('Email must be valid')),
         ],
-        render_kw={'readonly': True}
     )
 
+    # Collect additional user emails
     extra_mails = FieldList(
         EmailField(
             _('Additional email'),
@@ -180,6 +180,7 @@ class UserSettingsEmailForm(BaseForm):
         label=_('Additional emails'),
     )
 
+    # Checkbox to display Fedora Project email alias
     display_fedoraproject_email = BooleanField(
         _('Display Fedora Project email alias'),
         description=_(
