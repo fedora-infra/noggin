@@ -60,6 +60,7 @@ def group_or_404(ipa, groupname):
 
 def user_or_404(ipa, username, **kwargs):
     try:
+        # Find a specific user in IPA
         users = ipa.user_find(o_uid=username, **kwargs)['result']
         if not users:
             abort(404)

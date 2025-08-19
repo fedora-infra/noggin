@@ -109,7 +109,7 @@ def _user_mod(ipa, form, user, details, redirect_to):
                 raise FormError("non_field_errors", e.message)
         flash(
             Markup(  # nosec B704
-                f'Profile Updated: <a href="{url_for(".user", username=user.username)}">'
+                f'Profile Updated: <a href=\"{url_for(".user", username=user.username)}\">'
                 'view your profile</a>'
             ),
             'success',
@@ -190,6 +190,7 @@ def user_settings_email(ipa, username):
     user = User(user_or_404(ipa, username, all=True))
     form = UserSettingsEmailForm()
 
+    # Populate the web form with user settings
     if request.method == "GET":
         form.mail.data = user.primary_email
         form.rhbz_mail.data = user.rhbz_mail
@@ -269,12 +270,11 @@ def user_settings_email(ipa, username):
 
         with handle_form_errors(form):
             if display_fedora_email and not has_tag:
-                ipa.user_mod(user.username, setattr=[f"description={description_tag}"])
+                ipa.user_mod(user.username, addattr=[f"description={description_tag}"])
                 flash("Display preference updated.", "success")
                 mods_made = True
             elif not display_fedora_email and has_tag:
-                # Per instructions, set description to empty string on uncheck
-                ipa.user_mod(user.username, setattr=["description="])
+                ipa.user_mod(user.username, delattr=[f"description={description_tag}"])
                 flash("Display preference updated.", "success")
                 mods_made = True
 
@@ -503,7 +503,7 @@ def user_settings_otp_disable(ipa, username):
         except python_freeipa.exceptions.BadRequest as e:
             if (
                 e.message
-                == "Server is unwilling to perform: Can\'t disable last active token"
+                == "Server is unwilling to perform: Can't disable last active token"
             ):
                 flash(_('Sorry, You cannot disable your last active token.'), 'warning')
             else:
@@ -564,7 +564,7 @@ def user_settings_otp_delete(ipa, username):
         except python_freeipa.exceptions.BadRequest as e:
             if (
                 e.message
-                == "Server is unwilling to perform: Can\'t delete last active token"
+                == "Server is unwilling to perform: Can't delete last active token"
             ):
                 flash(_('Sorry, You cannot delete your last active token.'), 'warning')
             else:
@@ -592,7 +592,7 @@ def handle_agreement_form(ipa, user, form):
         current_app.logger.error(f"Cannot sign the agreement {agreement_name!r}: {e}")
         flash(
             _(
-                'Cannot sign the agreement "%s": %s',
+                'Cannot sign the agreement "%(name)s": %(error)s',
                 name=agreement_name,
                 error=e,
             ),
@@ -600,7 +600,7 @@ def handle_agreement_form(ipa, user, form):
         )
     else:
         flash(
-            _('You signed the "%s" agreement.', name=agreement_name),
+            _('You signed the "%(name)s" agreement.', name=agreement_name),
             "success",
         )
     return redirect(request.url)
