@@ -17,6 +17,7 @@ class User(Representation):
         "locale": "faslocale",
         "ircnick": "fasircnick",
         "gpgkeys": "fasgpgkeyid",
+        "codeberg": "fascodebergusername",
         "github": "fasgithubusername",
         "gitlab": "fasgitlabusername",
         "rhbz_mail": "fasrhbzemail",
