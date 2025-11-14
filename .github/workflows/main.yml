@@ -22,7 +22,7 @@ jobs:
       - name: Install RPM dependencies
         run: dnf install -y krb5-devel
       - name: Install Python dependencies
-        run: pip install poetry python3-poetry-plugin-export
+        run: pip install poetry poetry-plugin-export
       - name: Mark the directory as safe for git
         run: git config --global --add safe.directory $PWD
       - name: Run tests
@@ -52,7 +52,7 @@ jobs:
       - name: Install RPM dependencies
         run: dnf install -y krb5-devel
       - name: Install Python dependencies
-        run: pip install poetry python3-poetry-plugin-export
+        run: pip install poetry poetry-plugin-export
       - name: Mark the directory as safe for git
         run: git config --global --add safe.directory $PWD
       - name: Run tests
@@ -78,7 +78,7 @@ jobs:
       - name: Install RPM dependencies
         run: dnf install -y krb5-devel
       - name: Install Python dependencies
-        run: pip install poetry python3-poetry-plugin-export
+        run: pip install poetry poetry-plugin-export
       - name: Run integration tests
         run: tox -e py${{ matrix.python }}-integration
     strategy:
