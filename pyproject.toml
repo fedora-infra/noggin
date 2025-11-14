@@ -1,75 +1,62 @@
-[tool.poetry]
+[project]
 name = "noggin-aaa"
-version = "1.10.0"
 description = "Noggin is a self-service portal for FreeIPA. The primary purpose of the portal is to allow users to sign up and manage their account information and group membership."
-
 license = "MIT"
-
-authors = [
-  "Fedora Infrastructure <admin@fedoraproject.org>"
+keywords = ["security"]
+version = "1.10.0"
+dynamic = ["classifiers"]
+readme = "README.md"
+authors = [{name = "Fedora Infrastructure", email = "admin@fedoraproject.org"}]
+requires-python = ">=3.9.0,<4.0.0"
+dependencies = [
+    "cryptography (>=3.4.7)",
+    "flask (>=2.0.0,<4.0.0)",
+    "flask-wtf (>=0.14.3,<2.0.0)",
+    "python-freeipa (>=1.0.6,<2.0.0)",
+    "click (>=8.0,<9.0)",
+    "pyjwt (>=2.1.0,<3.0.0)",
+    "Flask-Mail (>=0.9.1,<0.11.0)",
+    "fedora-messaging (>=2.1.0,<4.0)",
+    "backoff (>=1.6.0,<3.0)",
+    "noggin-messages (>=1.1.0,<2.0.0)",
+    "whitenoise (>=5.3,<7.0)",
+    "flask-babel (>=4.0.0,<5.0.0)",
+    "flask-healthz (>=1.0.0,<2.0.0)",
+    "markupsafe (>=1.1.1,<4.0.0)",
+    "wtforms[email] (>=3.0.0,<4.0.0)",
+    "requests[security] (>=2.25.0,<3.0.0)",
+    "translitcodec (>=0.7.0)",
+    "unidecode (>=1.2.0,<2.0.0)",
+    "flask-talisman (>=0.8.1,<2.0)",
+    "pyotp (>=2.2.7,<3.0.0)",
+    "srvlookup (>=2.0.0,<4.0.0)",
 ]
 
-readme = 'README.md'  # Markdown files are supported
-
-repository = "https://github.com/fedora-infra/noggin"
+[project.urls]
 homepage = "https://github.com/fedora-infra/noggin"
+repository = "https://github.com/fedora-infra/noggin"
 
-keywords = ['security']
+[project.optional-dependencies]
+deploy = ["gunicorn (>=20.0,<24.0.0)"]
 
+[tool.poetry]
 packages = [
     { include = "noggin" },
 ]
-
 include = [
-    { path = "tox.ini", format = "sdist" },
-    { path = "babel.cfg", format = "sdist" },
-    { path = "deployment/*", format = "sdist" },
-    { path = "docs/*", format = "sdist" },
-    { path = "tests/*", format = "sdist" },
+    "tox.ini",
+    "babel.cfg",
+    "deployment/*",
+    "docs/*",
+    "tests/*",
 ]
-
 classifiers = [
     "Environment :: Web Environment",
     "License :: OSI Approved :: MIT License",
     "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     "Topic :: System :: Systems Administration :: Authentication/Directory",
 ]
-
-[tool.poetry.dependencies]
-python = "^3.9.0"
-cryptography = ">=3.4.7"
-flask = "^2.0.0 || ^3.0.0"
-flask-wtf = ">=0.14.3, <2.0.0"
-python-freeipa = "^1.0.6"
-click = "^8.0"
-pyjwt = "^2.1.0"
-Flask-Mail = "^0.9.1 || ^0.10.0"
-gunicorn = {version = "^20.0 || ^21.0.0 || ^22.0.0 || ^23.0.0", optional = true}
-fedora-messaging = ">=2.1.0, <4.0"
-backoff = ">=1.6.0, <3.0"
-noggin-messages = "^1.1.0"
-whitenoise = ">=5.3, <7.0"
-flask-babel = "^4.0.0"
-flask-healthz = "^1.0.0"
-markupsafe = "^1.1.1 || ^2.0.0 || ^3.0.0"
-wtforms = {extras = ["email"], version = "^3.0.0"}
-requests = {extras = ["security"], version = "^2.25.0"}
-translitcodec = "0.7.0"
-unidecode = "^1.2.0"
-flask-talisman = ">=0.8.1, <2.0"
-pyotp = "^2.2.7"
-srvlookup = "^2.0.0 || ^3.0.0"
-sphinx = {version = ">=4.2", optional = true}
-myst-parser = {version = ">=2.0.0", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.0"
@@ -89,10 +76,9 @@ typer = "^0.11.0"
 pre-commit = ">=2.13.0"
 towncrier = ">=21.3.0"
 
-[tool.poetry.extras]
-deploy = ["gunicorn"]
-docs = ["sphinx", "myst-parser"]
-
+[tool.poetry.group.docs.dependencies]
+sphinx = ">=4.2"
+myst-parser = ">=2.0.0"
 
 [tool.black]
 skip-string-normalization = true
