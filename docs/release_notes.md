@@ -2,6 +2,67 @@
 
 <!-- towncrier release notes start -->
 
+## v1.11.0
+Released on 2025-11-14.
+
+### Features
+
+- Password reset now possible with email address as well as username (#1240)
+- Send message to messagebus when user is removed from a group (#1415)
+- Show the account creation date on user profiles (#1447)
+- Allow logging in with an email address instead of a username (#1484)
+- Restore the `FREEIPA_SERVERS` config option in case DNS discovery is not available
+- Support Python 3.11 and 3.12
+
+### Bug Fixes
+
+- Remove the toasts when they are autohidden (#1430)
+- Warn users that logging in with email addresses is not supported (#1475)
+- Don't allow passwords longer than 122 chars (see [IPA#9600](https://pagure.io/freeipa/issue/9600))
+- Fix the popovers in the FAS theme
+
+### Development Improvements
+
+- Drop the Safety scanner as it now requires an online account
+
+### Other Changes
+
+- Use fedora-bootstrap 5.3.3-0 in fas theme (PR #1432)
+
+### Contributors
+
+Many thanks to the contributors of bug reports, pull requests, and pull request reviews for this release:
+
+- Akashdeep Dhar
+- Aurélien Bompard
+- Cappy Ishihara
+- eliba
+- Fco. Javier F. Serrador
+- Hugo Costa
+- Salvatore Cocuzza
+- Justin W. Flory (he/him)
+- Charles Lee
+- Léane GRASSER
+- Lenka Segura
+- Nils Philippsen
+- Weblate
+- Apertium APy
+- Oğuz Ersen
+- Patrik Polakovič
+- Pedro Moura
+- Ricky Tigg
+- Ryan Lerch
+- William Modave
+- Yuri Chornoivan
+- hsu zangmen
+- Dmytro Markevych
+- Andrea Morelli
+- Nathan
+- Adrien Ricciardi
+- Scrambled 777
+- Wojciech Teichert
+- Adam0Brien
+
 ## v1.10.0
 
 Released on 2024-04-15.
