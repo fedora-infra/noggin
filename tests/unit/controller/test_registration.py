@@ -94,8 +94,9 @@ def spamcheck_on(mocker):
 def test_step_1(client, post_data_step_1, cleanup_dummy_user, mocker):
     """Register a user, step 1"""
     record_signal = mocker.Mock()
-    with mailer.record_messages() as outbox, stageuser_created.connected_to(
-        record_signal
+    with (
+        mailer.record_messages() as outbox,
+        stageuser_created.connected_to(record_signal),
     ):
         result = client.post('/', data=post_data_step_1)
     print(result.data.decode())
@@ -149,8 +150,9 @@ def test_step_1_registration_closed(
     """Try to register a user when registration is closed"""
     mocker.patch.dict(current_app.config, {"REGISTRATION_OPEN": False})
     record_signal = mocker.Mock()
-    with mailer.record_messages() as outbox, stageuser_created.connected_to(
-        record_signal
+    with (
+        mailer.record_messages() as outbox,
+        stageuser_created.connected_to(record_signal),
     ):
         result = client.post('/', data=post_data_step_1)
     assert_redirects_with_flash(
@@ -168,8 +170,9 @@ def test_step_1_bad_length(client, post_data_step_1, mocker, username):
     """Try to register a user with a username that has a bad length"""
     post_data_step_1["register-username"] = username
     record_signal = mocker.Mock()
-    with mailer.record_messages() as outbox, stageuser_created.connected_to(
-        record_signal
+    with (
+        mailer.record_messages() as outbox,
+        stageuser_created.connected_to(record_signal),
     ):
         result = client.post('/', data=post_data_step_1)
     assert_form_field_error(
@@ -185,8 +188,9 @@ def test_step1_mixed_case(client, post_data_step_1, mocker):
     """Test giving username uppercase letters"""
     post_data_step_1["register-username"] = "DummyUser"
     record_signal = mocker.Mock()
-    with mailer.record_messages() as outbox, stageuser_created.connected_to(
-        record_signal
+    with (
+        mailer.record_messages() as outbox,
+        stageuser_created.connected_to(record_signal),
     ):
         result = client.post('/', data=post_data_step_1)
     assert_form_field_error(
@@ -205,8 +209,9 @@ def test_step_1_bad_format(client, post_data_step_1, mocker, username):
     """Try to register a user with an invalid username"""
     post_data_step_1["register-username"] = username
     record_signal = mocker.Mock()
-    with mailer.record_messages() as outbox, stageuser_created.connected_to(
-        record_signal
+    with (
+        mailer.record_messages() as outbox,
+        stageuser_created.connected_to(record_signal),
     ):
         result = client.post('/', data=post_data_step_1)
     assert_form_field_error(
@@ -228,8 +233,9 @@ def test_step_1_blocked_value(client, post_data_step_1, mocker, username, regexp
     )
     post_data_step_1["register-username"] = username
     record_signal = mocker.Mock()
-    with mailer.record_messages() as outbox, stageuser_created.connected_to(
-        record_signal
+    with (
+        mailer.record_messages() as outbox,
+        stageuser_created.connected_to(record_signal),
     ):
         result = client.post('/', data=post_data_step_1)
     assert_form_field_error(
@@ -248,8 +254,9 @@ def test_step_1_spamcheck(
     """Register a user, step 1, with spamcheck on"""
     mocked_requests = mocker.patch("noggin.signals.requests")
     record_signal = mocker.Mock()
-    with mailer.record_messages() as outbox, stageuser_created.connected_to(
-        record_signal
+    with (
+        mailer.record_messages() as outbox,
+        stageuser_created.connected_to(record_signal),
     ):
         result = client.post('/', data=post_data_step_1)
     assert result.status_code == 302
@@ -297,9 +304,12 @@ def test_step_3(
 ):
     """Register a user, step 3"""
     record_signal = mocker.Mock()
-    with fml_testing.mock_sends(
-        UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
-    ), user_registered.connected_to(record_signal):
+    with (
+        fml_testing.mock_sends(
+            UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+        ),
+        user_registered.connected_to(record_signal),
+    ):
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
         )
@@ -548,9 +558,12 @@ def test_short_password_policy(
 ):
     """Register a user with a password rejected by the server policy"""
     record_signal = mocker.Mock()
-    with fml_testing.mock_sends(
-        UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
-    ), user_registered.connected_to(record_signal):
+    with (
+        fml_testing.mock_sends(
+            UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+        ),
+        user_registered.connected_to(record_signal),
+    ):
         post_data_step_3["password"] = post_data_step_3["password_confirm"] = "1234567"
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
@@ -625,8 +638,9 @@ def test_field_error_step_3(
         message="invalid 'password': this is invalid", code="4242"
     )
     record_signal = mocker.Mock()
-    with fml_testing.mock_sends(UserCreateV1), user_registered.connected_to(
-        record_signal
+    with (
+        fml_testing.mock_sends(UserCreateV1),
+        user_registered.connected_to(record_signal),
     ):
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
@@ -751,9 +765,12 @@ def test_generic_pwchange_error(
     )
     untouched_ipa_client.return_value = ipa_client
     record_signal = mocker.Mock()
-    with fml_testing.mock_sends(
-        UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
-    ), user_registered.connected_to(record_signal):
+    with (
+        fml_testing.mock_sends(
+            UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+        ),
+        user_registered.connected_to(record_signal),
+    ):
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
         )
@@ -781,9 +798,12 @@ def test_no_ipa_server(
     )
     untouched_ipa_client.return_value = ipa_client
     record_signal = mocker.Mock()
-    with fml_testing.mock_sends(
-        UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
-    ), user_registered.connected_to(record_signal):
+    with (
+        fml_testing.mock_sends(
+            UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+        ),
+        user_registered.connected_to(record_signal),
+    ):
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
         )
@@ -803,9 +823,12 @@ def test_no_direct_login(
         ),
     )
     record_signal = mocker.Mock()
-    with fml_testing.mock_sends(
-        UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
-    ), user_registered.connected_to(record_signal):
+    with (
+        fml_testing.mock_sends(
+            UserCreateV1({"msg": {"agent": "dummy", "user": "dummy"}})
+        ),
+        user_registered.connected_to(record_signal),
+    ):
         result = client.post(
             f"/register/activate?token={token_for_dummy_user}", data=post_data_step_3
         )
