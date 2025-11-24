@@ -18,7 +18,7 @@ jobs:
     name: Misc tests
     container: fedorapython/fedora-python-tox
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install RPM dependencies
         run: dnf install -y krb5-devel
       - name: Install Python dependencies
@@ -48,7 +48,7 @@ jobs:
     name: Unit tests
     container: fedorapython/fedora-python-tox:latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install RPM dependencies
         run: dnf install -y krb5-devel
       - name: Install Python dependencies
@@ -70,7 +70,7 @@ jobs:
     name: Integration tests
     container: fedorapython/fedora-python-tox:latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install RabbitMQ
         uses: mer-team/rabbitmq-mng-action@v1.2
         with:
@@ -103,7 +103,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
