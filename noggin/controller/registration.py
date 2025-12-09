@@ -355,6 +355,7 @@ def sign_agreements(ipa):
         user=user,
         agreementslist=agreements,
         all_signed=all(agreement.name in user.agreements for agreement in agreements),
+        agreement_warnings=current_app.config.get('AGREEMENT_WARNINGS', {}),
     )
 
 
