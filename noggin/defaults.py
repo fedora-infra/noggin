@@ -61,3 +61,11 @@ SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 
 # Cheat code to toggle Fedora Messaging support
 FEDORA_MESSAGING_ENABLED = False
+
+# Agreement warnings shown when the corresponding agreement is not signed.
+# Keys must match the agreement.name from FreeIPA.
+AGREEMENT_WARNINGS = {
+    "Fedora Project Contributor Agreement": _(
+        "Not signing the FPCA will prevent you from logging in to many Fedora services such as Pagure, Fedora Discussion, and other contributor platforms."
+    ),
+}
