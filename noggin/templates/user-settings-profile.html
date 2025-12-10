@@ -35,16 +35,16 @@
       <div class="mb-3 mb-4">
         <p class="m-0">{{ form.ircnick.label(class_="mt-2") }}</p>
         <p class="m-0">
-          {% trans %}
+          {% trans -%}
             The format is either <code>username</code> or <code>username:server.name</code> if you're not using the default servers:
-          {% endtrans %}
+          {%- endtrans %}
         </p>
         <ul class="mb-2">
           {% for name, title in form.ircnick.entries[0].subfields[0].choices %}
           <li>
-            {% trans server=config["CHAT_NETWORKS"][name]["default_server"] %}
+            {% trans server=config["CHAT_NETWORKS"][name]["default_server"] -%}
               For {{title}}: <code>{{server}}</code>
-            {% endtrans %}
+            {%- endtrans %}
           </li>
           {% endfor %}
         </ul>
