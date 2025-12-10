@@ -1,4 +1,4 @@
-# Translations template for PROJECT.
+# Italian translations for PROJECT.
 # Copyright (C) 2020 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
@@ -9,81 +9,105 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-02 13:32-0600\n"
+"POT-Creation-Date: 2025-12-10 11:40+0100\n"
 "PO-Revision-Date: 2025-06-28 11:50+0000\n"
 "Last-Translator: Salvatore Cocuzza <info@salvatorecocuzza.it>\n"
-"Language-Team: Italian <https://translate.fedoraproject.org/projects/"
-"fedora-infra/noggin/it/>\n"
 "Language: it\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: Italian <https://translate.fedoraproject.org/projects"
+"/fedora-infra/noggin/it/>\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
-"Generated-By: Babel 2.8.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
+#: noggin/controller/authentication.py:36
 msgid "Password expired. Please reset it."
 msgstr "Password scaduta, per favore esegui il reset."
 
+#: noggin/controller/authentication.py:47
+#: noggin/controller/authentication.py:54
 msgid "Could not log in to the IPA server."
 msgstr "impossibile accedere al server IPA."
 
+#: noggin/controller/authentication.py:56
 #, python-format
 msgid "Welcome, %(username)s!"
 msgstr "Benvenuto, %(username)s!"
 
+#: noggin/controller/authentication.py:81
 msgid "Token successfully synchronized"
 msgstr "Token sincronizzato con successo"
 
+#: noggin/controller/authentication.py:91 noggin/controller/password.py:49
+#: noggin/controller/password.py:300 noggin/controller/registration.py:307
+msgid "No IPA server available"
+msgstr ""
+
+#: noggin/controller/group.py:65
 #, python-format
 msgid "User %(username)s was not found in the system."
 msgstr "L'utente %(username)s non è stato trovato nel sistema."
 
+#: noggin/controller/group.py:78
 #, python-format
 msgid "Unable to add user %(username)s: %(errormessage)s"
 msgstr "Impossibile aggiunger l'utente %(username)s: %(errormessage)s"
 
+#: noggin/controller/group.py:87
 #, python-format
 msgid "You got it! %(username)s has been added to %(groupname)s."
 msgstr "Ce lai fatta! %(username)s è stato creato in %(groupname)s."
 
+#: noggin/controller/group.py:139
 #, python-format
 msgid "You got it! %(username)s has been removed from %(groupname)s."
 msgstr "Ce l'ha fatta! %(username)s è stato rimosso da %(groupname)s."
 
+#: noggin/controller/group.py:194
 #, python-format
 msgid "You got it! %(username)s is no longer a sponsor of %(groupname)s."
 msgstr "Hai indovinato! %(username)s non è più sponsor di %(groupname)s."
 
+#: noggin/controller/password.py:60
 msgid "The old password or username is not correct"
 msgstr "La vecchia password o il vecchio nome utente non sono corretti"
 
+#: noggin/controller/password.py:71
 msgid "Could not change password."
 msgstr "Impossibile modificare la password."
 
+#: noggin/controller/password.py:74
 msgid "Your password has been changed"
 msgstr "La tua password è stata modifica"
 
+#: noggin/controller/password.py:156
 #, python-format
 msgid ""
-"You have already requested a password reset, you need to wait %(wait_min)s "
-"minute(s) and %(wait_sec)s seconds before you can request another."
+"You have already requested a password reset, you need to wait "
+"%(wait_min)s minute(s) and %(wait_sec)s seconds before you can request "
+"another."
 msgstr ""
 "È già stata richiesta una reimpostazione della password; è necessario "
 "attendere %(wait_min)s minuti e %(wait_sec)s secondi prima di poterne "
 "richiedere un'altra."
 
+#: noggin/controller/password.py:167
 #, python-format
 msgid "User %(username)s does not exist"
 msgstr "L'utente %(username)s non esiste"
 
+#: noggin/controller/password.py:184
 msgid "We could not send you an email, please retry later"
 msgstr ""
-"Non è stato possibile inviarle un'e-mail, la preghiamo di riprovare più tardi"
+"Non è stato possibile inviarle un'e-mail, la preghiamo di riprovare più "
+"tardi"
 
+#: noggin/controller/password.py:188
 msgid "Your email address is rejected by smtp server"
 msgstr "Il tuo indirizzo email è stato rifiutato dal server smtp"
 
+#: noggin/controller/password.py:198
 msgid ""
 "An email has been sent to your address with instructions on how to reset "
 "your password"
@@ -91,12 +115,15 @@ msgstr ""
 "È stata inviata un'e-mail al vostro indirizzo con le istruzioni per "
 "reimpostare la password"
 
+#: noggin/controller/password.py:216
 msgid "The token is invalid, please request a new one."
 msgstr "Il token non è valido, richiederne uno nuovo."
 
+#: noggin/controller/password.py:224
 msgid "The token has expired, please request a new one."
 msgstr "Il token è scaduto, richiederne uno nuovo."
 
+#: noggin/controller/password.py:234
 msgid ""
 "Your password has been changed since you requested this token, please "
 "request a new one."
@@ -104,784 +131,1052 @@ msgstr ""
 "La password è stata modificata da quando si è richiesto questo token; si "
 "prega di richiederne una nuova."
 
+#: noggin/controller/password.py:265
 #, python-format
 msgid ""
 "Your password has been changed, but it does not comply with the policy "
-"(%(policy_error)s) and has thus been set as expired. You will be asked to "
-"change it after logging in."
+"(%(policy_error)s) and has thus been set as expired. You will be asked to"
+" change it after logging in."
 msgstr ""
 "La password è stata modificata, ma non è conforme alla policy "
-"(%(policy_error)s) e quindi è stata impostata come scaduta. Vi verrà chiesto "
-"di cambiarla dopo l'accesso."
+"(%(policy_error)s) e quindi è stata impostata come scaduta. Vi verrà "
+"chiesto di cambiarla dopo l'accesso."
 
+#: noggin/controller/password.py:289
 msgid "Incorrect value."
 msgstr "Valore non corretto."
 
+#: noggin/controller/password.py:297
 msgid "Could not change password, please try again."
 msgstr "Impossibile cambiare la password, per favore riprova."
 
+#: noggin/controller/password.py:303
 msgid "Your password has been changed."
 msgstr "La password è stata modificata."
 
+#: noggin/controller/registration.py:72 noggin/controller/user.py:178
 msgid "Verify your email address"
 msgstr "Verifica il tuo indirizzo email"
 
+#: noggin/controller/registration.py:81 noggin/controller/user.py:225
 msgid "We could not send you the address validation email, please retry later"
 msgstr ""
-"Non siamo riusciti a inviarti l'email di convalida dell'indirizzo, riprova "
-"più tardi"
+"Non siamo riusciti a inviarti l'email di convalida dell'indirizzo, "
+"riprova più tardi"
 
+#: noggin/controller/registration.py:129
 #, python-format
 msgid ""
 "The username '%(username)s' or the email address '%(email)s' are already "
 "taken."
 msgstr ""
-"Il nome utente '%(username)s' o l'indirizzo email '%(email)s' sono già stati "
-"utilizzati."
+"Il nome utente '%(username)s' o l'indirizzo email '%(email)s' sono già "
+"stati utilizzati."
 
+#: noggin/controller/registration.py:144
 msgid "An error occurred while creating the account, please try again."
-msgstr ""
-"Si è verificato un errore durante la creazione dell'account, riprovare."
+msgstr "Si è verificato un errore durante la creazione dell'account, riprovare."
 
+#: noggin/controller/registration.py:165 noggin/controller/registration.py:182
 msgid "The registration seems to have failed, please try again."
 msgstr "La registrazione sembra essere fallita, ti preghiamo di riprovare."
 
+#: noggin/controller/registration.py:193
 msgid ""
-"The address validation email has be sent again. Make sure it did not land in "
-"your spam folder"
+"The address validation email has be sent again. Make sure it did not land"
+" in your spam folder"
 msgstr ""
-"L'email di convalida dell'indirizzo è stata inviata nuovamente. Assicurati "
-"che non sia finita nella cartella dello spam"
+"L'email di convalida dell'indirizzo è stata inviata nuovamente. "
+"Assicurati che non sia finita nella cartella dello spam"
 
+#: noggin/controller/registration.py:209 noggin/controller/user.py:262
 msgid "No token provided, please check your email validation link."
-msgstr ""
-"Nessun token fornito, controlla il link di convalida presente nell'email."
+msgstr "Nessun token fornito, controlla il link di convalida presente nell'email."
 
+#: noggin/controller/registration.py:216
 msgid "The token is invalid, please register again."
 msgstr "Il token non è valido, ti preghiamo di registrarti nuovamente."
 
+#: noggin/controller/registration.py:219
 msgid "This token is no longer valid, please register again."
 msgstr "Questo token non è più valido, ti preghiamo di registrarti nuovamente."
 
+#: noggin/controller/registration.py:225
 msgid "This user cannot be found, please register again."
 msgstr ""
-"Questo utente non può essere trovato, ti preghiamo di registrarti nuovamente."
+"Questo utente non può essere trovato, ti preghiamo di registrarti "
+"nuovamente."
 
+#: noggin/controller/registration.py:236
 msgid ""
-"The username and the email address don't match the token you used, please "
-"register again."
+"The username and the email address don't match the token you used, please"
+" register again."
 msgstr ""
-"Il nome utente e l'indirizzo email non corrispondono al token utilizzato, ti "
-"preghiamo di registrarti nuovamente."
+"Il nome utente e l'indirizzo email non corrispondono al token utilizzato,"
+" ti preghiamo di registrarti nuovamente."
 
-msgid ""
-"Something went wrong while creating your account, please try again later."
+#: noggin/controller/registration.py:259
+msgid "Something went wrong while creating your account, please try again later."
 msgstr ""
-"Si è verificato un errore durante la creazione del tuo account, ti preghiamo "
-"di riprovare più tardi."
+"Si è verificato un errore durante la creazione del tuo account, ti "
+"preghiamo di riprovare più tardi."
 
+#: noggin/controller/registration.py:279
 #, python-format
 msgid ""
-"Your account has been created, but the password you chose does not comply "
-"with the policy (%(policy_error)s) and has thus been set as expired. You "
-"will be asked to change it after logging in."
+"Your account has been created, but the password you chose does not comply"
+" with the policy (%(policy_error)s) and has thus been set as expired. You"
+" will be asked to change it after logging in."
 msgstr ""
 "Il vostro account è stato creato, ma la password che avete scelto non è "
 "conforme alla policy (%(policy_error)s) e quindi è stata impostata come "
 "scaduta. Vi verrà chiesto di cambiarla dopo l'accesso."
 
+#: noggin/controller/registration.py:299
 #, python-format
 msgid ""
 "Your account has been created, but an error occurred while setting your "
 "password (%(message)s). You may need to change it after logging in."
 msgstr ""
-"Il tuo account è stato creato, ma si è verificato un errore durante l’"
-"impostazione della password (%(message)s). Potrebbe essere necessario "
+"Il tuo account è stato creato, ma si è verificato un errore durante "
+"l’impostazione della password (%(message)s). Potrebbe essere necessario "
 "cambiarla dopo aver effettuato l’accesso."
 
+#: noggin/controller/registration.py:317
 #, python-format
 msgid "Congratulations, your account has been created! Welcome, %(name)s."
 msgstr "Congratulazioni, il tuo account è stato creato! Benvenuto, %(name)s."
 
+#: noggin/controller/registration.py:327
 msgid ""
 "Congratulations, your account has been created! Go ahead and sign in to "
 "proceed."
 msgstr ""
-"Congratulazioni, il tuo account è stato creato! Procedi con l’accesso per "
-"continuare."
+"Congratulazioni, il tuo account è stato creato! Procedi con l’accesso per"
+" continuare."
 
+#: noggin/controller/registration.py:405
 msgid "All"
 msgstr "Tutti"
 
+#: noggin/controller/registration.py:406
 msgid "Unknown"
 msgstr "Sconosciuto"
 
+#: noggin/controller/registration.py:407
 msgid "Not Spam"
 msgstr "Non spam"
 
+#: noggin/controller/registration.py:408
 msgid "Spam"
 msgstr "Spam"
 
+#: noggin/controller/registration.py:409
 msgid "Awaiting"
 msgstr "In attesa"
 
+#: noggin/controller/root.py:49 noggin/templates/_register_form.html:27
 msgid "Registration is closed at the moment."
 msgstr "Le registrazioni sono chiuse in questo momento."
 
+#: noggin/controller/user.py:231
 #, python-format
 msgid ""
-"The email address %(mail)s needs to be validated. Please check your inbox "
-"and click on the link to proceed. If you can't find the email in a couple "
-"minutes, check your spam folder."
+"The email address %(mail)s needs to be validated. Please check your inbox"
+" and click on the link to proceed. If you can't find the email in a "
+"couple minutes, check your spam folder."
 msgstr ""
-"L'indirizzo email %(mail)s deve essere convalidato. Controlla la tua casella "
-"di posta e clicca sul link per procedere. Se non trovi l'email entro qualche "
-"minuto, controlla la cartella dello spam."
+"L'indirizzo email %(mail)s deve essere convalidato. Controlla la tua "
+"casella di posta e clicca sul link per procedere. Se non trovi l'email "
+"entro qualche minuto, controlla la cartella dello spam."
 
+#: noggin/controller/user.py:244
 msgid "No modifications."
 msgstr "Nessuna modifica."
 
+#: noggin/controller/user.py:269
 msgid "The token is invalid, please set the email again."
 msgstr "Il token non è valido, si prega di impostare nuovamente l'email."
 
+#: noggin/controller/user.py:273
 msgid "This token is no longer valid, please set the email again."
-msgstr ""
-"Questo token non è più valido, si prega di impostare nuovamente l'email."
+msgstr "Questo token non è più valido, si prega di impostare nuovamente l'email."
 
+#: noggin/controller/user.py:277
 msgid "This token does not belong to you."
 msgstr "Questo token non ti appartiene."
 
+#: noggin/controller/user.py:354
 msgid "Incorrect password"
 msgstr "Password errata"
 
+#: noggin/controller/user.py:374
 msgid "Cannot create the token."
 msgstr "Impossibile creare il token."
 
+#: noggin/controller/user.py:376
 msgid "The token has been created."
 msgstr "Il token è stato creato."
 
+#: noggin/controller/user.py:426
 msgid "Cannot rename the token."
 msgstr "Impossibile rinominare il token."
 
+#: noggin/controller/user.py:453
 msgid "Sorry, You cannot disable your last active token."
 msgstr "Spiacenti, non puoi disabilitare il tuo ultimo token attivo."
 
+#: noggin/controller/user.py:455 noggin/controller/user.py:460
 msgid "Cannot disable the token."
 msgstr "Impossibile disabilitare il token."
 
+#: noggin/controller/user.py:486
 #, python-format
 msgid "Cannot enable the token. %(errormessage)s"
 msgstr "Impossibile abilitare il token. %(errormessage)s"
 
+#: noggin/controller/user.py:514
 msgid "Sorry, You cannot delete your last active token."
 msgstr "Spiacenti, non puoi eliminare il tuo ultimo token attivo."
 
+#: noggin/controller/user.py:516 noggin/controller/user.py:521
 msgid "Cannot delete the token."
 msgstr "Impossibile eliminare il token."
 
-#, python-format
-msgid "Unknown agreement: %(name)s."
-msgstr "Accordo sconosciuto: %(name)s."
-
+#: noggin/controller/user.py:540
 #, python-format
 msgid "Cannot sign the agreement \"%(name)s\": %(error)s"
 msgstr "Impossibile firmare l'accordo \"%(name)s\": %(error)s"
 
+#: noggin/controller/user.py:548
 #, python-format
 msgid "You signed the \"%(name)s\" agreement."
 msgstr "Hai firmato l'accordo \"%(name)s\"."
 
+#: noggin/form/edit_user.py:78
 msgid "This does not look like a valid nickname."
 msgstr "Questo non sembra un nickname valido."
 
+#: noggin/form/edit_user.py:80
 msgid "This does not look like a valid server name."
 msgstr "Questo non sembra un nome server valido."
 
+#: noggin/form/edit_user.py:90 noggin/form/register_user.py:26
 msgid "First Name"
 msgstr "Nome"
 
+#: noggin/form/edit_user.py:91 noggin/form/register_user.py:27
 msgid "First name must not be empty"
 msgstr "Il nome non può essere vuoto"
 
+#: noggin/form/edit_user.py:95 noggin/form/register_user.py:32
 msgid "Last Name"
 msgstr "Cognome"
 
+#: noggin/form/edit_user.py:96 noggin/form/register_user.py:33
 msgid "Last name must not be empty"
 msgstr "Il cognome non può essere vuoto"
 
+#: noggin/form/edit_user.py:100
 msgid "Locale"
 msgstr "Locale"
 
+#: noggin/form/edit_user.py:103
 msgid "Locale must not be empty"
 msgstr "La località non può essere vuota"
 
+#: noggin/form/edit_user.py:104
 msgid "Locale must be a valid locale short-code"
 msgstr "La località deve essere un codice locale valido"
 
+#: noggin/form/edit_user.py:110
 msgid "Chat Nicknames"
 msgstr "Soprannomi in chat"
 
+#: noggin/form/edit_user.py:114 noggin/templates/user.html:42
+#: noggin/templates/user.html:44
 msgid "Timezone"
 msgstr "Fuso orario"
 
+#: noggin/form/edit_user.py:117
 msgid "Timezone must not be empty"
 msgstr "Il fuso orario non può essere vuoto"
 
+#: noggin/form/edit_user.py:118
 msgid "Timezone must be a valid timezone"
 msgstr "Il fuso orario deve essere valido"
 
+#: noggin/form/edit_user.py:123
 msgid "GitHub Username"
 msgstr "Nome utente GitHub"
 
+#: noggin/form/edit_user.py:127
 msgid "GitLab Username"
 msgstr "Nome utente GitLab"
 
-msgid "Website or Blog URL"
-msgstr "URL del sito web o blog"
-
+#: noggin/form/edit_user.py:134 noggin/form/edit_user.py:146
 msgid "Valid URL required"
 msgstr "È richiesto un URL valido"
 
+#: noggin/form/edit_user.py:139 noggin/templates/user.html:94
+#, fuzzy
+msgid "Blog URL"
+msgstr "Esci"
+
+#: noggin/form/edit_user.py:151 noggin/templates/user.html:106
+msgid "RSS URL"
+msgstr ""
+
+#: noggin/form/edit_user.py:155
 msgid "Private"
 msgstr "Privato"
 
+#: noggin/form/edit_user.py:157
 msgid "Hide information from other users, see the Privacy Policy for details."
 msgstr ""
 "Nascondi le informazioni agli altri utenti, consulta la Politica sulla "
 "Privacy per i dettagli."
 
+#: noggin/form/edit_user.py:162 noggin/templates/user.html:29
+#: noggin/templates/user.html:31
 msgid "Pronouns"
 msgstr "Pronomi"
 
+#: noggin/form/edit_user.py:167 noggin/form/register_user.py:67
 msgid "E-mail Address"
 msgstr "Indirizzo email"
 
+#: noggin/form/edit_user.py:169 noggin/form/register_user.py:69
 msgid "Email must not be empty"
 msgstr "L'email non può essere vuota"
 
+#: noggin/form/edit_user.py:170 noggin/form/register_user.py:70
 msgid "Email must be valid"
 msgstr "L'email deve essere valida"
 
+#: noggin/form/edit_user.py:174
 msgid "Red Hat Bugzilla Email"
 msgstr "Email di Red Hat Bugzilla"
 
+#: noggin/form/edit_user.py:180 noggin/templates/user.html:84
 msgid "SSH Keys"
 msgstr "Chiavi SSH"
 
+#: noggin/form/edit_user.py:185 noggin/templates/user.html:74
 msgid "GPG Keys"
 msgstr "Chiavi GPS"
 
+#: noggin/form/edit_user.py:191 noggin/templates/user-settings-otp.html:59
 msgid "Token name"
 msgstr "Nome del token"
 
+#: noggin/form/edit_user.py:193
 msgid "Add an optional name to help you identify this token"
 msgstr "Aggiungi un nome opzionale per aiutarti"
 
+#: noggin/form/edit_user.py:197
 msgid "Enter your current password"
 msgstr "Inserisci la tua password attuale"
 
+#: noggin/form/edit_user.py:198 noggin/form/login_user.py:20
+#: noggin/form/sync_token.py:16
 msgid "You must provide a password"
 msgstr "Devi fornire una password"
 
+#: noggin/form/edit_user.py:199
 msgid "please reauthenticate so we know it is you"
-msgstr ""
-"Per favore, effettua nuovamente l'autenticazione così sappiamo che sei tu"
+msgstr "Per favore, effettua nuovamente l'autenticazione così sappiamo che sei tu"
 
+#: noggin/form/edit_user.py:203 noggin/form/login_user.py:23
+#: noggin/templates/user-settings-otp.html:62
 msgid "One-Time Password"
 msgstr "Password monouso"
 
+#: noggin/form/edit_user.py:205
 msgid "Enter your One-Time Password"
 msgstr "Inserisci la tua password monouso"
 
+#: noggin/form/edit_user.py:208
 msgid "Generate OTP Token"
 msgstr "Genera token OTP"
 
+#: noggin/form/edit_user.py:214
 msgid "Could not find the token secret"
 msgstr "Impossibile trovare il token segreto."
 
+#: noggin/form/edit_user.py:221 noggin/templates/user-settings-otp.html:27
 msgid "Verification Code"
 msgstr "Codice di verifica"
 
+#: noggin/form/edit_user.py:222
 msgid "You must provide a verification code"
 msgstr "Devi fornire un codice di verifica"
 
+#: noggin/form/edit_user.py:224
 msgid "Verify and Enable OTP Token"
 msgstr "Verifica e abilita il token OTP"
 
+#: noggin/form/edit_user.py:229
 msgid "The code is wrong, please try again."
 msgstr "Il codice è sbagliato, riprova per favore."
 
+#: noggin/form/edit_user.py:234 noggin/form/edit_user.py:240
 msgid "Token must not be empty"
 msgstr "Il nome non deve essere vuoto"
 
+#: noggin/form/edit_user.py:249
 msgid "Agreement must not be empty"
 msgstr "L'accordo non deve essere vuoto"
 
+#: noggin/form/group.py:11
 msgid "New member username must not be empty"
 msgstr "Il nome utente del nuovo membro non deve essere vuoto"
 
+#: noggin/form/group.py:17 noggin/form/register_user.py:38
+#: noggin/form/sync_token.py:10 noggin/templates/sync-token.html:16
 msgid "Username"
 msgstr "Nome utente"
 
+#: noggin/form/group.py:18
 msgid "Username must not be empty"
 msgstr "Il nome utente non deve essere vuoto"
 
+#: noggin/form/login_user.py:11
+#, fuzzy
+msgid "Username (or email address)"
+msgstr "Verifica il tuo indirizzo email"
+
+#: noggin/form/login_user.py:13 noggin/form/sync_token.py:11
 msgid "You must provide a user name"
 msgstr "Devi fornire un nome utente"
 
+#: noggin/form/login_user.py:19 noggin/form/register_user.py:93
+#: noggin/form/sync_token.py:15 noggin/templates/sync-token.html:19
+#: noggin/templates/user-settings-otp.html:60
+#: noggin/templates/user-settings.html:31
 msgid "Password"
 msgstr "Password"
 
+#: noggin/form/login_user.py:25
 msgid "Log In"
 msgstr "Accedi"
 
+#: noggin/form/password_reset.py:11
 msgid "New Password"
 msgstr "Nuova password"
 
+#: noggin/form/password_reset.py:13 noggin/form/register_user.py:95
 msgid "Password must not be empty"
 msgstr "La password non deve essere vuota"
 
+#: noggin/form/password_reset.py:15 noggin/form/register_user.py:97
 msgid "Passwords must match"
 msgstr "Le password devono corrispondere"
 
+#: noggin/form/password_reset.py:19
 msgid "Confirm New Password"
 msgstr "Conferma nuova password"
 
-msgid ""
-"One-Time Password (if your account has Two-Factor Authentication enabled)"
+#: noggin/form/password_reset.py:22
+msgid "One-Time Password (if your account has Two-Factor Authentication enabled)"
 msgstr ""
 "Password monouso (se il tuo account ha l'autenticazione a due fattori "
 "abilitata)"
 
+#: noggin/form/password_reset.py:29
 msgid "Current Password"
 msgstr "Password corrente"
 
+#: noggin/form/password_reset.py:30
 msgid "Current password must not be empty"
 msgstr "La password attuale non deve essere vuota"
 
+#: noggin/form/password_reset.py:36
+#, fuzzy
+msgid "Username or Email"
+msgstr "Nome utente"
+
+#: noggin/form/password_reset.py:37 noggin/form/register_user.py:40
 msgid "User name must not be empty"
 msgstr "Il nome utente non deve essere vuoto"
 
-msgid "Enter your username to reset your password"
+#: noggin/form/password_reset.py:38
+#, fuzzy
+msgid "Enter your username or email to reset your password"
 msgstr "Inserisci il tuo nome utente per reimpostare la password"
 
+#: noggin/form/register_user.py:54
 #, python-format
 msgid "Only these characters are allowed: \"%(chars)s\"."
 msgstr "Sono consentiti solo questi caratteri: \"%(chars)s\"."
 
+#: noggin/form/register_user.py:76
 msgid "I am over 16 years old"
 msgstr "Ho più di 16 anni"
 
+#: noggin/form/register_user.py:79
 msgid "You must be over 16 years old to create an account"
 msgstr "Devi avere più di 16 anni per creare un account"
 
+#: noggin/form/register_user.py:84 noggin/templates/index.html:21
 msgid "Register"
 msgstr "Registrati"
 
+#: noggin/form/register_user.py:88
 msgid "Resend email"
 msgstr "Invia di nuovo l'email"
 
+#: noggin/form/register_user.py:100
 msgid "Please choose a strong password"
 msgstr "Si prega di scegliere una password sicura"
 
+#: noggin/form/register_user.py:103
 msgid "Confirm Password"
 msgstr "Conferma password"
 
+#: noggin/form/register_user.py:105
 msgid "Activate"
 msgstr "Attiva"
 
+#: noggin/form/sync_token.py:20 noggin/templates/sync-token.html:22
 msgid "First OTP"
 msgstr "Primo OTP"
 
+#: noggin/form/sync_token.py:21
 msgid "You must provide a first code"
 msgstr "Devi fornire un primo codice"
 
+#: noggin/form/sync_token.py:25 noggin/templates/sync-token.html:25
 msgid "Second OTP"
 msgstr "Secondo OTP"
 
+#: noggin/form/sync_token.py:26
 msgid "You must provide a second code"
 msgstr "Devi fornire un secondo codice"
 
+#: noggin/form/sync_token.py:29 noggin/templates/sync-token.html:28
 msgid "Token ID"
 msgstr "ID del token"
 
+#: noggin/form/validators.py:19
 msgid "Email addresses from that domain are not allowed"
 msgstr "Gli indirizzi email di quel dominio non sono consentiti"
 
+#: noggin/form/validators.py:39
 msgid "Mixed case is not allowed, try lower case."
 msgstr ""
-"Il testo con lettere maiuscole e minuscole non è consentito, prova con tutte "
-"minuscole."
+"Il testo con lettere maiuscole e minuscole non è consentito, prova con "
+"tutte minuscole."
 
+#: noggin/form/validators.py:66
 #, python-format
 msgid "Field must not match \"%(pattern)s\"."
 msgstr "Il campo non deve corrispondere a \"%(pattern)s\"."
 
+#: noggin/templates/404.html:3 noggin/templates/404.html:10
 msgid "That page wasn't found."
 msgstr "Pagina non trovata."
 
+#: noggin/templates/_agreements_form.html:10
+msgid "View agreement"
+msgstr "Vedi accordo"
+
+#: noggin/templates/_agreements_form.html:12
+msgid "Sign"
+msgstr "Firma"
+
+#: noggin/templates/_agreements_form.html:32
+msgid "Sign User Agreement"
+msgstr "Firma l'accordo utente"
+
+#: noggin/templates/_login_form.html:21
 msgid "Forgot Password?"
 msgstr "Password dimenticata?"
 
+#: noggin/templates/_login_form.html:23
 msgid "Forgot Password or OTP?"
 msgstr "Password o OTP dimenticati?"
 
+#: noggin/templates/_login_form.html:26
 msgid "Sync Token"
 msgstr "Sincronizza Token"
 
+#: noggin/templates/_pagination.html:8
 msgid "Previous"
 msgstr "Indietro"
 
+#: noggin/templates/_pagination.html:17
 msgid "current"
 msgstr "Corrente"
 
+#: noggin/templates/_pagination.html:35
 msgid "Next"
 msgstr "Avanti"
 
+#: noggin/templates/base.html:28 noggin/themes/almalinux/templates/main.html:24
+#: noggin/themes/centos/templates/main.html:16
+#: noggin/themes/default/templates/main.html:16
+#: noggin/themes/fas/templates/main.html:27
 msgid "Groups"
 msgstr "Gruppi"
 
+#: noggin/templates/base.html:29
 msgid "Users"
 msgstr "Utenti"
 
+#: noggin/templates/forgot-password-ask.html:2
 msgid "Password Recovery"
 msgstr "Recupero password"
 
+#: noggin/templates/forgot-password-ask.html:16
 msgid "Did you forget your password?"
 msgstr "Hai dimenticato la password?"
 
+#: noggin/templates/forgot-password-ask.html:17
+#, fuzzy
 msgid ""
-"Enter your username and an email will be sent to your address with further "
-"instructions."
+"Enter your username or email address and an email will be sent to your "
+"address with further instructions."
 msgstr ""
-"Inserisci il tuo nome utente e verrà inviata un'email al tuo indirizzo con "
-"ulteriori istruzioni."
+"Inserisci il tuo nome utente e verrà inviata un'email al tuo indirizzo "
+"con ulteriori istruzioni."
 
+#: noggin/templates/forgot-password-ask.html:22
 msgid "Send"
 msgstr "Invia"
 
+#: noggin/templates/forgot-password-change.html:2
+#: noggin/templates/forgot-password-change.html:23
 msgid "Reset Password"
 msgstr "Resetta password"
 
+#: noggin/templates/forgot-password-change.html:16
 #, python-format
 msgid "Password Reset for %(username)s"
 msgstr "Reimpostazione password per %(username)s"
 
+#: noggin/templates/group.html:6
 #, python-format
 msgid "%(groupname)s Group"
 msgstr "Gruppo %(groupname)s"
 
-msgid ""
-"You are a sponsor of this group, but not a member. Add yourself if you want "
-"to be a member."
-msgstr ""
-"Sei sponsor di questo gruppo, ma non un membro. Aggiungiti se vuoi diventare "
-"membro."
-
-msgid "To join this group, contact a group sponsor."
-msgstr "Per unirti a questo gruppo, contatta uno sponsor del gruppo."
-
-msgid "Sponsors"
-msgstr "Sponsor"
-
-msgid "no sponsors"
-msgstr "nessuno sponsor"
-
-msgid "Members"
-msgstr "Membri"
-
-msgid "add user..."
-msgstr "aggiungi utente.."
-
+#: noggin/templates/group.html:36
 msgid "Leave group"
 msgstr "Esci dal gruppo"
 
+#: noggin/templates/group.html:55
+msgid ""
+"You are a sponsor of this group, but not a member. Add yourself if you "
+"want to be a member."
+msgstr ""
+"Sei sponsor di questo gruppo, ma non un membro. Aggiungiti se vuoi "
+"diventare membro."
+
+#: noggin/templates/group.html:57
+msgid "To join this group, contact a group sponsor."
+msgstr "Per unirti a questo gruppo, contatta uno sponsor del gruppo."
+
+#: noggin/templates/group.html:65
+msgid "Sponsors"
+msgstr "Sponsor"
+
+#: noggin/templates/group.html:69
+msgid "no sponsors"
+msgstr "nessuno sponsor"
+
+#: noggin/templates/group.html:106
+msgid "Members"
+msgstr "Membri"
+
+#: noggin/templates/group.html:113
+msgid "add user..."
+msgstr "aggiungi utente.."
+
+#: noggin/templates/group.html:121
 msgid "No members yet."
 msgstr "Nessun membro ancora."
 
+#: noggin/templates/groups.html:6 noggin/templates/groups.html:13
 msgid "Group List"
 msgstr "Lista gruppo"
 
+#: noggin/templates/groups.html:44
 #, python-format
 msgid "%(member_count)s members"
 msgstr "%(member_count)s membri"
 
+#: noggin/templates/groups.html:49
 msgid "No groups."
 msgstr "Nessun gruppo."
 
+#: noggin/templates/index.html:18
 msgid "Login"
 msgstr "Accesso"
 
+#: noggin/templates/ipa_error.html:11
 msgid "IPA Error"
 msgstr "Errore IPA"
 
+#: noggin/templates/ipa_error.html:13
 msgid "There was a problem with the IPA backend, please try again later."
 msgstr "Si è verificato un problema con il backend IPA, riprova più tardi."
 
+#: noggin/templates/ipa_error.html:15
 #, python-format
 msgid ""
-"You can also <a href=\"%(url)s\">log out</a> and log back in if the problem "
-"persists."
+"You can also <a href=\"%(url)s\">log out</a> and log back in if the "
+"problem persists."
 msgstr ""
-"Puoi anche <a href=\"%(url)s\">disconnetterti</a> e accedere di nuovo se il "
-"problema persiste."
+"Puoi anche <a href=\"%(url)s\">disconnetterti</a> e accedere di nuovo se "
+"il problema persiste."
 
+#: noggin/templates/password-reset.html:2
 msgid "Expired Password Reset"
 msgstr "Reimpostazione password scaduta"
 
+#: noggin/templates/password-reset.html:15
 #, python-format
 msgid "Expired Password Reset for %(username)s"
 msgstr "Reimpostazione password scaduta per %(username)s"
 
+#: noggin/templates/password-reset.html:26
+#: noggin/templates/user-settings-password.html:7
+#: noggin/templates/user-settings-password.html:18
 msgid "Change Password"
 msgstr "Cambia password"
 
+#: noggin/templates/registering.html:2 noggin/templates/registering.html:10
+#: noggin/themes/almalinux/templates/main.html:34
+#: noggin/themes/centos/templates/main.html:27
+#: noggin/themes/default/templates/main.html:27
+#: noggin/themes/fas/templates/main.html:38
 msgid "Registering Users"
 msgstr "Registrazioni utenti"
 
+#: noggin/templates/registering.html:43
 msgid "Name:"
 msgstr "Nome:"
 
+#: noggin/templates/registering.html:48
 msgid "Email:"
 msgstr "Email"
 
+#: noggin/templates/registering.html:53
 msgid "Registered:"
 msgstr "Registrato."
 
+#: noggin/templates/registering.html:59
 msgid "Status:"
 msgstr "Stato:"
 
+#: noggin/templates/registering.html:63
 msgid "Waiting for spam check"
 msgstr "In attesa del controllo antispam"
 
+#: noggin/templates/registering.html:65
 msgid "Not flagged as spam"
 msgstr "Non segnalato come spam"
 
+#: noggin/templates/registering.html:67
 msgid "Flagged as spam"
 msgstr "Segnalato come spam"
 
+#: noggin/templates/registering.html:69
 msgid "Spam status unknown"
 msgstr "Stato spam sconosciuto"
 
+#: noggin/templates/registering.html:82
 msgid "Accept"
 msgstr "accetta"
 
+#: noggin/templates/registering.html:86
 msgid "Flag as spam"
 msgstr "Segnala come spam"
 
+#: noggin/templates/registering.html:89
 msgid "Delete"
 msgstr "Cancella"
 
+#: noggin/templates/registering.html:108
 msgid ""
 "Clicking on Accept will send the validation email to this user. Other "
 "buttons will not send anything."
 msgstr ""
-"Cliccando su Accetta verrà inviata l’email di convalida a questo utente. Gli "
-"altri pulsanti non invieranno nulla."
+"Cliccando su Accetta verrà inviata l’email di convalida a questo utente. "
+"Gli altri pulsanti non invieranno nulla."
 
+#: noggin/templates/registering.html:121
 msgid "No registering users in this state at the moment."
 msgstr "Al momento non ci sono utenti in registrazione in questo stato."
 
+#: noggin/templates/registering.html:123
 msgid "No registering users at the moment."
 msgstr "Al momento non ci sono utenti in registrazione."
 
+#: noggin/templates/registration-activation.html:2
 msgid "Activate your account"
 msgstr "Attiva il tuo account"
 
+#: noggin/templates/registration-activation.html:17
 msgid "Account creation, step 3/3"
 msgstr "Creazione account, step 3/3"
 
+#: noggin/templates/registration-activation.html:18
 #, python-format
 msgid "Hello %(name)s. To activate your account, please choose a password."
 msgstr "Ciao %(name)s. Per attivare il tuo account, scegli una password."
 
+#: noggin/templates/registration-agreements.html:2
+#, fuzzy
+msgid "Sign agreements"
+msgstr "Firma l'accordo utente"
+
+#: noggin/templates/registration-agreements.html:15
+msgid "Optional agreement signing"
+msgstr ""
+
+#: noggin/templates/registration-agreements.html:16
+#, python-format
+msgid "Hello %(name)s. Please sign the agreement(s) below if you agree with them."
+msgstr ""
+
+#: noggin/templates/registration-agreements.html:23
+msgid "Continue"
+msgstr ""
+
+#: noggin/templates/registration-agreements.html:26
+msgid "Skip"
+msgstr ""
+
+#: noggin/templates/registration-confirmation.html:2
 msgid "Validate your email address"
 msgstr "Convalida il tuo indirizzo email"
 
+#: noggin/templates/registration-confirmation.html:15
 msgid "Account creation, step 2/3"
 msgstr "Creazione account, step 2/3"
 
+#: noggin/templates/registration-confirmation.html:16
 #, python-format
 msgid "Congratulations %(name)s, your account has been created!"
 msgstr "Congratulazioni %(name)s, il tuo account è stato creato!"
 
+#: noggin/templates/registration-confirmation.html:17
 #, python-format
 msgid ""
-"Before you can log in, your email address: %(mail)s needs to be validated. "
-"Please check your inbox and click on the link to proceed."
+"Before you can log in, your email address: %(mail)s needs to be "
+"validated. Please check your inbox and click on the link to proceed."
 msgstr ""
-"Prima di poter effettuare il login, il tuo indirizzo email: %(mail)s deve "
-"essere convalidato. Controlla la tua casella di posta e clicca sul link per "
-"procedere."
+"Prima di poter effettuare il login, il tuo indirizzo email: %(mail)s deve"
+" essere convalidato. Controlla la tua casella di posta e clicca sul link "
+"per procedere."
 
+#: noggin/templates/registration-confirmation.html:19
 msgid ""
-"If you can't find the email in a couple minutes, check your spam folder. If "
-"it's not there, you can ask for another validation email by clicking on the "
-"button below."
+"If you can't find the email in a couple minutes, check your spam folder. "
+"If it's not there, you can ask for another validation email by clicking "
+"on the button below."
 msgstr ""
-"Se non trovi l'email entro qualche minuto, controlla la cartella dello spam. "
-"Se non è lì, puoi richiedere un'altra email di convalida cliccando sul "
-"pulsante qui sotto."
+"Se non trovi l'email entro qualche minuto, controlla la cartella dello "
+"spam. Se non è lì, puoi richiedere un'altra email di convalida cliccando "
+"sul pulsante qui sotto."
 
+#: noggin/templates/registration-spamcheck-wait.html:2
 msgid "Spam check in progress"
 msgstr "Controllo antispam in corso."
 
+#: noggin/templates/registration-spamcheck-wait.html:13
 msgid "Your account is being checked"
 msgstr "Il tuo account è in fase di controllo"
 
+#: noggin/templates/registration-spamcheck-wait.html:15
 msgid ""
-"Before you can log in, your account needs to be check for spam likelihood. "
-"It should only take a few seconds, please wait..."
+"Before you can log in, your account needs to be check for spam "
+"likelihood. It should only take a few seconds, please wait..."
 msgstr ""
-"Prima di poter effettuare il login, il tuo account deve essere verificato "
-"per la probabilità di spam. Dovrebbe richiedere solo pochi secondi, ti "
+"Prima di poter effettuare il login, il tuo account deve essere verificato"
+" per la probabilità di spam. Dovrebbe richiedere solo pochi secondi, ti "
 "preghiamo di attendere..."
 
+#: noggin/templates/registration-spamcheck-wait.html:18
 msgid "Your account requires admin approval"
 msgstr "Il tuo account richiede l'approvazione dell'amministratore"
 
+#: noggin/templates/registration-spamcheck-wait.html:21
 msgid "Your account needs to be approved by an administrator."
 msgstr "Il tuo account deve essere approvato da un amministratore."
 
+#: noggin/templates/registration-spamcheck-wait.html:22
 msgid "You will receive an email when the decision has been taken."
 msgstr "Riceverai un'email quando la decisione sarà stata presa."
 
+#: noggin/templates/registration-spamcheck-wait.html:23
 msgid "Thank you for your patience."
 msgstr "Grazie per la tua pazienza."
 
+#: noggin/templates/registration-spamcheck-wait.html:30
 msgid "Your account is blocked"
 msgstr "Il tuo account è bloccato"
 
+#: noggin/templates/registration-spamcheck-wait.html:32
 msgid "Your account has been flagged as spam."
 msgstr "Il tuo account è stato contrassegnato come spam."
 
+#: noggin/templates/registration-spamcheck-wait.html:38
 msgid "Something went wrong"
 msgstr "Qualcosa non ha funzionato"
 
+#: noggin/templates/registration-spamcheck-wait.html:41
 #, python-format
 msgid "Unsupported spam status: %s, please contact the administrators"
 msgstr ""
-"Stato spam non supportato: %s, ti preghiamo di contattare gli amministratori"
+"Stato spam non supportato: %s, ti preghiamo di contattare gli "
+"amministratori"
 
+#: noggin/templates/sync-token.html:2
 msgid "Sync OTP Token"
 msgstr "Sincronizza il token OTP"
 
+#: noggin/templates/sync-token.html:10
 msgid "Synchronize OTP Token"
 msgstr "Sincronizza il token OTP"
 
+#: noggin/templates/sync-token.html:33
 msgid "Sync"
 msgstr "Sincronizza"
 
-msgid "View agreement"
-msgstr "Vedi accordo"
-
-msgid "Sign"
-msgstr "Firma"
-
-msgid "Sign User Agreement"
-msgstr "Firma l'accordo utente"
-
+#: noggin/templates/user-settings-email-validation.html:2
+#: noggin/templates/user-settings-email-validation.html:17
 msgid "Validate your email"
 msgstr "Verifica la tua email"
 
+#: noggin/templates/user-settings-email-validation.html:18
 #, python-format
 msgid "Hello %(user_name)s. Do you want to set your %(attr_name)s to %(mail)s?"
 msgstr "Ciao %(user_name)s. Vuoi impostare il tuo %(attr_name)s su %(mail)s?"
 
+#: noggin/templates/user-settings-email-validation.html:23
+#: noggin/templates/user-settings-otp.html:33
 msgid "Cancel"
 msgstr "Annulla"
 
+#: noggin/templates/user-settings-email-validation.html:24
 msgid "Do it"
 msgstr "Fallo"
 
+#: noggin/templates/user-settings-email.html:14
+#: noggin/templates/user-settings-keys.html:13
+#: noggin/templates/user-settings-profile.html:59
 msgid "Save"
 msgstr "Salva"
 
+#: noggin/templates/user-settings-keys.html:8
 msgid "GPG Key ID"
 msgstr "ID Chiave GPG"
 
+#: noggin/templates/user-settings-keys.html:9
 msgid "SSH Public Key"
 msgstr "Chiave pubblica SSH"
 
+#: noggin/templates/user-settings-otp.html:11
 msgid "Scan your new token"
 msgstr "Scansiona il tuo nuovo token"
 
+#: noggin/templates/user-settings-otp.html:16
 msgid ""
-"Your new token is ready. Click on the button below to reveal the QR code and "
-"scan it."
+"Your new token is ready. Click on the button below to reveal the QR code "
+"and scan it."
 msgstr ""
-"Il tuo nuovo token è pronto. Clicca sul pulsante qui sotto per visualizzare "
-"il codice QR e scansionarlo."
+"Il tuo nuovo token è pronto. Clicca sul pulsante qui sotto per "
+"visualizzare il codice QR e scansionarlo."
 
+#: noggin/templates/user-settings-otp.html:17
 msgid "Reveal"
 msgstr "Reveal"
 
-msgid ""
-"or copy and paste the following token URL if you can't scan the QR code:"
+#: noggin/templates/user-settings-otp.html:19
+msgid "or copy and paste the following token URL if you can't scan the QR code:"
 msgstr ""
-"oppure copia e incolla il seguente URL del token se non riesci a scansionare "
-"il codice QR:"
+"oppure copia e incolla il seguente URL del token se non riesci a "
+"scansionare il codice QR:"
 
+#: noggin/templates/user-settings-otp.html:26
 msgid ""
-"After enrolling the token in your application, verify it by generating your "
-"first code and entering it below:"
+"After enrolling the token in your application, verify it by generating "
+"your first code and entering it below:"
 msgstr ""
-"Dopo aver registrato il token nella tua applicazione, verifica generando il "
-"tuo primo codice e inserendolo qui sotto:"
+"Dopo aver registrato il token nella tua applicazione, verifica generando "
+"il tuo primo codice e inserendolo qui sotto:"
 
+#: noggin/templates/user-settings-otp.html:47
+#: noggin/templates/user-settings-otp.html:75
 msgid "Add OTP Token"
 msgstr "Aggiungi OTP Token"
 
-msgid ""
-"Creating your first OTP token enables two-factor authentication using OTP."
+#: noggin/templates/user-settings-otp.html:53
+msgid "Creating your first OTP token enables two-factor authentication using OTP."
 msgstr ""
-"Creare il tuo primo token OTP abilita l’autenticazione a due fattori tramite "
-"OTP."
+"Creare il tuo primo token OTP abilita l’autenticazione a due fattori "
+"tramite OTP."
 
+#: noggin/templates/user-settings-otp.html:54
 msgid "Once enabled, two-factor authentication cannot be disabled."
 msgstr ""
 "Una volta abilitata, l’autenticazione a due fattori non può essere "
 "disattivata."
 
+#: noggin/templates/user-settings-otp.html:74
 msgid "OTP Tokens"
 msgstr "Token OTP"
 
+#: noggin/templates/user-settings-otp.html:85
 msgid "(no name)"
 msgstr "(nessun nome)"
 
+#: noggin/templates/user-settings-otp.html:86
+#: noggin/templates/user-settings-otp.html:92
 msgid "Rename"
 msgstr "Rinomina"
 
+#: noggin/templates/user-settings-otp.html:101
 msgid "Disable"
 msgstr "Disabilita"
 
+#: noggin/templates/user-settings-otp.html:106
 msgid "Enable"
 msgstr "Abilita"
 
+#: noggin/templates/user-settings-otp.html:118
 msgid "You have no OTP tokens"
 msgstr "Non hai token OTP"
 
+#: noggin/templates/user-settings-otp.html:119
 msgid "Add an OTP token to enable two-factor authentication on your account."
 msgstr ""
-"Aggiungi un token OTP per abilitare l’autenticazione a due fattori sul tuo "
-"account."
+"Aggiungi un token OTP per abilitare l’autenticazione a due fattori sul "
+"tuo account."
 
+#: noggin/templates/user-settings-profile.html:12
 msgid "Change Avatar"
 msgstr "Cambia Avatar"
 
+#: noggin/templates/user-settings-profile.html:38
 msgid ""
 "\n"
-"            The format is either <code>username</code> or <code>username:"
-"server.name</code> if you're not using the default servers:\n"
+"            The format is either <code>username</code> or "
+"<code>username:server.name</code> if you're not using the default "
+"servers:\n"
 "          "
 msgstr ""
 "\n"
 "            The format is either <code>username</code> or "
-"<code>username:server.name</code> if you're not using the default servers:Il "
-"formato è <code>username</code> oppure <code>username\\:server.name</code> "
-"se non stai usando i server predefiniti:\n"
+"<code>username:server.name</code> if you're not using the default "
+"servers:Il formato è <code>username</code> oppure "
+"<code>username\\:server.name</code> se non stai usando i server "
+"predefiniti:\n"
 "          "
 
+#: noggin/templates/user-settings-profile.html:45
 #, python-format
 msgid ""
 "\n"
@@ -892,82 +1187,139 @@ msgstr ""
 "              Per %(title)s: <code>%(server)s</code>\n"
 "            "
 
+#: noggin/templates/user-settings.html:3 noggin/templates/user-settings.html:14
 #, python-format
 msgid "Settings for %(username)s"
 msgstr "Impostazioni per %(username)s"
 
+#: noggin/templates/user-settings.html:19
+#: noggin/themes/almalinux/templates/main.html:31
+#: noggin/themes/centos/templates/main.html:24
+#: noggin/themes/default/templates/main.html:24
+#: noggin/themes/fas/templates/main.html:35
 msgid "Profile"
 msgstr "Profilo"
 
+#: noggin/templates/user-settings.html:22
 msgid "Emails"
 msgstr "Email"
 
+#: noggin/templates/user-settings.html:25
 msgid "SSH &amp; GPG Keys"
 msgstr "Chiavi SSH e GPG"
 
+#: noggin/templates/user-settings.html:28
 msgid "OTP"
 msgstr "OTP"
 
+#: noggin/templates/user-settings.html:34
 msgid "Agreements"
 msgstr "Contratto"
 
+#: noggin/templates/user.html:3
 #, python-format
 msgid "Profile for %(username)s"
 msgstr "Profilo di %(username)s"
 
+#: noggin/templates/user.html:17
 msgid "Edit Profile"
 msgstr "Edita profilo"
 
+#: noggin/templates/user.html:23
+msgid "Created on"
+msgstr ""
+
+#: noggin/templates/user.html:51 noggin/templates/user.html:53
 msgid "Current Time"
 msgstr "Orario corrente"
 
+#: noggin/templates/user.html:62 noggin/templates/user.html:63
 msgid "Chat"
 msgstr "Chat"
 
-msgid "Website"
-msgstr "Sito web"
+#: noggin/templates/user.html:94
+#, fuzzy
+msgid "Blog"
+msgstr "Accesso"
 
+#: noggin/templates/user.html:106
+msgid "RSS"
+msgstr ""
+
+#: noggin/templates/user.html:118
 msgid "RHBZ"
 msgstr "RHBZ"
 
+#: noggin/templates/user.html:140
 #, python-format
 msgid "%(groupcount)s Group(s), %(agreementcount)s Agreement(s)"
 msgstr "%(groupcount)s Gruppo(i), %(agreementcount)s Accordo(i)"
 
+#: noggin/templates/user.html:157
 msgid "signed"
 msgstr "firmato"
 
+#: noggin/templates/user.html:175
 msgid "sponsor"
 msgstr "sponsor"
 
+#: noggin/templates/user.html:176
 msgid "member"
 msgstr "membri"
 
+#: noggin/themes/almalinux/templates/email-validation.html:2
+#: noggin/themes/almalinux/templates/settings-email-validation.html:2
+#: noggin/themes/centos/templates/email-validation.html:2
+#: noggin/themes/centos/templates/settings-email-validation.html:2
+#: noggin/themes/default/templates/email-validation.html:2
+#: noggin/themes/default/templates/settings-email-validation.html:2
+#: noggin/themes/fas/templates/email-validation.html:2
+#: noggin/themes/fas/templates/settings-email-validation.html:2
 #, python-format
 msgid "Hello %(name)s,"
 msgstr "Benvenuto %(name)s,"
 
+#: noggin/themes/almalinux/templates/email-validation.html:3
+#: noggin/themes/centos/templates/email-validation.html:3
+#: noggin/themes/default/templates/email-validation.html:3
+#: noggin/themes/fas/templates/email-validation.html:3
 #, python-format
 msgid ""
-"To activate your account with username %(username)s, click on the link below:"
+"To activate your account with username %(username)s, click on the link "
+"below:"
 msgstr ""
-"Per attivare il tuo account con nome utente %(username)s, fai clic sul link "
-"qui sotto:"
+"Per attivare il tuo account con nome utente %(username)s, fai clic sul "
+"link qui sotto:"
 
+#: noggin/themes/almalinux/templates/email-validation.html:9
+#: noggin/themes/centos/templates/email-validation.html:9
+#: noggin/themes/default/templates/email-validation.html:16
+#: noggin/themes/fas/templates/email-validation.html:16
 #, python-format
 msgid ""
-"If you did not create an account for username %(username)s, you can ignore "
-"this email."
+"If you did not create an account for username %(username)s, you can "
+"ignore this email."
 msgstr ""
-"Se non hai creato un account con il nome utente %(username)s, puoi ignorare "
-"questa email."
+"Se non hai creato un account con il nome utente %(username)s, puoi "
+"ignorare questa email."
 
+#: noggin/themes/almalinux/templates/email-validation.html:11
+#: noggin/themes/almalinux/templates/forgot-password-email.html:9
+#: noggin/themes/almalinux/templates/settings-email-validation.html:11
 msgid "The AlmaLinux Team"
 msgstr "Il team AlmaLinux"
 
+#: noggin/themes/almalinux/templates/forgot-password-email.html:1
+#: noggin/themes/centos/templates/forgot-password-email.html:1
+#: noggin/themes/default/templates/forgot-password-email.html:1
+#: noggin/themes/fas/templates/forgot-password-email.html:1
 msgid "Hi,"
 msgstr "Ciao,"
 
+#: noggin/themes/almalinux/templates/forgot-password-email.html:2
+#: noggin/themes/centos/templates/forgot-password-email.html:2
+#: noggin/themes/default/templates/forgot-password-email.html:2
+#: noggin/themes/fas/templates/forgot-password-email.html:2
 msgid ""
 "Click the link below to reset your password. If you did not request a "
 "password reset, please ignore this email."
@@ -975,55 +1327,71 @@ msgstr ""
 "Fai clic sul link qui sotto per reimpostare la tua password. Se non hai "
 "richiesto il reset della password, ignora questa email."
 
+#: noggin/themes/almalinux/templates/main.html:2
 msgid "AlmaLinux Account Services"
 msgstr "Servizi Account AlmaLinux"
 
+#: noggin/themes/almalinux/templates/main.html:21
+#: noggin/themes/centos/templates/main.html:13
+#: noggin/themes/default/templates/main.html:13
+#: noggin/themes/fas/templates/main.html:24
 msgid "search..."
 msgstr "Cerca..."
 
+#: noggin/themes/almalinux/templates/main.html:32
+#: noggin/themes/centos/templates/main.html:25
+#: noggin/themes/default/templates/main.html:25
+#: noggin/themes/fas/templates/main.html:36
 msgid "Settings"
 msgstr "Impostazioni"
 
+#: noggin/themes/almalinux/templates/main.html:37
+#: noggin/themes/centos/templates/main.html:30
+#: noggin/themes/fas/templates/main.html:41
 msgid "Help"
 msgstr "Aiuto"
 
+#: noggin/themes/almalinux/templates/main.html:38
+#: noggin/themes/centos/templates/main.html:31
+#: noggin/themes/default/templates/main.html:29
+#: noggin/themes/fas/templates/main.html:42
 msgid "Log Out"
 msgstr "Esci"
 
+#: noggin/themes/almalinux/templates/main.html:72
+#: noggin/themes/centos/templates/main.html:63
+#: noggin/themes/default/templates/main.html:61
+#: noggin/themes/fas/templates/main.html:116
 #, python-format
 msgid "Powered by %(noggin_link)s"
 msgstr "Supportato da %(noggin_link)s"
 
+#: noggin/themes/almalinux/templates/main.html:88
 msgid "AlmaLinux Accounts"
 msgstr "Account AlmaLinux"
 
+#: noggin/themes/almalinux/templates/main.html:90
 msgid ""
-"AlmaLinux Accounts provides the ability to create and manage your account "
-"across AlmaLinux's entire infrastructure."
+"AlmaLinux Accounts provides the ability to create and manage your account"
+" across AlmaLinux's entire infrastructure."
 msgstr ""
 "AlmaLinux Accounts consente di creare e gestire il tuo account su tutta "
 "l'infrastruttura di AlmaLinux."
 
-msgid ""
-"Additional configuration is required when using Kerberos tickets when OTP is "
-"enabled"
-msgstr ""
-"È necessaria una configurazione aggiuntiva quando si utilizzano i ticket "
-"Kerberos con OTP abilitato"
-
-msgid ""
-"Read the <a href='https://docs.fedoraproject.org/en-US/fedora-accounts/user/"
-"#pkinit'>documentation</a> for details on configuring your system"
-msgstr ""
-"Leggi la <a href='https://docs.fedoraproject.org/en-US/fedora-accounts/user/"
-"#pkinit'>documentazione</a> per i dettagli sulla configurazione del tuo "
-"sistema"
-
+#: noggin/themes/almalinux/templates/settings-email-validation.html:3
+#: noggin/themes/centos/templates/settings-email-validation.html:3
+#: noggin/themes/default/templates/settings-email-validation.html:3
+#: noggin/themes/fas/templates/settings-email-validation.html:3
 #, python-format
 msgid "To validate the email address %(address)s, click on the link below:"
 msgstr ""
-"Per convalidare l'indirizzo email %(address)s, fare clic sul link qui sotto:"
+"Per convalidare l'indirizzo email %(address)s, fare clic sul link qui "
+"sotto:"
 
+#: noggin/themes/almalinux/templates/settings-email-validation.html:9
+#: noggin/themes/centos/templates/settings-email-validation.html:9
+#: noggin/themes/default/templates/settings-email-validation.html:9
+#: noggin/themes/fas/templates/settings-email-validation.html:9
 #, python-format
 msgid ""
 "If you did not set the email address %(address)s in your account "
@@ -1032,86 +1400,141 @@ msgstr ""
 "Se non hai impostato l'indirizzo email %(address)s nel tuo account "
 "%(username)s, puoi ignorare questa email."
 
+#: noggin/themes/centos/templates/email-validation.html:11
+#: noggin/themes/centos/templates/forgot-password-email.html:9
+#: noggin/themes/centos/templates/settings-email-validation.html:11
+#: noggin/themes/default/templates/email-validation.html:18
+#: noggin/themes/default/templates/forgot-password-email.html:9
+#: noggin/themes/default/templates/settings-email-validation.html:11
 msgid "The Noggin team"
 msgstr "Il Noggin Team"
 
+#: noggin/themes/centos/templates/main.html:78
+#: noggin/themes/default/templates/main.html:76
 msgid "Welcome to noggin!"
 msgstr "Benvenuto in noggin!"
 
+#: noggin/themes/centos/templates/main.html:80
+#: noggin/themes/default/templates/main.html:78
 msgid ""
 "This is the open source, community self-service portal for FreeIPA. It "
-"allows you to do things like create an account, change your password, manage "
-"group membership, and more."
+"allows you to do things like create an account, change your password, "
+"manage group membership, and more."
 msgstr ""
-"Questo è il portale open source e self-service della community per FreeIPA. "
-"Ti consente di fare cose come creare un account, cambiare la password, "
-"gestire l'appartenenza ai gruppi e altro ancora."
+"Questo è il portale open source e self-service della community per "
+"FreeIPA. Ti consente di fare cose come creare un account, cambiare la "
+"password, gestire l'appartenenza ai gruppi e altro ancora."
 
+#: noggin/themes/centos/templates/main.html:110
+#: noggin/themes/fas/templates/main.html:208
+msgid ""
+"Additional configuration is required when using Kerberos tickets when OTP"
+" is enabled"
+msgstr ""
+"È necessaria una configurazione aggiuntiva quando si utilizzano i ticket "
+"Kerberos con OTP abilitato"
+
+#: noggin/themes/centos/templates/main.html:111
+#: noggin/themes/fas/templates/main.html:209
+msgid ""
+"Read the <a href='https://docs.fedoraproject.org/en-US/fedora-"
+"accounts/user/#pkinit'>documentation</a> for details on configuring your "
+"system"
+msgstr ""
+"Leggi la <a href='https://docs.fedoraproject.org/en-US/fedora-"
+"accounts/user/#pkinit'>documentazione</a> per i dettagli sulla "
+"configurazione del tuo sistema"
+
+#: noggin/themes/centos/templates/main.html:121
 msgid "You can also use your Fedora account to login here."
 msgstr "Puoi anche usare il tuo account Fedora per accedere qui."
 
+#: noggin/themes/default/templates/email-validation.html:10
+#: noggin/themes/fas/templates/email-validation.html:10
 #, python-format
-msgid ""
-"This link will be valid for %(ttl)s minutes (until %(valid_until)s UTC)."
+msgid "This link will be valid for %(ttl)s minutes (until %(valid_until)s UTC)."
 msgstr ""
-"Questo link sarà valido per %(ttl)s minuti (fino alle %(valid_until)s UTC)."
+"Questo link sarà valido per %(ttl)s minuti (fino alle %(valid_until)s "
+"UTC)."
 
+#: noggin/themes/default/templates/email-validation.html:11
+#: noggin/themes/fas/templates/email-validation.html:11
 msgid "If the link has expired, you can request a new one here: "
 msgstr "Se il link è scaduto, puoi richiederne uno nuovo qui: "
 
+#: noggin/themes/fas/templates/email-validation.html:1
+#: noggin/themes/fas/templates/email-validation.html:18
+#: noggin/themes/fas/templates/forgot-password-email.html:9
+#: noggin/themes/fas/templates/settings-email-validation.html:1
+#: noggin/themes/fas/templates/settings-email-validation.html:11
 msgid "Fedora Accounts System"
 msgstr "Fedora Account System"
 
+#: noggin/themes/fas/templates/main.html:2
+#: noggin/themes/fas/templates/main.html:153
 msgid "Fedora Accounts"
 msgstr "Fedora Accounts"
 
+#: noggin/themes/fas/templates/main.html:142
 msgid "Wiki"
 msgstr "Wiki"
 
+#: noggin/themes/fas/templates/main.html:146
 msgid "Fedora People"
 msgstr "Fedora People"
 
+#: noggin/themes/fas/templates/main.html:155
 msgid ""
-"Fedora Accounts allows you to create and manage an account for Fedora Tools "
-"and Infrastructure."
+"Fedora Accounts allows you to create and manage an account for Fedora "
+"Tools and Infrastructure."
 msgstr ""
-"Fedora Accounts ti consente di creare e gestire un account per gli strumenti "
-"e l’infrastruttura di Fedora."
+"Fedora Accounts ti consente di creare e gestire un account per gli "
+"strumenti e l’infrastruttura di Fedora."
 
+#: noggin/themes/fas/templates/main.html:167
 msgid "Edit Group"
 msgstr "Modifica Gruppo"
 
+#: noggin/themes/fas/templates/main.html:168
 msgid "To change group details or add sponsors, file a ticket with"
 msgstr ""
-"Per modificare i dettagli di un gruppo o aggiungere sponsor, apri un ticket "
-"con"
+"Per modificare i dettagli di un gruppo o aggiungere sponsor, apri un "
+"ticket con"
 
+#: noggin/themes/fas/templates/main.html:178
 msgid "Create a PDR request to disable your account"
 msgstr "Crea una richiesta PDR per disabilitare il tuo account"
 
+#: noggin/themes/fas/templates/main.html:179
 msgid "Request account deletion"
 msgstr "Richiedi la cancellazione dell'account"
 
+#: noggin/themes/fas/templates/main.html:190
 msgid "Did you lose your last OTP token?"
 msgstr "Hai perso il tuo ultimo token OTP?"
 
+#: noggin/themes/fas/templates/main.html:194
 #, python-format
 msgid ""
 "If you have lost your last OTP token you need to send an email to "
-"%(admin_email)s. Please sign this email using the GPG key associated with "
-"your account if possible, so that the administrator can verify your identity."
+"%(admin_email)s. Please sign this email using the GPG key associated with"
+" your account if possible, so that the administrator can verify your "
+"identity."
 msgstr ""
-"Se hai perso il tuo ultimo token OTP, devi inviare un'email a %(admin_email)"
-"s. Se possibile, firma questa email con la chiave GPG associata al tuo "
-"account, così l'amministratore potrà verificare la tua identità."
+"Se hai perso il tuo ultimo token OTP, devi inviare un'email a "
+"%(admin_email)s. Se possibile, firma questa email con la chiave GPG "
+"associata al tuo account, così l'amministratore potrà verificare la tua "
+"identità."
 
+#: noggin/themes/fas/templates/main.html:195
 msgid ""
-"If you had multiple tokens and lost one, you can use another to login and "
-"delete the lost token from your account."
+"If you had multiple tokens and lost one, you can use another to login and"
+" delete the lost token from your account."
 msgstr ""
-"Se avevi più token e ne hai perso uno, puoi usare un altro per accedere ed "
-"eliminare il token perso dal tuo account."
+"Se avevi più token e ne hai perso uno, puoi usare un altro per accedere "
+"ed eliminare il token perso dal tuo account."
 
+#: noggin/themes/fas/templates/main.html:196
 msgid ""
 "If you haven't enrolled a OTP token, you don't have one and this doesn't "
 "apply to you."
@@ -1119,33 +1542,54 @@ msgstr ""
 "Se non hai registrato un token OTP, non ne possiedi uno e questo non ti "
 "riguarda."
 
+#: noggin/themes/fas/templates/main.html:220
 #, python-format
 msgid ""
 "To let admins know that you're not a spammer, please send an email to "
 "%(email_link)s and explain the situation."
 msgstr ""
-"Per far sapere agli amministratori che non sei uno spammer, invia un’email a "
-"%(email_link)s e spiega la situazione."
+"Per far sapere agli amministratori che non sei uno spammer, invia "
+"un’email a %(email_link)s e spiega la situazione."
 
+#: noggin/themes/fas/templates/main.html:228
 msgid ""
-"By using a Fedora account, you agree to follow the <a href='https://docs."
-"fedoraproject.org/en-US/project/code-of-conduct/'>Fedora&nbsp;Code&nbsp;"
-"of&nbsp;Conduct</a>."
+"By using a Fedora account, you agree to follow the <a "
+"href='https://docs.fedoraproject.org/en-US/project/code-of-"
+"conduct/'>Fedora&nbsp;Code&nbsp;of&nbsp;Conduct</a>."
 msgstr ""
-"Utilizzando un account Fedora, accetti di rispettare il <a href='https://"
-"docs.fedoraproject.org/en-US/project/code-of-conduct/'>Codice di Condotta di "
-"Fedora</a>."
+"Utilizzando un account Fedora, accetti di rispettare il <a "
+"href='https://docs.fedoraproject.org/en-US/project/code-of-"
+"conduct/'>Codice di Condotta di Fedora</a>."
 
+#: noggin/themes/fas/templates/main.html:231
 msgid "You can also use your CentOS account to login here."
 msgstr "Puoi anche usare il tuo account CentOS per accedere qui."
 
+#: noggin/utility/controllers.py:56
 #, python-format
 msgid "Group %(groupname)s could not be found."
 msgstr "Il gruppo %(groupname)s non è stato trovato."
 
+#: noggin/utility/controllers.py:78
+#, python-format
+msgid "No Users with email %(username_or_email)s found"
+msgstr ""
+
+#: noggin/utility/templates.py:26
 msgid "Undo"
 msgstr "Annulla"
 
+#: noggin/utility/templates.py:89
 #, python-format
 msgid "%(protocol)s on %(server)s"
 msgstr "%(protocol)s su %(server)s"
+
+#~ msgid "Unknown agreement: %(name)s."
+#~ msgstr "Accordo sconosciuto: %(name)s."
+
+#~ msgid "Website or Blog URL"
+#~ msgstr "URL del sito web o blog"
+
+#~ msgid "Website"
+#~ msgstr "Sito web"
+
