@@ -16,7 +16,7 @@
               <p>{{ngettext(
                 "Hello %(name)s. Please sign the agreement below if you agree with it.",
                 "Hello %(name)s. Please sign the agreements below if you agree with them.",
-                len(agreementslist),
+                agreementslist|length,
                 name=user.name
               )}}</p>
               {% include '_agreements_form.html' %}
