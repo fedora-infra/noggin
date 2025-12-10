@@ -2,7 +2,7 @@
     {% for agreement in agreementslist %}
 
       {# Look up a warning, if any, for this agreement #}
-      {% set warning = agreement_warnings.get(agreement.name) %}
+      {% set warning = config["AGREEMENT_WARNINGS"].get(agreement.name) %}
 
       {% if warning and agreement.name not in user.agreements %}
         <div class="alert alert-warning my-3">
