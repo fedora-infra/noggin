@@ -1,6 +1,8 @@
 # This file contains the default configuration values
 import socket
 
+from flask_babel import _
+
 
 TEMPLATES_AUTO_RELOAD = False
 SESSION_COOKIE_HTTPONLY = True
@@ -18,6 +20,9 @@ PASSWORD_POLICY = {"min": 8, "max": 122}
 PASSWORD_RESET_EXPIRATION = 10  # in minutes
 # We're running in Openshift, so nobody else has access to /tmp
 PASSWORD_RESET_LOCK_DIR = "/tmp/noggin-pw-reset"  # nosec
+# Days before password expiration when Noggin should send reminder emails.
+# Example: "7,3,1" means notify 7 days, 3 days, and 1 day before expiry.
+PASSWORD_EXPIRY_REMINDER_DAYS = "7,3,1"
 ACTIVATION_TOKEN_EXPIRATION = 30  # in minutes
 REGISTRATION_OPEN = True
 HIDE_GROUPS_IN = "hidden_groups"
@@ -61,3 +66,13 @@ SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 
 # Cheat code to toggle Fedora Messaging support
 FEDORA_MESSAGING_ENABLED = False
+
+# Agreement warnings shown when the corresponding agreement is not signed.
+# Keys must match the agreement.name from FreeIPA.
+AGREEMENT_WARNINGS = {
+    "Fedora Project Contributor Agreement": _(
+        "Not signing the FPCA will prevent you from logging in to many Fedora "
+        "services such as Pagure, Fedora Discussion, and other contributor "
+        "platforms."
+    ),
+}

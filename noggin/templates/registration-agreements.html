@@ -4,7 +4,6 @@
 {% block content %}
   {{ super() }}
 
-
 {% import '_form_macros.html' as macros %}
 
   <div class="container py-4">
@@ -13,12 +12,8 @@
         <div class="card">
             <div class="card-body">
               <h4 class="card-title">{{_("Optional agreement signing")}}</h4>
-              <p>{{ngettext(
-                "Hello %(name)s. Please sign the agreement below if you agree with it.",
-                "Hello %(name)s. Please sign the agreements below if you agree with them.",
-                agreementslist|length,
-                name=user.name
-              )}}</p>
+
+              <p>{{_("Hello %(name)s. Please sign the agreement(s) below if you agree with them.", name=user.name)}}</p>
               {% include '_agreements_form.html' %}
             </div>
             <div class="card-footer d-flex justify-content-between">
@@ -32,7 +27,6 @@
                 {% endif %}
               </a>
             </div>
-          </form>
         </div>
       </div>
     </div> <!-- ./row -->
