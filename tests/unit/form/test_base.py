@@ -4,8 +4,15 @@ import pytest
 from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
+from wtforms.validators import StopValidation
 
-from noggin.form.base import ButtonWidget, CSVListField, ModestForm, SubmitButtonField
+from noggin.form.base import (
+    AltchaField,
+    ButtonWidget,
+    CSVListField,
+    ModestForm,
+    SubmitButtonField,
+)
 
 
 def test_buttonwidget(client):
@@ -88,3 +95,32 @@ def test_csvlistfield_read(client, data, expected):
 
     form = DummyForm(obj=Obj(csvfield=data))
     assert form.csvfield._value() == expected
+
+
+def test_altcha_field_no_data(request_context, mocker):
+    mocker.patch(
+        "noggin.form.base.verify_solution", return_value=(False, "dummy error")
+    )
+
+    class DummyForm(FlaskForm):
+        altcha = AltchaField()
+
+    Data = namedtuple("Data", ["altcha"])
+    form = DummyForm(obj=Data(altcha=""))
+    assert form.validate() is False
+    assert form.errors == {'altcha': ['CAPTCHA payload missing']}
+
+
+def test_altcha_field_stopped_validation(request_context, mocker):
+    mocker.patch(
+        "noggin.form.base.verify_solution", return_value=(False, "dummy error")
+    )
+
+    def stopping_validator(form, field):
+        raise StopValidation()
+
+    class DummyForm(FlaskForm):
+        altcha = AltchaField(validators=[stopping_validator])
+
+    form = DummyForm()
+    form.validate()

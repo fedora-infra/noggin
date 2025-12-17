@@ -1,7 +1,7 @@
 {% import '_form_macros.html' as macros %}
 
 {% if config["REGISTRATION_OPEN"] %}
-<form action="{{ url_for('.root') }}?tab=register" method="post" novalidate>
+<form action="{{ url_for('.root') }}?tab=register" method="post">
   {{ register_form.csrf_token }}
   <div class="card-body">
     <div class="mb-3">{{ macros.with_errors(register_form.username, tabindex="4") }}</div>
@@ -14,6 +14,16 @@
     </div>
     <div class="row form-check">
       <div class="mb-3 col">{{ macros.with_errors(register_form.underage, tabindex="8") }}</div>
+    </div>
+    <div class="row">
+      <div class="mb-3 col">
+        {{ register_form.altcha }}
+        {% if register_form.altcha.errors %}
+          <div class="text-danger">
+            {{ register_form.altcha.errors|map('escape')|join(' ') }}
+          </div>
+        {% endif %}
+      </div>
     </div>
   </div>
   <div class="card-footer d-flex justify-content-between">

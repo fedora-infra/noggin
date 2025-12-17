@@ -32,3 +32,17 @@
     </div>
   </div>
 {% endblock %}
+
+
+{% block head %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='js/vendor/altcha-2.2.4/altcha.css') }}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+
+{% block scripts %}
+    {{ super() }}
+    <script async defer type="module" nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/altcha-2.2.4/altcha.min.js') }}"></script>
+    <script async defer nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/altcha-2.2.4/worker.min.js') }}"></script>
+    <script async defer nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/altcha-2.2.4/i18n-all.min.js') }}"></script>
+{% endblock %}

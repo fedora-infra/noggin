@@ -39,6 +39,7 @@ def post_data_step_1():
         "register-mail": "dummy@unit.tests",
         "register-username": "dummy",
         "register-underage": "true",
+        "register-altcha": "dummy",
         "register-submit": "1",
     }
 
@@ -90,8 +91,13 @@ def spamcheck_on(mocker):
     mocker.patch.dict(current_app.config, {"BASSET_URL": "http://basset.test"})
 
 
+@pytest.fixture
+def disable_captcha(mocker):
+    mocker.patch("noggin.form.base.verify_solution", return_value=(True, None))
+
+
 @pytest.mark.vcr()
-def test_step_1(client, post_data_step_1, cleanup_dummy_user, mocker):
+def test_step_1(client, post_data_step_1, cleanup_dummy_user, disable_captcha, mocker):
     """Register a user, step 1"""
     record_signal = mocker.Mock()
     with (
@@ -120,7 +126,9 @@ def test_step_1(client, post_data_step_1, cleanup_dummy_user, mocker):
 
 
 @pytest.mark.vcr()
-def test_gecos(client, post_data_non_ascii, cleanup_dummy_user, mocker):
+def test_gecos(
+    client, post_data_non_ascii, cleanup_dummy_user, disable_captcha, mocker
+):
     record_signal = mocker.Mock()
     with mailer.record_messages() as _, stageuser_created.connected_to(record_signal):
         result = client.post('/', data=post_data_non_ascii)
@@ -133,7 +141,9 @@ def test_gecos(client, post_data_non_ascii, cleanup_dummy_user, mocker):
 
 
 @pytest.mark.vcr()
-def test_lowercase_email(client, post_data_step_1, cleanup_dummy_user, mocker):
+def test_lowercase_email(
+    client, post_data_step_1, cleanup_dummy_user, disable_captcha, mocker
+):
     post_data_step_1["register-mail"] = "UPPERCASE-DUMMY@UNIT.TESTS"
     record_signal = mocker.Mock()
     with mailer.record_messages() as _, stageuser_created.connected_to(record_signal):
@@ -145,7 +155,7 @@ def test_lowercase_email(client, post_data_step_1, cleanup_dummy_user, mocker):
 
 @pytest.mark.vcr()
 def test_step_1_registration_closed(
-    client, post_data_step_1, cleanup_dummy_user, mocker
+    client, post_data_step_1, cleanup_dummy_user, disable_captcha, mocker
 ):
     """Try to register a user when registration is closed"""
     mocker.patch.dict(current_app.config, {"REGISTRATION_OPEN": False})
@@ -249,7 +259,7 @@ def test_step_1_blocked_value(client, post_data_step_1, mocker, username, regexp
 
 @pytest.mark.vcr()
 def test_step_1_spamcheck(
-    client, post_data_step_1, cleanup_dummy_user, spamcheck_on, mocker
+    client, post_data_step_1, cleanup_dummy_user, spamcheck_on, disable_captcha, mocker
 ):
     """Register a user, step 1, with spamcheck on"""
     mocked_requests = mocker.patch("noggin.signals.requests")
@@ -323,7 +333,9 @@ def test_step_3(
 
 
 @pytest.mark.vcr()
-def test_step_1_no_smtp(client, post_data_step_1, cleanup_dummy_user, mocker):
+def test_step_1_no_smtp(
+    client, post_data_step_1, cleanup_dummy_user, disable_captcha, mocker
+):
     mailer = mocker.patch("noggin.controller.registration.mailer")
     mailer.send.side_effect = ConnectionRefusedError
     logger = mocker.patch.object(current_app._get_current_object(), "logger")
@@ -582,7 +594,9 @@ def test_short_password_policy(
 
 
 @pytest.mark.vcr()
-def test_duplicate(client, post_data_step_1, cleanup_dummy_user, dummy_user):
+def test_duplicate(
+    client, post_data_step_1, cleanup_dummy_user, disable_captcha, dummy_user
+):
     """Register a user that already exists"""
     result = client.post('/', data=post_data_step_1)
     assert_form_generic_error(
@@ -596,7 +610,9 @@ def test_duplicate(client, post_data_step_1, cleanup_dummy_user, dummy_user):
 
 @pytest.mark.parametrize("field_name", ["firstname", "lastname"])
 @pytest.mark.vcr()
-def test_strip(client, post_data_step_1, cleanup_dummy_user, field_name):
+def test_strip(
+    client, post_data_step_1, cleanup_dummy_user, disable_captcha, field_name
+):
     """Register a user with fields that contain trailing spaces"""
     post_data_step_1[f"register-{field_name}"] = "Dummy "
     with mailer.record_messages() as outbox:
@@ -616,7 +632,9 @@ def test_strip(client, post_data_step_1, cleanup_dummy_user, field_name):
         ("mail", "email"),
     ],
 )
-def test_field_error_step_1(client, post_data_step_1, mocker, field_name, server_name):
+def test_field_error_step_1(
+    client, post_data_step_1, mocker, field_name, server_name, disable_captcha
+):
     """Register a user with fields that the server errors on"""
     ipa_admin = mocker.patch("noggin.controller.registration.ipa_admin")
     ipa_admin.stageuser_add.side_effect = python_freeipa.exceptions.ValidationError(
@@ -651,7 +669,7 @@ def test_field_error_step_3(
     record_signal.assert_called_once()
 
 
-def test_field_error_unknown(client, post_data_step_1, mocker):
+def test_field_error_unknown(client, post_data_step_1, disable_captcha, mocker):
     """Register a user with fields that the server errors on, but it's unknown to us"""
     ipa_admin = mocker.patch("noggin.controller.registration.ipa_admin")
     ipa_admin.stageuser_add.side_effect = python_freeipa.exceptions.ValidationError(
@@ -663,7 +681,7 @@ def test_field_error_unknown(client, post_data_step_1, mocker):
     )
 
 
-def test_invalid_first_name(client, post_data_step_1, mocker):
+def test_invalid_first_name(client, post_data_step_1, disable_captcha, mocker):
     """Register a user with an invalid first name"""
     ipa_admin = mocker.patch("noggin.controller.registration.ipa_admin")
     ipa_admin.stageuser_add.side_effect = python_freeipa.exceptions.ValidationError(
@@ -718,7 +736,7 @@ def test_underage(client, post_data_step_1):
     )
 
 
-def test_generic_error(client, post_data_step_1, mocker):
+def test_generic_error(client, post_data_step_1, disable_captcha, mocker):
     """Register a user with an unhandled error"""
     ipa_admin = mocker.patch("noggin.controller.registration.ipa_admin")
     ipa_admin.stageuser_add.side_effect = python_freeipa.exceptions.FreeIPAError(
@@ -1092,3 +1110,18 @@ def test_registering_delete_error(
     user = User(ipa_admin.stageuser_show("dummy")["result"])
     assert user.status_note == "spamcheck_awaiting"
     assert len(outbox) == 0
+
+
+def test_captcha(client):
+    response = client.get("/captcha")
+    assert response.status_code == 200
+    for required_key in ("algorithm", "challenge", "max_number", "salt", "signature"):
+        assert required_key in response.json
+
+
+def test_captcha_failure(client):
+    with mock.patch("noggin.controller.registration.create_challenge") as func:
+        func.side_effect = RuntimeError("dummy error")
+        response = client.get("/captcha")
+    assert response.status_code == 500
+    assert response.json == {"error": "Failed to create challenge: dummy error"}

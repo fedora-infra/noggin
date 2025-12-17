@@ -18,7 +18,7 @@ from noggin.form.validators import (
     validator_proxy,
 )
 
-from .base import BaseForm, ModestForm, SubmitButtonField, lower, strip
+from .base import AltchaField, BaseForm, ModestForm, SubmitButtonField, lower, strip
 
 
 class RegisterUserForm(ModestForm):
@@ -80,6 +80,7 @@ class RegisterUserForm(ModestForm):
             )
         ],
     )
+    altcha = AltchaField()
 
     submit = SubmitButtonField(_("Register"))
 

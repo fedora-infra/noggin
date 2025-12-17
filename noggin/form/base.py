@@ -1,8 +1,12 @@
+from altcha import verify_solution
+from flask import current_app, url_for
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from markupsafe import Markup, escape
 from wtforms import Field, SubmitField
 from wtforms.fields import FieldList, SelectField, StringField
 from wtforms.utils import unset_value
+from wtforms.validators import ValidationError
 from wtforms.widgets import TextInput, html_params
 
 
@@ -208,3 +212,38 @@ class NonEmptyFieldList(FieldList):
     @property
     def data(self):
         return [f.data.strip() for f in self.entries if f.data and f.data.strip()]
+
+
+class AltchaWidget:
+    html_params = staticmethod(html_params)
+
+    def __call__(self, field, **kwargs):
+        kwargs.setdefault("id", field.id)
+        kwargs.setdefault("challengeurl", url_for(".get_captcha"))
+        kwargs.setdefault("workerurl", "worker.min.js")
+        kwargs.setdefault("debug", False)
+        params = self.html_params(name=field.name, **kwargs)
+        return Markup(f"<altcha-widget {params}></altcha-widget>")  # nosec B704
+
+
+class AltchaField(Field):
+    widget = AltchaWidget()
+
+    def post_validate(self, form, validation_stopped):
+        if validation_stopped:
+            return
+
+        if not self.data:
+            raise ValidationError(_("CAPTCHA payload missing"))
+
+        captcha_secret_key = current_app.config["SECRET_KEY"].decode(
+            "ascii", errors="ignore"
+        )
+        try:
+            verified, err = verify_solution(self.data, captcha_secret_key, True)
+            if not verified:
+                raise ValidationError(_("Invalid CAPTCHA payload"))
+        except Exception as e:
+            raise ValidationError(
+                _("Failed to process CAPTCHA payload: %(error)s", error=str(e))
+            )
