@@ -98,6 +98,8 @@ def create_app(config=None):
             # The style-src directive needs to be specified (even if it's the same as default-src)
             # to add the nonce.
             "style-src": "'self'",
+            # For Altcha: https://altcha.org/docs/v2/widget-integration/#content-security-policy-csp
+            "worker-src": ["'self'", "blob:"],
         },
         content_security_policy_nonce_in=['script-src', 'style-src'],
     )

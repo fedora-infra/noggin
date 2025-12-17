@@ -3,6 +3,10 @@ import re
 
 import jwt
 import python_freeipa
+from altcha import (
+    ChallengeOptions,
+    create_challenge,
+)
 from flask import (
     abort,
     current_app,
@@ -481,3 +485,17 @@ def registering_users(ipa):
         form=form,
         filter=status_filter,
     )
+
+
+@bp.route("/captcha", methods=["GET"])
+def get_captcha():
+    try:
+        challenge = create_challenge(
+            ChallengeOptions(
+                hmac_key=current_app.config["ALTCHA_HMAC_KEY"],
+                max_number=50000,
+            )
+        )
+        return jsonify(challenge.__dict__)
+    except Exception as e:
+        return jsonify({"error": f"Failed to create challenge: {str(e)}"}), 500

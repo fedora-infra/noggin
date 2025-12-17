@@ -1092,3 +1092,18 @@ def test_registering_delete_error(
     user = User(ipa_admin.stageuser_show("dummy")["result"])
     assert user.status_note == "spamcheck_awaiting"
     assert len(outbox) == 0
+
+
+def test_captcha(client):
+    response = client.get("/captcha")
+    assert response.status_code == 200
+    for required_key in ("algorithm", "challenge", "max_number", "salt", "signature"):
+        assert required_key in response.json
+
+
+def test_captcha_failure(client):
+    with mock.patch("noggin.controller.registration.create_challenge") as func:
+        func.side_effect = RuntimeError("dummy error")
+        response = client.get("/captcha")
+    assert response.status_code == 500
+    assert response.json == {"error": "Failed to create challenge: dummy error"}

@@ -73,3 +73,6 @@ AGREEMENT_WARNINGS = {
         "platforms."
     ),
 }
+
+# CAPTCHA secret key, leave empty to autogenerate.
+ALTCHA_HMAC_KEY = ""
