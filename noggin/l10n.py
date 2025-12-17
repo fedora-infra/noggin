@@ -2,11 +2,8 @@ from flask import current_app, request
 from flask_babel import Babel
 
 
-SUPPORTED_LANGUAGES = ["en_US", "fr_FR"]
-
-
 def get_locale():
-    return request.accept_languages.best_match(SUPPORTED_LANGUAGES)
+    return guess_locale().split("-")[0]
 
 
 # def get_timezone():
