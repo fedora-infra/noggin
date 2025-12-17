@@ -1,6 +1,10 @@
 == {{_("Fedora Accounts System")}} ==
 
-{{_("Hello %(name)s,", name=user.name)}}
+{{_("Hello %(username)s,", username=user.username)}}
+
+{{_("This email address has been used to sign up for a Fedora Account.")}}
+
+{{_("If you did not create an account for username %(username)s, you can ignore this email.", username=user.username)}}
 
 {{_("To activate your account with username %(username)s, click on the link below:", username=user.username)}}
 
@@ -10,7 +14,5 @@
 {{_("If the link has expired, you can request a new one here:")}}
 
   {{ url_for('.confirm_registration', _external=True) }}?username={{ user.username }}
-
-{{_("If you did not create an account for username %(username)s, you can ignore this email.", username=user.username)}}
 
 -- {{_("Fedora Accounts System")}}
