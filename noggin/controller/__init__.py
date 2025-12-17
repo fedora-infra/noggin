@@ -1,6 +1,7 @@
 import os
 
 from flask import Blueprint, g, render_template, session
+from flask_babel import get_locale
 
 from noggin import __version__
 from noggin.utility.templates import gravatar
@@ -27,10 +28,14 @@ def inject_global_template_vars():
         ]
         version = f"{version} ({':'.join(version_ext)})"
 
+    lang = get_locale()
+    lang = lang.language if lang is not None else None
+
     return dict(
         gravatar=gravatar,
         ipa=g.ipa if 'ipa' in g else None,
         current_user=g.current_user if 'current_user' in g else None,
         current_username=session.get('noggin_username'),
         noggin_version=version,
+        lang=lang,
     )
