@@ -1,0 +1,33 @@
+; supervisor config file.
+; This is used for development.
+
+[unix_http_server]
+file=%(here)s/devel/run/supervisor.sock
+
+[supervisord]
+logfile = %(here)s/devel/run/supervisord.log
+logfile_maxbytes = 1024000
+logfile_backups = 0
+pidfile=%(here)s/devel/run/supervisord.pid
+directory = %(here)s
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix://%(here)s/devel/run/supervisor.sock
+
+; Programs
+
+[program:noggin]
+command = poetry run flask run -h 0.0.0.0
+environment =
+    PYTHONUNBUFFERED=1,
+    FLASK_DEBUG=1,
+    FEDORA_MESSAGING_CONF={{ devel_dir }}/fedora-messaging.toml,
+    FLASK_APP={{ top_dir }}/noggin/app.py,
+    NOGGIN_CONFIG_PATH={{ devel_dir }}/noggin.cfg
+autorestart = false
+redirect_stderr = true
+stdout_logfile = {{ devel_dir }}/%(program_name)s.log
+stdout_logfile_maxbytes = 1024000

@@ -27,6 +27,9 @@ below.
 
 Development Environment
 =======================
+
+With Vagrant
+------------
 Vagrant allows contributors to get quickly up and running with a Noggin development environment by
 automatically configuring a virtual machine. To get started, first install the Vagrant and Virtualization
 packages needed, and start the libvirt service::
@@ -69,6 +72,29 @@ webUI.
 
 Note that the ``/vagrant/`` folder contains the source of the git checkout on your host. Any changes
 to the files in that directory on the host will be automatically synced to the VM.
+
+Without Vagrant
+---------------
+If you don't wish to run Noggin through Vagrant, it is also possible to run it locally. You still need to run tiny-stage as
+instructed above (stop at ``vagrant up ipa``).
+
+If you haven't installed it already, install the ``supervisor`` package::
+
+    $ sudo dnf install supervisor
+
+Then you can use Ansible to setup a development environment::
+
+    $ ansible-playbook -v ./devel/ansible/local.yml
+
+You can control the running instance with ``supervisorctl``::
+
+    $ supervisorctl status
+    noggin          RUNNING   pid 2586417, uptime 0:02:48
+    $ supervisorctl restart all
+    noggin: stopped
+    noggin: started
+
+Use ``supervisorctl shutdown`` to stop the development environment.
 
 
 Guidelines

@@ -1,0 +1,56 @@
+- name: Install the app
+  command: poetry install --all-extras
+  register: result
+  changed_when: '"No dependencies to install or update" not in result.stdout'
+
+- name: Get the Tinystage CA cert
+  get_url:
+    url: https://auth.tinystage.test/ca.crt
+    dest: "{{ devel_dir }}/ca.crt"
+    validate_certs: false
+
+- name: Load the content of the Tinystage CA cert
+  slurp:
+    src: "{{ devel_dir }}/ca.crt"
+  register: ca_crt
+
+- name: Find where certifi's CA bundle is located
+  command:
+    cmd: poetry run python -c "import certifi; print(certifi.where())"
+  register: _ca_bundle_path
+  changed_when: False
+
+- name: Put tinystage root CA in the list of CA's for certifi
+  blockinfile:
+    block: "{{ ca_crt.content | b64decode }}"
+    path: "{{ _ca_bundle_path.stdout }}"
+
+# Config files
+
+- name: Create the config file
+  template:
+    src: noggin.cfg.j2
+    dest: "{{ devel_dir }}/noggin.cfg"
+  notify: reload supervisord
+
+- name: Create the fedora-messaging config file
+  copy:
+    src: fedora-messaging.toml
+    dest: "{{ devel_dir }}/fedora-messaging.toml"
+  notify: reload supervisord
+
+- name: Create the supervisord config file
+  template:
+    src: supervisord.conf.j2
+    dest: "{{ top_dir }}/supervisord.conf"
+  notify: reload supervisord
+
+- name: compile the translations
+  command:
+    cmd: poetry run pybabel compile -d {{top_dir}}/noggin/translations
+
+- name: Start supervisord
+  command:
+    cmd: supervisord
+    chdir: "{{ top_dir }}"
+    creates: "{{ devel_dir }}/supervisor.sock"
