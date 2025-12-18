@@ -1,3 +1,5 @@
+from random import shuffle
+
 import python_freeipa
 import srvlookup
 from cryptography.fernet import Fernet
@@ -137,7 +139,8 @@ def choose_server(app, session=None):
     if session is not None:
         server = session.get('noggin_ipa_server_hostname', None)
     if app.config["FREEIPA_SERVERS"]:
-        available_servers = app.config["FREEIPA_SERVERS"]
+        available_servers = app.config["FREEIPA_SERVERS"][:]
+        shuffle(available_servers)
     else:
         try:
             available_servers = [
