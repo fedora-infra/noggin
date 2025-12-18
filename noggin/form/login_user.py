@@ -2,7 +2,8 @@ from flask_babel import lazy_gettext as _
 from wtforms import PasswordField, StringField
 from wtforms.validators import DataRequired, Optional
 
-from .base import ModestForm, SubmitButtonField
+from .base import ModestForm
+from .fields import SubmitButtonField
 from .validators import no_mixed_case
 
 

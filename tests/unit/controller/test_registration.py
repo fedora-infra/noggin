@@ -93,7 +93,7 @@ def spamcheck_on(mocker):
 
 @pytest.fixture
 def disable_captcha(mocker):
-    mocker.patch("noggin.form.base.verify_solution", return_value=(True, None))
+    mocker.patch("noggin.form.fields.verify_solution", return_value=(True, None))
 
 
 @pytest.mark.vcr()

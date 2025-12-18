@@ -18,7 +18,8 @@ from noggin.form.validators import (
     validator_proxy,
 )
 
-from .base import AltchaField, BaseForm, ModestForm, SubmitButtonField, lower, strip
+from .base import BaseForm, ModestForm, lower, strip
+from .fields import AltchaField, SubmitButtonField
 
 
 class RegisterUserForm(ModestForm):

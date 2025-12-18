@@ -29,15 +29,17 @@ from noggin.utility.timezones import TIMEZONES
 
 from .base import (
     BaseForm,
-    CSVListField,
-    FieldWithClearButtonWidget,
     ModestForm,
-    NonEmptyFieldList,
-    SubmitButtonField,
-    TypeAndStringField,
     replace,
     strip,
     strip_at,
+)
+from .fields import (
+    CSVListField,
+    FieldWithClearButtonWidget,
+    NonEmptyFieldList,
+    SubmitButtonField,
+    TypeAndStringField,
 )
 
 
