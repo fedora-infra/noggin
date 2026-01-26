@@ -44,7 +44,6 @@ from noggin_messages import UserUpdateV1
 
 from . import blueprint as bp
 
-
 # Must be the same as KEY_LENGTH in ipaserver/plugins/otptoken.py
 # For maximum compatibility, must be a multiple of 5.
 OTP_KEY_LENGTH = 35

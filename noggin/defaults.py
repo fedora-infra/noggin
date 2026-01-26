@@ -3,7 +3,6 @@ import socket
 
 from flask_babel import _
 
-
 TEMPLATES_AUTO_RELOAD = False
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True

@@ -7,7 +7,6 @@ from wtforms.validators import ValidationError
 
 from noggin.form.edit_user import UserSettingsProfileForm, https_required
 
-
 Obj = namedtuple("Obj", ["ircnick"])
 
 

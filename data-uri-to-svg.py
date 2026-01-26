@@ -17,7 +17,6 @@ import os
 import re
 from urllib.parse import unquote
 
-
 DATA_URI_RE = re.compile(r"url\(\"data:image/svg\+xml,([^\"]+)\"\)")
 
 

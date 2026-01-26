@@ -2,7 +2,6 @@ import re
 
 from .base import Representation
 
-
 NOT_ASCII_RE = re.compile(r"\W")
 
 
