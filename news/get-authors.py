@@ -21,7 +21,6 @@ import os
 from argparse import ArgumentParser
 from subprocess import check_output
 
-
 EXCLUDE = ["Weblate (bot)"]
 
 last_tag = check_output(

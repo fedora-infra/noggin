@@ -6,7 +6,6 @@ from flask_babel import get_locale
 from noggin import __version__
 from noggin.utility.templates import gravatar
 
-
 blueprint = Blueprint("root", __name__)
 
 

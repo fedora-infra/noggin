@@ -17,7 +17,6 @@ from noggin.themes import Theme
 from noggin.utility import import_all
 from noggin.utility.templates import format_channel, format_nickname
 
-
 # Forms
 csrf = CSRFProtect()
 

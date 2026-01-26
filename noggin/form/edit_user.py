@@ -42,7 +42,6 @@ from .fields import (
     TypeAndStringField,
 )
 
-
 NICK_RE = {
     "irc": re.compile(r"^[a-z_\[\]\\^{}|`-][a-z0-9_\[\]\\^{}|`-]*$", re.IGNORECASE),
     "matrix": re.compile(r"^[a-z0-9.=_/-]+$", re.IGNORECASE),

@@ -42,7 +42,6 @@ from noggin.utility.token import Audience, make_token, read_token
 from . import blueprint as bp
 from .user import handle_agreement_form
 
-
 # Errors coming from FreeIPA are specified by a field name that is different from our form field
 # name. This dict maps one to the other. See the `cli_name` in
 # https://pagure.io/freeipa/blob/master/f/ipaclient/remote_plugins/2_164/user.py

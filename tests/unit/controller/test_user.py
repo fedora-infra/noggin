@@ -13,7 +13,6 @@ from noggin_messages import UserUpdateV1
 
 from ..utilities import assert_form_generic_error, assert_redirects_with_flash
 
-
 POST_CONTENTS = {
     "firstname": "Dummy",
     "lastname": "User",

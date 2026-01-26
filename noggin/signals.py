@@ -8,7 +8,6 @@ from noggin.utility import messaging
 from noggin.utility.token import Audience, make_token
 from noggin_messages import UserCreateV1
 
-
 noggin_signals = Namespace()
 
 stageuser_created = noggin_signals.signal('stageuser-created')

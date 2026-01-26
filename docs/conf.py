@@ -14,12 +14,10 @@ import os
 import re
 import sys
 
-
 topdir = os.path.abspath("../")
 sys.path.insert(0, topdir)
 
 import noggin  # NOQA
-
 
 # -- Project information -----------------------------------------------------
 

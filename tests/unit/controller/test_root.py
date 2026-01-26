@@ -175,9 +175,7 @@ def test_version(client):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     powered_by = page.select_one("footer div div small")
-    assert (
-        powered_by.prettify().strip()
-        == """
+    assert powered_by.prettify().strip() == """
 <small>
  Powered by
  <a href="https://github.com/fedora-infra/noggin">
@@ -185,10 +183,7 @@ def test_version(client):
  </a>
  v{}
 </small>
-""".strip().format(
-            __version__
-        )
-    )
+""".strip().format(__version__)
 
 
 def test_version_openshift(mocker, client):
@@ -204,9 +199,7 @@ def test_version_openshift(mocker, client):
     assert result.status_code == 200
     page = BeautifulSoup(result.data, 'html.parser')
     powered_by = page.select_one("footer div div small")
-    assert (
-        powered_by.prettify().strip()
-        == """
+    assert powered_by.prettify().strip() == """
 <small>
  Powered by
  <a href="https://github.com/fedora-infra/noggin">
@@ -214,7 +207,4 @@ def test_version_openshift(mocker, client):
  </a>
  v{} (tests:abcdef0)
 </small>
-""".strip().format(
-            __version__
-        )
-    )
+""".strip().format(__version__)
