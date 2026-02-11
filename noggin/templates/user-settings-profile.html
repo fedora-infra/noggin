@@ -11,8 +11,7 @@
     <img src="{{ gravatar(user.mail if user.mail else 'default', 100) }}" class="pb-2" alt="user avatar"/>
     {% set buttontext = _('Change Avatar')%}
     {%- if OPENID is defined %}
-    <form method="GET" action="https://www.libravatar.org/openid/login/">
-      <input type="hidden" name="openid_identifier" value="{{ OPENID % (user.username) }}">
+    <form method="GET" action="https://www.libravatar.org/auth/login/fedora/">
       <input name="change-avatar" type="submit" value="{{ buttontext }}" class="btn btn-sm btn-outline-primary">
     </form>
     {%- else %}
