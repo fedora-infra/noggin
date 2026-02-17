@@ -69,6 +69,12 @@ jobs:
   integration_tests:
     name: Integration tests
     container: fedorapython/fedora-python-tox:latest
+    services:
+      rabbitmq:
+        image: rabbitmq:4-management-alpine
+        ports:
+          - 5672
+          - 15672
     steps:
       - uses: actions/checkout@v6
       - name: Install RabbitMQ
