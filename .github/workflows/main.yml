@@ -69,12 +69,14 @@ jobs:
   integration_tests:
     name: Integration tests
     container: fedorapython/fedora-python-tox:latest
+    services:
+      rabbitmq:
+        image: rabbitmq:4-management-alpine
+        ports:
+          - 5672
+          - 15672
     steps:
       - uses: actions/checkout@v6
-      - name: Install RabbitMQ
-        uses: mer-team/rabbitmq-mng-action@v1.2
-        with:
-          RABBITMQ_TAG: "3-management-alpine"
       - name: Install RPM dependencies
         run: dnf install -y krb5-devel
       - name: Install Python dependencies
