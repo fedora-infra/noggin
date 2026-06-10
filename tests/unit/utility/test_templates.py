@@ -80,6 +80,12 @@ def test_format_nickname_no_matrixto_args(request_context):
         assert str(format_nickname(value)) == expected_html
 
 
+def test_format_nickname_web_url(request_context):
+    value = "https://example.com/user"
+    expected_html = f'<a href="{value}">{value}</a>'
+    assert str(format_nickname(value)) == expected_html
+
+
 def test_format_nickname_invalid(request_context):
     with pytest.raises(ValueError) as e:
         format_nickname("invalid:/username")
@@ -164,4 +170,12 @@ def test_format_nickname_invalid_with_config(app, request_context, mocker):
 )
 def test_format_channel(request_context, value, expected):
     expected_html = '<a href="{href}" title="{title}">{name}</a>'.format(**expected)
+    assert str(format_channel(value)) == expected_html
+
+
+@pytest.mark.parametrize(
+    "value", ["http://example.com/channel", "https://example.com/channel"]
+)
+def test_format_channel_web_url(request_context, value):
+    expected_html = f'<a href="{value}">{value}</a>'
     assert str(format_channel(value)) == expected_html

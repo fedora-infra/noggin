@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 
 from flask import current_app
 from flask_babel import lazy_gettext as _
-from markupsafe import Markup
+from markupsafe import Markup, escape
 
 
 def gravatar(email, size):
@@ -54,6 +54,9 @@ def format_chat(value, isnick):
     elif not name and url.fragment:
         name = url.fragment
     scheme = url.scheme
+    if scheme in ("http", "https"):
+        value = escape(value)
+        return Markup(f"""<a href="{value}">{value}</a>""")  # nosec B704
     if not scheme:
         scheme = "irc"
     try:
