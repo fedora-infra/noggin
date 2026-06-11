@@ -81,8 +81,9 @@ def test_format_nickname_no_matrixto_args(request_context):
 
 
 def test_format_nickname_web_url(request_context):
-    value = "https://example.com/user"
-    expected_html = f'<a href="{value}">{value}</a>'
+    value = "https://example.com/user?a=1&b=2"
+    escaped_value = "https://example.com/user?a=1&amp;b=2"
+    expected_html = f'<a href="{value}">{escaped_value}</a>'
     assert str(format_nickname(value)) == expected_html
 
 
@@ -173,9 +174,9 @@ def test_format_channel(request_context, value, expected):
     assert str(format_channel(value)) == expected_html
 
 
-@pytest.mark.parametrize(
-    "value", ["http://example.com/channel", "https://example.com/channel"]
-)
-def test_format_channel_web_url(request_context, value):
-    expected_html = f'<a href="{value}">{value}</a>'
+@pytest.mark.parametrize("scheme", ["http", "https"])
+def test_format_channel_web_url(request_context, scheme):
+    value = f"{scheme}://example.com/channel?a=1&b=2"
+    escaped_value = f"{scheme}://example.com/channel?a=1&amp;b=2"
+    expected_html = f'<a href="{value}">{escaped_value}</a>'
     assert str(format_channel(value)) == expected_html

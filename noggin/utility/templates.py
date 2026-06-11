@@ -55,8 +55,8 @@ def format_chat(value, isnick):
         name = url.fragment
     scheme = url.scheme
     if scheme in ("http", "https"):
-        value = escape(value)
-        return Markup(f"""<a href="{value}">{value}</a>""")  # nosec B704
+        label = escape(value)
+        return Markup(f"""<a href="{value}">{label}</a>""")  # nosec B704
     if not scheme:
         scheme = "irc"
     try:
