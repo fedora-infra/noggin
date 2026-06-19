@@ -7,6 +7,7 @@ from flask import (
     current_app,
     flash,
     g,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -29,6 +30,7 @@ from noggin.form.edit_user import (
     UserSettingsKeysForm,
     UserSettingsOTPNameChange,
     UserSettingsOTPStatusChange,
+    UserSettingsPasskeyDeleteForm,
     UserSettingsProfileForm,
 )
 from noggin.representation.agreement import Agreement
@@ -39,6 +41,16 @@ from noggin.security.ipa import maybe_ipa_login
 from noggin.utility import messaging
 from noggin.utility.controllers import require_self, user_or_404, with_ipa
 from noggin.utility.forms import FormError, handle_form_errors
+from noggin.utility.passkey import (
+    SUPPORTED_PUB_KEY_CRED_PARAMS,
+    b64url_decode,
+    b64url_encode,
+    compute_user_handle,
+    format_passkey_attr,
+    generate_challenge,
+    parse_passkey_attr,
+    verify_registration,
+)
 from noggin.utility.token import Audience, make_token, read_token
 from noggin_messages import UserUpdateV1
 
@@ -569,3 +581,197 @@ def user_settings_agreements(ipa, username):
         agreementslist=agreements,
         raw=ipa.fasagreement_find(all=True),
     )
+
+
+@bp.route('/user/<username>/settings/passkeys/', methods=['GET'])
+@with_ipa()
+@require_self
+def user_settings_passkeys(ipa, username):
+    try:
+        user_data = ipa.user_show(a_uid=username, o_all=True)['result']
+    except python_freeipa.exceptions.NotFound:
+        abort(404)
+    user = User(user_data)
+    if user.locked:
+        abort(404)
+
+    raw_passkeys = user_data.get('ipapasskey', [])
+
+    passkeys = []
+    for raw_val in raw_passkeys:
+        parsed = parse_passkey_attr(raw_val)
+        if parsed:
+            passkeys.append(parsed)
+        else:
+            current_app.logger.warning(
+                'Skipping unparseable passkey for user %s: %s…', username, raw_val[:40]
+            )
+
+    rp_id = current_app.config['PASSKEY_RP_ID'] or current_app.config['FREEIPA_DOMAIN']
+    rp_name = current_app.config['PASSKEY_RP_NAME']
+
+    return render_template(
+        'user-settings-passkeys.html',
+        user=user,
+        activetab="passkeys",
+        passkeys=passkeys,
+        rp_id=rp_id,
+        rp_name=rp_name,
+    )
+
+
+@bp.route('/user/<username>/settings/passkeys/register-begin', methods=['POST'])
+@with_ipa()
+@require_self
+def user_settings_passkey_register_begin(ipa, username):
+    try:
+        user_data = ipa.user_show(a_uid=username, o_all=True)['result']
+    except python_freeipa.exceptions.NotFound:
+        abort(404)
+    user = User(user_data)
+    if user.locked:
+        abort(404)
+
+    rp_id = current_app.config['PASSKEY_RP_ID'] or current_app.config['FREEIPA_DOMAIN']
+    rp_name = current_app.config['PASSKEY_RP_NAME']
+
+    challenge = generate_challenge()
+
+    session['noggin_passkey_challenge'] = b64url_encode(challenge)
+    session['noggin_passkey_challenge_username'] = username
+    session['noggin_passkey_challenge_time'] = time.time()
+
+    raw_passkeys = user_data.get('ipapasskey', [])
+    exclude_credentials = []
+    for raw_val in raw_passkeys:
+        parsed = parse_passkey_attr(raw_val)
+        if parsed:
+            exclude_credentials.append(
+                {
+                    'type': 'public-key',
+                    'id': b64url_encode(parsed.credential_id),
+                }
+            )
+        else:
+            current_app.logger.warning(
+                'Skipping unparseable passkey for user %s: %s…', username, raw_val[:40]
+            )
+
+    user_handle = compute_user_handle(username, current_app.config['SECRET_KEY'])
+
+    return jsonify(
+        {
+            'challenge': b64url_encode(challenge),
+            'rp': {'id': rp_id, 'name': rp_name},
+            'user': {
+                'id': b64url_encode(user_handle),
+                'name': username,
+                'displayName': user.name or username,
+            },
+            'excludeCredentials': exclude_credentials,
+            'pubKeyCredParams': SUPPORTED_PUB_KEY_CRED_PARAMS,
+            'authenticatorSelection': {
+                'residentKey': 'preferred',
+                'userVerification': 'preferred',
+            },
+            'timeout': 300000,
+            'attestation': 'none',
+        }
+    )
+
+
+@bp.route('/user/<username>/settings/passkeys/register-complete', methods=['POST'])
+@with_ipa()
+@require_self
+def user_settings_passkey_register_complete(ipa, username):
+    stored_challenge_b64 = session.pop('noggin_passkey_challenge', None)
+    stored_username = session.pop('noggin_passkey_challenge_username', None)
+
+    if not stored_challenge_b64 or stored_username != username:
+        return jsonify({'error': 'Challenge missing or expired'}), 400
+
+    challenge_time = session.pop('noggin_passkey_challenge_time', None)
+    if challenge_time is not None and (time.time() - challenge_time) > 300:
+        return jsonify({'error': 'Challenge expired. Please try again.'}), 400
+
+    stored_challenge = b64url_decode(stored_challenge_b64)
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid request body'}), 400
+
+    try:
+        client_data_json_b64 = data['response']['clientDataJSON']
+        attestation_object_b64 = data['response']['attestationObject']
+    except (KeyError, TypeError):
+        return jsonify({'error': 'Missing attestation data'}), 400
+
+    rp_id = current_app.config['PASSKEY_RP_ID'] or current_app.config['FREEIPA_DOMAIN']
+
+    try:
+        result = verify_registration(
+            client_data_json_b64=client_data_json_b64,
+            attestation_object_b64=attestation_object_b64,
+            expected_challenge=stored_challenge,
+            expected_rp_id=rp_id,
+            expected_origin=request.host_url.rstrip('/'),
+        )
+    except ValueError as e:
+        current_app.logger.warning(
+            'Passkey registration verification failed for %s: %s', username, e
+        )
+        return jsonify({'error': 'Registration verification failed.'}), 400
+
+    # Check for duplicate credential ID
+    user_data = ipa.user_show(a_uid=username, o_all=True)['result']
+    existing_passkeys = user_data.get('ipapasskey', [])
+    new_cred_id = result.credential_id
+    for raw_val in existing_passkeys:
+        parsed = parse_passkey_attr(raw_val)
+        if parsed and parsed.credential_id == new_cred_id:
+            return jsonify({'error': 'This authenticator is already registered.'}), 409
+
+    max_passkeys = current_app.config.get('MAX_PASSKEYS', 20)
+    if len(existing_passkeys) >= max_passkeys:
+        return jsonify({'error': 'Maximum number of passkeys reached.'}), 400
+
+    passkey_value = format_passkey_attr(result.credential_id, result.public_key_cose)
+
+    try:
+        ipa.passkey_add(username, passkey_value)
+    except python_freeipa.exceptions.FreeIPAError as e:
+        current_app.logger.exception('Failed to add passkey for user %s', username)
+        return jsonify({'error': 'Failed to save passkey. Please try again.'}), 500
+
+    return jsonify({'ok': True})
+
+
+@bp.route('/user/<username>/settings/passkeys/delete/', methods=['POST'])
+@with_ipa()
+@require_self
+def user_settings_passkey_delete(ipa, username):
+    form = UserSettingsPasskeyDeleteForm()
+
+    if form.validate_on_submit():
+        passkey_value = form.passkey.data
+        if not passkey_value or not passkey_value.startswith('passkey:'):
+            flash(_('Invalid passkey value.'), 'danger')
+            return redirect(url_for('.user_settings_passkeys', username=username))
+        try:
+            ipa.passkey_del(username, passkey_value)
+        except (
+            python_freeipa.exceptions.BadRequest,
+            python_freeipa.exceptions.FreeIPAError,
+        ) as e:
+            flash(_('Cannot delete the passkey.'), 'danger')
+            current_app.logger.exception(
+                'Error deleting passkey for user %s: %s…', username, passkey_value[:40]
+            )
+        else:
+            flash(_('The passkey has been removed.'), 'success')
+
+    for field_errors in form.errors.values():
+        for error in field_errors:
+            flash(error, 'danger')
+
+    return redirect(url_for('.user_settings_passkeys', username=username))
