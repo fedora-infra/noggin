@@ -445,6 +445,21 @@ privileges need to be set up in the FreeIPA server.
         ipa role-add-member "Stage User Managers" --groups sysadmin
 
 
+Configuring FreeIPA server for passkey management
+--------------------------------------------------
+
+Noggin supports self-service management of FIDO2 passkeys. This requires
+FreeIPA v4.10 or later, which includes built-in passkey support and the
+self-service permission allowing users to manage their own passkeys.
+
+.. note::
+    The WebAuthn Relying Party (RP) ID is always the IPA primary domain
+    (the Kerberos realm in lowercase). Noggin must be served from a hostname
+    under this domain for passkey registration to work. For example, if the
+    IPA domain is ``example.com``, Noggin can be at ``accounts.example.com``
+    but not at ``accounts.otherdomain.com``.
+
+
 Discretion
 ==========
 

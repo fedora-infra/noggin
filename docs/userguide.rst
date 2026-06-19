@@ -122,6 +122,36 @@ Next time you log in to Noggin, you will need to enter in your password followed
 chosen authenticator app.
 
 
+Passkeys (FIDO2)
+================
+
+What are passkeys?
+******************
+Passkeys are a modern, phishing-resistant authentication method based on the FIDO2/WebAuthn standard.
+They allow you to authenticate using hardware security keys (such as YubiKey) or platform authenticators
+built into your device (such as fingerprint readers or face recognition).
+
+Passkeys registered in Noggin are stored in FreeIPA and can also be used for system-level authentication
+via SSSD, if configured by your administrator.
+
+How do I add a passkey?
+***********************
+To add a passkey, go to the **Passkeys** tab in your user settings and click the **Add Passkey** button.
+
+Your browser will prompt you to insert and activate your security key, or to use your platform authenticator.
+Follow the prompts to complete registration.
+
+Once registered, the passkey will appear in the list showing its key type (e.g. ES256, EdDSA, RS256)
+and a truncated credential identifier.
+
+.. note::
+    Your browser must support WebAuthn to register passkeys. All modern browsers (Chrome, Firefox, Safari, Edge)
+    support this standard.
+
+How do I remove a passkey?
+**************************
+To remove a passkey, go to the **Passkeys** tab in your user settings and click the trash icon next to
+the passkey you want to remove.
 
 
 
