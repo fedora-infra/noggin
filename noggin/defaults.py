@@ -60,6 +60,12 @@ ACCEPT_IMAGES_FROM = []
 BASSET_URL = None
 SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 
+PASSKEY_RP_NAME = "Noggin"
+PASSKEY_RP_ID = None  # Falls back to FREEIPA_DOMAIN when None
+MAX_PASSKEYS = 20
+
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB; Flask default is unlimited
+
 # Cheat code to toggle Fedora Messaging support
 FEDORA_MESSAGING_ENABLED = False
 
