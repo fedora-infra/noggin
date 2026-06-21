@@ -8,8 +8,8 @@ import os
 from dataclasses import dataclass
 from typing import Optional
 
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec, ed25519, padding, rsa, utils
 from fido2 import cbor
 from fido2.webauthn import AuthenticatorData
 
@@ -46,6 +46,11 @@ class ParsedPasskey:
 class RegistrationResult:
     credential_id: bytes
     public_key_cose: bytes
+
+
+@dataclass
+class AssertionResult:
+    credential_id: bytes
 
 
 def parse_passkey_attr(attr_value: str) -> Optional[ParsedPasskey]:
@@ -249,3 +254,102 @@ def verify_registration(
         credential_id=credential_id,
         public_key_cose=public_key_cose,
     )
+
+
+def _verify_signature(public_key_der: bytes, signed_data: bytes, signature: bytes):
+    """Verify a WebAuthn assertion signature using the stored SPKI DER public key.
+
+    Raises ValueError if the signature is invalid or the key type is unsupported.
+    """
+    pub_key = serialization.load_der_public_key(public_key_der)
+
+    try:
+        if isinstance(pub_key, ec.EllipticCurvePublicKey):
+            der_sig = _raw_ecdsa_to_der(signature, pub_key.key_size)
+            pub_key.verify(
+                der_sig,
+                signed_data,
+                ec.ECDSA(hashes.SHA256()),
+            )
+        elif isinstance(pub_key, ed25519.Ed25519PublicKey):
+            pub_key.verify(signature, signed_data)
+        elif isinstance(pub_key, rsa.RSAPublicKey):
+            pub_key.verify(
+                signature,
+                signed_data,
+                padding.PKCS1v15(),
+                hashes.SHA256(),
+            )
+        else:
+            raise ValueError(f"Unsupported key type: {type(pub_key)}")
+    except Exception as e:
+        if isinstance(e, ValueError):
+            raise
+        raise ValueError(f"Signature verification failed: {e}") from e
+
+
+def _raw_ecdsa_to_der(raw_sig: bytes, key_size_bits: int) -> bytes:
+    """Convert a raw ECDSA signature (r||s) to DER-encoded format.
+
+    WebAuthn uses raw concatenated (r||s) format, while the cryptography
+    library expects DER-encoded signatures.
+    """
+    byte_len = (key_size_bits + 7) // 8
+    if len(raw_sig) != 2 * byte_len:
+        raise ValueError(
+            f"Invalid raw ECDSA signature length: {len(raw_sig)} "
+            f"(expected {2 * byte_len})"
+        )
+    r = int.from_bytes(raw_sig[:byte_len], 'big')
+    s = int.from_bytes(raw_sig[byte_len:], 'big')
+    return utils.encode_dss_signature(r, s)
+
+
+def verify_assertion(
+    client_data_json_b64: str,
+    authenticator_data_b64: str,
+    signature_b64: str,
+    expected_challenge: bytes,
+    expected_rp_id: str,
+    expected_origin: str,
+    public_key_der: bytes,
+    credential_id: bytes,
+) -> AssertionResult:
+    """Verify a WebAuthn assertion response (login).
+
+    Follows W3C WebAuthn section 7.2.  Unlike registration, assertion
+    verification MUST check the cryptographic signature.
+
+    Raises ValueError on any verification failure.
+    """
+    cdj_bytes = b64url_decode(client_data_json_b64)
+    cdj = json.loads(cdj_bytes)
+
+    if cdj.get('type') != 'webauthn.get':
+        raise ValueError('clientData type must be webauthn.get')
+
+    expected_challenge_b64url = b64url_encode(expected_challenge)
+    if cdj.get('challenge') != expected_challenge_b64url:
+        raise ValueError('Challenge mismatch')
+
+    got_origin = cdj.get('origin', '').rstrip('/')
+    if got_origin != expected_origin.rstrip('/'):
+        raise ValueError('Origin mismatch')
+
+    auth_data_bytes = b64url_decode(authenticator_data_b64)
+    ad = AuthenticatorData(auth_data_bytes)
+
+    rp_id_hash = hashlib.sha256(expected_rp_id.encode()).digest()
+    if ad.rp_id_hash != rp_id_hash:
+        raise ValueError('RP ID hash mismatch')
+
+    if not ad.flags & AuthenticatorData.FLAG.UP:
+        raise ValueError('User presence flag not set')
+
+    client_data_hash = hashlib.sha256(cdj_bytes).digest()
+    signed_data = auth_data_bytes + client_data_hash
+
+    sig_bytes = b64url_decode(signature_b64)
+    _verify_signature(public_key_der, signed_data, sig_bytes)
+
+    return AssertionResult(credential_id=credential_id)

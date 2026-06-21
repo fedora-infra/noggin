@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives.asymmetric import ec, ed25519, rsa
 from fido2 import cbor
 
 from noggin.utility.passkey import (
+    AssertionResult,
     b64url_decode,
     b64url_encode,
     compute_user_handle,
@@ -16,6 +17,7 @@ from noggin.utility.passkey import (
     detect_key_type,
     format_passkey_attr,
     parse_passkey_attr,
+    verify_assertion,
     verify_registration,
 )
 
@@ -376,4 +378,222 @@ def test_verify_registration_no_attested_data():
             expected_challenge=CHALLENGE,
             expected_rp_id=RP_ID,
             expected_origin=ORIGIN,
+        )
+
+
+# ── verify_assertion ───────────────────────────────────────────────────
+
+
+def _make_assertion(
+    rp_id=RP_ID,
+    challenge=CHALLENGE,
+    origin=ORIGIN,
+    cdj_type='webauthn.get',
+    flags=0x01,
+    counter=1,
+    private_key=None,
+    public_key_der=None,
+):
+    """Build a complete WebAuthn assertion with a real signature."""
+    if private_key is None:
+        private_key = ec.generate_private_key(ec.SECP256R1())
+    if public_key_der is None:
+        public_key_der = private_key.public_key().public_bytes(
+            serialization.Encoding.DER,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+
+    rp_id_hash = hashlib.sha256(rp_id.encode()).digest()
+    auth_data = rp_id_hash + bytes([flags]) + struct.pack('>I', counter)
+
+    challenge_b64url = b64url_encode(challenge)
+    cdj = json.dumps(
+        {'type': cdj_type, 'challenge': challenge_b64url, 'origin': origin}
+    )
+    cdj_bytes = cdj.encode()
+    client_data_hash = hashlib.sha256(cdj_bytes).digest()
+
+    signed_data = auth_data + client_data_hash
+
+    from cryptography.hazmat.primitives.asymmetric import utils as asym_utils
+
+    if isinstance(private_key, ec.EllipticCurvePrivateKey):
+        from cryptography.hazmat.primitives import hashes
+
+        der_sig = private_key.sign(signed_data, ec.ECDSA(hashes.SHA256()))
+        r, s = asym_utils.decode_dss_signature(der_sig)
+        byte_len = (private_key.key_size + 7) // 8
+        raw_sig = r.to_bytes(byte_len, 'big') + s.to_bytes(byte_len, 'big')
+    elif isinstance(private_key, ed25519.Ed25519PrivateKey):
+        raw_sig = private_key.sign(signed_data)
+    elif isinstance(private_key, rsa.RSAPrivateKey):
+        from cryptography.hazmat.primitives import hashes
+        from cryptography.hazmat.primitives.asymmetric import padding
+
+        raw_sig = private_key.sign(
+            signed_data, padding.PKCS1v15(), hashes.SHA256()
+        )
+    else:
+        raise TypeError(f"Unsupported key type: {type(private_key)}")
+
+    return {
+        'client_data_json_b64': b64url_encode(cdj_bytes),
+        'authenticator_data_b64': b64url_encode(auth_data),
+        'signature_b64': b64url_encode(raw_sig),
+        'public_key_der': public_key_der,
+    }
+
+
+def test_verify_assertion_es256():
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    pub_der = private_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion = _make_assertion(private_key=private_key, public_key_der=pub_der)
+    result = verify_assertion(
+        credential_id=CRED_ID,
+        expected_challenge=CHALLENGE,
+        expected_rp_id=RP_ID,
+        expected_origin=ORIGIN,
+        **assertion,
+    )
+    assert isinstance(result, AssertionResult)
+    assert result.credential_id == CRED_ID
+
+
+def test_verify_assertion_eddsa():
+    private_key = ed25519.Ed25519PrivateKey.generate()
+    pub_der = private_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion = _make_assertion(private_key=private_key, public_key_der=pub_der)
+    result = verify_assertion(
+        credential_id=CRED_ID,
+        expected_challenge=CHALLENGE,
+        expected_rp_id=RP_ID,
+        expected_origin=ORIGIN,
+        **assertion,
+    )
+    assert result.credential_id == CRED_ID
+
+
+def test_verify_assertion_rs256():
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    pub_der = private_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion = _make_assertion(private_key=private_key, public_key_der=pub_der)
+    result = verify_assertion(
+        credential_id=CRED_ID,
+        expected_challenge=CHALLENGE,
+        expected_rp_id=RP_ID,
+        expected_origin=ORIGIN,
+        **assertion,
+    )
+    assert result.credential_id == CRED_ID
+
+
+def test_verify_assertion_wrong_challenge():
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    pub_der = private_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion = _make_assertion(private_key=private_key, public_key_der=pub_der)
+    with pytest.raises(ValueError, match="Challenge mismatch"):
+        verify_assertion(
+            credential_id=CRED_ID,
+            expected_challenge=b'\xff' * 32,
+            expected_rp_id=RP_ID,
+            expected_origin=ORIGIN,
+            **assertion,
+        )
+
+
+def test_verify_assertion_wrong_origin():
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    pub_der = private_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion = _make_assertion(private_key=private_key, public_key_der=pub_der)
+    with pytest.raises(ValueError, match="Origin mismatch"):
+        verify_assertion(
+            credential_id=CRED_ID,
+            expected_challenge=CHALLENGE,
+            expected_rp_id=RP_ID,
+            expected_origin="https://evil.example.com",
+            **assertion,
+        )
+
+
+def test_verify_assertion_wrong_rp_id():
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    pub_der = private_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion = _make_assertion(private_key=private_key, public_key_der=pub_der)
+    with pytest.raises(ValueError, match="RP ID hash mismatch"):
+        verify_assertion(
+            credential_id=CRED_ID,
+            expected_challenge=CHALLENGE,
+            expected_rp_id="wrong.example.com",
+            expected_origin=ORIGIN,
+            **assertion,
+        )
+
+
+def test_verify_assertion_wrong_type():
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    pub_der = private_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion = _make_assertion(
+        private_key=private_key, public_key_der=pub_der, cdj_type='webauthn.create'
+    )
+    with pytest.raises(ValueError, match="clientData type"):
+        verify_assertion(
+            credential_id=CRED_ID,
+            expected_challenge=CHALLENGE,
+            expected_rp_id=RP_ID,
+            expected_origin=ORIGIN,
+            **assertion,
+        )
+
+
+def test_verify_assertion_no_user_presence():
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    pub_der = private_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion = _make_assertion(
+        private_key=private_key, public_key_der=pub_der, flags=0x00
+    )
+    with pytest.raises(ValueError, match="User presence"):
+        verify_assertion(
+            credential_id=CRED_ID,
+            expected_challenge=CHALLENGE,
+            expected_rp_id=RP_ID,
+            expected_origin=ORIGIN,
+            **assertion,
+        )
+
+
+def test_verify_assertion_invalid_signature():
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    pub_der = private_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion = _make_assertion(private_key=private_key, public_key_der=pub_der)
+    # Use a different key's public key to cause signature mismatch
+    other_key = ec.generate_private_key(ec.SECP256R1())
+    other_pub_der = other_key.public_key().public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    assertion['public_key_der'] = other_pub_der
+    with pytest.raises(ValueError, match="Signature verification failed"):
+        verify_assertion(
+            credential_id=CRED_ID,
+            expected_challenge=CHALLENGE,
+            expected_rp_id=RP_ID,
+            expected_origin=ORIGIN,
+            **assertion,
         )
