@@ -153,5 +153,19 @@ How do I remove a passkey?
 To remove a passkey, go to the **Passkeys** tab in your user settings and click the trash icon next to
 the passkey you want to remove.
 
+How do I sign in with a passkey?
+********************************
+If your Noggin deployment has Kerberos delegation configured (see the
+:doc:`installation guide </installation/01-freeipa-server>`), you can sign in using a registered passkey
+instead of a password.
+
+On the login page, enter your username and click the **Sign in with Passkey** button. Your browser will
+prompt you to activate your security key or platform authenticator. After successful verification, you
+will be logged in and redirected to your profile.
+
+.. note::
+    The passkey login button is only visible when the Noggin administrator has configured Kerberos
+    delegation. If you do not see the button, contact your administrator.
+
 
 
