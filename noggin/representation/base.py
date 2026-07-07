@@ -17,6 +17,12 @@ def attr_to_bool(value):
     return value[0] in (True, "TRUE")
 
 
+def attr_to_int(value):
+    if not value:
+        return 0
+    return int(value[0])
+
+
 def attr_to_date(value):
     if value is None:
         return None
@@ -26,6 +32,7 @@ def attr_to_date(value):
 
 CONVERTERS = {
     "str": attr_to_str,
+    "int": attr_to_int,
     "list": attr_to_list,
     "bool": attr_to_bool,
     "date": attr_to_date,
