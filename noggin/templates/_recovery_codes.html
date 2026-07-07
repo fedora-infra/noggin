@@ -1,0 +1,54 @@
+{% macro codes_grid(recovery_codes) %}
+<div class="row justify-content-center my-3">
+  <div class="col-md-10">
+    <div class="row">
+      {% for code in recovery_codes %}
+        <div class="col-6 mb-2">
+          <code class="fs-5" data-role="recovery-code">{{ loop.index }}. {{ code }}</code>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<div class="d-flex gap-2 mb-3">
+  <button id="copy-codes" class="btn btn-outline-secondary btn-sm" type="button">
+    <i class="fa fa-copy"></i> {{ _("Copy all") }}
+  </button>
+  <button id="download-codes" class="btn btn-outline-secondary btn-sm" type="button">
+    <i class="fa fa-download"></i> {{ _("Download as text file") }}
+  </button>
+</div>
+{% endmacro %}
+
+{% macro codes_scripts(download_filename='recovery-codes.txt') %}
+<script nonce="{{ csp_nonce() }}">
+  $(document).ready(function() {
+      var codes = [];
+      $('[data-role="recovery-code"]').each(function() {
+          codes.push($(this).text().trim());
+      });
+      var codesText = codes.join('\n');
+
+      $('#copy-codes').click(function() {
+          navigator.clipboard.writeText(codesText).then(function() {
+              $('#copy-codes').text({{ _("Copied!") | tojson }});
+              setTimeout(function() {
+                  $('#copy-codes').html('<i class="fa fa-copy"></i> ' + {{ _("Copy all") | tojson }});
+              }, 2000);
+          });
+      });
+
+      $('#download-codes').click(function() {
+          var blob = new Blob([codesText], {type: 'text/plain'});
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = {{ download_filename | tojson }};
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+      });
+  });
+</script>
+{% endmacro %}

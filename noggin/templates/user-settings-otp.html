@@ -1,6 +1,7 @@
 {% extends "user-settings.html" %}
 
 {% import '_form_macros.html' as macros %}
+{% import '_recovery_codes.html' as recovery_macros %}
 {% block settings_content %}
 
 {% if otp_uri %}
@@ -9,7 +10,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{{ _("Scan your new token") }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
       </div>
       <div class="modal-body">
         {# Only show the QR code when the user is ready, this gives them time to pick up their phone and check noone is looking over their shoulders #}
@@ -17,7 +18,7 @@
         <div class="text-center"><button id="otp-toggle" class="btn btn-primary" data-bs-toggle="button" aria-pressed="false">{{ _("Reveal") }}</button></div>
         <div id="otp-qrcode" class="text-center mt-3"></div>
         <p class="mb-1 mt-4">{{ _("or copy and paste the following token URL if you can't scan the QR code:") }}</p>
-        <input id="otp-uri" class="form-control" readonly value="{{otp_uri|safe}}" />
+        <input id="otp-uri" class="form-control" readonly value="{{otp_uri}}" />
         <form action="{{ url_for('.user_settings_otp', username=current_user.username) }}" method="post" class="py-3" novalidate>
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           {{ confirmotpform.secret() }}
@@ -29,7 +30,7 @@
           <div>{{ macros.non_field_errors(confirmotpform) }}</div>
           <div class="d-flex justify-content-between">
           {{ confirmotpform.submit(color="primary") }}
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="{{ _('Cancel') }}">
             {{ _("Cancel") }}
           </button>
           </div>
@@ -40,12 +41,45 @@
 </div>
 {% endif%}
 
+{% if recovery_codes %}
+<div class="modal fade" id="recovery-codes-modal" tabindex="-1" role="dialog"
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ _("Recovery Codes") }}</h5>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning" role="alert">
+          <strong>{{ _("Save these codes in a safe place.") }}</strong>
+          {{ _("You will not be able to see them again. If you lose your "
+               "authenticator device, you can use one of these codes to sign in.") }}
+        </div>
+        {{ recovery_macros.codes_grid(recovery_codes) }}
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="codes-saved-check">
+          <label class="form-check-label" for="codes-saved-check">
+            {{ _("I have saved my recovery codes") }}
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="done-btn" type="button" class="btn btn-primary disabled"
+                data-bs-dismiss="modal" disabled>
+          {{ _("Done") }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <div class="modal fade" id="add-token-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{{ _("Add OTP Token") }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
       </div>
       <div class="modal-body">
         {% if not tokens %}
@@ -123,6 +157,76 @@
 
 {{ otp_notice() if otp_notice is defined and tokens }}
 
+<div class="card-body mt-4" id="recovery-codes">
+  <h5>{{ _("Recovery Codes") }}</h5>
+  <p class="text-muted">
+    {{ _("Recovery codes can be used to sign in if you lose access "
+         "to your authenticator app. Each code can only be used once.") }}
+  </p>
+  {% if recovery_token %}
+    <p>
+      {% if recovery_codes_remaining is not none and recovery_codes_remaining == 0 %}
+        <span class="badge bg-danger">{{ _("Exhausted") }}</span>
+        {{ _("All recovery codes have been used. Regenerate now to stay protected.") }}
+      {% elif recovery_codes_remaining is not none and recovery_codes_remaining <= config.OTP_RECOVERY_LOW_THRESHOLD %}
+        <span class="badge bg-warning text-dark">{{ _("Low") }}</span>
+        {{ ngettext("%(num)d recovery code remaining.",
+                    "%(num)d recovery codes remaining.",
+                    recovery_codes_remaining) }}
+        {{ _("Consider regenerating your recovery codes.") }}
+      {% elif recovery_codes_remaining is not none %}
+        <span class="badge bg-success">{{ _("Active") }}</span>
+        {{ ngettext("%(num)d recovery code remaining.",
+                    "%(num)d recovery codes remaining.",
+                    recovery_codes_remaining) }}
+      {% else %}
+        <span class="badge bg-success">{{ _("Active") }}</span>
+        {{ _("You have recovery codes set up.") }}
+      {% endif %}
+    </p>
+    <form action="{{ url_for('.user_settings_otp_recovery_regenerate',
+                     username=current_user.username) }}"
+          method="post" class="d-inline" novalidate>
+      <input type="hidden" name="csrf_token"
+             value="{{ csrf_token() }}"/>
+      <div class="mb-3">
+        {{ macros.with_errors(regenerate_recovery_form.password,
+               label=False, placeholder=_("Current password")) }}
+      </div>
+      {% if tokens %}
+        <div class="mb-3">
+          {{ macros.with_errors(regenerate_recovery_form.otp,
+                 label=False, placeholder=_("One-Time Password")) }}
+        </div>
+      {% endif %}
+      {{ regenerate_recovery_form.submit(color="warning") }}
+    </form>
+  {% else %}
+    <p>
+      <span class="badge bg-warning text-dark">{{ _("Not set up") }}</span>
+      {{ _("You have no recovery codes. Generate them now to avoid "
+           "being locked out if you lose your authenticator device.") }}
+    </p>
+    <form action="{{ url_for('.user_settings_otp_recovery_generate',
+                     username=current_user.username) }}"
+          method="post" class="d-inline" novalidate>
+      <input type="hidden" name="csrf_token"
+             value="{{ csrf_token() }}"/>
+      <div class="mb-3">
+        {{ macros.with_errors(generate_recovery_form.password,
+               label=False, placeholder=_("Current password")) }}
+      </div>
+      {% if tokens %}
+        <div class="mb-3">
+          {{ macros.with_errors(generate_recovery_form.otp,
+                 label=False, placeholder=_("One-Time Password")) }}
+        </div>
+      {% endif %}
+      {{ generate_recovery_form.submit(color="primary") }}
+    </form>
+  {% endif %}
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -132,9 +236,25 @@
   <script nonce="{{ csp_nonce() }}">
     $(document).ready(function() {
         $('#otp-modal').modal('show');
-        $('#otp-qrcode').hide().qrcode("{{ otp_uri|safe }}");
+        $('#otp-qrcode').hide().qrcode({{ otp_uri|tojson }});
         $('#otp-toggle').click(function() {
           $('#otp-qrcode').slideToggle("fast");
+        });
+    });
+  </script>
+  {% endif %}
+
+  {% if recovery_codes %}
+  {{ recovery_macros.codes_scripts() }}
+  <script nonce="{{ csp_nonce() }}">
+    $(document).ready(function() {
+        $('#recovery-codes-modal').modal('show');
+        $('#codes-saved-check').change(function() {
+            if ($(this).is(':checked')) {
+                $('#done-btn').removeClass('disabled').prop('disabled', false);
+            } else {
+                $('#done-btn').addClass('disabled').prop('disabled', true);
+            }
         });
     });
   </script>
