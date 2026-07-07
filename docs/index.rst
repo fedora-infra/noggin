@@ -73,6 +73,14 @@ for information on migrating applications to the new API.
 
    contributing
 
+.. Design Documents
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Design Documents
+
+   design-otp-recovery-codes
+
 
 .. Release Notes
 
