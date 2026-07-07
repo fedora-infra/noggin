@@ -648,6 +648,68 @@ interactions:
       code: 200
       message: Success
 - request:
+    body: '{"method": "otptoken_find", "params": [[null], {"ipatokenowner": "dummy",
+      "all": true, "raw": false, "no_members": true, "pkey_only": false, "version":
+      "2.235"}]}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '162'
+      Content-Type:
+      - application/json
+      Cookie:
+      - ipa_session=MagBearerToken=G%2bA%2b0AymcyNbJdEyw2QHnJlziAX0dxrN4G2MfbXzAiTNU7Ps%2f2BNaruTLtzpBv3vqXG144TjpyuExybsEsw3QsV%2fNcXtEMkYsmTT3xqRkeGHVd4qA4RG13v3EU5QJE54HzYFFGjwCNiXFiDjqDHMSoVgr05Ljs3PzDkoPuNo40FKKGhQMPSZRMvHNdPHcdgZ4Ta%2bTBOzLFjHpoZkneNk%2bA%3d%3d
+      Referer:
+      - https://ipa.tinystage.test/ipa
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://ipa.tinystage.test/ipa/session/json
+  response:
+    body:
+      string: '{"result": {"result": [{"ipatokenotpalgorithm": ["sha1"], "ipatokenotpdigits":
+        ["6"], "ipatokentotptimestep": ["30"], "ipatokenuniqueid": ["0a43d55d-84e2-4f52-8fb3-8ac88837d921"],
+        "description": ["pants token"], "objectclass": ["ipatoken", "ipatokentotp",
+        "top"], "ipatokenowner": ["dummy"], "type": "TOTP", "managedby_user": ["dummy"],
+        "dn": "ipatokenuniqueid=0a43d55d-84e2-4f52-8fb3-8ac88837d921,cn=otp,dc=tinystage,dc=test"},
+        {"ipatokenotpalgorithm": ["sha1"], "ipatokenotpdigits": ["6"], "ipatokentotptimestep":
+        ["30"], "ipatokenuniqueid": ["ba25ca27-5e5c-471d-a852-cb382ec90af2"], "description":
+        ["dummy''s token"], "objectclass": ["ipatoken", "ipatokentotp", "top"], "ipatokenowner":
+        ["dummy"], "type": "TOTP", "managedby_user": ["dummy"], "dn": "ipatokenuniqueid=ba25ca27-5e5c-471d-a852-cb382ec90af2,cn=otp,dc=tinystage,dc=test"}],
+        "count": 2, "truncated": false, "summary": "2 OTP tokens matched"}, "error":
+        null, "id": null, "principal": "dummy@TINYSTAGE.TEST", "version": "4.10.3"}'
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 15 Apr 2024 14:27:18 GMT
+      Keep-Alive:
+      - timeout=30, max=100
+      Server:
+      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: Success
+- request:
     body: '{"method": "ping", "params": [[], {"version": "2.235"}]}'
     headers:
       Accept:

@@ -589,6 +589,63 @@ interactions:
       code: 200
       message: Success
 - request:
+    body: '{"method": "otptoken_find", "params": [[null], {"ipatokenowner": "dummy",
+      "all": true, "raw": false, "no_members": true, "pkey_only": false, "version":
+      "2.235"}]}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '162'
+      Content-Type:
+      - application/json
+      Cookie:
+      - ipa_session=MagBearerToken=XOyeKgYYVsMA95XHmwIKjEquKAoPpElURFL9bNdqiIGLFBDqO82lghzHFsQzeCCceKO%2bKnL9Vnk7%2fmVlISGnb0ifLPvewbJK5R%2bz2vmCCLMnRW%2bWXbQKCcGWA06z0vD6AGA6ObdRuHrQoSxWYvMTeHGMneCrU0MWCXwuGPvMSVaRDKdeoX6KialFJzPZdgJTHzdI5mFggilNjB4NPMe%2fUw%3d%3d
+      Referer:
+      - https://ipa.tinystage.test/ipa
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://ipa.tinystage.test/ipa/session/json
+  response:
+    body:
+      string: '{"result": {"result": [{"ipatokenotpalgorithm": ["sha1"], "ipatokenotpdigits":
+        ["6"], "ipatokentotptimestep": ["30"], "ipatokenowner": ["dummy"], "ipatokenuniqueid":
+        ["4cb9504a-198e-4596-9a41-e99ed3b4c2c6"], "objectclass": ["ipatoken", "ipatokentotp",
+        "top"], "type": "TOTP", "managedby_user": ["dummy"], "dn": "ipatokenuniqueid=4cb9504a-198e-4596-9a41-e99ed3b4c2c6,cn=otp,dc=tinystage,dc=test"}],
+        "count": 1, "truncated": false, "summary": "1 OTP token matched"}, "error":
+        null, "id": null, "principal": "dummy@TINYSTAGE.TEST", "version": "4.10.3"}'
+    headers:
+      Cache-Control:
+      - no-cache, private
+      Connection:
+      - Keep-Alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 15 Apr 2024 14:27:21 GMT
+      Keep-Alive:
+      - timeout=30, max=100
+      Server:
+      - Apache/2.4.58 (Fedora Linux) OpenSSL/3.0.8 mod_wsgi/4.9.4 Python/3.11 mod_auth_gssapi/1.6.5
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: Success
+- request:
     body: '{"method": "ping", "params": [[], {"version": "2.235"}]}'
     headers:
       Accept:

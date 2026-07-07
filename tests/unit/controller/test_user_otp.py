@@ -4,6 +4,7 @@ from urllib.parse import parse_qs, urlparse
 import pytest
 import python_freeipa
 from bs4 import BeautifulSoup
+from flask import get_flashed_messages
 from pyotp import TOTP
 
 from noggin.app import ipa_admin
@@ -126,12 +127,13 @@ def test_user_settings_otp_confirm(
             "confirm-submit": "1",
         },
     )
-    assert_redirects_with_flash(
-        result,
-        expected_url="/user/dummy/settings/otp/",
-        expected_message="The token has been created.",
-        expected_category="success",
-    )
+    assert result.status_code == 302
+    assert result.location == "/user/dummy/settings/otp/"
+    messages = get_flashed_messages(with_categories=True)
+    assert len(messages) == 2
+    assert messages[0] == ("success", "The token has been created.")
+    assert messages[1][0] == "warning"
+    assert "recovery codes" in messages[1][1].lower()
     result = client.get("/user/dummy/settings/otp/")
     page = BeautifulSoup(result.data, "html.parser")
     tokenlist = page.select_one("div.list-group")
@@ -260,7 +262,6 @@ def test_user_settings_otp_check_description_escaping(
 
     page = BeautifulSoup(result.data, "html.parser")
     otp_uri = page.select_one("input#otp-uri")
-    print(page.prettify())
     assert otp_uri is not None
     parsed_otp_uri = urlparse(otp_uri["value"])
 
@@ -774,3 +775,600 @@ def test_user_settings_otp_rename_invalid_form(client, logged_in_dummy_user_with
         expected_message="Token must not be empty",
         expected_category="danger",
     )
+# --- Recovery code tests ---
+
+# These tests mock the IPA client directly instead of using VCR cassettes,
+# since the recovery code routes were added after the original cassettes
+# were recorded.
+
+DUMMY_USER_RESULT = {
+    "cn": ["Dummy User"],
+    "displayname": ["Dummy User"],
+    "uid": ["dummy"],
+    "krbprincipalname": ["dummy@TINYSTAGE.TEST"],
+    "mail": ["dummy@unit.tests"],
+    "sn": ["User"],
+    "givenname": ["Dummy"],
+    "nsaccountlock": False,
+    "dn": "uid=dummy,cn=users,cn=accounts,dc=tinystage,dc=test",
+}
+
+DUMMY_TOTP_TOKEN = {
+    "ipatokenotpalgorithm": ["sha1"],
+    "ipatokenotpdigits": ["6"],
+    "ipatokentotptimestep": ["30"],
+    "ipatokenuniqueid": ["totp-token-id-001"],
+    "description": ["dummy's token"],
+    "objectclass": ["ipatoken", "ipatokentotp", "top"],
+    "ipatokenowner": ["dummy"],
+    "type": "TOTP",
+    "managedby_user": ["dummy"],
+    "dn": "ipatokenuniqueid=totp-token-id-001,cn=otp,dc=tinystage,dc=test",
+}
+
+DUMMY_RECOVERY_TOKEN = {
+    "ipatokenotpalgorithm": ["sha256"],
+    "ipatokenotpdigits": ["8"],
+    "ipatokenuniqueid": ["recovery-token-id-001"],
+    "ipatokenhotpcounter": ["0"],
+    "description": ["Recovery codes"],
+    "objectclass": ["ipatoken", "ipatokenhotp", "top"],
+    "ipatokenowner": ["dummy"],
+    "type": "HOTP",
+    "managedby_user": ["dummy"],
+    "dn": "ipatokenuniqueid=recovery-token-id-001,cn=otp,dc=tinystage,dc=test",
+}
+
+
+@pytest.fixture
+def mock_ipa_client(client, app):
+    """Provide a logged-in session with a mock IPA client."""
+    mock_client = mock.MagicMock()
+    mock_client.ping.return_value = {"summary": "IPA server version 4.10.3"}
+    mock_client.ipa_version = "IPA server version 4.10.3"
+    mock_client.user_find.return_value = {"result": [DUMMY_USER_RESULT]}
+    mock_client.user_show.return_value = {"result": DUMMY_USER_RESULT}
+
+    with mock.patch("noggin.utility.controllers.maybe_ipa_session", return_value=mock_client):
+        with client.session_transaction() as sess:
+            sess["noggin_session"] = b"fake-session"
+            sess["noggin_username"] = "dummy"
+            sess["noggin_ipa_server_hostname"] = "ipa.tinystage.test"
+        yield mock_client
+
+
+def test_recovery_generate(client, mock_ipa_client):
+    """Test generating recovery codes"""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {"result": [DUMMY_TOTP_TOKEN], "count": 0}
+    ipa.otptoken_add.return_value = {
+        "result": {**DUMMY_RECOVERY_TOKEN, "uri": "otpauth://hotp/dummy@TEST:recovery"}
+    }
+    ipa.otptoken_show.return_value = {"result": {**DUMMY_RECOVERY_TOKEN}}
+
+    def otptoken_find_side_effect(**kwargs):
+        if kwargs.get("o_type") == "hotp":
+            return {"result": [], "count": 0}
+        return {"result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN], "count": 2}
+
+    ipa.otptoken_find.side_effect = otptoken_find_side_effect
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/recovery/generate",
+            data={
+                "gen-password": "dummy_password",
+                "gen-submit": "1",
+            },
+        )
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, "html.parser")
+    codes = page.select('[data-role="recovery-code"]')
+    assert len(codes) == 10
+    for code_el in codes:
+        text = code_el.get_text(strip=True)
+        code_part = text.split(". ", 1)[1]
+        assert len(code_part) == 8
+        assert code_part.isdigit()
+
+
+def test_recovery_generate_requires_auth(client, mock_ipa_client):
+    """Test that wrong password is rejected"""
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.side_effect = python_freeipa.exceptions.InvalidSessionPassword(
+            message="invalid credentials", code="4242"
+        )
+        result = client.post(
+            "/user/dummy/settings/otp/recovery/generate",
+            data={
+                "gen-password": "wrong_password",
+                "gen-submit": "1",
+            },
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Incorrect password",
+        expected_category="danger",
+    )
+
+
+def test_recovery_generate_duplicate(client, mock_ipa_client):
+    """Test that generating codes when recovery token already exists returns error"""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {"result": [DUMMY_RECOVERY_TOKEN], "count": 1}
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/recovery/generate",
+            data={
+                "gen-password": "dummy_password",
+                "gen-submit": "1",
+            },
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="You already have recovery codes. Regenerate them instead.",
+        expected_category="warning",
+    )
+
+
+def test_recovery_regenerate(client, mock_ipa_client):
+    """Test regenerating recovery codes"""
+    ipa = mock_ipa_client
+
+    find_calls = [0]
+
+    def otptoken_find_side_effect(**kwargs):
+        find_calls[0] += 1
+        if kwargs.get("o_type") == "hotp":
+            return {"result": [DUMMY_RECOVERY_TOKEN], "count": 1}
+        return {"result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN], "count": 2}
+
+    ipa.otptoken_find.side_effect = otptoken_find_side_effect
+    ipa.otptoken_del.return_value = {"result": True}
+    ipa.otptoken_add.return_value = {
+        "result": {**DUMMY_RECOVERY_TOKEN, "uri": "otpauth://hotp/dummy@TEST:recovery"}
+    }
+    ipa.otptoken_show.return_value = {"result": {**DUMMY_RECOVERY_TOKEN}}
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/recovery/regenerate",
+            data={
+                "regen-password": "dummy_password",
+                "regen-submit": "1",
+            },
+        )
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, "html.parser")
+    codes = page.select('[data-role="recovery-code"]')
+    assert len(codes) == 10
+
+
+def test_recovery_regenerate_last_token(client, mock_ipa_client):
+    """Test regeneration when recovery token is the last active token"""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {"result": [DUMMY_RECOVERY_TOKEN], "count": 1}
+    ipa.otptoken_del.side_effect = python_freeipa.exceptions.BadRequest(
+        message="Server is unwilling to perform: Can't delete last active token",
+        code="4242",
+    )
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/recovery/regenerate",
+            data={
+                "regen-password": "dummy_password",
+                "regen-submit": "1",
+            },
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message=(
+            "Cannot regenerate recovery codes while they are your only "
+            "active token. Add a regular OTP token first."
+        ),
+        expected_category="warning",
+    )
+
+
+def test_recovery_generate_ipa_error(client, mock_ipa_client):
+    """Test IPA error during recovery token creation"""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {"result": [], "count": 0}
+    ipa.otptoken_add.side_effect = python_freeipa.exceptions.FreeIPAError(
+        message="Cannot create the token.", code="4242"
+    )
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/recovery/generate",
+            data={
+                "gen-password": "dummy_password",
+                "gen-submit": "1",
+            },
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot create recovery codes.",
+        expected_category="danger",
+    )
+
+
+def test_recovery_token_hidden_from_list(client, mock_ipa_client):
+    """Test that the recovery token does not appear in the regular token list"""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN],
+        "count": 2,
+    }
+    ipa.otptoken_show.return_value = {"result": {**DUMMY_RECOVERY_TOKEN}}
+
+    result = client.get("/user/dummy/settings/otp/")
+    page = BeautifulSoup(result.data, "html.parser")
+    tokenlist = page.select("div.list-group .list-group-item")
+    assert len(tokenlist) == 1
+    desc = tokenlist[0].select_one("div[data-role='token-description']")
+    assert desc is not None
+    assert "Recovery codes" not in desc.get_text(strip=True)
+
+    recovery_section = page.select_one("#recovery-codes")
+    assert recovery_section is not None
+
+
+@pytest.mark.vcr()
+def test_recovery_generate_no_permission(client, logged_in_dummy_user):
+    """Verify that a user can't generate recovery codes for another user"""
+    result = client.post(
+        "/user/dudemcpants/settings/otp/recovery/generate",
+        data={"gen-password": "dummy_password", "gen-submit": "1"},
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dudemcpants/",
+        expected_message="You do not have permission to edit this account.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_recovery_regenerate_no_permission(client, logged_in_dummy_user):
+    """Verify that a user can't regenerate recovery codes for another user"""
+    result = client.post(
+        "/user/dudemcpants/settings/otp/recovery/regenerate",
+        data={"regen-password": "dummy_password", "regen-submit": "1"},
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dudemcpants/",
+        expected_message="You do not have permission to edit this account.",
+        expected_category="danger",
+    )
+
+
+@pytest.mark.vcr()
+def test_recovery_generate_invalid_form(client, logged_in_dummy_user):
+    """Test that submitting the generate form without a password returns error"""
+    result = client.post(
+        "/user/dummy/settings/otp/recovery/generate",
+        data={"gen-submit": "1"},
+    )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="You must provide a password",
+        expected_category="danger",
+    )
+
+
+def test_recovery_token_no_rename(client, mock_ipa_client):
+    """Verify the recovery token has no rename button in the UI"""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN],
+        "count": 2,
+    }
+    ipa.otptoken_show.return_value = {"result": {**DUMMY_RECOVERY_TOKEN}}
+
+    result = client.get("/user/dummy/settings/otp/")
+    page = BeautifulSoup(result.data, "html.parser")
+    token_items = page.select("div.list-group .list-group-item")
+    assert len(token_items) == 1
+    rename_buttons = token_items[0].select("button[title='Rename']")
+    assert len(rename_buttons) == 1
+    rename_forms = page.select(
+        "form[action='/user/dummy/settings/otp/rename/'] "
+        "button[value='recovery-token-id-001']"
+    )
+    assert len(rename_forms) == 0
+
+
+def test_rename_to_recovery_description_blocked(client, mock_ipa_client):
+    """Server rejects renaming a token TO the recovery description."""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN],
+        "count": 1,
+    }
+
+    result = client.post(
+        "/user/dummy/settings/otp/rename/",
+        data={"token": "some-token-id", "description": "Recovery codes"},
+    )
+    assert result.status_code == 302
+    assert "/user/dummy/settings/otp/" in result.headers["Location"]
+    ipa.otptoken_mod.assert_not_called()
+
+
+def test_recovery_codes_remaining_display(client, mock_ipa_client):
+    """Verify the remaining code count appears on the OTP page"""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN],
+        "count": 2,
+    }
+    ipa.otptoken_show.return_value = {
+        "result": {**DUMMY_RECOVERY_TOKEN, "ipatokenhotpcounter": ["3"]},
+    }
+
+    result = client.get("/user/dummy/settings/otp/")
+    page = BeautifulSoup(result.data, "html.parser")
+    recovery_section = page.select_one("#recovery-codes")
+    assert recovery_section is not None
+    text = recovery_section.get_text()
+    assert "7 recovery codes remaining" in text
+    badge = recovery_section.select_one("span.badge.bg-success")
+    assert badge is not None
+    assert badge.get_text(strip=True) == "Active"
+
+
+def test_recovery_codes_remaining_low_warning(client, mock_ipa_client):
+    """Verify warning badge when codes are running low"""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN],
+        "count": 2,
+    }
+    ipa.otptoken_show.return_value = {
+        "result": {**DUMMY_RECOVERY_TOKEN, "ipatokenhotpcounter": ["8"]},
+    }
+
+    result = client.get("/user/dummy/settings/otp/")
+    page = BeautifulSoup(result.data, "html.parser")
+    recovery_section = page.select_one("#recovery-codes")
+    text = recovery_section.get_text()
+    assert "2 recovery codes remaining" in text
+    assert "Consider regenerating" in text
+    badge = recovery_section.select_one("span.badge.bg-warning")
+    assert badge is not None
+    assert badge.get_text(strip=True) == "Low"
+
+
+def test_recovery_codes_remaining_zero(client, mock_ipa_client):
+    """Verify display when all codes are exhausted"""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN],
+        "count": 2,
+    }
+    ipa.otptoken_show.return_value = {
+        "result": {**DUMMY_RECOVERY_TOKEN, "ipatokenhotpcounter": ["10"]},
+    }
+
+    result = client.get("/user/dummy/settings/otp/")
+    page = BeautifulSoup(result.data, "html.parser")
+    recovery_section = page.select_one("#recovery-codes")
+    text = recovery_section.get_text()
+    assert "Exhausted" in text
+    assert "Regenerate now" in text
+    badge = recovery_section.select_one("span.badge.bg-danger")
+    assert badge is not None
+
+
+# --- Enhancement 2: Mandatory recovery codes ---
+
+
+def _confirm_otp_data(totp_secret="JBSWY3DPEHPK3PXP"):
+    """Build POST data for the confirm OTP form with a valid TOTP code."""
+    totp = TOTP(totp_secret)
+    return {
+        "confirm-description": "my token",
+        "confirm-secret": totp_secret,
+        "confirm-code": totp.now(),
+        "confirm-submit": "1",
+    }
+
+
+def test_mandatory_recovery_codes_on_first_token(
+    client, mock_ipa_client, app, monkeypatch
+):
+    """With OTP_REQUIRE_RECOVERY_CODES enabled, confirming the first OTP token
+    auto-generates recovery codes and shows the modal."""
+    ipa = mock_ipa_client
+    monkeypatch.setitem(app.config, 'OTP_REQUIRE_RECOVERY_CODES', True)
+
+    ipa.otptoken_add.return_value = {
+        "result": {**DUMMY_TOTP_TOKEN, "uri": "otpauth://totp/dummy@TEST:token"}
+    }
+
+    find_calls = [0]
+
+    def otptoken_find_side_effect(**kwargs):
+        find_calls[0] += 1
+        if find_calls[0] == 1:
+            return {"result": [DUMMY_TOTP_TOKEN], "count": 1}
+        return {"result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN], "count": 2}
+
+    ipa.otptoken_find.side_effect = otptoken_find_side_effect
+    ipa.otptoken_show.return_value = {"result": {**DUMMY_RECOVERY_TOKEN}}
+
+    result = client.post(
+        "/user/dummy/settings/otp/",
+        data=_confirm_otp_data(),
+    )
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, "html.parser")
+    modal = page.select_one("#recovery-codes-modal")
+    assert modal is not None
+    codes = page.select('[data-role="recovery-code"]')
+    assert len(codes) == 10
+
+
+def test_mandatory_recovery_codes_disabled(
+    client, mock_ipa_client, app, monkeypatch
+):
+    """With OTP_REQUIRE_RECOVERY_CODES disabled (default), confirming the first
+    token redirects with a warning flash instead of auto-generating codes."""
+    ipa = mock_ipa_client
+    monkeypatch.setitem(app.config, 'OTP_REQUIRE_RECOVERY_CODES', False)
+
+    ipa.otptoken_add.return_value = {
+        "result": {**DUMMY_TOTP_TOKEN, "uri": "otpauth://totp/dummy@TEST:token"}
+    }
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN],
+        "count": 1,
+    }
+
+    result = client.post(
+        "/user/dummy/settings/otp/",
+        data=_confirm_otp_data(),
+    )
+    assert result.status_code == 302
+    messages = get_flashed_messages(with_categories=True)
+    assert len(messages) == 2
+    assert messages[0] == ("success", "The token has been created.")
+    assert messages[1][0] == "warning"
+    assert "recovery codes" in messages[1][1].lower()
+
+
+def test_mandatory_recovery_codes_already_has_recovery(
+    client, mock_ipa_client, app, monkeypatch
+):
+    """With OTP_REQUIRE_RECOVERY_CODES enabled, if user already has a recovery
+    token, normal redirect with no auto-generation."""
+    ipa = mock_ipa_client
+    monkeypatch.setitem(app.config, 'OTP_REQUIRE_RECOVERY_CODES', True)
+
+    ipa.otptoken_add.return_value = {
+        "result": {**DUMMY_TOTP_TOKEN, "uri": "otpauth://totp/dummy@TEST:token"}
+    }
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN],
+        "count": 2,
+    }
+
+    result = client.post(
+        "/user/dummy/settings/otp/",
+        data=_confirm_otp_data(),
+    )
+    assert result.status_code == 302
+    messages = get_flashed_messages(with_categories=True)
+    assert len(messages) == 1
+    assert messages[0] == ("success", "The token has been created.")
+
+
+
+def test_recovery_regenerate_delete_error(client, mock_ipa_client):
+    """IPA error deleting old recovery token during regeneration."""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {"result": [DUMMY_RECOVERY_TOKEN], "count": 1}
+    ipa.otptoken_del.side_effect = python_freeipa.exceptions.FreeIPAError(
+        message="Cannot delete token", code="4242"
+    )
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/recovery/regenerate",
+            data={
+                "regen-password": "dummy_password",
+                "regen-submit": "1",
+            },
+        )
+    assert_redirects_with_flash(
+        result,
+        expected_url="/user/dummy/settings/otp/",
+        expected_message="Cannot regenerate recovery codes.",
+        expected_category="danger",
+    )
+
+
+def test_mandatory_recovery_codes_auto_generate_failure(
+    client, mock_ipa_client, app, monkeypatch
+):
+    """With OTP_REQUIRE_RECOVERY_CODES enabled, if auto-creating recovery codes
+    fails, the user gets a warning flash and redirect instead of codes modal."""
+    ipa = mock_ipa_client
+    monkeypatch.setitem(app.config, 'OTP_REQUIRE_RECOVERY_CODES', True)
+
+    add_calls = [0]
+
+    def otptoken_add_side_effect(**kwargs):
+        add_calls[0] += 1
+        if add_calls[0] == 1:
+            return {
+                "result": {
+                    **DUMMY_TOTP_TOKEN,
+                    "uri": "otpauth://totp/dummy@TEST:token",
+                }
+            }
+        raise python_freeipa.exceptions.FreeIPAError(
+            message="Cannot create token", code="4242"
+        )
+
+    ipa.otptoken_add.side_effect = otptoken_add_side_effect
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN],
+        "count": 1,
+    }
+
+    result = client.post(
+        "/user/dummy/settings/otp/",
+        data=_confirm_otp_data(),
+    )
+    assert result.status_code == 302
+    messages = get_flashed_messages(with_categories=True)
+    assert len(messages) == 2
+    assert messages[0] == ("success", "The token has been created.")
+    assert messages[1][0] == "warning"
+    assert "recovery codes" in messages[1][1].lower()
+
+
+def test_recovery_generate_cache_control(client, mock_ipa_client):
+    """Recovery code responses include Cache-Control: no-store."""
+    ipa = mock_ipa_client
+    ipa.otptoken_find.return_value = {"result": [DUMMY_TOTP_TOKEN], "count": 0}
+    ipa.otptoken_add.return_value = {
+        "result": {**DUMMY_RECOVERY_TOKEN, "uri": "otpauth://hotp/dummy@TEST:recovery"}
+    }
+    ipa.otptoken_show.return_value = {"result": {**DUMMY_RECOVERY_TOKEN}}
+
+    def otptoken_find_side_effect(**kwargs):
+        if kwargs.get("o_type") == "hotp":
+            return {"result": [], "count": 0}
+        return {"result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN], "count": 2}
+
+    ipa.otptoken_find.side_effect = otptoken_find_side_effect
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/recovery/generate",
+            data={
+                "gen-password": "dummy_password",
+                "gen-submit": "1",
+            },
+        )
+    assert result.status_code == 200
+    assert result.headers.get("Cache-Control") == "no-store"
+
