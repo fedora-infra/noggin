@@ -16,6 +16,10 @@
             {% if user.username == current_user.username %}
             <a href="{{ url_for('.user_settings_profile', username=user.username) }}" class="btn btn-outline-primary btn-block my-3">{{_("Edit Profile")}}</a>
             {% endif %}
+            {% if is_otp_admin %}
+            <a href="{{ url_for('.user_settings_otp_admin_reset', username=user.username) }}"
+               class="btn btn-warning btn-sm my-1">{{ _("Reset OTP") }}</a>
+            {% endif %}
           </div>
           <ul class="list-group list-group-flush" id="user_attributes">
               {% if user.creation_time %}
@@ -177,7 +181,7 @@
               </li>
           {% else %}
           <li class="list-group-item h4 text-muted h-100 text-center d-flex align-items-center justify-content-center bg-light">
-            {{user.username}} has no group memberships
+            {{ _("%(username)s has no group memberships", username=user.username) }}
           </li>
           {% endfor %}
         </ul>

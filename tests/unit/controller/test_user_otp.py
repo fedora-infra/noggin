@@ -1372,3 +1372,292 @@ def test_recovery_generate_cache_control(client, mock_ipa_client):
     assert result.status_code == 200
     assert result.headers.get("Cache-Control") == "no-store"
 
+
+# --- Enhancement 3: Admin-assisted OTP recovery ---
+
+ADMIN_USER_RESULT = {
+    "cn": ["Admin User"],
+    "displayname": ["Admin User"],
+    "uid": ["admin_user"],
+    "krbprincipalname": ["admin_user@TINYSTAGE.TEST"],
+    "mail": ["admin@unit.tests"],
+    "sn": ["User"],
+    "givenname": ["Admin"],
+    "nsaccountlock": False,
+    "dn": "uid=admin_user,cn=users,cn=accounts,dc=tinystage,dc=test",
+}
+
+
+@pytest.fixture
+def mock_admin_client(client, app):
+    """Provide a logged-in session as admin_user with mocked IPA admin."""
+    app.config['OTP_ADMIN_RECOVERY_ROLE'] = 'OTP Recovery Admins'
+
+    mock_client = mock.MagicMock()
+    mock_client.ping.return_value = {"summary": "IPA server version 4.10.3"}
+    mock_client.ipa_version = "IPA server version 4.10.3"
+    mock_client.user_find.return_value = {"result": [ADMIN_USER_RESULT]}
+    mock_client.user_show.return_value = {"result": DUMMY_USER_RESULT}
+
+    mock_admin = mock.MagicMock()
+    mock_admin.role_show.return_value = {
+        "result": {
+            "cn": ["OTP Recovery Admins"],
+            "member_user": ["admin_user"],
+        }
+    }
+
+    with mock.patch(
+        "noggin.utility.controllers.maybe_ipa_session", return_value=mock_client
+    ), mock.patch(
+        "noggin.utility.controllers.ipa_admin", mock_admin
+    ), mock.patch(
+        "noggin.controller.user_otp.ipa_admin", mock_admin
+    ):
+        with client.session_transaction() as sess:
+            sess["noggin_session"] = b"fake-session"
+            sess["noggin_username"] = "admin_user"
+            sess["noggin_ipa_server_hostname"] = "ipa.tinystage.test"
+        yield mock_client, mock_admin
+
+
+def test_admin_otp_reset_get(client, mock_admin_client):
+    """Admin can view the OTP reset confirmation page for another user."""
+    ipa, admin = mock_admin_client
+    admin.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN],
+        "count": 2,
+    }
+
+    result = client.get("/user/dummy/settings/otp/admin-reset")
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, "html.parser")
+    heading = page.select_one("#pageheading")
+    assert heading is not None
+    assert "dummy" in heading.get_text()
+    assert "Reset OTP" in heading.get_text()
+    token_list = page.select("ul.list-group li.list-group-item")
+    assert len(token_list) == 1
+    assert "dummy's token" in token_list[0].get_text()
+    form = page.select_one(
+        "form[action='/user/dummy/settings/otp/admin-reset']"
+    )
+    assert form is not None
+
+
+def test_admin_otp_reset_post(client, mock_admin_client):
+    """Admin successfully resets OTP and recovery codes are generated."""
+    ipa, admin = mock_admin_client
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN],
+        "count": 2,
+    }
+    old_recovery = {
+        **DUMMY_RECOVERY_TOKEN,
+        "ipatokenuniqueid": ["old-recovery-id"],
+        "ipatokenhotpcounter": ["5"],
+    }
+    new_recovery = {
+        **DUMMY_RECOVERY_TOKEN,
+        "ipatokenuniqueid": ["new-recovery-id"],
+        "ipatokenhotpcounter": ["0"],
+    }
+    admin.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN, old_recovery, new_recovery],
+        "count": 3,
+    }
+    admin.otptoken_del.return_value = {"result": True}
+    admin.otptoken_add.return_value = {
+        "result": {
+            **DUMMY_RECOVERY_TOKEN,
+            "ipatokenuniqueid": ["new-recovery-id"],
+            "uri": "otpauth://hotp/dummy@TEST:recovery",
+        }
+    }
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/admin-reset",
+            data={
+                "admin-reset-password": "admin_password",
+                "admin-reset-submit": "1",
+            },
+        )
+    assert result.status_code == 200
+    page = BeautifulSoup(result.data, "html.parser")
+    codes = page.select('[data-role="recovery-code"]')
+    assert len(codes) == 10
+    for code_el in codes:
+        text = code_el.get_text(strip=True)
+        code_part = text.split(". ", 1)[1]
+        assert len(code_part) == 8
+        assert code_part.isdigit()
+    assert admin.otptoken_del.call_count == 2
+    admin.otptoken_add.assert_called_once()
+
+
+def test_admin_otp_reset_no_permission(client, mock_admin_client):
+    """Non-admin user is rejected when trying to reset OTP."""
+    ipa, admin = mock_admin_client
+    admin.role_show.return_value = {
+        "result": {
+            "cn": ["OTP Recovery Admins"],
+            "member_user": ["someone_else"],
+        }
+    }
+
+    result = client.get("/user/dummy/settings/otp/admin-reset")
+    assert result.status_code == 302
+    assert "/user/dummy/" in result.headers["Location"]
+
+
+def test_admin_otp_reset_self(client, mock_admin_client):
+    """Admin trying to reset their own OTP redirects to normal OTP flow."""
+    ipa, admin = mock_admin_client
+    ipa.user_show.return_value = {"result": ADMIN_USER_RESULT}
+
+    result = client.get("/user/admin_user/settings/otp/admin-reset")
+    assert result.status_code == 302
+    assert "/user/admin_user/settings/otp" in result.headers["Location"]
+
+
+def test_admin_otp_reset_disabled(client, mock_ipa_client, app):
+    """When OTP_ADMIN_RECOVERY_ROLE is None, route returns 404."""
+    app.config['OTP_ADMIN_RECOVERY_ROLE'] = None
+    result = client.get("/user/dummy/settings/otp/admin-reset")
+    assert result.status_code == 404
+
+
+def test_admin_otp_reset_requires_auth(client, mock_admin_client):
+    """Wrong admin password is rejected."""
+    ipa, admin = mock_admin_client
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.side_effect = python_freeipa.exceptions.InvalidSessionPassword(
+            message="invalid credentials", code="4242"
+        )
+        result = client.post(
+            "/user/dummy/settings/otp/admin-reset",
+            data={
+                "admin-reset-password": "wrong_password",
+                "admin-reset-submit": "1",
+            },
+        )
+    assert result.status_code == 302
+    assert "/user/dummy/settings/otp/admin-reset" in result.headers["Location"]
+
+
+def test_admin_otp_reset_delete_error(client, mock_admin_client):
+    """IPA error during token deletion shows error message."""
+    ipa, admin = mock_admin_client
+    admin.otptoken_add.return_value = {
+        "result": {
+            **DUMMY_RECOVERY_TOKEN,
+            "ipatokenuniqueid": ["new-recovery-id"],
+            "uri": "otpauth://hotp/dummy@TEST:recovery",
+        }
+    }
+    admin.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN],
+        "count": 1,
+    }
+    admin.otptoken_del.side_effect = python_freeipa.exceptions.FreeIPAError(
+        message="Cannot delete token", code="4242"
+    )
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/admin-reset",
+            data={
+                "admin-reset-password": "admin_password",
+                "admin-reset-submit": "1",
+            },
+        )
+    assert result.status_code == 302
+    assert "/user/dummy/settings/otp/admin-reset" in result.headers["Location"]
+
+
+def test_admin_otp_reset_create_error(client, mock_admin_client):
+    """IPA error during recovery token creation shows error message."""
+    ipa, admin = mock_admin_client
+    admin.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN],
+        "count": 1,
+    }
+    admin.otptoken_del.return_value = {"result": True}
+    admin.otptoken_add.side_effect = python_freeipa.exceptions.FreeIPAError(
+        message="Cannot create token", code="4242"
+    )
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/admin-reset",
+            data={
+                "admin-reset-password": "admin_password",
+                "admin-reset-submit": "1",
+            },
+        )
+    assert result.status_code == 302
+    assert "/user/dummy/settings/otp/admin-reset" in result.headers["Location"]
+
+
+
+def test_admin_otp_reset_cache_control(client, mock_admin_client):
+    """Admin recovery code responses include Cache-Control: no-store."""
+    ipa, admin = mock_admin_client
+    ipa.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN],
+        "count": 1,
+    }
+    admin.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN],
+        "count": 1,
+    }
+    admin.otptoken_del.return_value = {"result": True}
+    admin.otptoken_add.return_value = {
+        "result": {
+            **DUMMY_RECOVERY_TOKEN,
+            "ipatokenuniqueid": ["new-recovery-id"],
+            "uri": "otpauth://hotp/dummy@TEST:recovery",
+        }
+    }
+
+    with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
+        login_mock.return_value = ipa
+        result = client.post(
+            "/user/dummy/settings/otp/admin-reset",
+            data={
+                "admin-reset-password": "admin_password",
+                "admin-reset-submit": "1",
+            },
+        )
+    assert result.status_code == 200
+    assert result.headers.get("Cache-Control") == "no-store"
+
+
+def test_admin_otp_reset_group_membership(client, mock_admin_client):
+    """Admin with role membership via group can access OTP reset."""
+    ipa, admin = mock_admin_client
+    ipa.user_find.return_value = {
+        "result": [{
+            **ADMIN_USER_RESULT,
+            "memberof_group": ["otp-admins-group", "other-group"],
+        }]
+    }
+    admin.role_show.return_value = {
+        "result": {
+            "cn": ["OTP Recovery Admins"],
+            "member_user": [],
+            "member_group": ["otp-admins-group"],
+        }
+    }
+    admin.otptoken_find.return_value = {
+        "result": [DUMMY_TOTP_TOKEN],
+        "count": 1,
+    }
+
+    result = client.get("/user/dummy/settings/otp/admin-reset")
+    assert result.status_code == 200
