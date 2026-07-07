@@ -16,7 +16,9 @@ from markupsafe import Markup
 from pyotp import TOTP
 from werkzeug.datastructures import MultiDict
 
+from noggin.app import ipa_admin
 from noggin.form.edit_user import (
+    AdminOTPResetForm,
     UserSettingsAddOTPForm,
     UserSettingsConfirmOTPForm,
     UserSettingsGenerateRecoveryForm,
@@ -27,8 +29,10 @@ from noggin.form.edit_user import (
 from noggin.representation.otptoken import OTPToken
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login
-from noggin.utility.controllers import require_self, user_or_404, with_ipa
+from noggin.utility import messaging
+from noggin.utility.controllers import require_otp_admin, require_self, user_or_404, with_ipa
 from noggin.utility.recovery_codes import generate_recovery_codes
+from noggin_messages import UserUpdateV1
 
 from . import blueprint as bp
 
@@ -531,3 +535,120 @@ def user_settings_otp_recovery_regenerate(ipa, username):
         for error in field_errors:
             flash(error, 'danger')
     return redirect(url_for('.user_settings_otp', username=username))
+
+
+@bp.route('/user/<username>/settings/otp/admin-reset', methods=['GET', 'POST'])
+@with_ipa()
+@require_otp_admin
+def user_settings_otp_admin_reset(ipa, username):
+    user = User(user_or_404(ipa, username))
+    form = AdminOTPResetForm(prefix="admin-reset-")
+
+    if form.validate_on_submit():
+        admin_username = session.get('noggin_username')
+        if not _reauthenticate(form, admin_username):
+            return redirect(
+                url_for('.user_settings_otp_admin_reset', username=username)
+            )
+
+        try:
+            codes, new_token_id = _create_recovery_token(ipa_admin, username)
+        except python_freeipa.exceptions.FreeIPAError as e:
+            current_app.logger.error(
+                f'Admin {admin_username} failed to create recovery token '
+                f'for user {username}: {e}'
+            )
+            flash(_('Error creating recovery codes.'), 'danger')
+            return redirect(
+                url_for('.user_settings_otp_admin_reset', username=username)
+            )
+
+        try:
+            all_tokens = ipa_admin.otptoken_find(o_ipatokenowner=username)
+        except python_freeipa.exceptions.FreeIPAError as e:
+            current_app.logger.error(
+                'Failed to list tokens for user %s after recovery '
+                'token creation: %s',
+                username,
+                e,
+            )
+            flash(
+                _(
+                    'Recovery codes were created but old tokens could '
+                    'not be removed. Please try again.'
+                ),
+                'warning',
+            )
+            return redirect(
+                url_for('.user_settings_otp_admin_reset', username=username)
+            )
+
+        for t in all_tokens['result']:
+            token_id = t['ipatokenuniqueid'][0]
+            if token_id == new_token_id:
+                continue
+            try:
+                ipa_admin.otptoken_del(
+                    a_ipatokenuniqueid=token_id,
+                )
+            except python_freeipa.exceptions.FreeIPAError as e:
+                current_app.logger.error(
+                    f'Admin {admin_username} failed to delete token '
+                    f'{token_id} for user {username}: {e}'
+                )
+                flash(_('Error deleting OTP tokens.'), 'danger')
+                return redirect(
+                    url_for('.user_settings_otp_admin_reset', username=username)
+                )
+
+        current_app.logger.info(
+            f'Admin {admin_username} reset OTP for user {username}'
+        )
+        messaging.publish(
+            UserUpdateV1(
+                {
+                    "msg": {
+                        "agent": admin_username,
+                        "user": username,
+                        "fields": ["otp_reset"],
+                    }
+                }
+            )
+        )
+        flash(
+            _('OTP tokens have been reset for %(username)s.', username=username),
+            'success',
+        )
+        response = make_response(
+            render_template(
+                'user-settings-otp-admin-reset.html',
+                target_user=user,
+                recovery_codes=codes,
+                form=form,
+            )
+        )
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+
+    try:
+        all_tokens = [
+            OTPToken(t)
+            for t in ipa_admin.otptoken_find(
+                o_ipatokenowner=username
+            )["result"]
+        ]
+    except python_freeipa.exceptions.FreeIPAError:
+        current_app.logger.error(
+            'Failed to list OTP tokens for user %s', username
+        )
+        flash(_('Could not load OTP tokens.'), 'danger')
+        return redirect(url_for('.user', username=username))
+    tokens, recovery_token = _categorize_tokens(all_tokens)
+
+    return render_template(
+        'user-settings-otp-admin-reset.html',
+        target_user=user,
+        tokens=tokens,
+        recovery_token=recovery_token,
+        form=form,
+    )

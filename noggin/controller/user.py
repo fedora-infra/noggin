@@ -13,7 +13,7 @@ from flask_babel import _
 from flask_mail import Message
 from markupsafe import Markup
 
-from noggin.app import mailer
+from noggin.app import ipa_admin, mailer
 from noggin.form.base import BaseForm
 from noggin.form.edit_user import (
     UserSettingsAgreementSign,
@@ -25,7 +25,12 @@ from noggin.representation.agreement import Agreement
 from noggin.representation.group import Group
 from noggin.representation.user import User
 from noggin.utility import messaging
-from noggin.utility.controllers import require_self, user_or_404, with_ipa
+from noggin.utility.controllers import (
+    is_role_member,
+    require_self,
+    user_or_404,
+    with_ipa,
+)
 from noggin.utility.forms import FormError, handle_form_errors
 from noggin.utility.token import Audience, make_token, read_token
 from noggin_messages import UserUpdateV1
@@ -66,12 +71,28 @@ def user(ipa, username):
     if user != g.current_user and user.is_private:
         user.anonymize()
 
+    # Check if the current user is an OTP recovery admin
+    is_otp_admin = False
+    role = current_app.config.get('OTP_ADMIN_RECOVERY_ROLE')
+    if role and g.current_user.username != user.username:
+        try:
+            role_info = ipa_admin.role_show(a_cn=role)
+            is_otp_admin = is_role_member(
+                role_info, g.current_user.username, g.current_user.groups
+            )
+        except python_freeipa.exceptions.FreeIPAError:
+            current_app.logger.warning(
+                'Failed to check OTP admin role for user %s',
+                g.current_user.username,
+            )
+
     return render_template(
         'user.html',
         user=user,
         groups=groups,
         managed_groups=managed_groups,
         member_groups=member_groups,
+        is_otp_admin=is_otp_admin,
     )
 
 
