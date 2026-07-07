@@ -15,6 +15,12 @@ class IPAAdmin:
         "stageuser_activate",
         "stageuser_mod",
         "ping",
+        "otptoken_add",
+        "otptoken_del",
+        "otptoken_find",
+        "otptoken_mod",
+        "otptoken_show",
+        "role_show",
     )
     __WRAPPED_METHODS_TESTING = (
         "user_add",
@@ -28,9 +34,6 @@ class IPAAdmin:
         "pwpolicy_add",
         "pwpolicy_mod",
         "pwpolicy_show",
-        "otptoken_add",
-        "otptoken_del",
-        "otptoken_find",
         "stageuser_del",
         "stageuser_mod",
         "batch",

@@ -72,3 +72,18 @@ AGREEMENT_WARNINGS = {
         "platforms."
     ),
 }
+
+# Number of recovery codes to generate. Must not exceed the FreeIPA
+# ipatokenHOTPauthWindow (default: 10).
+OTP_RECOVERY_CODE_COUNT = 10
+# Token description used to identify recovery tokens.
+# WARNING: Changing this value after recovery tokens have been created will
+# cause existing tokens to no longer be recognized as recovery tokens.
+OTP_RECOVERY_DESCRIPTION = "Recovery codes"
+# Warn the user when this many or fewer recovery codes remain.
+OTP_RECOVERY_LOW_THRESHOLD = 3
+# Auto-generate recovery codes when the user enrolls their first OTP token.
+OTP_REQUIRE_RECOVERY_CODES = False
+# IPA role whose members may reset another user's OTP tokens and generate
+# recovery codes on their behalf.  None disables the feature.
+OTP_ADMIN_RECOVERY_ROLE = None

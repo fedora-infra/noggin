@@ -83,7 +83,7 @@ class ProtocolAndNickField(TypeAndStringField):
 
 def https_required(form, field):
     if not field.data.startswith('https://'):
-        raise ValidationError('URL should start with "https://".')
+        raise ValidationError(_('URL should start with "https://".'))
 
 
 class UserSettingsProfileForm(BaseForm):
@@ -243,6 +243,34 @@ class UserSettingsOTPNameChange(BaseForm):
     description = StringField(
         validators=[Optional()],
     )
+
+
+class UserSettingsGenerateRecoveryForm(ModestForm):
+    password = PasswordField(
+        _('Enter your current password'),
+        validators=[DataRequired(message=_('You must provide a password'))],
+    )
+    otp = StringField(
+        _('One-Time Password'),
+        validators=[Optional()],
+    )
+    submit = SubmitButtonField(_("Generate Recovery Codes"))
+
+
+class UserSettingsRegenerateRecoveryForm(UserSettingsGenerateRecoveryForm):
+    submit = SubmitButtonField(_("Regenerate Recovery Codes"))
+
+
+class AdminOTPResetForm(ModestForm):
+    password = PasswordField(
+        _('Enter your password to confirm'),
+        validators=[DataRequired(message=_('You must provide a password'))],
+    )
+    otp = StringField(
+        _('One-Time Password'),
+        validators=[Optional()],
+    )
+    submit = SubmitButtonField(_("Reset OTP and Generate Recovery Codes"))
 
 
 class UserSettingsAgreementSign(BaseForm):
