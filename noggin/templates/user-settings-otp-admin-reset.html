@@ -1,0 +1,98 @@
+{% extends "main.html" %}
+
+{% import '_form_macros.html' as macros %}
+{% import '_recovery_codes.html' as recovery_macros %}
+
+{% block title %}{{ _("Reset OTP for %(username)s", username=target_user.username) }}{% endblock %}
+
+{% block content %}
+  {{ super() }}
+
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-8 mx-auto">
+        <div class="card">
+          <div class="card-body">
+            <h5 id="pageheading">
+              {{ _("Reset OTP for %(username)s", username=target_user.username) }}
+            </h5>
+
+            {% if recovery_codes %}
+              <div class="alert alert-success" role="alert">
+                {{ _("OTP tokens have been reset. Share the recovery codes below "
+                     "with the user through a verified secure channel.") }}
+              </div>
+              <div class="alert alert-warning" role="alert">
+                <strong>{{ _("These codes will not be shown again.") }}</strong>
+                {{ _("Make sure the user saves them before you leave this page.") }}
+              </div>
+              {{ recovery_macros.codes_grid(recovery_codes) }}
+              <a href="{{ url_for('.user', username=target_user.username) }}"
+                 class="btn btn-primary">{{ _("Done") }}</a>
+
+            {% else %}
+              <p>{{ _("This will delete all OTP tokens for %(username)s and "
+                      "generate a set of recovery codes that you can share with "
+                      "the user.", username=target_user.username) }}</p>
+
+              {% if tokens %}
+                <h6>{{ _("Current OTP tokens:") }}</h6>
+                <ul class="list-group mb-3">
+                  {% for token in tokens %}
+                    <li class="list-group-item">
+                      {{ token.description if token.description else _("(no name)") }}
+                      <span class="text-muted">— {{ token.uniqueid }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p class="text-muted">{{ _("This user has no OTP tokens.") }}</p>
+              {% endif %}
+
+              {% if recovery_token %}
+                <p class="text-muted">
+                  <i class="fa fa-info-circle"></i>
+                  {{ _("This user also has recovery codes which will be replaced.") }}
+                </p>
+              {% endif %}
+
+              <div class="alert alert-danger" role="alert">
+                <strong>{{ _("Warning:") }}</strong>
+                {{ _("This action cannot be undone. All existing OTP tokens will "
+                     "be permanently deleted.") }}
+              </div>
+
+              <form action="{{ url_for('.user_settings_otp_admin_reset',
+                               username=target_user.username) }}"
+                    method="post" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="mb-3">
+                  {{ macros.with_errors(form.password, label=False,
+                         placeholder=_("Your password")) }}
+                </div>
+                <div class="mb-3">
+                  {{ macros.with_errors(form.otp, label=False,
+                         placeholder=_("One-Time Password")) }}
+                </div>
+                <div>{{ macros.non_field_errors(form) }}</div>
+                <div class="d-flex justify-content-between">
+                  {{ form.submit(color="danger") }}
+                  <a href="{{ url_for('.user', username=target_user.username) }}"
+                     class="btn btn-secondary">{{ _("Cancel") }}</a>
+                </div>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  {% if recovery_codes %}
+  {{ recovery_macros.codes_scripts(
+       download_filename='recovery-codes-' ~ target_user.username ~ '.txt') }}
+  {% endif %}
+{% endblock %}

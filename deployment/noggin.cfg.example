@@ -124,5 +124,23 @@ CHAT_MATRIX_TO_ARGS = "web-instance[element.io]=app.element.io"
 # BASSET_URL = None
 # SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 
+# OTP Recovery Codes
+# Number of recovery codes to generate. Must not exceed the FreeIPA
+# ipatokenHOTPauthWindow (default: 10).
+# OTP_RECOVERY_CODE_COUNT = 10
+# Token description used to identify recovery tokens.
+# WARNING: Changing this value after recovery tokens have been created will
+# cause existing tokens to no longer be recognized as recovery tokens.
+# OTP_RECOVERY_DESCRIPTION = "Recovery codes"
+# Warn the user when this many or fewer recovery codes remain.
+# OTP_RECOVERY_LOW_THRESHOLD = 3
+# Auto-generate recovery codes when the user enrolls their first OTP token.
+# OTP_REQUIRE_RECOVERY_CODES = False
+# IPA role whose members may reset another user's OTP tokens and generate
+# recovery codes on their behalf. Set to None (default) to disable.
+# To set up: ipa role-add "OTP Recovery Admins" --desc="..."
+#            ipa role-add-member "OTP Recovery Admins" --users=helpdesk_user
+# OTP_ADMIN_RECOVERY_ROLE = "OTP Recovery Admins"
+
 # Set to True to enable Fedora Messaging integration
 # FEDORA_MESSAGING_ENABLED = True
