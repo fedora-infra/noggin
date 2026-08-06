@@ -20,10 +20,9 @@ class Audience(Enum):
     spam_check = "sc"
 
 
-def make_token(data: dict[str, Any], audience: Audience, ttl=None):
+def make_token(data: dict[str, Any], audience: Audience, ttl):
     data["aud"] = audience.value
-    if ttl is not None:
-        data["exp"] = datetime.utcnow() + timedelta(minutes=ttl)
+    data["exp"] = datetime.utcnow() + timedelta(minutes=ttl)
     token = jwt.encode(data, current_app.config["SECRET_KEY"], algorithm="HS256")
     return token
 

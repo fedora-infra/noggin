@@ -868,7 +868,11 @@ def test_no_direct_login(
 def test_spamcheck(client, dummy_stageuser, mocker, spamcheck_status, spamcheck_on):
     user = User(ipa_admin.stageuser_show("dummy")["result"])
     assert user.status_note != spamcheck_status
-    token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
+    token = make_token(
+        {"sub": "dummy"},
+        audience=Audience.spam_check,
+        ttl=current_app.config["SPAMCHECK_TOKEN_EXPIRATION"],
+    )
     with mailer.record_messages() as outbox:
         response = client.post(
             "/register/spamcheck-hook",
@@ -931,7 +935,7 @@ def test_spamcheck_expired_token(client, dummy_user, mocker, spamcheck_on):
 
 @pytest.mark.vcr()
 def test_spamcheck_invalid_token(client, dummy_user, mocker, spamcheck_on):
-    token = make_token({"sub": "dummy"}, audience=Audience.email_validation)
+    token = make_token({"sub": "dummy"}, audience=Audience.email_validation, ttl=10)
     response = client.post(
         "/register/spamcheck-hook",
         json={"token": token, "status": "active"},
@@ -942,7 +946,7 @@ def test_spamcheck_invalid_token(client, dummy_user, mocker, spamcheck_on):
 
 @pytest.mark.vcr()
 def test_spamcheck_wrong_status(client, dummy_user, mocker, spamcheck_on):
-    token = make_token({"sub": "dummy"}, audience=Audience.spam_check)
+    token = make_token({"sub": "dummy"}, audience=Audience.spam_check, ttl=10)
     response = client.post(
         "/register/spamcheck-hook",
         json={"token": token, "status": "this-is-wrong"},
