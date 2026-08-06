@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from enum import Enum
+from typing import Any
 
 import jwt
 from flask import current_app
@@ -19,7 +20,7 @@ class Audience(Enum):
     spam_check = "sc"
 
 
-def make_token(data, audience, ttl=None):
+def make_token(data: dict[str, Any], audience: Audience, ttl=None):
     data["aud"] = audience.value
     if ttl is not None:
         data["exp"] = datetime.utcnow() + timedelta(minutes=ttl)
@@ -27,7 +28,7 @@ def make_token(data, audience, ttl=None):
     return token
 
 
-def read_token(token, audience=None):
+def read_token(token: str, audience: Audience):
     return jwt.decode(
         token,
         current_app.config["SECRET_KEY"],
