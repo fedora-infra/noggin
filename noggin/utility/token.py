@@ -43,4 +43,5 @@ def make_password_change_token(user):
     return make_token(
         {"sub": user.username, "lpc": lpc},
         audience=Audience.password_reset,
+        ttl=current_app.config["PASSWORD_RESET_EXPIRATION"],
     )

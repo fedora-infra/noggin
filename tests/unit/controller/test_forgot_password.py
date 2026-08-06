@@ -35,6 +35,7 @@ def token_for_dummy_user(dummy_user):
     return make_token(
         {"sub": user.username, "lpc": user.last_password_change.isoformat()},
         audience=Audience.password_reset,
+        ttl=current_app.config["PASSWORD_RESET_EXPIRATION"],
     )
 
 
@@ -117,6 +118,7 @@ def test_ask_post(client, dummy_user, patched_lock, data):
     token_data = read_token(token, audience=Audience.password_reset)
     assert token_data.get("sub") == "dummy"
     assert "lpc" in token_data
+    assert "exp" in token_data
     # Lock activated
     patched_lock["store"].assert_called_once()
 
@@ -281,6 +283,25 @@ def test_change_too_old(client, token_for_dummy_user, patched_lock):
     patched_lock["valid_until"].return_value = passed_expiry
     result = client.get(f'/forgot-password/change?token={token_for_dummy_user}')
     patched_lock["delete"].assert_called_once()
+    assert_redirects_with_flash(
+        result,
+        expected_url="/forgot-password/ask",
+        expected_message="The token has expired, please request a new one.",
+        expected_category="warning",
+    )
+
+
+@pytest.mark.vcr()
+def test_change_token_too_old(client, dummy_user, patched_lock):
+    user = User(ipa_admin.user_show("dummy")["result"])
+    assert user.last_password_change is not None
+    token = make_token(
+        {"sub": user.username, "lpc": user.last_password_change.isoformat()},
+        audience=Audience.password_reset,
+        ttl=-1,
+    )
+    result = client.get(f'/forgot-password/change?token={token}')
+    patched_lock["delete"].assert_not_called()
     assert_redirects_with_flash(
         result,
         expected_url="/forgot-password/ask",

@@ -215,6 +215,9 @@ def forgot_password_change():
     except jwt.exceptions.DecodeError:
         flash(_("The token is invalid, please request a new one."), "warning")
         return redirect(url_for('.forgot_password_ask'))
+    except jwt.exceptions.ExpiredSignatureError:
+        flash(_("The token has expired, please request a new one."), "warning")
+        return redirect(url_for('.forgot_password_ask'))
     username = token_data["sub"]
     lock = PasswordResetLock(username)
     valid_until = lock.valid_until()
