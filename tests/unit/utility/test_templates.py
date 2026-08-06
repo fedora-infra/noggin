@@ -80,6 +80,13 @@ def test_format_nickname_no_matrixto_args(request_context):
         assert str(format_nickname(value)) == expected_html
 
 
+def test_format_nickname_web_url():
+    value = "https://example.com/user?a=1&b=2"
+    escaped_value = "https://example.com/user?a=1&amp;b=2"
+    expected_html = f'<a href="{value}">{escaped_value}</a>'
+    assert str(format_nickname(value)) == expected_html
+
+
 def test_format_nickname_invalid(request_context):
     with pytest.raises(ValueError) as e:
         format_nickname("invalid:/username")
@@ -164,4 +171,12 @@ def test_format_nickname_invalid_with_config(app, request_context, mocker):
 )
 def test_format_channel(request_context, value, expected):
     expected_html = '<a href="{href}" title="{title}">{name}</a>'.format(**expected)
+    assert str(format_channel(value)) == expected_html
+
+
+@pytest.mark.parametrize("scheme", ["http", "https"])
+def test_format_channel_web_url(scheme):
+    value = f"{scheme}://example.com/channel?a=1&b=2"
+    escaped_value = f"{scheme}://example.com/channel?a=1&amp;b=2"
+    expected_html = f'<a href="{value}">{escaped_value}</a>'
     assert str(format_channel(value)) == expected_html
