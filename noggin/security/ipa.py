@@ -56,6 +56,36 @@ class Client(IPAClient):
         except RequestException:
             raise BadRequest(message="Something went wrong trying to sync OTP token.")
 
+    def passkey_add(self, username, passkey_value):
+        """
+        Add a passkey to a user via the user_add_passkey IPA command.
+
+        :param username: the user to add the passkey to
+        :type username: string
+        :param passkey_value: the passkey mapping data
+        :type passkey_value: string
+        """
+        data = self._request(
+            'user_add_passkey', username, {'ipapasskey': [passkey_value]}
+        )
+        raise_on_failed(data['result'])
+        return data['result']
+
+    def passkey_del(self, username, passkey_value):
+        """
+        Remove a passkey from a user via the user_remove_passkey IPA command.
+
+        :param username: the user to remove the passkey from
+        :type username: string
+        :param passkey_value: the passkey mapping data to remove
+        :type passkey_value: string
+        """
+        data = self._request(
+            'user_remove_passkey', username, {'ipapasskey': [passkey_value]}
+        )
+        raise_on_failed(data['result'])
+        return data['result']
+
     def fasagreement_find(self, **kwargs):
         """
         Search agreements
