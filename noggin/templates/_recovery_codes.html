@@ -1,13 +1,13 @@
 {% macro codes_grid(recovery_codes) %}
 <div class="row justify-content-center my-3">
   <div class="col-md-10">
-    <div class="row">
+    <ol class="d-flex flex-row flex-wrap">
       {% for code in recovery_codes %}
-        <div class="col-6 mb-2">
-          <code class="fs-5" data-role="recovery-code">{{ loop.index }}. {{ code }}</code>
-        </div>
+        <li class="col-6 mb-2">
+          <code class="fs-5" data-role="recovery-code">{{ code }}</code>
+        </li>
       {% endfor %}
-    </div>
+    </ol>
   </div>
 </div>
 <div class="d-flex gap-2 mb-3">
