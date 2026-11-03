@@ -549,108 +549,18 @@ Testing Plan
 Unit tests
 ----------
 
-Tests in ``tests/unit/controller/test_user_otp.py`` (64 tests). The
-recovery code tests use mock-based testing (``mock_ipa_client`` fixture)
-instead of VCR cassettes, since VCR cassettes are fragile and these
-routes were added after the original cassettes were recorded. Admin
-reset tests use a ``mock_admin_client`` fixture that provides a
-logged-in admin session with mocked IPA admin.
+General tests in ``tests/unit/controller/test_user_otp.py``. The recovery
+code tests use mock-based testing (``mock_ipa_client`` fixture) instead
+of VCR cassettes, since VCR cassettes are fragile and these routes were
+added after the original cassettes were recorded. Admin reset tests use
+a ``mock_admin_client`` fixture that provides a logged-in admin session
+with mocked IPA admin.
 
-**Core recovery code tests:**
+Recovery code utility tests in ``tests/unit/utility/test_recovery_codes.py``,
 
-- **test_recovery_generate**: Create a recovery token, verify 10
-  eight-digit codes are returned in the response.
-- **test_recovery_generate_requires_auth**: Wrong password returns
-  error.
-- **test_recovery_generate_duplicate**: Generating codes when a
-  recovery token already exists returns an error.
-- **test_recovery_regenerate**: Old token is deleted and a new one
-  is created with fresh codes.
-- **test_recovery_regenerate_last_token**: Graceful handling when the
-  recovery token is the user's last active token.
-- **test_recovery_generate_ipa_error**: IPA error during token
-  creation shows error message.
-- **test_recovery_token_hidden_from_list**: Recovery token does not
-  appear in the regular token list.
-- **test_recovery_token_no_rename**: Recovery token has no rename
-  button in the UI.
-- **test_rename_to_recovery_description_blocked**: Renaming a regular
-  token to the recovery description is rejected.
-- **test_recovery_generate_no_permission**: Cannot generate codes for
-  another user.
-- **test_recovery_regenerate_no_permission**: Cannot regenerate codes
-  for another user.
-- **test_recovery_generate_invalid_form**: Missing password returns
-  validation error.
-- **test_recovery_regenerate_delete_error**: IPA error during old
-  recovery token deletion shows error message.
-- **test_recovery_generate_cache_control**: Recovery code response
-  includes ``Cache-Control: no-store``.
 
-**Remaining code count tests:**
-
-- **test_recovery_codes_remaining_display**: Remaining count and green
-  "Active" badge appear when codes are available.
-- **test_recovery_codes_remaining_low_warning**: Warning badge appears
-  when codes are at or below the low threshold.
-- **test_recovery_codes_remaining_zero**: Danger badge and
-  "Exhausted" message when all codes are used.
-
-**Mandatory recovery code tests:**
-
-- **test_mandatory_recovery_codes_on_first_token**: With
-  ``OTP_REQUIRE_RECOVERY_CODES`` enabled, confirming the first OTP
-  token auto-generates recovery codes and shows the modal.
-- **test_mandatory_recovery_codes_disabled**: With the config
-  disabled (default), first token redirect with warning flash.
-- **test_mandatory_recovery_codes_already_has_recovery**: No
-  auto-generation when the user already has a recovery token.
-- **test_mandatory_recovery_codes_auto_generate_failure**: IPA error
-  during auto-generation falls back to a warning flash.
-
-**Admin-assisted recovery tests:**
-
-- **test_admin_otp_reset_get**: Admin sees the confirmation page with
-  the target user's current tokens listed.
-- **test_admin_otp_reset_post**: Admin resets OTP, all tokens deleted,
-  recovery codes generated and shown.
-- **test_admin_otp_reset_no_permission**: Non-admin user is rejected.
-- **test_admin_otp_reset_self**: Admin trying to reset their own OTP
-  redirects to normal OTP settings.
-- **test_admin_otp_reset_disabled**: Route returns 404 when
-  ``OTP_ADMIN_RECOVERY_ROLE`` is None.
-- **test_admin_otp_reset_requires_auth**: Wrong password is rejected.
-- **test_admin_otp_reset_delete_error**: IPA error during token
-  deletion shows error message.
-- **test_admin_otp_reset_create_error**: IPA error during recovery
-  token creation shows error message.
-- **test_admin_otp_reset_cache_control**: Admin reset response includes
-  ``Cache-Control: no-store``.
-- **test_admin_otp_reset_group_membership**: Admin with role membership
-  via group (not direct user membership) can access OTP reset.
-
-**Recovery code utility tests** (``tests/unit/utility/test_recovery_codes.py``,
-8 tests):
-
-- **test_generate_recovery_codes_count**: Verify correct number of
-  codes are generated.
-- **test_generate_recovery_codes_eight_digits**: Verify each code is
-  exactly 8 digits.
-- **test_generate_recovery_codes_match_hotp**: Verify codes match
-  ``pyotp.HOTP`` output.
-- **test_generate_recovery_codes_uses_sha256**: Verify SHA-256
-  algorithm is used.
-- **test_generate_recovery_codes_zero_count**: Zero count returns
-  empty list.
-- **test_generate_recovery_codes_negative_count**: Negative count
-  returns empty list.
-- **test_generate_recovery_codes_unique**: Verify all codes in a set
-  are unique.
-- **test_generate_recovery_codes_custom_count**: Custom count
-  generates correct number of codes.
-
-Integration tests
------------------
+TODO: Integration tests
+-----------------------
 
 Against a live FreeIPA instance:
 

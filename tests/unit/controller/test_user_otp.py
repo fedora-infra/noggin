@@ -775,6 +775,8 @@ def test_user_settings_otp_rename_invalid_form(client, logged_in_dummy_user_with
         expected_message="Token must not be empty",
         expected_category="danger",
     )
+
+
 # --- Recovery code tests ---
 
 # These tests mock the IPA client directly instead of using VCR cassettes,
@@ -829,12 +831,17 @@ def mock_ipa_client(client, app):
     mock_client.user_find.return_value = {"result": [DUMMY_USER_RESULT]}
     mock_client.user_show.return_value = {"result": DUMMY_USER_RESULT}
 
-    with mock.patch("noggin.utility.controllers.maybe_ipa_session", return_value=mock_client):
+    with mock.patch(
+        "noggin.utility.controllers.maybe_ipa_session", return_value=mock_client
+    ):
         with client.session_transaction() as sess:
             sess["noggin_session"] = b"fake-session"
             sess["noggin_username"] = "dummy"
             sess["noggin_ipa_server_hostname"] = "ipa.tinystage.test"
         yield mock_client
+
+
+# --- Core recovery code tests ---
 
 
 def test_recovery_generate(client, mock_ipa_client):
@@ -1109,6 +1116,9 @@ def test_rename_to_recovery_description_blocked(client, mock_ipa_client):
     ipa.otptoken_mod.assert_not_called()
 
 
+# --- Remaining code count tests ---
+
+
 def test_recovery_codes_remaining_display(client, mock_ipa_client):
     """Verify the remaining code count appears on the OTP page"""
     ipa = mock_ipa_client
@@ -1223,9 +1233,7 @@ def test_mandatory_recovery_codes_on_first_token(
     assert len(codes) == 10
 
 
-def test_mandatory_recovery_codes_disabled(
-    client, mock_ipa_client, app, monkeypatch
-):
+def test_mandatory_recovery_codes_disabled(client, mock_ipa_client, app, monkeypatch):
     """With OTP_REQUIRE_RECOVERY_CODES disabled (default), confirming the first
     token redirects with a warning flash instead of auto-generating codes."""
     ipa = mock_ipa_client
@@ -1275,7 +1283,6 @@ def test_mandatory_recovery_codes_already_has_recovery(
     messages = get_flashed_messages(with_categories=True)
     assert len(messages) == 1
     assert messages[0] == ("success", "The token has been created.")
-
 
 
 def test_recovery_regenerate_delete_error(client, mock_ipa_client):
@@ -1407,12 +1414,12 @@ def mock_admin_client(client, app):
         }
     }
 
-    with mock.patch(
-        "noggin.utility.controllers.maybe_ipa_session", return_value=mock_client
-    ), mock.patch(
-        "noggin.utility.controllers.ipa_admin", mock_admin
-    ), mock.patch(
-        "noggin.controller.user_otp.ipa_admin", mock_admin
+    with (
+        mock.patch(
+            "noggin.utility.controllers.maybe_ipa_session", return_value=mock_client
+        ),
+        mock.patch("noggin.utility.controllers.ipa_admin", mock_admin),
+        mock.patch("noggin.controller.user_otp.ipa_admin", mock_admin),
     ):
         with client.session_transaction() as sess:
             sess["noggin_session"] = b"fake-session"
@@ -1439,9 +1446,7 @@ def test_admin_otp_reset_get(client, mock_admin_client):
     token_list = page.select("ul.list-group li.list-group-item")
     assert len(token_list) == 1
     assert "dummy's token" in token_list[0].get_text()
-    form = page.select_one(
-        "form[action='/user/dummy/settings/otp/admin-reset']"
-    )
+    form = page.select_one("form[action='/user/dummy/settings/otp/admin-reset']")
     assert form is not None
 
 
@@ -1604,7 +1609,6 @@ def test_admin_otp_reset_create_error(client, mock_admin_client):
     assert "/user/dummy/settings/otp/admin-reset" in result.headers["Location"]
 
 
-
 def test_admin_otp_reset_cache_control(client, mock_admin_client):
     """Admin recovery code responses include Cache-Control: no-store."""
     ipa, admin = mock_admin_client
@@ -1642,10 +1646,12 @@ def test_admin_otp_reset_group_membership(client, mock_admin_client):
     """Admin with role membership via group can access OTP reset."""
     ipa, admin = mock_admin_client
     ipa.user_find.return_value = {
-        "result": [{
-            **ADMIN_USER_RESULT,
-            "memberof_group": ["otp-admins-group", "other-group"],
-        }]
+        "result": [
+            {
+                **ADMIN_USER_RESULT,
+                "memberof_group": ["otp-admins-group", "other-group"],
+            }
+        ]
     }
     admin.role_show.return_value = {
         "result": {
