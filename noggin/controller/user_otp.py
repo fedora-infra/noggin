@@ -298,8 +298,21 @@ def user_settings_otp_rename(ipa, username):
 
     if form.validate_on_submit():
         token_id = form.token.data
-        recovery_desc = current_app.config.get('OTP_RECOVERY_DESCRIPTION')
-        if recovery_desc and form.description.data == recovery_desc:
+        # Ensure someone can not overwrite a recovery token nor create
+        # an unexpected recovery token in place of what is expected in IPA.
+        # To ensure no shenanigans we are forcing the check with all lower case.
+        recovery_desc = current_app.config.get('OTP_RECOVERY_DESCRIPTION').lower()
+
+        token_info = OTPToken(
+            ipa.otptoken_show(
+                a_ipatokenuniqueid=token_id, o_all=False
+            )["result"]
+        )
+
+        if recovery_desc and (
+            form.description.data.lower() == recovery_desc or
+            token_info.description.lower() == recovery_desc
+        ):
             flash(
                 _('This description is reserved for recovery codes.'),
                 'warning',
