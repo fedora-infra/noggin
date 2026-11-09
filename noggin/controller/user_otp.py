@@ -155,7 +155,6 @@ def user_settings_otp(ipa, username):
         flash(_('Could not load OTP tokens.'), 'danger')
         return redirect(url_for('.user', username=username))
     tokens, recovery_token = _categorize_tokens(all_tokens)
-    recovery_codes_remaining = _get_recovery_codes_remaining(ipa, recovery_token)
 
     return render_template(
         'user-settings-otp.html',
@@ -167,7 +166,6 @@ def user_settings_otp(ipa, username):
         activetab="otp",
         tokens=tokens,
         recovery_token=recovery_token,
-        recovery_codes_remaining=recovery_codes_remaining,
         otp_uri=otp_uri,
     )
 
@@ -196,6 +194,14 @@ def _create_recovery_token(ipa_client, username):
 
 
 def _get_recovery_codes_remaining(ipa, recovery_token):
+    """
+    Returns the amount of codes remaining in the recovery token.
+
+    .. TODO::
+       Decide how to wire this up or remove it if not required. Currently,
+       the IPA client must have admin access to read ipatokenhotpcounter which
+       populates `counter` in the OTPToken representation.
+    """
     if not recovery_token:
         return None
     try:
@@ -261,7 +267,6 @@ def _render_otp_page(ipa, username, recovery_codes=None, user=None):
             flash(_('Could not load OTP tokens.'), 'danger')
             return redirect(url_for('.user', username=username))
     tokens, recovery_token = _categorize_tokens(all_tokens)
-    recovery_codes_remaining = _get_recovery_codes_remaining(ipa, recovery_token)
 
     response = make_response(
         render_template(
@@ -276,7 +281,6 @@ def _render_otp_page(ipa, username, recovery_codes=None, user=None):
             activetab="otp",
             tokens=tokens,
             recovery_token=recovery_token,
-            recovery_codes_remaining=recovery_codes_remaining,
             otp_uri=None,
             recovery_codes=recovery_codes,
         )

@@ -166,24 +166,8 @@
     </p>
     {% if recovery_token %}
       <p>
-        {% if recovery_codes_remaining is not none and recovery_codes_remaining == 0 %}
-          <span class="badge bg-danger">{{ _("Exhausted") }}</span>
-          {{ _("All recovery codes have been used. Regenerate now to stay protected.") }}
-        {% elif recovery_codes_remaining is not none and recovery_codes_remaining <= config.OTP_RECOVERY_LOW_THRESHOLD %}
-          <span class="badge bg-warning text-dark">{{ _("Low") }}</span>
-          {{ ngettext("%(num)d recovery code remaining.",
-                      "%(num)d recovery codes remaining.",
-                      recovery_codes_remaining) }}
-          {{ _("Consider regenerating your recovery codes.") }}
-        {% elif recovery_codes_remaining is not none %}
-          <span class="badge bg-success">{{ _("Active") }}</span>
-          {{ ngettext("%(num)d recovery code remaining.",
-                      "%(num)d recovery codes remaining.",
-                      recovery_codes_remaining) }}
-        {% else %}
           <span class="badge bg-success">{{ _("Active") }}</span>
           {{ _("You have recovery codes set up.") }}
-        {% endif %}
       </p>
       <form action="{{ url_for('.user_settings_otp_recovery_regenerate',
                        username=current_user.username) }}"
