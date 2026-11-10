@@ -8,6 +8,7 @@ def dummy_user_dict():
         'displayname': ['Dummy User'],
         'dn': 'uid=dummy,cn=users,cn=accounts,dc=example,dc=com',
         'fascreationtime': [{'__datetime__': '20200122162312Z'}],
+        'fascodebergusername': ['dummy'],
         'fasgithubusername': ['dummy'],
         'fasgitlabusername': ['dummy'],
         'fasgpgkeyid': ['dummy-gpg-key-id-1', 'dummy-gpg-key-id-2'],
