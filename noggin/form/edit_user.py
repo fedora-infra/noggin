@@ -245,6 +245,13 @@ class UserSettingsOTPNameChange(BaseForm):
     )
 
 
+class UserSettingsPasskeyDeleteForm(BaseForm):
+    passkey = HiddenField(
+        'passkey',
+        validators=[DataRequired(message=_('Passkey must not be empty'))],
+    )
+
+
 class UserSettingsAgreementSign(BaseForm):
     agreement = HiddenField(
         'agreement', validators=[DataRequired(message=_('Agreement must not be empty'))]

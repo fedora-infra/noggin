@@ -1,0 +1,55 @@
+{% extends "user-settings.html" %}
+
+{% import '_form_macros.html' as macros %}
+{% block settings_content %}
+
+<div class="card-body">
+  <div class="d-flex">
+    <h5 id="pageheading">{{ _("Passkeys") }}</h5>
+    <button id="register-passkey-btn" class="btn btn-primary btn-sm ms-auto">
+      {{_("Add Passkey")}}
+    </button>
+  </div>
+  <div id="passkey-error" class="alert alert-danger mt-2 d-none"></div>
+  <div id="passkey-success" class="alert alert-success mt-2 d-none"></div>
+</div>
+
+<div class="list-group list-group-flush mt-3">
+{% for pk in passkeys %}
+  <div class="list-group-item">
+    <div class="row align-items-center">
+      <div class="col">
+        <div class="font-weight-bold">
+          <i class="fa fa-key"></i> {{ pk.key_type }}
+        </div>
+        <div class="text-monospace small text-muted">{{ pk.display_id }}...</div>
+      </div>
+      <div class="col-auto">
+        <form action="{{ url_for('.user_settings_passkey_delete', username=user.username) }}" method="post" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-sm btn-outline-danger" name="passkey" value="{{ pk.raw_value }}">
+            <i class="fa fa-trash"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="list-group-item text-center bg-light text-muted font-weight-bold">
+    <div>{{ _("You have no passkeys") }}</div>
+    <div><small>{{ _("Add a passkey to enable passwordless authentication.") }}</small></div>
+  </div>
+{% endfor %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script nonce="{{ csp_nonce() }}">
+    var PASSKEY_REGISTER_BEGIN_URL = {{ url_for('.user_settings_passkey_register_begin', username=user.username)|tojson }};
+    var PASSKEY_REGISTER_COMPLETE_URL = {{ url_for('.user_settings_passkey_register_complete', username=user.username)|tojson }};
+    var CSRF_TOKEN = {{ csrf_token()|tojson }};
+  </script>
+  <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/passkey.js') }}"></script>
+{% endblock %}

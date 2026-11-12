@@ -60,6 +60,15 @@ ACCEPT_IMAGES_FROM = []
 BASSET_URL = None
 SPAMCHECK_TOKEN_EXPIRATION = 60  # in minutes
 
+PASSKEY_RP_NAME = "Noggin"
+PASSKEY_RP_ID = None  # Falls back to FREEIPA_DOMAIN when None
+MAX_PASSKEYS = 20
+
+KERBEROS_KEYTAB = None  # Path to service keytab; None disables passkey login
+KERBEROS_SERVICE_PRINCIPAL = None  # e.g. "HTTP/noggin.example.com@EXAMPLE.COM"
+
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB; Flask default is unlimited
+
 # Cheat code to toggle Fedora Messaging support
 FEDORA_MESSAGING_ENABLED = False
 

@@ -45,4 +45,12 @@
     <script async defer type="module" nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/altcha-2.2.4/altcha.min.js') }}"></script>
     <script async defer nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/altcha-2.2.4/worker.min.js') }}"></script>
     <script async defer nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/vendor/altcha-2.2.4/i18n-all.min.js') }}"></script>
+    {% if passkey_login_enabled %}
+    <script nonce="{{ csp_nonce() }}">
+      var PASSKEY_LOGIN_BEGIN_URL = {{ url_for('.passkey_login_begin')|tojson }};
+      var PASSKEY_LOGIN_COMPLETE_URL = {{ url_for('.passkey_login_complete')|tojson }};
+      var PASSKEY_LOGIN_CSRF_TOKEN = {{ csrf_token()|tojson }};
+    </script>
+    <script nonce="{{ csp_nonce() }}" src="{{ url_for('static', filename='js/passkey-login.js') }}"></script>
+    {% endif %}
 {% endblock %}
