@@ -18,6 +18,7 @@ def test_user(dummy_user_dict):
     assert user.ircnick == ["dummy", "dummy_"]
     assert user.gpgkeys == ["dummy-gpg-key-id-1", "dummy-gpg-key-id-2"]
     assert user.groups == ["ipausers"]
+    assert user.codeberg == "dummy"
     assert user.github == "dummy"
     assert user.gitlab == "dummy"
     assert user.rhbz_mail == "dummy@unit.tests"

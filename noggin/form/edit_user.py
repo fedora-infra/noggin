@@ -120,6 +120,10 @@ class UserSettingsProfileForm(BaseForm):
         ],
     )
 
+    codeberg = StringField(
+        _('Codeberg Username'), validators=[Optional()], filters=[strip_at]
+    )
+
     github = StringField(
         _('GitHub Username'), validators=[Optional()], filters=[strip_at]
     )
