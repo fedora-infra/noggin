@@ -31,3 +31,14 @@
     {{ login_form.submit(color="primary", tabindex="4") }}
   </div>
 </form>
+{% if passkey_login_enabled %}
+<div class="card-body pt-0">
+  <div class="d-flex align-items-center my-2">
+    <hr class="flex-grow-1"><span class="mx-2 text-muted small">{{ _("or") }}</span><hr class="flex-grow-1">
+  </div>
+  <button id="passkey-login-btn" class="btn btn-outline-secondary w-100" disabled>
+    <i class="fa fa-key"></i> {{ _("Sign in with Passkey") }}
+  </button>
+  <div id="passkey-login-error" class="alert alert-danger mt-2 d-none"></div>
+</div>
+{% endif %}

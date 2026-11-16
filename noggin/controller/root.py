@@ -56,6 +56,7 @@ def root():
         register_form=register_form,
         login_form=login_form,
         activetab=activetab,
+        passkey_login_enabled=bool(current_app.config.get('KERBEROS_KEYTAB')),
     )
 
 

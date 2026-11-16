@@ -445,6 +445,190 @@ privileges need to be set up in the FreeIPA server.
         ipa role-add-member "Stage User Managers" --groups sysadmin
 
 
+Configuring FreeIPA server for passkey management
+--------------------------------------------------
+
+Noggin supports self-service management of FIDO2 passkeys. This requires
+FreeIPA v4.10 or later, which includes built-in passkey support and the
+self-service permission allowing users to manage their own passkeys.
+
+.. note::
+    The WebAuthn Relying Party (RP) ID is always the IPA primary domain
+    (the Kerberos realm in lowercase). Noggin must be served from a hostname
+    under this domain for passkey registration to work. For example, if the
+    IPA domain is ``example.com``, Noggin can be at ``accounts.example.com``
+    but not at ``accounts.otherdomain.com``.
+
+
+Configuring Kerberos delegation for passkey login
+-------------------------------------------------
+
+Noggin can authenticate users via their registered passkeys. After verifying
+the WebAuthn assertion locally, Noggin uses Kerberos protocol transition
+(S4U2Self) to obtain a Kerberos ticket on behalf of the user, and then
+constrained delegation (S4U2Proxy) to present that ticket to the FreeIPA HTTP
+service and obtain a user-scoped IPA session.
+
+This requires:
+
+- FreeIPA v4.10 or later
+- A Kerberos service principal and keytab for the Noggin service
+- Constrained delegation rules allowing Noggin's service principal to
+  delegate to the IPA HTTP service on behalf of users
+
+.. note::
+    FreeIPA's HTTP service principal is already configured with general
+    constrained delegation rules (the built-in ``ipa-http-delegation`` rule
+    that allows the IPA HTTP service to delegate to the LDAP service). Because
+    a Kerberos principal can only be governed by one delegation mechanism,
+    Resource-Based Constrained Delegation (RBCD) cannot be used to target the
+    IPA HTTP service. The setup below uses general constrained delegation
+    instead. For background on both mechanisms, see the
+    `FreeIPA RBCD design document <https://freeipa.readthedocs.io/en/latest/designs/rbcd.html>`_
+    and the
+    `Service Constraint Delegation design <https://www.freeipa.org/page/V4/Service_Constraint_Delegation>`_.
+
+
+Step 1: Create a service principal for Noggin
+`````````````````````````````````````````````
+
+The Noggin host must be enrolled as a FreeIPA client (via ``ipa-client-install``)
+or at least have a host entry in IPA. Then create an HTTP service principal for
+Noggin:
+
+.. code-block:: shell
+
+    kinit admin
+    ipa service-add HTTP/noggin.example.com
+
+Replace ``noggin.example.com`` with the fully qualified hostname where Noggin
+is deployed.
+
+
+Step 2: Obtain a keytab
+```````````````````````
+
+Generate a keytab file for the Noggin service principal. Run this command on
+the Noggin host (or any enrolled host, then copy the keytab securely):
+
+.. code-block:: shell
+
+    ipa-getkeytab -s ipa.example.com -p HTTP/noggin.example.com \
+        -k /etc/noggin/noggin.keytab
+
+Set appropriate permissions so only the Noggin service user can read the
+keytab:
+
+.. code-block:: shell
+
+    chown noggin:noggin /etc/noggin/noggin.keytab
+    chmod 600 /etc/noggin/noggin.keytab
+
+
+Step 3: Enable protocol transition (ok-to-auth-as-delegate)
+````````````````````````````````````````````````````````````
+
+For S4U2Self to produce forwardable tickets (required for the subsequent
+S4U2Proxy step), the Noggin service principal must have the
+``ok-to-auth-as-delegate`` flag set:
+
+.. code-block:: shell
+
+    ipa service-mod HTTP/noggin.example.com --ok-to-auth-as-delegate=True
+
+This flag allows the Noggin service to perform protocol transition — that is,
+to obtain a Kerberos ticket on behalf of a user who authenticated via a
+non-Kerberos mechanism (in this case, a passkey/WebAuthn assertion).
+
+.. warning::
+    The ``ok-to-auth-as-delegate`` flag grants the service the ability to
+    impersonate any user to itself. The constrained delegation rules (next
+    step) limit which target services the impersonated tickets can be
+    forwarded to.
+
+
+Step 4: Configure constrained delegation rules
+````````````````````````````````````````````````
+
+Create a constrained delegation target containing the IPA HTTP service
+principal, and a rule that grants the Noggin service principal permission
+to delegate to that target.
+
+First, create a delegation target for the IPA HTTP service:
+
+.. code-block:: shell
+
+    ipa servicedelegationtarget-add noggin-delegation-targets
+
+Add the IPA HTTP service principal(s) to the target. If you have multiple
+IPA servers, add all of them:
+
+.. code-block:: shell
+
+    ipa servicedelegationtarget-add-member noggin-delegation-targets \
+        --principals=HTTP/ipa.example.com@EXAMPLE.COM
+
+    # If you have multiple IPA servers:
+    ipa servicedelegationtarget-add-member noggin-delegation-targets \
+        --principals=HTTP/ipa2.example.com@EXAMPLE.COM
+
+Next, create a delegation rule and add the Noggin service as a member:
+
+.. code-block:: shell
+
+    ipa servicedelegationrule-add noggin-delegation
+    ipa servicedelegationrule-add-member noggin-delegation \
+        --principals=HTTP/noggin.example.com@EXAMPLE.COM
+
+Finally, link the rule to the target:
+
+.. code-block:: shell
+
+    ipa servicedelegationrule-add-target noggin-delegation \
+        --servicedelegationtargets=noggin-delegation-targets
+
+Replace ``EXAMPLE.COM`` with your Kerberos realm (typically the IPA domain
+in uppercase).
+
+
+Step 5: Verify the delegation setup
+````````````````````````````````````
+
+Test the full S4U2Self + S4U2Proxy chain from the Noggin host using ``kvno``:
+
+.. code-block:: shell
+
+    kvno -U testuser -k /etc/noggin/noggin.keytab \
+         -P HTTP/noggin.example.com HTTP/ipa.example.com
+
+This command authenticates as the Noggin service using its keytab, obtains
+an S4U2Self ticket on behalf of ``testuser``, and uses S4U2Proxy to request
+a ticket to the IPA HTTP service. A successful result confirms the delegation
+chain is correctly configured.
+
+
+Step 6: Configure Noggin
+`````````````````````````
+
+Add the following settings to Noggin's configuration file
+(``/etc/noggin/noggin.cfg``):
+
+.. code-block:: python
+
+    # Path to the Kerberos keytab for the Noggin service.
+    # Setting this enables passkey login.
+    KERBEROS_KEYTAB = '/etc/noggin/noggin.keytab'
+
+    # The service principal in the keytab. If not set, Noggin derives it
+    # from the machine's FQDN and the FREEIPA_DOMAIN setting:
+    # HTTP/<fqdn>@<FREEIPA_DOMAIN in uppercase>
+    # KERBEROS_SERVICE_PRINCIPAL = 'HTTP/noggin.example.com@EXAMPLE.COM'
+
+When ``KERBEROS_KEYTAB`` is set to a valid keytab path, the passkey login
+button appears on the login page. When it is ``None`` (the default), passkey
+login is disabled and the button is hidden.
+
+
 Discretion
 ==========
 
