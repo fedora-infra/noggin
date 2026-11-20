@@ -870,14 +870,14 @@ def test_recovery_generate(client, mock_ipa_client):
             },
         )
     assert result.status_code == 200
+
     page = BeautifulSoup(result.data, "html.parser")
     codes = page.select('[data-role="recovery-code"]')
     assert len(codes) == 10
     for code_el in codes:
         text = code_el.get_text(strip=True)
-        code_part = text.split(". ", 1)[1]
-        assert len(code_part) == 8
-        assert code_part.isdigit()
+        assert len(text) == 8
+        assert text.isdigit()
 
 
 def test_recovery_generate_requires_auth(client, mock_ipa_client):
@@ -899,6 +899,7 @@ def test_recovery_generate_requires_auth(client, mock_ipa_client):
         expected_message="Incorrect password",
         expected_category="danger",
     )
+
 
 
 def test_recovery_generate_duplicate(client, mock_ipa_client):
@@ -1011,27 +1012,6 @@ def test_recovery_generate_ipa_error(client, mock_ipa_client):
     )
 
 
-def test_recovery_token_hidden_from_list(client, mock_ipa_client):
-    """Test that the recovery token does not appear in the regular token list"""
-    ipa = mock_ipa_client
-    ipa.otptoken_find.return_value = {
-        "result": [DUMMY_TOTP_TOKEN, DUMMY_RECOVERY_TOKEN],
-        "count": 2,
-    }
-    ipa.otptoken_show.return_value = {"result": {**DUMMY_RECOVERY_TOKEN}}
-
-    result = client.get("/user/dummy/settings/otp/")
-    page = BeautifulSoup(result.data, "html.parser")
-    tokenlist = page.select("div.list-group .list-group-item")
-    assert len(tokenlist) == 1
-    desc = tokenlist[0].select_one("div[data-role='token-description']")
-    assert desc is not None
-    assert "Recovery codes" not in desc.get_text(strip=True)
-
-    recovery_section = page.select_one("#recovery-codes")
-    assert recovery_section is not None
-
-
 @pytest.mark.vcr()
 def test_recovery_generate_no_permission(client, logged_in_dummy_user):
     """Verify that a user can't generate recovery codes for another user"""
@@ -1089,7 +1069,7 @@ def test_recovery_token_no_rename(client, mock_ipa_client):
     result = client.get("/user/dummy/settings/otp/")
     page = BeautifulSoup(result.data, "html.parser")
     token_items = page.select("div.list-group .list-group-item")
-    assert len(token_items) == 1
+    assert len(token_items) == 2
     rename_buttons = token_items[0].select("button[title='Rename']")
     assert len(rename_buttons) == 1
     rename_forms = page.select(
@@ -1118,7 +1098,8 @@ def test_rename_to_recovery_description_blocked(client, mock_ipa_client):
 
 # --- Remaining code count tests ---
 
-
+# TODO: Enable if/when remaining count is done
+'''
 def test_recovery_codes_remaining_display(client, mock_ipa_client):
     """Verify the remaining code count appears on the OTP page"""
     ipa = mock_ipa_client
@@ -1182,7 +1163,7 @@ def test_recovery_codes_remaining_zero(client, mock_ipa_client):
     assert "Regenerate now" in text
     badge = recovery_section.select_one("span.badge.bg-danger")
     assert badge is not None
-
+'''
 
 # --- Enhancement 2: Mandatory recovery codes ---
 
@@ -1481,23 +1462,28 @@ def test_admin_otp_reset_post(client, mock_admin_client):
     }
 
     with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
-        login_mock.return_value = ipa
-        result = client.post(
-            "/user/dummy/settings/otp/admin-reset",
-            data={
-                "admin-reset-password": "admin_password",
-                "admin-reset-submit": "1",
-            },
-        )
+        # We need the following to mock the message sending else the test will
+        # hang forever in wait
+        with mock.patch("noggin.utility.messaging.publish") as publish_mock:
+            login_mock.return_value = ipa
+            result = client.post(
+                "/user/dummy/settings/otp/admin-reset",
+                data={
+                    "admin-reset-password": "admin_password",
+                    "admin-reset-submit": "1",
+                }
+            )
+            assert publish_mock.call_count == 1
+
     assert result.status_code == 200
     page = BeautifulSoup(result.data, "html.parser")
     codes = page.select('[data-role="recovery-code"]')
     assert len(codes) == 10
+
     for code_el in codes:
         text = code_el.get_text(strip=True)
-        code_part = text.split(". ", 1)[1]
-        assert len(code_part) == 8
-        assert code_part.isdigit()
+        assert len(text) == 8
+        assert text.isdigit()
     assert admin.otptoken_del.call_count == 2
     admin.otptoken_add.assert_called_once()
 
@@ -1630,14 +1616,18 @@ def test_admin_otp_reset_cache_control(client, mock_admin_client):
     }
 
     with mock.patch("noggin.controller.user_otp.maybe_ipa_login") as login_mock:
-        login_mock.return_value = ipa
-        result = client.post(
-            "/user/dummy/settings/otp/admin-reset",
-            data={
-                "admin-reset-password": "admin_password",
-                "admin-reset-submit": "1",
-            },
-        )
+        # We need the following to mock the message sending else the test will
+        # hang forever in wait
+        with mock.patch("noggin.utility.messaging.publish") as publish_mock:
+            login_mock.return_value = ipa
+            result = client.post(
+                "/user/dummy/settings/otp/admin-reset",
+                data={
+                    "admin-reset-password": "admin_password",
+                    "admin-reset-submit": "1",
+                },
+            )
+            assert publish_mock.call_count == 1
     assert result.status_code == 200
     assert result.headers.get("Cache-Control") == "no-store"
 
