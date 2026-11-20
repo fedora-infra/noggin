@@ -310,8 +310,8 @@ def user_settings_otp_rename(ipa, username):
         )
 
         if recovery_desc and (
-            form.description.data.lower() == recovery_desc or
-            token_info.description.lower() == recovery_desc
+            (form.description.data or "").lower() == recovery_desc or
+            (token_info.description or "").lower() == recovery_desc
         ):
             flash(
                 _('This description is reserved for recovery codes.'),
@@ -341,6 +341,44 @@ def user_settings_otp_rename(ipa, username):
     return redirect(url_for('.user_settings_otp', username=username))
 
 
+def _can_disable_or_delete_token(token_q, username, message):
+    """
+    We must not allow the user to have ONLY a recovery token active.
+
+    :param token_q: The token uniqueid that is in question
+    :type token_q: str
+    :param username: The username for the user which is used to look up all tokens
+    :type username: str
+    :param message: The FreeIPA BadRequest exception raised if disable/delete isn't allowed
+    :type message: str
+
+    :raises python_freeipa.exceptions.BadRequest: Caught later for blocking the action
+    """
+    # Get all the token information available for the user in a list
+    all_tokens = [
+        OTPToken(t)
+        for t in ipa_admin.otptoken_find(
+            o_ipatokenowner=username
+        )["result"]
+    ]
+
+    error = python_freeipa.exceptions.BadRequest(message=message)
+    tokens, recovery_token = _categorize_tokens(all_tokens)
+
+    # It's possible the user may not have a recovery token, hence the getattr->None
+    if token_q != getattr(recovery_token, "uniqueid", None):
+        if len(tokens) <= 1:  # One (or less?) tokens, no, can't disable/delete
+            raise error
+        else:
+            for one_token in tokens:  # For each token..
+                if one_token.uniqueid != token_q:  # ..that isn't the requested token
+                    if one_token.disabled is False:
+                        # If at least one other token is NOT disabled the user may
+                        # disable the current token ....
+                        return
+            # .... otherwise we fail closed
+            raise error
+
 @bp.route('/user/<username>/settings/otp/disable/', methods=['POST'])
 @with_ipa()
 @require_self
@@ -349,7 +387,9 @@ def user_settings_otp_disable(ipa, username):
 
     if form.validate_on_submit():
         token = form.token.data
+
         try:
+            _can_disable_or_delete_token(token, username, "Server is unwilling to perform: Can't disable last active token")
             ipa.otptoken_mod(a_ipatokenuniqueid=token, o_ipatokendisabled=True)
         except python_freeipa.exceptions.BadRequest as e:
             if (
@@ -410,6 +450,7 @@ def user_settings_otp_delete(ipa, username):
     if form.validate_on_submit():
         token = form.token.data
         try:
+            _can_disable_or_delete_token(token, username, "Server is unwilling to perform: Can't delete last active token")
             ipa.otptoken_del(a_ipatokenuniqueid=token)
         except python_freeipa.exceptions.BadRequest as e:
             if (
@@ -458,6 +499,7 @@ def user_settings_otp_recovery_generate(ipa, username):
             )
             flash(_('Cannot create recovery codes.'), 'danger')
             return redirect(url_for('.user_settings_otp', username=username))
+
         if existing['count'] > 0:
             flash(
                 _('You already have recovery codes. Regenerate them instead.'),

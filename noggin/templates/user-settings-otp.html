@@ -160,14 +160,7 @@
       <div class="col">
         <div data-role="token-description" class="font-weight-bold otp-description">
           {{recovery_token.description if recovery_token.description else _('(no name)')}}
-          <button class="btn btn-sm btn-outline-secondary ms-1" title="{{ _('Rename') }}"><i class="fa fa-edit"></i></button>
-        </div>
-        <div class="otp-rename-form d-none">
-          <form action="{{ url_for('.user_settings_otp_rename', username=current_user.username) }}" method="post" class="d-inline">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <input type="text" class="form-control form-control-sm me-1" name="description" value="{{recovery_token.description if recovery_token.description}}" />
-            <button type="submit" class="btn btn-sm btn-primary" name="token" value="{{ recovery_token.uniqueid }}">{{ _("Rename") }}</button>
-          </form>
+
         </div>
         <div class="text-monospace">{{recovery_token.uniqueid}}</div>
       </div>
