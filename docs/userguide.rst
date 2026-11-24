@@ -122,6 +122,66 @@ Next time you log in to Noggin, you will need to enter in your password followed
 chosen authenticator app.
 
 
+What are recovery codes?
+************************
+Recovery codes are single-use backup codes that let you sign in if you lose access to your
+authenticator device (phone loss, factory reset, hardware failure). Each code can only be used
+once. After using a code, it is permanently consumed and cannot be reused.
+
+Recovery codes work anywhere your OTP code works: Noggin login, SSH, FreeIPA WebUI, and any
+other service that authenticates through FreeIPA.
+
+
+How do I generate recovery codes?
+**********************************
+After adding your first OTP token, go to the **OTP** tab in your user settings. Scroll down
+to the **Recovery Codes** section and enter your current password (and OTP code if you already
+have a token). Click **Generate Recovery Codes**.
+
+A set of 10 eight-digit recovery codes will be displayed. **Save these codes in a safe place** —
+you will not be able to see them again. Store them in a password manager or print them and keep
+them in a secure location.
+
+You must check the "I have saved my recovery codes" checkbox before dismissing the codes dialog.
+
+.. note::
+    If your Noggin deployment has ``OTP_REQUIRE_RECOVERY_CODES`` enabled, recovery codes will
+    be generated automatically when you enroll your first OTP token. You will be shown the codes
+    immediately and must acknowledge saving them before continuing.
+
+
+How do I use a recovery code?
+*****************************
+When prompted for your OTP code during login, enter one of your recovery codes instead of the
+code from your authenticator app. Each recovery code is 8 digits (compared to the usual 6-digit
+OTP code).
+
+After a recovery code is used, it is consumed and cannot be used again. You can check how many
+codes remain on the **OTP** tab of your user settings — the remaining count is shown with a
+colored status badge:
+
+- **Active** (green): You have a comfortable number of codes remaining.
+- **Low** (orange): You are running low on codes. Consider regenerating.
+- **Exhausted** (red): All codes have been used. Regenerate immediately.
+
+
+How do I regenerate recovery codes?
+************************************
+If you have used some or all of your recovery codes, or if you believe they may have been
+compromised, you can regenerate them. Go to the **OTP** tab in your user settings, scroll to
+the **Recovery Codes** section, enter your password and OTP code, and click
+**Regenerate Recovery Codes**.
+
+This permanently invalidates all previous recovery codes and generates a fresh set of 10 codes.
+Save the new codes in a safe place.
+
+
+What happens if I lose my authenticator and have no recovery codes?
+*******************************************************************
+If you have lost your authenticator device and never generated recovery codes (or have used all
+of them), you will need to contact your system administrator. If your Noggin deployment has
+admin-assisted OTP recovery enabled, an authorized administrator can reset your OTP tokens and
+provide you with temporary recovery codes to regain access to your account.
 
 
 

@@ -14,7 +14,7 @@
     <div class="mb-0">
       {{ macros.with_errors(login_form.otp, class="validate",
       placeholder="One-Time Password (if you have one)", tabindex="3",
-      autocomplete="off", label=False, pattern="\\d{6}") }}
+      autocomplete="off", label=False, pattern="\\d{6,8}") }}
     </div>
     <div class="mb-0 text-end">
     {% if lost_otp_token is not defined %}
