@@ -30,7 +30,12 @@ from noggin.representation.otptoken import OTPToken
 from noggin.representation.user import User
 from noggin.security.ipa import maybe_ipa_login
 from noggin.utility import messaging
-from noggin.utility.controllers import require_otp_admin, require_self, user_or_404, with_ipa
+from noggin.utility.controllers import (
+    require_otp_admin,
+    require_self,
+    user_or_404,
+    with_ipa,
+)
 from noggin.utility.recovery_codes import generate_recovery_codes
 from noggin_messages import UserUpdateV1
 
@@ -86,29 +91,20 @@ def user_settings_otp(ipa, username):
             flash(_('The token has been created.'), "success")
             # Check if the user should generate recovery codes
             try:
-                all_user_tokens = ipa.otptoken_find(
-                    o_ipatokenowner=username
-                )["result"]
+                all_user_tokens = ipa.otptoken_find(o_ipatokenowner=username)["result"]
             except python_freeipa.exceptions.FreeIPAError:
                 current_app.logger.warning(
-                    'Failed to check recovery tokens for user %s '
-                    'after OTP creation',
+                    'Failed to check recovery tokens for user %s ' 'after OTP creation',
                     username,
                 )
-                return redirect(
-                    url_for('.user_settings_otp', username=username)
-                )
+                return redirect(url_for('.user_settings_otp', username=username))
             desc = current_app.config['OTP_RECOVERY_DESCRIPTION']
-            has_recovery = any(
-                OTPToken(t).is_recovery(desc) for t in all_user_tokens
-            )
+            has_recovery = any(OTPToken(t).is_recovery(desc) for t in all_user_tokens)
             if not has_recovery:
                 if current_app.config.get('OTP_REQUIRE_RECOVERY_CODES'):
                     try:
                         codes, _token_id = _create_recovery_token(ipa, username)
-                        return _render_otp_page(
-                            ipa, username, recovery_codes=codes
-                        )
+                        return _render_otp_page(ipa, username, recovery_codes=codes)
                     except python_freeipa.exceptions.FreeIPAError as e:
                         current_app.logger.error(
                             f'Error auto-creating recovery codes for '
@@ -119,9 +115,7 @@ def user_settings_otp(ipa, username):
                         _(
                             '<a href="%(url)s">Generate recovery codes</a> '
                             'now to avoid being locked out.',
-                            url=url_for(
-                                '.user_settings_otp', username=username
-                            )
+                            url=url_for('.user_settings_otp', username=username)
                             + '#recovery-codes',
                         )
                     ),
@@ -145,13 +139,10 @@ def user_settings_otp(ipa, username):
     # List existing tokens, separating recovery tokens from regular ones
     try:
         all_tokens = [
-            OTPToken(t)
-            for t in ipa.otptoken_find(o_ipatokenowner=username)["result"]
+            OTPToken(t) for t in ipa.otptoken_find(o_ipatokenowner=username)["result"]
         ]
     except python_freeipa.exceptions.FreeIPAError:
-        current_app.logger.error(
-            'Failed to list OTP tokens for user %s', username
-        )
+        current_app.logger.error('Failed to list OTP tokens for user %s', username)
         flash(_('Could not load OTP tokens.'), 'danger')
         return redirect(url_for('.user', username=username))
     tokens, recovery_token = _categorize_tokens(all_tokens)
@@ -206,9 +197,9 @@ def _get_recovery_codes_remaining(ipa, recovery_token):
         return None
     try:
         detail = OTPToken(
-            ipa.otptoken_show(
-                a_ipatokenuniqueid=recovery_token.uniqueid, o_all=True
-            )["result"]
+            ipa.otptoken_show(a_ipatokenuniqueid=recovery_token.uniqueid, o_all=True)[
+                "result"
+            ]
         )
         return max(
             0,
@@ -226,9 +217,7 @@ def _categorize_tokens(all_tokens):
     desc = current_app.config['OTP_RECOVERY_DESCRIPTION']
     tokens = [t for t in all_tokens if not t.is_recovery(desc)]
     tokens.sort(key=lambda t: t.description or "")
-    recovery_token = next(
-        (t for t in all_tokens if t.is_recovery(desc)), None
-    )
+    recovery_token = next((t for t in all_tokens if t.is_recovery(desc)), None)
     return tokens, recovery_token
 
 
@@ -249,18 +238,17 @@ def _render_otp_page(ipa, username, recovery_codes=None, user=None):
         user = User(user_or_404(ipa, username))
     try:
         all_tokens = [
-            OTPToken(t)
-            for t in ipa.otptoken_find(o_ipatokenowner=username)["result"]
+            OTPToken(t) for t in ipa.otptoken_find(o_ipatokenowner=username)["result"]
         ]
     except python_freeipa.exceptions.FreeIPAError:
-        current_app.logger.error(
-            'Failed to list OTP tokens for user %s', username
-        )
+        current_app.logger.error('Failed to list OTP tokens for user %s', username)
         if recovery_codes:
             all_tokens = []
             flash(
-                _('Could not load your token list, but your new recovery '
-                  'codes are shown below. Please save them now.'),
+                _(
+                    'Could not load your token list, but your new recovery '
+                    'codes are shown below. Please save them now.'
+                ),
                 'warning',
             )
         else:
@@ -304,14 +292,12 @@ def user_settings_otp_rename(ipa, username):
         recovery_desc = current_app.config.get('OTP_RECOVERY_DESCRIPTION').lower()
 
         token_info = OTPToken(
-            ipa.otptoken_show(
-                a_ipatokenuniqueid=token_id, o_all=False
-            )["result"]
+            ipa.otptoken_show(a_ipatokenuniqueid=token_id, o_all=False)["result"]
         )
 
         if recovery_desc and (
-            (form.description.data or "").lower() == recovery_desc or
-            (token_info.description or "").lower() == recovery_desc
+            (form.description.data or "").lower() == recovery_desc
+            or (token_info.description or "").lower() == recovery_desc
         ):
             flash(
                 _('This description is reserved for recovery codes.'),
@@ -356,10 +342,7 @@ def _can_disable_or_delete_token(token_q, username, message):
     """
     # Get all the token information available for the user in a list
     all_tokens = [
-        OTPToken(t)
-        for t in ipa_admin.otptoken_find(
-            o_ipatokenowner=username
-        )["result"]
+        OTPToken(t) for t in ipa_admin.otptoken_find(o_ipatokenowner=username)["result"]
     ]
 
     error = python_freeipa.exceptions.BadRequest(message=message)
@@ -379,6 +362,7 @@ def _can_disable_or_delete_token(token_q, username, message):
             # .... otherwise we fail closed
             raise error
 
+
 @bp.route('/user/<username>/settings/otp/disable/', methods=['POST'])
 @with_ipa()
 @require_self
@@ -389,7 +373,11 @@ def user_settings_otp_disable(ipa, username):
         token = form.token.data
 
         try:
-            _can_disable_or_delete_token(token, username, "Server is unwilling to perform: Can't disable last active token")
+            _can_disable_or_delete_token(
+                token,
+                username,
+                "Server is unwilling to perform: Can't disable last active token",
+            )
             ipa.otptoken_mod(a_ipatokenuniqueid=token, o_ipatokendisabled=True)
         except python_freeipa.exceptions.BadRequest as e:
             if (
@@ -450,7 +438,11 @@ def user_settings_otp_delete(ipa, username):
     if form.validate_on_submit():
         token = form.token.data
         try:
-            _can_disable_or_delete_token(token, username, "Server is unwilling to perform: Can't delete last active token")
+            _can_disable_or_delete_token(
+                token,
+                username,
+                "Server is unwilling to perform: Can't delete last active token",
+            )
             ipa.otptoken_del(a_ipatokenuniqueid=token)
         except python_freeipa.exceptions.BadRequest as e:
             if (
@@ -569,9 +561,7 @@ def user_settings_otp_recovery_regenerate(ipa, username):
                         e,
                     )
                     flash(_('Cannot regenerate recovery codes.'), 'danger')
-                return redirect(
-                    url_for('.user_settings_otp', username=username)
-                )
+                return redirect(url_for('.user_settings_otp', username=username))
             except python_freeipa.exceptions.FreeIPAError as e:
                 current_app.logger.error(
                     f'Error deleting old recovery token for user {username}: {e.message}'
@@ -660,9 +650,7 @@ def user_settings_otp_admin_reset(ipa, username):
                     url_for('.user_settings_otp_admin_reset', username=username)
                 )
 
-        current_app.logger.info(
-            f'Admin {admin_username} reset OTP for user {username}'
-        )
+        current_app.logger.info(f'Admin {admin_username} reset OTP for user {username}')
         messaging.publish(
             UserUpdateV1(
                 {
@@ -692,14 +680,10 @@ def user_settings_otp_admin_reset(ipa, username):
     try:
         all_tokens = [
             OTPToken(t)
-            for t in ipa_admin.otptoken_find(
-                o_ipatokenowner=username
-            )["result"]
+            for t in ipa_admin.otptoken_find(o_ipatokenowner=username)["result"]
         ]
     except python_freeipa.exceptions.FreeIPAError:
-        current_app.logger.error(
-            'Failed to list OTP tokens for user %s', username
-        )
+        current_app.logger.error('Failed to list OTP tokens for user %s', username)
         flash(_('Could not load OTP tokens.'), 'danger')
         return redirect(url_for('.user', username=username))
     tokens, recovery_token = _categorize_tokens(all_tokens)

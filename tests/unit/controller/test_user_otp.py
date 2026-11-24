@@ -901,7 +901,6 @@ def test_recovery_generate_requires_auth(client, mock_ipa_client):
     )
 
 
-
 def test_recovery_generate_duplicate(client, mock_ipa_client):
     """Test that generating codes when recovery token already exists returns error"""
     ipa = mock_ipa_client
@@ -1471,7 +1470,7 @@ def test_admin_otp_reset_post(client, mock_admin_client):
                 data={
                     "admin-reset-password": "admin_password",
                     "admin-reset-submit": "1",
-                }
+                },
             )
             assert publish_mock.call_count == 1
 
